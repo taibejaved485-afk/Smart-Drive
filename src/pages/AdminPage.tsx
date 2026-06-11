@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car } from 'lucide-react';
+import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface BlogPost {
@@ -105,6 +105,7 @@ export default function AdminPage() {
   // Driving Academy Bookings & Pending Onboard Cars State
   const [bookings, setBookings] = useState<any[]>([]);
   const [pendingCars, setPendingCars] = useState<any[]>([]);
+  const [verifiedToggles, setVerifiedToggles] = useState<Record<string, boolean>>({});
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -255,7 +256,7 @@ export default function AdminPage() {
   };
 
   // Handler methods for Car Owner Registration Onboarding
-  const approveCarOnboarding = (car: any) => {
+  const approveCarOnboarding = (car: any, isVerified: boolean = false) => {
     // 1. Save to approved cars
     const savedCustomApproved = localStorage.getItem('approved_cars');
     let customApprovedList = savedCustomApproved ? JSON.parse(savedCustomApproved) : [];
@@ -264,7 +265,8 @@ export default function AdminPage() {
     const vettedCar = {
       ...car,
       id: car.id || 'owner-' + Date.now().toString(),
-      status: 'Available' as const
+      status: 'Available' as const,
+      isVerified: isVerified
     };
     customApprovedList = [vettedCar, ...customApprovedList];
     localStorage.setItem('approved_cars', JSON.stringify(customApprovedList));
@@ -1202,11 +1204,71 @@ export default function AdminPage() {
 
         {activeTab === 'rentals' && (
           <div className="space-y-8 animate-fade-in">
+            {/* Standard Fleet Summary Metrics Blocks */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {/* Total Submissions Card */}
+              <div className="bg-slate-950 text-white rounded-2xl border border-slate-800 p-6 flex items-center justify-between shadow-2xl relative overflow-hidden">
+                <div className="absolute right-0 bottom-0 translate-x-4 translate-y-4 opacity-5 pointer-events-none">
+                  <Car className="w-28 h-28 text-white" />
+                </div>
+                <div className="space-y-1.5 relative z-10">
+                  <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block">Total Cars Submissions</span>
+                  <p className="text-4xl font-black font-mono text-amber-500">
+                    {pendingCars.length + rentalCars.length}
+                  </p>
+                  <p className="text-[10px] text-slate-500 font-semibold uppercase">
+                    Approved active: {rentalCars.length} in fleet
+                  </p>
+                </div>
+                <div className="p-3.5 bg-slate-900 border border-slate-800 rounded-xl text-amber-500 relative z-10 shrink-0 shadow-lg">
+                  <Car className="w-6 h-6" />
+                </div>
+              </div>
+
+              {/* Pending Approvals Card */}
+              <div className="bg-slate-950 text-white rounded-2xl border border-slate-800 p-6 flex items-center justify-between shadow-2xl relative overflow-hidden">
+                <div className="absolute right-0 bottom-0 translate-x-4 translate-y-4 opacity-5 pointer-events-none">
+                  <Sliders className="w-28 h-28 text-white" />
+                </div>
+                <div className="space-y-1.5 relative z-10">
+                  <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block">Pending Approvals</span>
+                  <p className="text-4xl font-black font-mono text-amber-500">
+                    {pendingCars.length}
+                  </p>
+                  <p className="text-[10px] text-slate-500 font-semibold uppercase">
+                    Awaiting manual vetting
+                  </p>
+                </div>
+                <div className="p-3.5 bg-slate-900 border border-slate-800 rounded-xl text-amber-500 relative z-10 shrink-0 shadow-lg">
+                  <Clock className="w-6 h-6 animate-pulse" />
+                </div>
+              </div>
+
+              {/* Lessons Booked Card */}
+              <div className="bg-slate-950 text-white rounded-2xl border border-slate-800 p-6 flex items-center justify-between shadow-2xl relative overflow-hidden">
+                <div className="absolute right-0 bottom-0 translate-x-4 translate-y-4 opacity-5 pointer-events-none">
+                  <CheckCircle2 className="w-28 h-28 text-white" />
+                </div>
+                <div className="space-y-1.5 relative z-10">
+                  <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block">Lessons / Driving Booked</span>
+                  <p className="text-4xl font-black font-mono text-amber-500">
+                    {bookings.length}
+                  </p>
+                  <p className="text-[10px] text-slate-500 font-semibold uppercase">
+                    Active academy enrollment
+                  </p>
+                </div>
+                <div className="p-3.5 bg-slate-900 border border-slate-800 rounded-xl text-amber-500 relative z-10 shrink-0 shadow-lg">
+                  <CheckCircle2 className="w-6 h-6" />
+                </div>
+              </div>
+            </div>
+
             {/* Owner Listings Pending Approval Section */}
             <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm p-6 sm:p-8 space-y-6">
               <div className="border-b border-gray-100 pb-5">
                 <h2 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
-                  <Car className="w-6 h-6 text-red-650 animate-bounce" />
+                  <Car className="w-6 h-6 text-red-650" />
                   Car Owner Submissions Awaiting Approval
                 </h2>
                 <p className="text-gray-500 text-xs sm:text-sm mt-1">
@@ -1227,6 +1289,7 @@ export default function AdminPage() {
               ) : (
                 <div className="grid md:grid-cols-2 gap-6">
                   {pendingCars.map((car) => {
+                    const isVerifiedChecked = verifiedToggles[car.id] !== false; // checked by default
                     return (
                       <div 
                         key={car.id} 
@@ -1246,7 +1309,7 @@ export default function AdminPage() {
                         <div className="flex-grow min-w-0 flex flex-col justify-between">
                           <div>
                             <div className="flex justify-between items-start gap-1">
-                              <h3 className="font-extrabold text-gray-950 text-sm sm:text-base leading-snug truncate">
+                              <h3 className="font-bold text-gray-950 text-sm sm:text-base leading-snug truncate">
                                 {car.name}
                               </h3>
                               <span className="text-xs font-black font-mono text-red-650 shrink-0">
@@ -1266,11 +1329,18 @@ export default function AdminPage() {
                               </span>
                             </div>
 
+                            {/* Retro Registration Badge */}
+                            <div className="mt-2.5">
+                              <span className="inline-flex items-center gap-1 bg-yellow-50 text-yellow-800 border border-yellow-200 text-[9px] font-mono font-bold px-2 py-0.5 rounded-md">
+                                REG: {car.registrationNumber || 'Pending verification'}
+                              </span>
+                            </div>
+
                             {/* Contact Landlord Profile Card */}
                             <div className="bg-white rounded-lg p-2.5 border mt-3 text-[11px] text-gray-500 space-y-1">
                               <p className="font-bold text-gray-800 flex items-center gap-1">
                                 <span>Owner:</span>
-                                <strong className="text-red-600">{car.ownerName || 'Unknown Owner'}</strong>
+                                <strong className="text-red-650">{car.ownerName || 'Unknown Owner'}</strong>
                               </p>
                               {car.ownerPhone && (
                                 <p className="font-mono">
@@ -1285,19 +1355,38 @@ export default function AdminPage() {
                             </div>
                           </div>
 
+                          {/* Verify Toggle Control */}
+                          <div className="mt-3.5 flex items-center gap-1.5 bg-emerald-50 border border-emerald-100 p-2 rounded-xl text-[11px] font-bold text-emerald-800">
+                            <input 
+                              type="checkbox" 
+                              id={`verify-${car.id}`}
+                              checked={isVerifiedChecked}
+                              onChange={() => {
+                                setVerifiedToggles(prev => ({
+                                  ...prev,
+                                  [car.id]: !isVerifiedChecked
+                                }));
+                              }}
+                              className="accent-emerald-600 shrink-0 cursor-pointer"
+                            />
+                            <label htmlFor={`verify-${car.id}`} className="cursor-pointer select-none">
+                              Mark Car as Verified (Green Shield badge on fleet list)
+                            </label>
+                          </div>
+
                           {/* Approval Actions */}
-                          <div className="flex gap-2.5 mt-4 pt-3 border-t border-gray-200/50">
+                          <div className="flex gap-2.5 mt-3 pt-3 border-t border-gray-100">
                             <button
                               type="button"
-                              onClick={() => approveCarOnboarding(car)}
-                              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-extrabold text-xs uppercase tracking-wider py-2 rounded-xl transition shadow-md shadow-green-150 cursor-pointer"
+                              onClick={() => approveCarOnboarding(car, isVerifiedChecked)}
+                              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-extrabold text-xs uppercase tracking-wider py-2.5 rounded-xl transition shadow-md shadow-green-150 cursor-pointer"
                             >
                               Approve Listing
                             </button>
                             <button
                               type="button"
                               onClick={() => rejectCarOnboarding(car.id)}
-                              className="flex-1 bg-red-50 hover:bg-red-100 text-red-750 font-extrabold text-xs uppercase tracking-wider py-2 rounded-xl border border-red-200 transition cursor-pointer"
+                              className="flex-1 bg-red-50 hover:bg-red-150 text-red-750 font-extrabold text-xs uppercase tracking-wider py-2.5 rounded-xl border border-red-200 transition cursor-pointer"
                             >
                               Reject &amp; Discard
                             </button>

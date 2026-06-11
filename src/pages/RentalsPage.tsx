@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import SEO from '../components/SEO';
-import { Car, MapPin, Calendar, Sliders, CheckCircle2, X, Phone, DollarSign, Clock, HelpCircle } from 'lucide-react';
+import EarningsCalculator from '../components/EarningsCalculator';
+import { Car, MapPin, Calendar, Sliders, CheckCircle2, ShieldCheck, X, Phone, DollarSign, Clock, HelpCircle, Filter, Sparkles } from 'lucide-react';
 
 interface RentalCar {
   id: string;
@@ -14,6 +15,13 @@ interface RentalCar {
   imageUrl: string;
   city: string; // e.g. Faisalabad, Lahore, Islamabad, Karachi
   status: 'Available' | 'Booked';
+  type: 'Economy' | 'Sedan' | 'Luxury';
+  isVerified?: boolean;
+  registrationNumber?: string;
+  ownerName?: string;
+  ownerPhone?: string;
+  fuelType?: string;
+  description?: string;
 }
 
 const DEFAULT_RENTAL_CARS: RentalCar[] = [
@@ -25,7 +33,10 @@ const DEFAULT_RENTAL_CARS: RentalCar[] = [
     rentUnit: 'Day',
     imageUrl: 'https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600',
     city: 'Faisalabad',
-    status: 'Available'
+    status: 'Available',
+    type: 'Sedan',
+    isVerified: true,
+    registrationNumber: 'FSD-22-6710'
   },
   {
     id: 'rc-2',
@@ -35,7 +46,10 @@ const DEFAULT_RENTAL_CARS: RentalCar[] = [
     rentUnit: 'Day',
     imageUrl: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=600',
     city: 'Lahore',
-    status: 'Available'
+    status: 'Available',
+    type: 'Sedan',
+    isVerified: true,
+    registrationNumber: 'LHR-21-9954'
   },
   {
     id: 'rc-3',
@@ -45,7 +59,10 @@ const DEFAULT_RENTAL_CARS: RentalCar[] = [
     rentUnit: 'Day',
     imageUrl: 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600',
     city: 'Islamabad',
-    status: 'Booked'
+    status: 'Booked',
+    type: 'Sedan',
+    isVerified: false,
+    registrationNumber: 'ICT-18-5002'
   },
   {
     id: 'rc-4',
@@ -55,7 +72,10 @@ const DEFAULT_RENTAL_CARS: RentalCar[] = [
     rentUnit: 'Day',
     imageUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=600',
     city: 'Karachi',
-    status: 'Available'
+    status: 'Available',
+    type: 'Economy',
+    isVerified: true,
+    registrationNumber: 'KHI-23-4551'
   },
   {
     id: 'rc-5',
@@ -65,7 +85,10 @@ const DEFAULT_RENTAL_CARS: RentalCar[] = [
     rentUnit: 'Day',
     imageUrl: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=600',
     city: 'Lahore',
-    status: 'Available'
+    status: 'Available',
+    type: 'Sedan',
+    isVerified: true,
+    registrationNumber: 'LHR-22-3810'
   },
   {
     id: 'rc-6',
@@ -75,13 +98,46 @@ const DEFAULT_RENTAL_CARS: RentalCar[] = [
     rentUnit: 'Day',
     imageUrl: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=600',
     city: 'Faisalabad',
-    status: 'Available'
+    status: 'Available',
+    type: 'Economy',
+    isVerified: false,
+    registrationNumber: 'FSD-19-4402'
+  },
+  {
+    id: 'rc-7',
+    name: 'Toyota Fortuner Legender',
+    transmission: 'Automatic',
+    rentPrice: '45,000',
+    rentUnit: 'Day',
+    imageUrl: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=600',
+    city: 'Islamabad',
+    status: 'Available',
+    type: 'Luxury',
+    isVerified: true,
+    registrationNumber: 'ICT-23-4001',
+    fuelType: 'Diesel'
+  },
+  {
+    id: 'rc-8',
+    name: 'Mercedes Benz C-Class',
+    transmission: 'Automatic',
+    rentPrice: '38,000',
+    rentUnit: 'Day',
+    imageUrl: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=600',
+    city: 'Lahore',
+    status: 'Available',
+    type: 'Luxury',
+    isVerified: true,
+    registrationNumber: 'LHR-22-9901',
+    fuelType: 'Petrol'
   }
 ];
 
 export default function RentalsPage() {
   const [cars, setCars] = useState<RentalCar[]>([]);
   const [selectedCity, setSelectedCity] = useState<string>('All Cities');
+  const [selectedVehicleType, setSelectedVehicleType] = useState<string>('All');
+  const [selectedTransmission, setSelectedTransmission] = useState<string>('All');
   
   // Booking modal state
   const [selectedCar, setSelectedCar] = useState<RentalCar | null>(null);
@@ -132,9 +188,29 @@ export default function RentalsPage() {
   // Unique list of cities for filtration tabs
   const cities = ['All Cities', 'Lahore', 'Faisalabad', 'Islamabad', 'Karachi'];
 
-  const filteredCars = selectedCity === 'All Cities' 
-    ? cars 
-    : cars.filter(car => car.city.toLowerCase() === selectedCity.toLowerCase());
+  const filteredCars = cars.filter(car => {
+    // 1. City Filter
+    const matchesCity = selectedCity === 'All Cities' || car.city.toLowerCase() === selectedCity.toLowerCase();
+    
+    // 2. Vehicle Type Filter
+    let carType = car.type;
+    if (!carType) {
+      const nameLower = car.name.toLowerCase();
+      if (nameLower.includes('fortuner') || nameLower.includes('audi') || nameLower.includes('mercedes') || nameLower.includes('c-class') || nameLower.includes('montero') || nameLower.includes('v8')) {
+        carType = 'Luxury';
+      } else if (nameLower.includes('swift') || nameLower.includes('city') || nameLower.includes('alto') || nameLower.includes('cultus') || nameLower.includes('picanto') || nameLower.includes('vitz')) {
+        carType = 'Economy';
+      } else {
+        carType = 'Sedan';
+      }
+    }
+    const matchesType = selectedVehicleType === 'All' || carType === selectedVehicleType;
+
+    // 3. Transmission Filter
+    const matchesTransmission = selectedTransmission === 'All' || car.transmission === selectedTransmission;
+
+    return matchesCity && matchesType && matchesTransmission;
+  });
 
   const handleOpenBooking = (car: RentalCar) => {
     setSelectedCar(car);
@@ -176,6 +252,13 @@ export default function RentalsPage() {
         setBookingSuccess(false);
       }, 4000);
     }
+  };
+
+  const getWhatsAppLink = (car: RentalCar) => {
+    const defaultPhone = '923097666928';
+    const ownerPhone = car.ownerPhone ? car.ownerPhone.replace(/[^0-9]/g, '') : defaultPhone;
+    const message = `Hi, I am interested in renting your ${car.name} listed on the Driving & Rental platform.`;
+    return `https://wa.me/${ownerPhone}?text=${encodeURIComponent(message)}`;
   };
 
   const schema = {
@@ -225,6 +308,11 @@ export default function RentalsPage() {
         </div>
       </section>
 
+      {/* INTERACTIVE INCOME CALCULATOR COMPONENT */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 mb-16 relative z-20 animate-fade-in">
+        <EarningsCalculator />
+      </div>
+
       {/* Main Content & Fleet Section */}
       <section className="py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -237,7 +325,7 @@ export default function RentalsPage() {
                 Select Your Desired Transmission & City
               </h2>
               <p className="text-gray-500 text-sm mt-3 leading-relaxed">
-                We provide premium manual and automatic cars equipped with robust dual auxiliary passenger controls upon practice request to ensure 100% security during your road session. Select your preferred location below.
+                We provide premium manual and automatic cars equipped with dual auxiliary passenger controls upon practice request to ensure 100% security during your road session. Select your preferred location below.
               </p>
             </div>
 
@@ -253,42 +341,110 @@ export default function RentalsPage() {
             </div>
           </div>
 
-          {/* City Filter System */}
-          <div className="mb-10">
-            <div className="flex flex-wrap items-center gap-2 border-b border-gray-200 pb-3">
-              <span className="text-xs font-black text-gray-400 uppercase tracking-widest mr-2">Filter Location:</span>
-              {cities.map((city) => {
-                const isActive = selectedCity.toLowerCase() === city.toLowerCase();
-                return (
+          {/* ADVANCED MULTI-CRITERIA FILTERS BAR */}
+          <div className="bg-white rounded-3xl border border-gray-200 p-6 sm:p-8 mb-10 shadow-sm relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 via-amber-500 to-amber-600" />
+            
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-150">
+              <div className="flex items-center gap-2">
+                <Filter className="w-5 h-5 text-gray-800" />
+                <h3 className="font-extrabold text-xs sm:text-sm text-gray-950 uppercase tracking-widest font-display">Fleet Filter Dashboard</h3>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-semibold text-gray-500 font-mono">
+                  Found <strong className="text-gray-950 font-black">{filteredCars.length}</strong> matches
+                </span>
+                {(selectedCity !== 'All Cities' || selectedVehicleType !== 'All' || selectedTransmission !== 'All') && (
                   <button
-                    key={city}
                     onClick={() => {
-                      setSelectedCity(city);
+                      setSelectedCity('All Cities');
+                      setSelectedVehicleType('All');
+                      setSelectedTransmission('All');
                     }}
-                    type="button"
-                    className={`px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all duration-350 cursor-pointer ${
-                      isActive 
-                        ? 'bg-red-650 text-white shadow-md shadow-red-100 scale-102' 
-                        : 'bg-white hover:bg-gray-100 text-gray-700 border border-gray-200'
-                    }`}
+                    className="text-xs font-bold text-red-600 hover:text-red-750 transition-all underline cursor-pointer"
                   >
-                    {city}
+                    Reset Filters
                   </button>
-                );
-              })}
+                )}
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-12 gap-6 items-end">
+              {/* 1. City Filter */}
+              <div className="md:col-span-4 space-y-2">
+                <label className="block text-[10px] font-black uppercase text-gray-400 tracking-widest">
+                  Hometown Hub (City)
+                </label>
+                <select
+                  value={selectedCity}
+                  onChange={(e) => setSelectedCity(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none bg-white transition text-xs sm:text-sm font-semibold text-gray-800 cursor-pointer"
+                >
+                  {cities.map((city) => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 2. Vehicle Class Tabs */}
+              <div className="md:col-span-5 space-y-2">
+                <label className="block text-[10px] font-black uppercase text-gray-400 tracking-widest">
+                  Vehicle Type Class
+                </label>
+                <div className="grid grid-cols-4 gap-1 p-1 bg-gray-100/80 rounded-xl border border-gray-200">
+                  {['All', 'Economy', 'Sedan', 'Luxury'].map((type) => {
+                    const isActive = selectedVehicleType === type;
+                    return (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => setSelectedVehicleType(type)}
+                        className={`py-1.5 px-1 rounded-lg text-[10px] sm:text-xs font-bold tracking-wide transition-all cursor-pointer truncate ${
+                          isActive
+                            ? 'bg-red-650 text-white shadow-sm font-extrabold'
+                            : 'text-gray-600 hover:text-gray-900 hover:bg-white/40'
+                        }`}
+                      >
+                        {type}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 3. Transmission Toggle Select */}
+              <div className="md:col-span-3 space-y-2">
+                <label className="block text-[10px] font-black uppercase text-gray-400 tracking-widest">
+                  Transmission Type
+                </label>
+                <div className="grid grid-cols-3 gap-1 p-1 bg-gray-100/80 rounded-xl border border-gray-200">
+                  {['All', 'Automatic', 'Manual'].map((trans) => {
+                    const isActive = selectedTransmission === trans;
+                    const label = trans === 'All' ? 'All' : trans === 'Automatic' ? 'Auto' : 'Manual';
+                    return (
+                      <button
+                        key={trans}
+                        type="button"
+                        onClick={() => setSelectedTransmission(trans)}
+                        className={`py-1.5 px-0.5 rounded-lg text-[10px] sm:text-xs font-bold tracking-wide transition-all cursor-pointer truncate ${
+                          isActive
+                            ? 'bg-red-650 text-white shadow-sm font-extrabold'
+                            : 'text-gray-600 hover:text-gray-900 hover:bg-white/40'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Cars Grid */}
-          <AnimatePresence mode="wait">
+          <div>
             {filteredCars.length === 0 ? (
-              <motion.div 
-                key="empty"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                className="bg-white rounded-3xl p-12 text-center border border-gray-200 shadow-sm max-w-xl mx-auto my-8"
-              >
+              <div className="bg-white rounded-3xl p-12 text-center border border-gray-200 shadow-sm max-w-xl mx-auto my-8">
                 <div className="w-16 h-16 bg-red-50 text-red-650 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Car className="w-8 h-8" />
                 </div>
@@ -311,26 +467,15 @@ export default function RentalsPage() {
                     <Phone className="w-3.5 h-3.5" /> Call Support
                   </a>
                 </div>
-              </motion.div>
+              </div>
             ) : (
-              <motion.div 
-                key="grid"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8"
-              >
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredCars.map((car) => {
                   const isAvailable = car.status === 'Available';
                   return (
-                    <motion.div
-                      layout
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      whileHover={{ y: -6 }}
-                      transition={{ duration: 0.25 }}
+                    <div
                       key={car.id}
-                      className="bg-white rounded-3xl overflow-hidden border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-lg transition-all flex flex-col justify-between"
+                      className="bg-white rounded-3xl overflow-hidden border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col justify-between opacity-100"
                     >
                       {/* Card Image and City Badge */}
                       <div className="relative aspect-[16/10] bg-gray-100 overflow-hidden group">
@@ -340,11 +485,17 @@ export default function RentalsPage() {
                           referrerPolicy="no-referrer"
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
-                        <div className="absolute top-4 left-4 flex gap-1.5 items-center">
-                          <span className="bg-gray-900/95 backdrop-blur-sm text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md flex items-center gap-1">
-                            <MapPin className="w-3 h-3 text-red-500" />
+                        <div className="absolute top-4 left-4 flex flex-col gap-1.5 items-start z-10">
+                          <span className="bg-gray-900/95 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow-md">
+                            <MapPin className="w-3.5 h-3.5 text-red-500" />
                             {car.city}
                           </span>
+                          {car.isVerified && (
+                            <span className="bg-emerald-600/95 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow-md border border-emerald-500/30">
+                              <ShieldCheck className="w-3.5 h-3.5 text-white stroke-[2.5]" />
+                              Verified Car
+                            </span>
+                          )}
                         </div>
                         <div className="absolute top-4 right-4">
                           <span className={`text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-md ${
@@ -366,47 +517,90 @@ export default function RentalsPage() {
                             </h3>
                           </div>
                           
-                          {/* Transmission features */}
-                          <div className="flex items-center gap-3 my-4 text-xs font-bold text-gray-500">
+                          {/* Transmission & Fuel Features */}
+                          <div className="flex flex-wrap items-center gap-2 my-3 text-xs font-bold text-gray-500">
                             <span className="bg-gray-100 px-2.5 py-1 rounded-md text-gray-700 font-semibold">
                               {car.transmission}
                             </span>
-                            <span className="flex items-center gap-1">
-                              <Sliders className="w-3.5 h-3.5 text-red-500" /> Dual-Control Compatible
+                            <span className="bg-gray-100 px-2.5 py-1 rounded-md text-gray-700 font-semibold">
+                              {car.fuelType || 'Petrol'}
                             </span>
+                            {(!car.ownerName || car.id.startsWith('rc-')) && (
+                              <span className="flex items-center gap-1 text-red-650 bg-red-50 px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase">
+                                <Sliders className="w-3.5 h-3.5 text-red-500" /> Dual-Control
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Vetted Landlord Reference details */}
+                          <div className="bg-gray-55 border border-gray-150 rounded-2xl p-3.5 my-3 flex flex-col gap-1.5">
+                            <div className="flex justify-between items-center text-xs">
+                              <span className="text-gray-400 font-medium">Vetted Owner:</span>
+                              <span className="font-extrabold text-gray-800 flex items-center gap-1">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-green-600 shrink-0" />
+                                {car.ownerName || 'Smart Drive Partner'}
+                              </span>
+                            </div>
+                            {car.ownerPhone && (
+                              <div className="flex justify-between items-center text-xs">
+                                <span className="text-gray-400 font-medium">Owner Phone:</span>
+                                <span className="font-mono font-bold text-gray-700 select-all">{car.ownerPhone}</span>
+                              </div>
+                            )}
+                            {car.description && (
+                              <p className="text-[11px] text-gray-500 line-clamp-2 leading-relaxed border-t border-gray-200/60 pt-1.5 mt-1">
+                                {car.description}
+                              </p>
+                            )}
                           </div>
                         </div>
 
                         {/* Rent Rates & Action */}
-                        <div className="pt-4 border-t border-gray-100 mt-4 flex items-center justify-between">
+                        <div className="pt-4 border-t border-gray-100 mt-4 flex items-center justify-between gap-2.5">
                           <div>
-                            <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest">Rental Cost</p>
-                            <p className="text-gray-950 font-black text-xl">
+                            <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest leading-none mb-1">Rental Cost</p>
+                            <p className="text-gray-950 font-black text-lg sm:text-xl font-mono leading-none">
                               PKR {car.rentPrice}
-                              <span className="text-xs font-bold text-gray-500"> / {car.rentUnit || 'Day'}</span>
+                              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mt-1">/ {car.rentUnit || 'Day'}</span>
                             </p>
                           </div>
 
-                          <button
-                            onClick={() => handleOpenBooking(car)}
-                            type="button"
-                            disabled={!isAvailable}
-                            className={`px-5 py-3 rounded-xl text-xs font-extrabold uppercase tracking-widest transition-all duration-300 cursor-pointer ${
-                              isAvailable 
-                                ? 'bg-red-650 text-white hover:bg-red-700 hover:shadow-md' 
-                                : 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
-                            }`}
-                          >
-                            {isAvailable ? 'Book Now' : 'Booked'}
-                          </button>
+                          <div className="flex items-center gap-2">
+                            {car.ownerPhone && (
+                              <a 
+                                href={getWhatsAppLink(car)} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="bg-[#25D366] hover:bg-[#128C7E] text-white p-2.5 rounded-xl flex items-center justify-center transition shadow-lg shadow-green-100 cursor-pointer sm:px-3.5"
+                                title="Contact owner on WhatsApp"
+                              >
+                                <svg className="w-4 h-4 fill-white text-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.455 5.703 1.455h.008c6.56 0 11.895-5.335 11.898-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                                </svg>
+                                <span className="hidden xs:inline-block font-extrabold text-[10px] ml-1 uppercase">WhatsApp</span>
+                              </a>
+                            )}
+                            <button
+                              onClick={() => handleOpenBooking(car)}
+                              type="button"
+                              disabled={!isAvailable}
+                              className={`px-4 py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-widest transition-all duration-300 cursor-pointer ${
+                                isAvailable 
+                                  ? 'bg-red-650 text-white hover:bg-red-700 hover:shadow-md shadow-sm' 
+                                  : 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                              }`}
+                            >
+                              {isAvailable ? 'Book' : 'Booked'}
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </motion.div>
+                    </div>
                   );
                 })}
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
+          </div>
           
           {/* Driving School Practices Note */}
           <div className="mt-16 bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-sm max-w-5xl mx-auto flex flex-col sm:flex-row items-center gap-6">

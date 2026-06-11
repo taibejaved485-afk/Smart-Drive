@@ -226,14 +226,9 @@ export default function RentalMarketplace() {
         </div>
 
         {/* Marketplace Dynamic Grid */}
-        <AnimatePresence mode="popLayout">
+        <div>
           {filteredCars.length === 0 ? (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="text-center py-20 bg-white rounded-3xl border border-gray-200 p-8 shadow-sm flex flex-col items-center justify-center max-w-lg mx-auto"
-            >
+            <div className="text-center py-20 bg-white rounded-3xl border border-gray-200 p-8 shadow-sm flex flex-col items-center justify-center max-w-lg mx-auto">
               <div className="w-16 h-16 bg-gray-50 text-gray-400 rounded-full flex items-center justify-center mb-4">
                 <Car className="w-8 h-8" />
               </div>
@@ -241,23 +236,15 @@ export default function RentalMarketplace() {
               <p className="text-xs text-gray-500 max-w-sm mx-auto mt-2 leading-relaxed">
                 Be the first to list and make money! Click "List Your Car / Earn with Us" in the menu above to onboard your vehicle for local customers.
               </p>
-            </motion.div>
+            </div>
           ) : (
-            <motion.div 
-              layout
-              className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
-            >
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {filteredCars.map(car => {
                 const waUrl = getWhatsAppLink(car);
                 return (
-                  <motion.div
-                    layout
+                  <div
                     key={car.id}
-                    initial={{ opacity: 0, scale: 0.96 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.96 }}
-                    transition={{ duration: 0.35 }}
-                    className="bg-white rounded-3xl overflow-hidden border border-gray-200/90 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 hover:border-gray-300 transition-all group flex flex-col h-full"
+                    className="bg-white rounded-3xl overflow-hidden border border-gray-200/90 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 hover:border-gray-300 transition-all duration-300 transform hover:-translate-y-1 group flex flex-col h-full opacity-100"
                   >
                     {/* Visual Media Header */}
                     <div className="relative h-48 sm:h-52 overflow-hidden bg-gray-100">
@@ -287,7 +274,7 @@ export default function RentalMarketplace() {
                     {/* Meta Body Content */}
                     <div className="p-5 sm:p-6 flex flex-col flex-grow">
                       <div className="flex justify-between items-start gap-2 mb-2">
-                        <h3 className="text-lg md:text-xl font-bold text-gray-900 tracking-tight leading-tight group-hover:text-red-600 transition">
+                        <h3 className="text-lg md:text-xl font-bold text-gray-900 tracking-tight leading-tight group-hover:text-red-650 transition">
                           {car.name}
                         </h3>
                       </div>
@@ -346,12 +333,12 @@ export default function RentalMarketplace() {
                         </a>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 );
               })}
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
+        </div>
       </div>
     </section>
   );

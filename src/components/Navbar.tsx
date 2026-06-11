@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, Phone, Car, Plus, Check, ChevronRight, User, ShieldCheck, Mail, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -36,6 +36,16 @@ export default function Navbar() {
   const [step, setStep] = useState(1);
   const [submissionComplete, setSubmissionComplete] = useState(false);
 
+  useEffect(() => {
+    const handleOpenListing = () => {
+      setStep(1);
+      setSubmissionComplete(false);
+      setShowListCarModal(true);
+    };
+    window.addEventListener('open-listing-modal', handleOpenListing);
+    return () => window.removeEventListener('open-listing-modal', handleOpenListing);
+  }, []);
+
   // Form State
   const [formData, setFormData] = useState({
     ownerName: '',
@@ -48,7 +58,8 @@ export default function Navbar() {
     rentPrice: '',
     rentUnit: 'Day' as 'Day' | 'Hour',
     description: '',
-    imageUrl: PRESET_CAR_IMAGE_OPTIONS[0].url
+    imageUrl: PRESET_CAR_IMAGE_OPTIONS[0].url,
+    registrationNumber: ''
   });
 
   const navLinks = [
@@ -69,6 +80,10 @@ export default function Navbar() {
     } else if (step === 2) {
       if (!formData.name.trim()) {
         alert('Please enter your Car Model Name and Year.');
+        return;
+      }
+      if (!formData.registrationNumber.trim()) {
+        alert('Please enter your Car Registration Number.');
         return;
       }
     }
@@ -120,6 +135,7 @@ export default function Navbar() {
       rentUnit: formData.rentUnit,
       description: formData.description || 'Stunning family car listed by registered local owner. Perfect mechanical running order, fully functional AC, comfortable layout.',
       imageUrl: formData.imageUrl,
+      registrationNumber: formData.registrationNumber,
       status: 'Available' as 'Available' | 'Booked',
       createdAt: new Date().toISOString(),
       approved: false
@@ -157,7 +173,8 @@ export default function Navbar() {
       rentPrice: '',
       rentUnit: 'Day',
       description: '',
-      imageUrl: PRESET_CAR_IMAGE_OPTIONS[0].url
+      imageUrl: PRESET_CAR_IMAGE_OPTIONS[0].url,
+      registrationNumber: ''
     });
   };
 
@@ -380,6 +397,18 @@ export default function Navbar() {
                             placeholder="e.g. Honda City Aspire 1.5 CVT (2023)" 
                             value={formData.name} 
                             onChange={e => setFormData({...formData, name: e.target.value})} 
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-1.5">Car Registration Number * <span className="text-gray-400 font-normal text-[10px] sm:text-xs tracking-normal">(internal verification only, e.g. FSD-21-3954)</span></label>
+                          <input 
+                            required
+                            type="text" 
+                            className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition text-sm font-mono font-bold" 
+                            placeholder="e.g. LED-19-4509" 
+                            value={formData.registrationNumber} 
+                            onChange={e => setFormData({...formData, registrationNumber: e.target.value})} 
                           />
                         </div>
 
