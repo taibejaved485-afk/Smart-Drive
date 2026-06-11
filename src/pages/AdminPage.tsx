@@ -85,7 +85,7 @@ export default function AdminPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [newPost, setNewPost] = useState({ title: '', author: '', imageUrl: '', content: '' });
-  const [activeTab, setActiveTab] = useState<'blogs' | 'dns' | 'rentals'>('blogs');
+  const [activeTab, setActiveTab] = useState<'bookings' | 'blogs' | 'dns' | 'rentals'>('bookings');
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const carFileInputRef = useRef<HTMLInputElement>(null);
@@ -102,18 +102,68 @@ export default function AdminPage() {
     status: 'Available' as 'Available' | 'Booked'
   });
 
+  // Driving Academy Bookings & Pending Onboard Cars State
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [pendingCars, setPendingCars] = useState<any[]>([]);
+
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
     setCopiedText(id);
     setTimeout(() => setCopiedText(null), 3000);
   };
 
-  useEffect(() => {
+  const loadDataAndSync = () => {
+    // 1. Load blog posts
     const savedPosts = localStorage.getItem('blogPosts');
     if (savedPosts) {
       setPosts(JSON.parse(savedPosts));
     }
 
+    // 2. Load Driving School Bookings
+    const savedBookings = localStorage.getItem('driving_bookings');
+    if (savedBookings) {
+      try {
+        setBookings(JSON.parse(savedBookings));
+      } catch (err) {
+        setBookings([]);
+      }
+    } else {
+      // Seed starter bookings
+      const starterBookings = [
+        {
+          id: 'bk-starter-1',
+          fullName: 'Zainab Bibi',
+          email: 'zainab.bibi@gmail.com',
+          subject: 'Female-Only Safe Road Course',
+          comments: 'Required female instructor for late evening timings near Jaranwala Road.',
+          status: 'Confirmed',
+          createdAt: new Date(Date.now() - 3600000 * 3).toISOString()
+        },
+        {
+          id: 'bk-starter-2',
+          fullName: 'Asim Siddique',
+          email: 'asim.sid@yahoo.com',
+          subject: 'Beginner Class Driving Session',
+          comments: 'Weekend slot preparation for LTV commercial test.',
+          status: 'Pending',
+          createdAt: new Date(Date.now() - 3600000 * 24).toISOString()
+        }
+      ];
+      setBookings(starterBookings);
+      localStorage.setItem('driving_bookings', JSON.stringify(starterBookings));
+    }
+
+    // 3. Load Pending submitted owner cars
+    const savedPending = localStorage.getItem('pending_cars');
+    if (savedPending) {
+      try {
+        setPendingCars(JSON.parse(savedPending));
+      } catch (err) {
+        setPendingCars([]);
+      }
+    }
+
+    // 4. Load approved active car fleet
     const savedCars = localStorage.getItem('rental_cars');
     if (savedCars) {
       try {
@@ -152,7 +202,7 @@ export default function AdminPage() {
           rentUnit: 'Day',
           imageUrl: 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600',
           city: 'Islamabad',
-          status: 'Booked'
+          status: 'Available'
         },
         {
           id: 'rc-4',
@@ -168,7 +218,86 @@ export default function AdminPage() {
       setRentalCars(initial);
       localStorage.setItem('rental_cars', JSON.stringify(initial));
     }
+  };
+
+  useEffect(() => {
+    loadDataAndSync();
+    
+    // Cross-tab real-time sync listeners
+    window.addEventListener('storage', loadDataAndSync);
+    window.addEventListener('driving_bookings_updated', loadDataAndSync);
+    window.addEventListener('pending_cars_updated', loadDataAndSync);
+    
+    return () => {
+      window.removeEventListener('storage', loadDataAndSync);
+      window.removeEventListener('driving_bookings_updated', loadDataAndSync);
+      window.removeEventListener('pending_cars_updated', loadDataAndSync);
+    };
   }, []);
+
+  // Handler methods for Driving Academy Bookings
+  const changeBookingStatus = (id: string, newStatus: string) => {
+    const updated = bookings.map(b => b.id === id ? { ...b, status: newStatus } : b);
+    setBookings(updated);
+    localStorage.setItem('driving_bookings', JSON.stringify(updated));
+    window.dispatchEvent(new Event('driving_bookings_updated'));
+    window.dispatchEvent(new Event('storage'));
+  };
+
+  const removeBookingRecord = (id: string) => {
+    if (window.confirm('Are you sure you want to permanently delete this scheduling request?')) {
+      const updated = bookings.filter(b => b.id !== id);
+      setBookings(updated);
+      localStorage.setItem('driving_bookings', JSON.stringify(updated));
+      window.dispatchEvent(new Event('driving_bookings_updated'));
+      window.dispatchEvent(new Event('storage'));
+    }
+  };
+
+  // Handler methods for Car Owner Registration Onboarding
+  const approveCarOnboarding = (car: any) => {
+    // 1. Save to approved cars
+    const savedCustomApproved = localStorage.getItem('approved_cars');
+    let customApprovedList = savedCustomApproved ? JSON.parse(savedCustomApproved) : [];
+    
+    // Add new vetted id active
+    const vettedCar = {
+      ...car,
+      id: car.id || 'owner-' + Date.now().toString(),
+      status: 'Available' as const
+    };
+    customApprovedList = [vettedCar, ...customApprovedList];
+    localStorage.setItem('approved_cars', JSON.stringify(customApprovedList));
+
+    // 2. Insert into basic rental_cars fleet too so it shows in fallback
+    const savedActiveFleet = localStorage.getItem('rental_cars');
+    let activeFleet = savedActiveFleet ? JSON.parse(savedActiveFleet) : [];
+    activeFleet = [vettedCar, ...activeFleet];
+    setRentalCars(activeFleet);
+    localStorage.setItem('rental_cars', JSON.stringify(activeFleet));
+
+    // 3. Delete from pending
+    const remainingPending = pendingCars.filter(c => c.id !== car.id);
+    setPendingCars(remainingPending);
+    localStorage.setItem('pending_cars', JSON.stringify(remainingPending));
+
+    // Despach storage updates
+    window.dispatchEvent(new Event('pending_cars_updated'));
+    window.dispatchEvent(new Event('storage'));
+    alert(`Vehicle registered and Approved! "${vettedCar.name}" is now live on the driving platform renting directory.`);
+  };
+
+  const rejectCarOnboarding = (id: string) => {
+    if (window.confirm('Reject and permanently discard this owner submission?')) {
+      const remainingPending = pendingCars.filter(c => c.id !== id);
+      setPendingCars(remainingPending);
+      localStorage.setItem('pending_cars', JSON.stringify(remainingPending));
+      
+      window.dispatchEvent(new Event('pending_cars_updated'));
+      window.dispatchEvent(new Event('storage'));
+    }
+  };
+
 
   const handleCarImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -411,45 +540,188 @@ export default function AdminPage() {
             <ArrowLeft className="w-4 h-4" /> Exit to Blogs Page
           </Link>
         </div>
-                {/* SEO, DNS & Rental Fleet Tabs */}
+        {/* DUAL-PURPOSE PLATFORM ADMIN STRIP TABS */}
         <div className="flex border-b border-gray-200 mb-8 overflow-x-auto scrollbar-none gap-2">
+          {/* Tab 1: Manage Driving School Bookings */}
+          <button 
+            type="button"
+            onClick={() => setActiveTab('bookings')}
+            className={`pb-4 px-6 font-bold text-sm tracking-wide transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'bookings' 
+                ? 'border-red-650 text-red-650 font-black' 
+                : 'border-transparent text-gray-500 hover:text-gray-800'
+            }`}
+          >
+            <FileSpreadsheet className="w-4 h-4 text-red-650" />
+            Academy Bookings (ڈرائیونگ بکنگز)
+          </button>
+
+          {/* Tab 2: Manage Blogs */}
           <button 
             type="button"
             onClick={() => setActiveTab('blogs')}
-            className={`pb-4 px-6 font-bold text-sm tracking-wide transition-all border-b-2 flex items-center gap-2 ${
+            className={`pb-4 px-6 font-bold text-sm tracking-wide transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
               activeTab === 'blogs' 
                 ? 'border-red-650 text-red-650 font-black' 
                 : 'border-transparent text-gray-500 hover:text-gray-800'
             }`}
           >
-            <FileSpreadsheet className="w-4 h-4" />
+            <Plus className="w-4 h-4 text-gray-550" />
             Blogs Manager (بلاگ مینیجر)
           </button>
-          <button 
-            type="button"
-            onClick={() => setActiveTab('dns')}
-            className={`pb-4 px-6 font-bold text-sm tracking-wide transition-all border-b-2 flex items-center gap-2 ${
-              activeTab === 'dns' 
-                ? 'border-red-650 text-red-650 font-black' 
-                : 'border-transparent text-gray-500 hover:text-gray-800'
-            }`}
-          >
-            <ShieldAlert className="w-4 h-4 text-red-650 animate-pulse" />
-            SEO & DNS Settings (DMARC-Detections)
-          </button>
+
+          {/* Tab 3: Approve / Manage Listed Cars */}
           <button 
             type="button"
             onClick={() => setActiveTab('rentals')}
-            className={`pb-4 px-6 font-bold text-sm tracking-wide transition-all border-b-2 flex items-center gap-2 ${
+            className={`pb-4 px-6 font-bold text-sm tracking-wide transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
               activeTab === 'rentals' 
                 ? 'border-red-650 text-red-650 font-black' 
                 : 'border-transparent text-gray-500 hover:text-gray-800'
             }`}
           >
-            <Car className="w-4 h-4 text-red-650" />
-            Manage Car Fleet (رینٹل کار مینیجر)
+            <Car className="w-4 h-4 text-red-650 animate-bounce" />
+            Car Listings Approval (رینٹل کار مینیجر)
+          </button>
+
+          {/* Tab 4: SEO & DNS Settings */}
+          <button 
+            type="button"
+            onClick={() => setActiveTab('dns')}
+            className={`pb-4 px-6 font-bold text-sm tracking-wide transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'dns' 
+                ? 'border-red-650 text-red-650 font-black' 
+                : 'border-transparent text-gray-500 hover:text-gray-800'
+            }`}
+          >
+            <ShieldAlert className="w-4 h-4 text-yellow-500 animate-pulse" />
+            SEO & DNS Settings (DMARC)
           </button>
         </div>
+
+        {activeTab === 'bookings' && (
+          <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm p-6 sm:p-8 animate-fade-in space-y-6">
+            <div className="border-b border-gray-100 pb-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+                    <FileSpreadsheet className="w-6 h-6 text-red-600" />
+                    Manage Driving Academy Bookings
+                  </h2>
+                  <p className="text-gray-500 text-xs sm:text-sm mt-1">
+                    Process incoming course submissions. Select appropriate status modes like Confirm, Reschedule, or Cancel to coordinate with driver education pupils.
+                  </p>
+                </div>
+                
+                {/* Metric Summary count badges */}
+                <div className="flex gap-2">
+                  <span className="bg-red-50 text-red-650 px-3.5 py-1.5 rounded-xl text-xs font-bold border border-red-100">
+                    Total: {bookings.length}
+                  </span>
+                  <span className="bg-yellow-50 text-yellow-700 px-3.5 py-1.5 rounded-xl text-xs font-bold border border-yellow-100">
+                    Awaiting: {bookings.filter(b => b.status === 'Pending').length}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {bookings.length === 0 ? (
+              <div className="text-center py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200 p-6">
+                <FileSpreadsheet className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <h3 className="font-extrabold text-gray-850">No Bookings Recorded Yet</h3>
+                <p className="text-xs text-gray-400 mt-1 max-w-sm mx-auto">
+                  When visitors submit timing slots via the academy "Get Appointments" form on the homepage, listings will populate right here.
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto rounded-xl border border-gray-150">
+                <table className="w-full text-left border-collapse text-xs sm:text-sm">
+                  <thead>
+                    <tr className="bg-gray-50 border-b border-gray-150 text-gray-400 font-extrabold uppercase tracking-wider text-[10px]">
+                      <th className="p-4">Student (طالب علم)</th>
+                      <th className="p-4">Course Requested</th>
+                      <th className="p-4">Date Submited</th>
+                      <th className="p-4">Academy Status</th>
+                      <th className="p-4 text-right">Actions (انتظامی کنٹرول)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-150">
+                    {bookings.map((b) => {
+                      const isPending = b.status === 'Pending';
+                      const isConfirmed = b.status === 'Confirmed';
+                      const isRescheduled = b.status === 'Rescheduled';
+                      const isCancelled = b.status === 'Cancelled';
+
+                      let badgeCol = 'bg-gray-100 text-gray-600';
+                      if (isConfirmed) badgeCol = 'bg-green-100 text-green-700 font-bold';
+                      if (isPending) badgeCol = 'bg-yellow-50 text-yellow-750 font-bold border border-yellow-100';
+                      if (isRescheduled) badgeCol = 'bg-blue-50 text-blue-700 font-bold border border-blue-100';
+                      if (isCancelled) badgeCol = 'bg-red-55 text-red-750 font-bold border border-red-150';
+
+                      return (
+                        <tr key={b.id} className="hover:bg-gray-50/60 transition-colors">
+                          <td className="p-4">
+                            <p className="font-extrabold text-gray-900">{b.fullName}</p>
+                            <p className="text-xs text-gray-400 font-mono select-all mt-0.5">{b.email}</p>
+                          </td>
+                          <td className="p-4">
+                            <span className="font-bold text-gray-800">{b.subject}</span>
+                            {b.comments && (
+                              <p className="text-[11px] text-gray-400 italic mt-1 line-clamp-1 max-w-xs" title={b.comments}>
+                                "{b.comments}"
+                              </p>
+                            )}
+                          </td>
+                          <td className="p-4 text-xs font-medium text-gray-400 font-mono">
+                            {b.createdAt ? new Date(b.createdAt).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }) : 'Today'}
+                          </td>
+                          <td className="p-4">
+                            <span className={`px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider ${badgeCol}`}>
+                              {b.status || 'Pending'}
+                            </span>
+                          </td>
+                          <td className="p-4 text-right">
+                            <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                              <button
+                                onClick={() => changeBookingStatus(b.id, 'Confirmed')}
+                                className="px-2.5 py-1 rounded bg-green-600 hover:bg-green-700 text-white font-extrabold text-[10px] uppercase tracking-wide cursor-pointer shadow-sm shadow-green-100"
+                                type="button"
+                              >
+                                Confirm
+                              </button>
+                              <button
+                                onClick={() => changeBookingStatus(b.id, 'Rescheduled')}
+                                className="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-[10px] uppercase tracking-wide cursor-pointer shadow-sm shadow-blue-100"
+                                type="button"
+                              >
+                                Reschedule
+                              </button>
+                              <button
+                                onClick={() => changeBookingStatus(b.id, 'Cancelled')}
+                                className="px-2.5 py-1 rounded bg-orange-600 hover:bg-orange-700 text-white font-extrabold text-[10px] uppercase tracking-wide cursor-pointer"
+                                type="button"
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                onClick={() => removeBookingRecord(b.id)}
+                                className="p-1.5 text-gray-400 hover:text-red-650 hover:bg-red-50 rounded transition cursor-pointer ml-1"
+                                title="Delete Booking Permanently"
+                                type="button"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
 
         {activeTab === 'blogs' && (
           <div className="grid lg:grid-cols-12 gap-8">
@@ -929,7 +1201,117 @@ export default function AdminPage() {
         )}
 
         {activeTab === 'rentals' && (
-          <div className="grid lg:grid-cols-12 gap-8 animate-fade-in">
+          <div className="space-y-8 animate-fade-in">
+            {/* Owner Listings Pending Approval Section */}
+            <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm p-6 sm:p-8 space-y-6">
+              <div className="border-b border-gray-100 pb-5">
+                <h2 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+                  <Car className="w-6 h-6 text-red-650 animate-bounce" />
+                  Car Owner Submissions Awaiting Approval
+                </h2>
+                <p className="text-gray-500 text-xs sm:text-sm mt-1">
+                  Vet pending peer-to-peer rental car registrations. Approving a vehicle instantly maps it into the dynamically updated local marketplace directory.
+                </p>
+              </div>
+
+              {pendingCars.length === 0 ? (
+                <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-155 select-none p-6">
+                  <div className="w-12 h-12 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Check className="w-6 h-6 stroke-[3]" />
+                  </div>
+                  <h3 className="font-extrabold text-gray-800 text-sm">All Owner Requests Processed</h3>
+                  <p className="text-xs text-gray-400 mt-1 max-w-sm mx-auto">
+                    No pending custom listings in localStorage queue. New customer peer onboarding requests will appear here dynamically.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid md:grid-cols-2 gap-6">
+                  {pendingCars.map((car) => {
+                    return (
+                      <div 
+                        key={car.id} 
+                        className="bg-gray-50 border border-gray-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row gap-4 relative overflow-hidden group hover:border-gray-300 transition hover:shadow-md"
+                      >
+                        {/* Visual Asset */}
+                        <div className="w-full sm:w-28 h-20 sm:h-24 rounded-xl overflow-hidden bg-white shrink-0 border relative">
+                          <img 
+                            src={car.imageUrl || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=300'} 
+                            alt={car.name} 
+                            className="w-full h-full object-cover"
+                            referrerPolicy="no-referrer"
+                          />
+                        </div>
+
+                        {/* Specs & Owner Profile Details */}
+                        <div className="flex-grow min-w-0 flex flex-col justify-between">
+                          <div>
+                            <div className="flex justify-between items-start gap-1">
+                              <h3 className="font-extrabold text-gray-950 text-sm sm:text-base leading-snug truncate">
+                                {car.name}
+                              </h3>
+                              <span className="text-xs font-black font-mono text-red-650 shrink-0">
+                                PKR {car.rentPrice} / {car.rentUnit || 'Day'}
+                              </span>
+                            </div>
+
+                            <div className="flex flex-wrap gap-1.5 mt-1.5">
+                              <span className="bg-white text-gray-600 text-[9px] font-black px-1.5 py-0.5 rounded border uppercase">
+                                {car.transmission}
+                              </span>
+                              <span className="bg-white text-gray-600 text-[9px] font-black px-1.5 py-0.5 rounded border uppercase">
+                                {car.fuelType || 'Petrol'}
+                              </span>
+                              <span className="bg-white text-gray-600 text-[9px] font-black px-1.5 py-0.5 rounded border">
+                                Hub: {car.city}
+                              </span>
+                            </div>
+
+                            {/* Contact Landlord Profile Card */}
+                            <div className="bg-white rounded-lg p-2.5 border mt-3 text-[11px] text-gray-500 space-y-1">
+                              <p className="font-bold text-gray-800 flex items-center gap-1">
+                                <span>Owner:</span>
+                                <strong className="text-red-600">{car.ownerName || 'Unknown Owner'}</strong>
+                              </p>
+                              {car.ownerPhone && (
+                                <p className="font-mono">
+                                  <span>Phone:</span> {car.ownerPhone}
+                                </p>
+                              )}
+                              {car.description && (
+                                <p className="italic mt-1 text-[10px] text-gray-400 truncate line-clamp-1">
+                                  "{car.description}"
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Approval Actions */}
+                          <div className="flex gap-2.5 mt-4 pt-3 border-t border-gray-200/50">
+                            <button
+                              type="button"
+                              onClick={() => approveCarOnboarding(car)}
+                              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-extrabold text-xs uppercase tracking-wider py-2 rounded-xl transition shadow-md shadow-green-150 cursor-pointer"
+                            >
+                              Approve Listing
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => rejectCarOnboarding(car.id)}
+                              className="flex-1 bg-red-50 hover:bg-red-100 text-red-750 font-extrabold text-xs uppercase tracking-wider py-2 rounded-xl border border-red-200 transition cursor-pointer"
+                            >
+                              Reject &amp; Discard
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Direct Fleet and Inventory Administration Sub-grid */}
+            <div className="grid lg:grid-cols-12 gap-8">
             {/* Add New Rental Car Form */}
             <div className="lg:col-span-6 space-y-6">
               <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm transition">
@@ -1195,6 +1577,7 @@ export default function AdminPage() {
                 )}
               </div>
             </div>
+          </div>
           </div>
         )}
       </div>

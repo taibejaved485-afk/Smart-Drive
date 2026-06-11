@@ -1,9 +1,59 @@
+import { useState, FormEvent } from 'react';
 import { motion } from 'motion/react';
-import { Mail, Phone, CheckCircle2 } from 'lucide-react';
+import { Mail, Phone, CheckCircle2, Send, Check } from 'lucide-react';
 
 export default function AppointmentForm() {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [subject, setSubject] = useState('Beginner Class Driving Session');
+  const [comments, setComments] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const handleBookingSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!firstName.trim() || !lastName.trim() || !email.trim()) {
+      alert('Please fill in all required fields.');
+      return;
+    }
+
+    const newBooking = {
+      id: 'bk-' + Date.now().toString(),
+      fullName: `${firstName} ${lastName}`.trim(),
+      email: email,
+      subject: subject,
+      comments: comments || 'No comments specified.',
+      status: 'Pending',
+      createdAt: new Date().toISOString()
+    };
+
+    try {
+      const existing = localStorage.getItem('driving_bookings');
+      const list = existing ? JSON.parse(existing) : [];
+      list.unshift(newBooking);
+      localStorage.setItem('driving_bookings', JSON.stringify(list));
+      
+      // Dispatch events for real-time reactivity
+      window.dispatchEvent(new Event('driving_bookings_updated'));
+      window.dispatchEvent(new Event('storage'));
+    } catch (err) {
+      console.error('Failed to submit driving school booking', err);
+    }
+
+    setIsSuccess(true);
+  };
+
+  const resetFormState = () => {
+    setFirstName('');
+    setLastName('');
+    setEmail('');
+    setSubject('Beginner Class Driving Session');
+    setComments('');
+    setIsSuccess(false);
+  };
+
   return (
-    <section className="py-24 bg-gray-950 text-white relative overflow-hidden">
+    <section className="py-24 bg-gray-950 text-white relative overflow-hidden" id="booking-section">
       {/* Background glow effects */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-red-900/20 rounded-full blur-[128px]"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-900/20 rounded-full blur-[128px]"></div>
@@ -64,36 +114,100 @@ export default function AppointmentForm() {
           <motion.div 
             initial={{ opacity: 0, scale: 0.98 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            className="bg-gray-900/40 backdrop-blur-xl p-5 sm:p-8 md:p-10 rounded-3xl border border-white/10 shadow-2xl"
+            className="bg-gray-900/40 backdrop-blur-xl p-5 sm:p-8 md:p-10 rounded-3xl border border-white/10 shadow-2xl min-h-[460px] flex flex-col justify-center"
           >
-            <h3 className="text-xl sm:text-2xl font-black mb-6 text-white font-display">Your Details</h3>
-            <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-400">First Name *</label>
-                  <input type="text" required className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none text-white text-sm transition" placeholder="Anderson" />
+            {isSuccess ? (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center py-8 space-y-4"
+              >
+                <div className="w-16 h-16 bg-red-600/10 border border-red-500/20 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Check className="w-8 h-8 stroke-[3]" />
                 </div>
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-400">Last Name *</label>
-                  <input type="text" required className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none text-white text-sm transition" placeholder="Mikoo" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-400">Email Address *</label>
-                <input type="email" required className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none text-white text-sm transition" placeholder="user@website.com" />
-              </div>
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-400">Subject *</label>
-                <input type="text" required className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none text-white text-sm transition" placeholder="Driving Classes" />
-              </div>
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-400">Comments / Questions *</label>
-                <textarea rows={4} required className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none text-white text-sm transition resize-none" placeholder="Your comments"></textarea>
-              </div>
-              <button type="submit" className="w-full bg-red-650 hover:bg-red-700 text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition shadow-[0_0_20px_rgba(220,38,38,0.2)] active:scale-[0.99] cursor-pointer">
-                SEND MESSAGE
-              </button>
-            </form>
+                <h3 className="text-2xl font-black font-display text-white">Booking Received!</h3>
+                <p className="text-gray-300 text-sm max-w-sm mx-auto leading-relaxed">
+                  Excellent choice! Your appointment request for <strong className="text-red-500">{firstName}</strong> has been saved under state bookings. Our team will verify your preferred timings and call you shortly.
+                </p>
+                <button 
+                  onClick={resetFormState}
+                  className="mt-6 bg-red-650 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition hover:scale-103 cursor-pointer"
+                  type="button"
+                >
+                  Book Another Lesson
+                </button>
+              </motion.div>
+            ) : (
+              <>
+                <h3 className="text-xl sm:text-2xl font-black mb-6 text-white font-display">Your Details</h3>
+                <form className="space-y-5" onSubmit={handleBookingSubmit}>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-400">First Name *</label>
+                      <input 
+                        type="text" 
+                        required 
+                        className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none text-white text-sm transition" 
+                        placeholder="e.g. Muhammad" 
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-400">Last Name *</label>
+                      <input 
+                        type="text" 
+                        required 
+                        className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none text-white text-sm transition" 
+                        placeholder="e.g. Ahmad" 
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-400">Email Address *</label>
+                    <input 
+                      type="email" 
+                      required 
+                      className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none text-white text-sm transition" 
+                      placeholder="e.g. ahmad@gmail.com" 
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-400">Course / Subject *</label>
+                    <select 
+                      className="w-full p-3 rounded-xl bg-gray-800 border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none text-white text-sm transition"
+                      value={subject}
+                      onChange={(e) => setSubject(e.target.value)}
+                    >
+                      <option value="Beginner Class Driving Session">Beginner Class Driving Session (15 Days)</option>
+                      <option value="Advanced Manual Control">Advanced Manual Control (10 Days)</option>
+                      <option value="Female-Only Safe Road Course">Female-Only Safe Road Course (Instructors Provided)</option>
+                      <option value="Refresher Traffic Sign Coaching">Refresher Traffic Sign Coaching (5 Days)</option>
+                      <option value="Commercial Truck/LTV license prep">Commercial Truck/LTV license prep</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-400">Comments / Questions *</label>
+                    <textarea 
+                      rows={3} 
+                      required 
+                      className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none text-white text-sm transition resize-none leading-relaxed" 
+                      placeholder="Tell us about your driving experience or details..."
+                      value={comments}
+                      onChange={(e) => setComments(e.target.value)}
+                    />
+                  </div>
+                  <button type="submit" className="w-full bg-red-650 hover:bg-red-700 text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition shadow-[0_0_20px_rgba(220,38,38,0.2)] active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2">
+                    <span>SEND REQUEST</span>
+                    <Send className="w-3.5 h-3.5" />
+                  </button>
+                </form>
+              </>
+            )}
           </motion.div>
 
         </div>
@@ -101,3 +215,4 @@ export default function AppointmentForm() {
     </section>
   );
 }
+
