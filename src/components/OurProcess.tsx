@@ -51,16 +51,18 @@ export default function OurProcess() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.2 }}
-              className="bg-gray-50 p-8 rounded-3xl border border-gray-100 hover:border-red-500/50 transition-all shadow-sm hover:shadow-xl group"
+              className="bg-gray-50 p-8 rounded-3xl border border-gray-100 hover:border-red-500/50 transition-all shadow-sm hover:shadow-xl group flex flex-col justify-between h-full"
             >
-              <div className="flex justify-between items-start mb-8">
-                <step.icon className="w-12 h-12 text-red-500" />
-                <span className="text-4xl font-bold text-gray-900/10 group-hover:text-red-500/20 transition-colors">
-                  {step.number}
-                </span>
+              <div>
+                <div className="flex justify-between items-start mb-8">
+                  <step.icon className="w-12 h-12 text-red-500" />
+                  <span className="text-4xl font-bold text-gray-900/10 group-hover:text-red-500/20 transition-colors">
+                    {step.number}
+                  </span>
+                </div>
+                <h3 className="text-2xl font-bold mb-4">{step.title}</h3>
+                <p className="text-gray-600 mb-8 leading-relaxed">{step.desc}</p>
               </div>
-              <h3 className="text-2xl font-bold mb-4">{step.title}</h3>
-              <p className="text-gray-600 mb-8 leading-relaxed">{step.desc}</p>
               <Link to="/pricing" className="flex items-center gap-2 text-red-500 font-bold hover:gap-4 transition-all">
                 LEARN MORE <ArrowRight className="w-4 h-4" />
               </Link>
