@@ -3,6 +3,7 @@ import Footer from '../components/Footer';
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import Reviews from '../components/Reviews';
+import SEO from '../components/SEO';
 
 const faqs = [
   {q: "What Is The Minimum Age Requirement For The Heavy Bike Driving Course?", a: "The minimum age requirement is 18 years, and you must hold a valid learner's permit for motorbikes to start the training."},
@@ -16,9 +17,29 @@ const faqs = [
 export default function FAQPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map((faq) => ({
+      "@type": "Question",
+      "name": faq.q,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.a
+      }
+    }))
+  };
+
   return (
     <div className="min-h-screen bg-white">
+      <SEO 
+        title="FAQ - Driving School Questions & Answers"
+        description="Got questions about learning to drive in Faisalabad? Read our frequently asked questions about learner's permits, course length, refunds, and driver license test preparation."
+        keywords="driving school queries Faisalabad, learner permit age limit Pakistan, heavy bike training rules, fast track driving course FAQ"
+        schema={faqSchema}
+      />
       <Navbar />
+
       
       {/* Header */}
       <section 

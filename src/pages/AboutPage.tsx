@@ -4,8 +4,22 @@ import Stats from '../components/Stats';
 import WhyChooseUs from '../components/WhyChooseUs';
 import Reviews from '../components/Reviews';
 import { CheckCircle2 } from 'lucide-react';
+import SEO from '../components/SEO';
 
 export default function AboutPage() {
+  const aboutSchema = {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "name": "About Smart Drive Driving School Faisalabad",
+    "description": "Discover our values, our professional instructors, and our history. Smart Drive is the most trusted driving academy in Faisalabad for female and male students.",
+    "publisher": {
+      "@type": "LocalBusiness",
+      "name": "Smart Drive Driving School",
+      "telephone": "0300-1115429",
+      "email": "trainingdrivingschool@gmail.com"
+    }
+  };
+
   const features = [
     {
       title: 'Beginner Driving Course',
@@ -27,7 +41,14 @@ export default function AboutPage() {
 
   return (
     <div className="font-sans text-gray-900 bg-white">
+      <SEO 
+        title="About Us - Faisalabad's Expert Driving Academy"
+        description="Learn more about Smart Drive Driving School. We are Faisalabad's highly-rated educational institution with dedicated courses for manual & automatic vehicles."
+        keywords="about driving school, learn manual driving Faisalabad, professional driving lessons, certified car instructors Pakistan, defensive driving training, female driving school history"
+        schema={aboutSchema}
+      />
       <Navbar />
+
 
       {/* Header Banner */}
       <section 

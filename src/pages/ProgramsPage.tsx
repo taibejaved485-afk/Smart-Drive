@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { motion, AnimatePresence } from 'motion/react';
+import SEO from '../components/SEO';
 import { 
   Car, Shield, Award, HelpCircle, ArrowRight, CheckCircle2, 
   Search, Bike, Info, Clock, Check, X, Compass, Users, Calendar, Sparkles
 } from 'lucide-react';
+
 
 interface Program {
   id: string;
@@ -320,9 +322,38 @@ export default function ProgramsPage() {
     setSurveyResult(null);
   };
 
+  const coursesSchema = {
+    "@context": "https://schema.org",
+    "@graph": programsList.map((prog) => ({
+      "@type": "Course",
+      "name": prog.title,
+      "description": prog.description,
+      "provider": {
+        "@type": "LocalBusiness",
+        "name": "Smart Drive Driving School",
+        "telephone": "0300-1115429",
+        "email": "trainingdrivingschool@gmail.com",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Main Jaranwala Road",
+          "addressLocality": "Faisalabad",
+          "addressRegion": "Punjab",
+          "addressCountry": "PK"
+        }
+      }
+    }))
+  };
+
   return (
     <div className="font-sans text-gray-800 bg-gray-50/50 min-h-screen flex flex-col justify-between">
+      <SEO 
+        title="Driving Programs & Courses - Manual, Automatic & Motorcycle Coaching"
+        description="Choose from our premier range of tailored driving lessons in Faisalabad. We offer standard automatic car lessons, heavy bike classes, female trainer sessions, and license preparation."
+        keywords="automatic car lessons Faisalabad, manual gear training, motorcycle classes Pakistan, drive tutoring, female driving trainer, local driving simulator, passing driving test license"
+        schema={coursesSchema}
+      />
       <Navbar />
+
 
       {/* Styled Minimal Elegance Hero Banner */}
       <section className="bg-white border-b border-gray-200 py-20 relative overflow-hidden">

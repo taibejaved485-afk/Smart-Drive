@@ -5,13 +5,59 @@ import { CheckCircle2, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import Reviews from '../components/Reviews';
 import OurProcess from '../components/OurProcess';
+import SEO from '../components/SEO';
 
 export default function PricingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
+  const pricingSchema = {
+    "@context": "https://schema.org",
+    "@type": "OfferCatalog",
+    "name": "Smart Drive Driving School Lesson Rates",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Honda Civic (Manual) Driving Course",
+          "description": "10 Days Course manual gear shifter lessons on Honda Civic."
+        },
+        "price": "25000",
+        "priceCurrency": "PKR"
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Honda Civic (Automatic) Driving Course",
+          "description": "10 Days Course automatic transmission lessons on Honda Civic."
+        },
+        "price": "25000",
+        "priceCurrency": "PKR"
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Heavy Bike Riding Course",
+          "description": "Complete heavy motorcycle training under certified coaches."
+        },
+        "price": "50000",
+        "priceCurrency": "PKR"
+      }
+    ]
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen">
+      <SEO 
+        title="Lesson Fees & Course Packages - Affordable Driving School"
+        description="Check out our low-cost manual & automatic driving school pricing plans in Faisalabad. Learn in a high-end Honda Civic starting from 25,000 PKR only."
+        keywords="driving school fee Faisalabad, car driving class packages, heavy bike license course rates, cheap driving instructor cost, automatic car lesson prices Punjab"
+        schema={pricingSchema}
+      />
       <Navbar />
+
       
       {/* Hero Section */}
       <section className="relative py-24 bg-gray-950 text-white overflow-hidden bg-[url('https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center">

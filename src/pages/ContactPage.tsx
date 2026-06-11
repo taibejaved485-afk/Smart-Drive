@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { motion, AnimatePresence } from 'motion/react';
+import SEO from '../components/SEO';
 import { 
   Mail, Phone, MapPin, Clock, Send, CheckCircle2, ChevronRight, 
   Car, Shield, Award, HelpCircle, ArrowRight, MessageSquare, ExternalLink
@@ -11,6 +12,28 @@ import {
 export default function ContactPage() {
   const [searchParams] = useSearchParams();
   const programParam = searchParams.get('program');
+
+  const contactSchema = {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    "name": "Contact Smart Drive Driving School",
+    "description": "Contact Smart Drive Driving Academy. Enroll in manual or automatic driving courses, request female coach availability, or ask for pricing quotes in Faisalabad.",
+    "url": window.location.origin + "/contact",
+    "mainEntity": {
+      "@type": "LocalBusiness",
+      "name": "Smart Drive Driving School",
+      "telephone": "0300-1115429",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Main Jaranwala Road",
+        "addressLocality": "Faisalabad",
+        "addressRegion": "Punjab",
+        "postalCode": "38000",
+        "addressCountry": "PK"
+      }
+    }
+  };
+
 
   const [formData, setFormData] = useState({
     name: '',
@@ -64,7 +87,14 @@ export default function ContactPage() {
 
   return (
     <div className="font-sans text-gray-800 bg-slate-50 min-h-screen flex flex-col justify-between selection:bg-red-650 selection:text-white">
+      <SEO 
+        title="Contact Us & Student Enrollment Form"
+        description="Connect with Smart Drive Driving Academy. Book your driving lessons, find our office location in Faisalabad, call us at 0300-1115429, or fill out the enrollment form."
+        keywords="contact driving school Faisalabad, register driving classes, female driving instructor booking, learn driving school address Pakistan"
+        schema={contactSchema}
+      />
       <Navbar />
+
 
       {/* Elegant Hero Header Banner */}
       <section className="bg-white border-b border-gray-200 py-20 relative overflow-hidden">

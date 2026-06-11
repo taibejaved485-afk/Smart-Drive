@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { Link } from 'react-router-dom';
+import SEO from '../components/SEO';
 
 interface BlogPost {
   id: string;
@@ -22,9 +23,27 @@ export default function BlogPage() {
     }
   }, []);
 
+  const blogSchema = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "Smart Drive Driving Academy Advice Blog",
+    "description": "Helpful tips, rules, tutorials, and guidelines on safe manual/automatic driving from experts in Faisalabad PK.",
+    "publisher": {
+      "@type": "LocalBusiness",
+      "name": "Smart Drive Driving School"
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <SEO 
+        title="Driving Tips Blog & Educational Advice Guides"
+        description="Expand your safety awareness with expert driving tips and tutorials. We post custom-tailored articles about test procedures and road smart strategies in Faisalabad."
+        keywords="learn car guide, defensive driver tips Pakistan, parallel parking how-to, heavy bike tricks, female driver guidelines"
+        schema={blogSchema}
+      />
       <Navbar />
+
       <div className="max-w-7xl mx-auto px-4 py-16">
         <Link to="/" className="text-red-600 font-bold hover:underline mb-8 block">&larr; Back to Home</Link>
         <h1 className="text-5xl font-bold mb-12 text-center text-gray-950">Our Latest Blogs</h1>
