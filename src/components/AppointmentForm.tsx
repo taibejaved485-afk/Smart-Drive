@@ -52,7 +52,7 @@ export default function AppointmentForm() {
           >
             <p className="text-red-500 font-bold uppercase tracking-widest text-sm">Registrations</p>
             <h2 className="text-5xl font-bold font-display leading-tight">Get Appointments With Our Best Instructors</h2>
-            <p className="text-gray-400 text-lg leading-relaxed">Ready to start your driving journey? Booking an appointment with Training Driving School is quick and easy. Whether you're a beginner, need a refresher, or want to prepare for your driving test, we've got the perfect course for you.</p>
+            <p className="text-gray-400 text-lg leading-relaxed">Ready to start your driving journey? Booking an appointment with Smart Drive is quick and easy. Whether you're a beginner, need a refresher, or want to prepare for your driving test, we've got the perfect course for you.</p>
             
             <div className="space-y-4">
               {['Flexible scheduling options', 'Professional and experienced instructors', 'Customized driving programs'].map((item, i) => (

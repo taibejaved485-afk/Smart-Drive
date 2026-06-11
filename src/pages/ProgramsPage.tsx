@@ -371,7 +371,7 @@ export default function ProgramsPage() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="text-slate-400 text-sm sm:text-base leading-relaxed max-w-3xl mx-auto font-sans"
             >
-              At <span className="text-white font-semibold">Training Driving School</span>, we offer a variety of professional <span className="text-red-400 font-bold underline decoration-red-500 decoration-2 underline-offset-4">Female Driving Instructors</span> tailored to suit learners at every level. Whether you're a beginner, an experienced driver looking to enhance your skills, or preparing for a road test, choose a model and test your options below.
+              At <span className="text-white font-semibold">Smart Drive</span>, we offer a variety of professional <span className="text-red-400 font-bold underline decoration-red-500 decoration-2 underline-offset-4">Female Driving Instructors</span> tailored to suit learners at every level. Whether you're a beginner, an experienced driver looking to enhance your skills, or preparing for a road test, choose a model and test your options below.
             </motion.p>
           </div>
         </section>

@@ -28,7 +28,7 @@ export default function PricingPage() {
             <div className="text-center max-w-3xl mx-auto mb-16">
                 <p className="text-red-500 font-bold tracking-widest text-sm mb-4">PRICING PACKAGE</p>
                 <h2 className="text-5xl font-bold text-gray-950 mb-8">Choose A Package That Suits Your Needs</h2>
-                <p className="text-gray-600 text-lg leading-relaxed">At Training Driving School, we offer a range of driving packages to suit your needs, skill level, and budget. Whether you're a beginner or looking to refine your driving skills, we've got the perfect package for you.</p>
+                <p className="text-gray-600 text-lg leading-relaxed">At Smart Drive, we offer a range of driving packages to suit your needs, skill level, and budget. Whether you're a beginner or looking to refine your driving skills, we've got the perfect package for you.</p>
             </div>
 
             {/* Packages Grid */}

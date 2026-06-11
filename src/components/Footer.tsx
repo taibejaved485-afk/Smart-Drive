@@ -11,7 +11,7 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-12 mb-16">
           {/* Logo / Description */}
           <div className="md:col-span-1 space-y-6">
-            <h2 className="text-xl font-bold text-white tracking-widest uppercase">Training Driving</h2>
+            <h2 className="text-xl font-bold text-white tracking-widest uppercase">Smart Drive</h2>
             <p className="text-sm leading-relaxed text-gray-500">
               Transforming learners into confident, professional drivers in Faisalabad.
             </p>
@@ -53,7 +53,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-xs text-gray-600 gap-4">
-          <p>&copy; 2026 Training Driving School. All rights reserved.</p>
+          <p>&copy; 2026 Smart Drive. All rights reserved.</p>
           <p className="tracking-widest uppercase">system_v1.0.0_ready</p>
         </div>
       </div>

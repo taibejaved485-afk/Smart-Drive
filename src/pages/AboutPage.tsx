@@ -70,7 +70,7 @@ export default function AboutPage() {
           {/* Text & Grid Section on Right */}
           <div className="lg:col-span-6">
             <p className="text-gray-600 leading-relaxed text-base sm:text-lg mb-8">
-              Welcome to <span className="text-red-600 font-semibold underline underline-offset-4 decoration-red-600/30">Training Driving School</span>, the leading <span className="text-red-600 font-semibold underline underline-offset-4 decoration-red-600/30">Driving lessons in Faisalabad</span>, dedicated to helping learners become skilled, responsible, and confident drivers. Whether you're a beginner or looking to refine your driving skills, our expert instructors ensure a smooth learning experience tailored to your needs.
+              Welcome to <span className="text-red-600 font-semibold underline underline-offset-4 decoration-red-600/30">Smart Drive</span>, the leading <span className="text-red-600 font-semibold underline underline-offset-4 decoration-red-600/30">Driving lessons in Faisalabad</span>, dedicated to helping learners become skilled, responsible, and confident drivers. Whether you're a beginner or looking to refine your driving skills, our expert instructors ensure a smooth learning experience tailored to your needs.
             </p>
 
             {/* Custom Grid Layout with thin separators */}
@@ -133,7 +133,7 @@ export default function AboutPage() {
                 Our Commitment To Excellence
               </h2>
               <p className="text-gray-600 leading-relaxed text-base sm:text-lg">
-                At Training Driving School, we are committed to providing the highest standard of driver education. Our focus is on safety, skill development, and building confidence behind the wheel. We ensure that all our instructors are fully licensed, highly trained, and dedicated to each student's success. Whether you're a beginner or looking to refine your skills, we offer personalized lessons tailored to your needs. We believe in making the learning process enjoyable, effective, and stress-free. Our commitment to excellence drives us to continuously improve our methods and resources, ensuring every student becomes a competent, safe, and responsible driver.
+                At Smart Drive, we are committed to providing the highest standard of driver education. Our focus is on safety, skill development, and building confidence behind the wheel. We ensure that all our instructors are fully licensed, highly trained, and dedicated to each student's success. Whether you're a beginner or looking to refine your skills, we offer personalized lessons tailored to your needs. We believe in making the learning process enjoyable, effective, and stress-free. Our commitment to excellence drives us to continuously improve our methods and resources, ensuring every student becomes a competent, safe, and responsible driver.
               </p>
             </div>
 
