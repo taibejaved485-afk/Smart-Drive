@@ -18,11 +18,13 @@ export default function ContactPage() {
     "@type": "ContactPage",
     "name": "Contact Smart Drive Driving School",
     "description": "Contact Smart Drive Driving Academy. Enroll in manual or automatic driving courses, request female coach availability, or ask for pricing quotes in Faisalabad.",
-    "url": window.location.origin + "/contact",
+    "url": "https://smartdrivefd.com/contact",
     "mainEntity": {
       "@type": "LocalBusiness",
       "name": "Smart Drive Driving School",
       "telephone": "0300-1115429",
+      "email": "trainingdrivingschool@gmail.com",
+      "hasMap": "https://maps.google.com/?q=Smart+Drive+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan",
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "Main Jaranwala Road",
@@ -30,7 +32,18 @@ export default function ContactPage() {
         "addressRegion": "Punjab",
         "postalCode": "38000",
         "addressCountry": "PK"
-      }
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "31.4175",
+        "longitude": "73.1350"
+      },
+      "url": "https://smartdrivefd.com/",
+      "sameAs": [
+        "https://www.facebook.com/SmartDriveFSD",
+        "https://www.instagram.com/SmartDriveFSD",
+        "https://maps.google.com/?q=Smart+Drive+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan"
+      ]
     }
   };
 
@@ -410,7 +423,7 @@ export default function ContactPage() {
               </div>
 
               <a 
-                href="https://maps.google.com" 
+                href="https://maps.google.com/?q=Smart+Drive+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs uppercase tracking-wider px-6 py-3.5 rounded-xl border border-gray-300 inline-flex items-center gap-2 transition-all cursor-pointer"

@@ -25,6 +25,7 @@ export default function HomePage() {
         "image": "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=600&auto=format&fit=crop",
         "telephone": "0300-1115429",
         "email": "trainingdrivingschool@gmail.com",
+        "hasMap": "https://maps.google.com/?q=Smart+Drive+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan",
         "address": {
           "@type": "PostalAddress",
           "streetAddress": "Main Jaranwala Road",
@@ -38,7 +39,7 @@ export default function HomePage() {
           "latitude": "31.4175",
           "longitude": "73.1350"
         },
-        "url": window.location.origin,
+        "url": "https://smartdrivefd.com/",
         "priceRange": "$$",
         "openingHoursSpecification": {
           "@type": "OpeningHoursSpecification",
@@ -56,7 +57,8 @@ export default function HomePage() {
         },
         "sameAs": [
           "https://www.facebook.com/SmartDriveFSD",
-          "https://www.instagram.com/SmartDriveFSD"
+          "https://www.instagram.com/SmartDriveFSD",
+          "https://maps.google.com/?q=Smart+Drive+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan"
         ]
       },
       {

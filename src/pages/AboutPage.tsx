@@ -16,7 +16,27 @@ export default function AboutPage() {
       "@type": "LocalBusiness",
       "name": "Smart Drive Driving School",
       "telephone": "0300-1115429",
-      "email": "trainingdrivingschool@gmail.com"
+      "email": "trainingdrivingschool@gmail.com",
+      "hasMap": "https://maps.google.com/?q=Smart+Drive+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Main Jaranwala Road",
+        "addressLocality": "Faisalabad",
+        "addressRegion": "Punjab",
+        "postalCode": "38000",
+        "addressCountry": "PK"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "31.4175",
+        "longitude": "73.1350"
+      },
+      "url": "https://smartdrivefd.com/",
+      "sameAs": [
+        "https://www.facebook.com/SmartDriveFSD",
+        "https://www.instagram.com/SmartDriveFSD",
+        "https://maps.google.com/?q=Smart+Drive+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan"
+      ]
     }
   };
 
