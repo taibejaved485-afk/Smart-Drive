@@ -241,134 +241,164 @@ export default function RentalMarketplace() {
           </p>
         </div>
 
-        {/* UNIFIED FLEET SEARCH BAR */}
-        <div className="bg-white rounded-2xl sm:rounded-[2rem] border border-gray-200 p-3 sm:p-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] mb-6 max-w-5xl mx-auto relative overflow-hidden z-20">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 sm:gap-4 items-center">
-            {/* Column 1: Search */}
-            <div className="relative flex items-center bg-gray-50 rounded-xl sm:rounded-2xl border border-gray-100 hover:border-gray-200 transition-colors px-4 py-3 sm:py-4 focus-within:bg-white focus-within:ring-2 focus-within:ring-red-100 focus-within:border-red-500 group">
-              <Search className="w-5 h-5 text-gray-400 group-focus-within:text-red-500 transition-colors shrink-0" />
-              <input
-                type="text"
-                placeholder="Search car brand or model (e.g. Civic, Alto)..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent border-none outline-none text-sm font-bold text-gray-900 placeholder:text-gray-400 w-full ml-3"
-              />
-            </div>
+        {/* UNIFIED FLEET COMMAND BAR (FUTURISTIC) */}
+        <div className="relative mb-6 max-w-[68rem] mx-auto z-20 px-2 sm:px-0">
+          {/* Animated Glow Background */}
+          <div className="absolute -inset-1 bg-gradient-to-r from-red-600 via-rose-500 to-amber-500 rounded-[2.5rem] blur-lg opacity-20 sm:opacity-25 transition duration-1000 group-hover:opacity-40 pointer-events-none" />
+          
+          <div className="bg-white/80 backdrop-blur-2xl rounded-2xl sm:rounded-[2.25rem] border border-white/60 p-3 sm:p-4 shadow-[0_8px_32px_rgba(0,0,0,0.08)] relative overflow-hidden">
+            {/* Tech Grid Overlay */}
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none opacity-50 mix-blend-multiply"></div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3 sm:gap-4 items-center relative z-10">
+              {/* Filter 1: Universal Search */}
+              <div className="relative flex items-center bg-white/60 backdrop-blur-md rounded-xl sm:rounded-2xl border border-gray-200/80 hover:border-red-300 hover:bg-white transition-all duration-300 px-4 py-3 sm:py-4 focus-within:!bg-white focus-within:!border-red-500 focus-within:ring-4 focus-within:ring-red-500/10 group shadow-sm h-full">
+                <Search className="w-5 h-5 text-gray-400 group-focus-within:text-red-600 group-focus-within:scale-110 transition-all shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Enter brand or model..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bg-transparent border-none outline-none text-sm font-bold text-gray-900 placeholder:text-gray-400 w-full ml-3"
+                />
+              </div>
 
-            {/* Column 2: Main City */}
-            <div className="relative flex flex-col justify-center bg-gray-50 rounded-xl sm:rounded-2xl border border-gray-100 hover:border-gray-200 transition-colors px-4 py-2 sm:py-3 cursor-pointer group focus-within:bg-white focus-within:ring-2 focus-within:ring-red-100 focus-within:border-red-500">
-              <label className="text-[9px] font-black uppercase text-gray-400 tracking-widest pl-1 mb-0.5">Location</label>
-              <select 
-                value={activeCity} 
-                onChange={(e) => {
-                  setActiveCity(e.target.value);
-                  setSelectedArea('');
-                }}
-                className="bg-transparent border-none outline-none text-sm sm:text-base font-extrabold text-gray-900 w-full appearance-none cursor-pointer p-0 m-0 leading-tight"
-              >
-                {cities.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none group-focus-within:text-amber-500 transition-colors" />
-            </div>
+              {/* Filter 2: Main Hub */}
+              <div className="relative flex flex-col justify-center bg-white/60 backdrop-blur-md rounded-xl sm:rounded-2xl border border-gray-200/80 hover:border-red-300 hover:bg-white transition-all px-4 py-3 sm:py-0 h-14 sm:h-[4.5rem] cursor-pointer group focus-within:!bg-white focus-within:!border-red-500 focus-within:ring-4 focus-within:ring-red-500/10 shadow-sm">
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_5px_rgba(239,68,68,0.8)]"></div>
+                  <label className="text-[9px] font-mono uppercase text-gray-500 tracking-[0.2em] font-semibold">Hub</label>
+                </div>
+                <select 
+                  value={activeCity} 
+                  onChange={(e) => {
+                    setActiveCity(e.target.value);
+                    setSelectedArea('');
+                  }}
+                  className="bg-transparent border-none outline-none text-sm sm:text-base font-extrabold text-gray-900 w-full appearance-none cursor-pointer p-0 m-0 leading-tight block"
+                >
+                  {cities.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none group-focus-within:text-red-500 transition-colors" />
+              </div>
 
-            {/* Column 3: Area/Locality */}
-            <div className={`relative flex flex-col justify-center bg-gray-50 rounded-xl sm:rounded-2xl border border-gray-100 transition-colors px-4 py-2 sm:py-3 cursor-pointer group ${activeCity !== 'All Cities' && activeCity ? 'hover:border-gray-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-red-100 focus-within:border-red-500' : 'opacity-60 cursor-not-allowed'}`}>
-              <label className="text-[9px] font-black uppercase text-gray-400 tracking-widest pl-1 mb-0.5">Locality</label>
-              <select 
-                value={selectedArea}
-                onChange={(e) => setSelectedArea(e.target.value)}
-                disabled={activeCity === 'All Cities' || !activeCity}
-                className="bg-transparent border-none outline-none text-sm sm:text-base font-extrabold text-gray-900 w-full appearance-none cursor-pointer p-0 m-0 leading-tight disabled:text-gray-400 disabled:cursor-not-allowed"
-              >
-                <option value="">{activeCity !== 'All Cities' && activeCity ? 'All Areas' : 'Select City First'}</option>
-                {activeCity !== 'All Cities' && CITY_AREAS[activeCity]?.map(a => <option key={a} value={a}>{a}</option>)}
-              </select>
-              <ChevronDown className={`absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none transition-colors ${activeCity !== 'All Cities' && activeCity ? 'group-focus-within:text-amber-500' : 'opacity-50'}`} />
-            </div>
+              {/* Filter 3: Sector/Locality */}
+              <div className={`relative flex flex-col justify-center bg-white/60 backdrop-blur-md rounded-xl sm:rounded-2xl border transition-all px-4 py-3 sm:py-0 h-14 sm:h-[4.5rem] cursor-pointer group shadow-sm ${activeCity !== 'All Cities' && activeCity ? 'border-gray-200/80 hover:border-amber-300 hover:bg-white focus-within:!bg-white focus-within:!border-amber-500 focus-within:ring-4 focus-within:ring-amber-500/10' : 'border-gray-100 opacity-60 cursor-not-allowed bg-gray-50/50'}`}>
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <div className={`w-1.5 h-1.5 rounded-full shadow-sm ${activeCity !== 'All Cities' && activeCity ? 'bg-amber-400 shadow-[0_0_5px_rgba(251,191,36,0.8)]' : 'bg-gray-300'}`}></div>
+                  <label className="text-[9px] font-mono uppercase text-gray-500 tracking-[0.2em] font-semibold">Sector</label>
+                </div>
+                <select 
+                  value={selectedArea}
+                  onChange={(e) => setSelectedArea(e.target.value)}
+                  disabled={activeCity === 'All Cities' || !activeCity}
+                  className="bg-transparent border-none outline-none text-sm sm:text-base font-extrabold text-gray-900 w-full appearance-none cursor-pointer p-0 m-0 leading-tight disabled:text-gray-400 disabled:cursor-not-allowed block"
+                >
+                  <option value="">{activeCity !== 'All Cities' && activeCity ? 'All Sectors' : 'Awaiting Hub'}</option>
+                  {activeCity !== 'All Cities' && CITY_AREAS[activeCity]?.map(a => <option key={a} value={a}>{a}</option>)}
+                </select>
+                <ChevronDown className={`absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none transition-colors ${activeCity !== 'All Cities' && activeCity ? 'text-gray-400 group-focus-within:text-amber-500' : 'text-gray-300'}`} />
+              </div>
 
-            {/* Column 4: Search Action Button */}
-            <button className="bg-gray-950 hover:bg-gray-900 text-white rounded-xl sm:rounded-2xl font-black uppercase text-xs tracking-widest py-4 sm:py-5 px-6 transition-all shadow-[0_5px_15px_rgba(3,7,18,0.2)] hover:shadow-[0_8px_25px_rgba(3,7,18,0.3)] hover:scale-[1.02] flex items-center justify-center gap-2 cursor-pointer w-full h-full">
-              <Search className="w-4 h-4 text-amber-500" />
-              Search Fleet
-            </button>
+              {/* Filter 4: Trigger */}
+              <button className="relative overflow-hidden bg-gray-950 hover:bg-black text-white rounded-xl sm:rounded-2xl font-black uppercase text-xs tracking-[0.15em] py-4 sm:py-0 h-14 sm:h-[4.5rem] px-6 transition-all shadow-[0_8px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_25px_rgba(220,38,38,0.25)] hover:scale-[1.02] flex items-center justify-center gap-2.5 w-full group">
+                {/* Sweep effect on hover */}
+                <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+                <Search className="w-4 h-4 text-red-500 flex-shrink-0" />
+                <span className="relative z-10">Scan Fleet</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* SMART FILTERS (Below Main Bar) */}
-        <div className="flex flex-wrap items-center justify-center gap-3 mb-12 px-2 max-w-5xl mx-auto">
-          {/* Price Filter Pill */}
+        {/* SMART METADATA FILTERS (Technical style) */}
+        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 mb-12 px-4 max-w-[68rem] mx-auto">
+          {/* Price Category Dashboard */}
           <div className="relative group inline-block">
             <select 
               value={priceFilter}
               onChange={(e) => setPriceFilter(e.target.value)}
-              className="appearance-none bg-white border border-gray-200 hover:border-gray-300 text-xs font-bold text-gray-700 px-4 py-2 rounded-full cursor-pointer transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-red-100 pr-8"
+              className="appearance-none bg-white/70 backdrop-blur-md border border-gray-200/80 hover:border-gray-300 text-xs font-bold text-gray-700 px-5 py-2.5 rounded-full cursor-pointer transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-red-100 pr-9 font-mono"
             >
-              <option value="All Budgets">All Budgets</option>
-              <option value="Below 5k/day">Below 5k/day</option>
-              <option value="5k - 10k/day">5k - 10k/day</option>
-              <option value="Above 10k/day">Above 10k/day</option>
+              <option value="All Budgets">Rate: ANY</option>
+              <option value="Below 5k/day">Rate: &lt; 5K</option>
+              <option value="5k - 10k/day">Rate: 5K - 10K</option>
+              <option value="Above 10k/day">Rate: &gt; 10K</option>
             </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none group-hover:text-gray-600" />
+            <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none group-hover:text-gray-600" />
           </div>
 
-          {/* Transmission Mode */}
-          <div className="inline-flex items-center bg-white border border-gray-200 rounded-full p-1 shadow-sm">
+          {/* Transmission System Toggle */}
+          <div className="inline-flex items-center bg-white/70 backdrop-blur-md border border-gray-200/80 rounded-full p-1 shadow-sm relative relative overflow-hidden">
               {['All', 'Automatic', 'Manual'].map(trans => (
                 <button
                   key={trans}
                   type="button"
                   onClick={() => setSelectedTransmission(trans)}
-                  className={`text-[10px] sm:text-xs font-bold tracking-wide px-3 sm:px-4 py-1.5 rounded-full transition-all cursor-pointer ${
+                  className={`text-[10px] sm:text-xs font-bold tracking-wide px-4 py-1.5 rounded-full transition-all duration-300 cursor-pointer relative z-10 ${
                     selectedTransmission === trans 
-                    ? 'bg-gray-900 text-white shadow-sm'
-                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                    ? 'text-white'
+                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
                   }`}
                 >
-                  {trans}
+                  {selectedTransmission === trans && (
+                    <motion.div
+                      layoutId="transmission-bg"
+                      className="absolute inset-0 bg-gray-900 rounded-full -z-10 shadow-md"
+                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                    />
+                  )}
+                  {trans === 'All' ? 'SYS: ALL' : trans.toUpperCase()}
                 </button>
               ))}
           </div>
 
-          {/* Driver Preference Pill Option Toggle */}
-          <div className="inline-flex items-center bg-white border border-gray-200 rounded-full p-1 shadow-sm">
+          {/* Pilot Mode Toggle */}
+          <div className="inline-flex items-center bg-white/70 backdrop-blur-md border border-gray-200/80 rounded-full p-1 shadow-sm relative overflow-hidden">
               {['Any', 'Self-Drive', 'With Driver'].map(pref => (
                 <button
                   key={pref}
                   type="button"
                   onClick={() => setDriverPreference(pref)}
-                  className={`text-[10px] sm:text-xs font-bold tracking-wide px-3 sm:px-4 py-1.5 rounded-full transition-all cursor-pointer ${
+                  className={`text-[10px] sm:text-xs font-bold tracking-wide px-4 py-1.5 rounded-full transition-all duration-300 cursor-pointer relative z-10 ${
                     driverPreference === pref 
-                    ? 'bg-gray-900 text-white shadow-sm'
-                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                    ? 'text-white'
+                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
                   }`}
                 >
-                  {pref}
+                  {driverPreference === pref && (
+                    <motion.div
+                      layoutId="pilot-bg"
+                      className="absolute inset-0 bg-gray-900 rounded-full -z-10 shadow-md"
+                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                    />
+                  )}
+                  {pref === 'Any' ? 'PILOT: ANY' : pref.toUpperCase()}
                 </button>
               ))}
           </div>
 
-            {/* Clear Filters (if active) */}
-            <div className="ml-auto flex flex-wrap items-center gap-4">
-              <span className="text-xs font-semibold text-gray-500 font-mono hidden sm:inline-block">
-                Found <strong className="text-gray-950 font-black">{filteredCars.length}</strong> matches
-              </span>
-              {(searchQuery || activeCity !== 'All Cities' || selectedArea || priceFilter !== 'All Budgets' || driverPreference !== 'Any' || selectedTransmission !== 'All') && (
-                <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    setActiveCity('All Cities');
-                    setSelectedArea('');
-                    setPriceFilter('All Budgets');
-                    setDriverPreference('Any');
-                    setSelectedTransmission('All');
-                  }}
-                  className="text-[10px] font-black uppercase text-red-650 hover:text-red-750 transition-colors cursor-pointer tracking-wider flex items-center gap-1"
-                >
-                  <X className="w-3.5 h-3.5" /> Clear All Filters
-                </button>
-              )}
-            </div>
+          {/* Stats Bar */}
+          <div className="sm:ml-auto flex flex-wrap items-center justify-center w-full sm:w-auto gap-4 mt-2 sm:mt-0">
+            <span className="text-xs font-semibold text-gray-500 tracking-wider">
+              [ <strong className="text-gray-950 font-black">{filteredCars.length}</strong> ASSETS DETECTED ]
+            </span>
+            {(searchQuery || activeCity !== 'All Cities' || selectedArea || priceFilter !== 'All Budgets' || driverPreference !== 'Any' || selectedTransmission !== 'All') && (
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  setActiveCity('All Cities');
+                  setSelectedArea('');
+                  setPriceFilter('All Budgets');
+                  setDriverPreference('Any');
+                  setSelectedTransmission('All');
+                }}
+                className="text-[10px] font-black uppercase text-red-600 hover:text-red-700 transition-colors cursor-pointer tracking-widest flex items-center gap-1.5 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md"
+              >
+                <X className="w-3.5 h-3.5" /> Reset Array
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Marketplace Dynamic Grid */}
