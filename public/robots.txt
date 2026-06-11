@@ -1,0 +1,9 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Exclude Admin areas
+Disallow: /admin
+
+# Sitemap Location
+Sitemap: https://smartdrivefd.com/sitemap.xml

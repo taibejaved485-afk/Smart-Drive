@@ -42,7 +42,7 @@ export default function AboutPage() {
   return (
     <div className="font-sans text-gray-900 bg-white">
       <SEO 
-        title="About Us - Faisalabad's Expert Driving Academy"
+        title="About Our Driving School in Faisalabad | Smart Drive"
         description="Learn more about Smart Drive Driving School. We are Faisalabad's highly-rated educational institution with dedicated courses for manual & automatic vehicles."
         keywords="about driving school, learn manual driving Faisalabad, professional driving lessons, certified car instructors Pakistan, defensive driving training, female driving school history"
         schema={aboutSchema}

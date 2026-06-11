@@ -37,8 +37,8 @@ export default function BlogPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <SEO 
-        title="Driving Tips Blog & Educational Advice Guides"
-        description="Expand your safety awareness with expert driving tips and tutorials. We post custom-tailored articles about test procedures and road smart strategies in Faisalabad."
+        title="Driving Tips, Guides & Road Safety Blog | Smart Drive"
+        description="Learn safe driving with expert tips and tutorials. We post practical guides on road tests, parallel parking, and traffic rules in Faisalabad, Pakistan."
         keywords="learn car guide, defensive driver tips Pakistan, parallel parking how-to, heavy bike tricks, female driver guidelines"
         schema={blogSchema}
       />

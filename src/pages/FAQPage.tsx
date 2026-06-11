@@ -33,8 +33,8 @@ export default function FAQPage() {
   return (
     <div className="min-h-screen bg-white">
       <SEO 
-        title="FAQ - Driving School Questions & Answers"
-        description="Got questions about learning to drive in Faisalabad? Read our frequently asked questions about learner's permits, course length, refunds, and driver license test preparation."
+        title="Driving School FAQ - Questions & Answers | Smart Drive"
+        description="Got driving questions? Find answers on learner permits, course duration, refunds, and driver test preparation at Faisalabad's smart driving academy."
         keywords="driving school queries Faisalabad, learner permit age limit Pakistan, heavy bike training rules, fast track driving course FAQ"
         schema={faqSchema}
       />

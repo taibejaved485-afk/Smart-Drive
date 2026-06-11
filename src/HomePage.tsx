@@ -76,8 +76,8 @@ export default function HomePage() {
   return (
     <div className="font-sans text-gray-900">
       <SEO 
-        title="Female & Male Instructors - Professional Driving Academy in Faisalabad"
-        description="Faisalabad's premier driving academy offering safe, practical, and certified manual & automatic driving classes led by friendly, expert male & female instructors."
+        title="Male & Female Driving School in Faisalabad | Smart Drive"
+        description="Faisalabad's top driving academy. Learn manual & automatic driving with certified male & female instructors. Safety-focused training for all licenses."
         keywords="driving school Faisalabad, female driving instructor, learn driving car, automatic driving class, manual driving lessons, professional driving academy Pakistan, road test preparation"
         schema={homeSchema}
       />

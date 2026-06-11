@@ -51,7 +51,7 @@ export default function PricingPage() {
   return (
     <div className="bg-gray-50 min-h-screen">
       <SEO 
-        title="Lesson Fees & Course Packages - Affordable Driving School"
+        title="Driving School Fees & Lesson Packages | Smart Drive"
         description="Check out our low-cost manual & automatic driving school pricing plans in Faisalabad. Learn in a high-end Honda Civic starting from 25,000 PKR only."
         keywords="driving school fee Faisalabad, car driving class packages, heavy bike license course rates, cheap driving instructor cost, automatic car lesson prices Punjab"
         schema={pricingSchema}

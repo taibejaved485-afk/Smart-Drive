@@ -88,8 +88,8 @@ export default function ContactPage() {
   return (
     <div className="font-sans text-gray-800 bg-slate-50 min-h-screen flex flex-col justify-between selection:bg-red-650 selection:text-white">
       <SEO 
-        title="Contact Us & Student Enrollment Form"
-        description="Connect with Smart Drive Driving Academy. Book your driving lessons, find our office location in Faisalabad, call us at 0300-1115429, or fill out the enrollment form."
+        title="Contact Us & Driving Course Registration | Smart Drive"
+        description="Connect with Faisalabad's top driving school. Book lessons, find our location on Jaranwala Road, call 0300-1115429, or submit our online registration form."
         keywords="contact driving school Faisalabad, register driving classes, female driving instructor booking, learn driving school address Pakistan"
         schema={contactSchema}
       />

@@ -21,7 +21,7 @@ export default function SEO({
 }: SEOProps) {
   useEffect(() => {
     // 1. Dynamic document title
-    document.title = `${title} | Smart Drive Driving School`;
+    document.title = title;
     
     // Helper function to update/create meta tags dynamically
     const updateMeta = (name: string, content: string, isProperty = false) => {
@@ -42,13 +42,13 @@ export default function SEO({
     }
 
     // 3. Open Graph (OG) Facebook & Telegram optimization
-    updateMeta('og:title', `${title} | Smart Drive`, true);
+    updateMeta('og:title', title, true);
     updateMeta('og:description', description, true);
     updateMeta('og:image', ogImage, true);
     updateMeta('og:type', ogType, true);
 
     // 4. Twitter optimization
-    updateMeta('twitter:title', `${title} | Smart Drive`);
+    updateMeta('twitter:title', title);
     updateMeta('twitter:description', description);
     updateMeta('twitter:image', ogImage);
 

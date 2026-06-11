@@ -347,8 +347,8 @@ export default function ProgramsPage() {
   return (
     <div className="font-sans text-gray-800 bg-gray-50/50 min-h-screen flex flex-col justify-between">
       <SEO 
-        title="Driving Programs & Courses - Manual, Automatic & Motorcycle Coaching"
-        description="Choose from our premier range of tailored driving lessons in Faisalabad. We offer standard automatic car lessons, heavy bike classes, female trainer sessions, and license preparation."
+        title="Driving School Programs & Courses | Smart Drive Academy"
+        description="Choose from tailored driving lessons in Faisalabad. We offer automatic car classes, heavy bike courses, female trainer sessions, and license tests."
         keywords="automatic car lessons Faisalabad, manual gear training, motorcycle classes Pakistan, drive tutoring, female driving trainer, local driving simulator, passing driving test license"
         schema={coursesSchema}
       />
