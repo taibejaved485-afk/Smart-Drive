@@ -6,6 +6,7 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ScrollToTop from './components/ScrollToTop';
+import WhatsAppButton from './components/WhatsAppButton';
 
 // Lazy load pages for dynamic code-splitting and improved Google PageSpeed performance
 const HomePage = lazy(() => import('./HomePage'));
@@ -16,6 +17,7 @@ const FAQPage = lazy(() => import('./pages/FAQPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const ProgramsPage = lazy(() => import('./pages/ProgramsPage'));
+const RentalsPage = lazy(() => import('./pages/RentalsPage'));
 
 // Clean modern skeleton placeholder for page transitioning
 function PageLoader() {
@@ -43,8 +45,10 @@ export default function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/programs" element={<ProgramsPage />} />
+          <Route path="/rentals" element={<RentalsPage />} />
         </Routes>
       </Suspense>
+      <WhatsAppButton />
     </BrowserRouter>
   );
 }

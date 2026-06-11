@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet } from 'lucide-react';
+import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface BlogPost {
@@ -12,6 +12,44 @@ interface BlogPost {
   content: string;
   date: string;
 }
+
+interface RentalCar {
+  id: string;
+  name: string;
+  transmission: 'Automatic' | 'Manual';
+  rentPrice: string;
+  rentUnit: 'Day' | 'Hour';
+  imageUrl: string;
+  city: string;
+  status: 'Available' | 'Booked';
+}
+
+const PRESET_CAR_IMAGES = [
+  {
+    url: 'https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600',
+    label: 'White Sedan (Honda Civic)'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=600',
+    label: 'Silver Sedan (Toyota Yaris)'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600',
+    label: 'Premium Blue Sedan (Elantra)'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=600',
+    label: 'Dark Luxury Sedan'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=600',
+    label: 'Off-Road Compact SUV'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=600',
+    label: 'Sleek Sports Coupe'
+  }
+];
 
 const PRESET_IMAGES = [
   {
@@ -47,9 +85,22 @@ export default function AdminPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [newPost, setNewPost] = useState({ title: '', author: '', imageUrl: '', content: '' });
-  const [activeTab, setActiveTab] = useState<'blogs' | 'dns'>('blogs');
+  const [activeTab, setActiveTab] = useState<'blogs' | 'dns' | 'rentals'>('blogs');
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const carFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Car Fleet State
+  const [rentalCars, setRentalCars] = useState<RentalCar[]>([]);
+  const [newCar, setNewCar] = useState({
+    name: '',
+    transmission: 'Automatic' as 'Automatic' | 'Manual',
+    rentPrice: '',
+    rentUnit: 'Day' as 'Day' | 'Hour',
+    imageUrl: '',
+    city: 'Faisalabad',
+    status: 'Available' as 'Available' | 'Booked'
+  });
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -62,7 +113,145 @@ export default function AdminPage() {
     if (savedPosts) {
       setPosts(JSON.parse(savedPosts));
     }
+
+    const savedCars = localStorage.getItem('rental_cars');
+    if (savedCars) {
+      try {
+        setRentalCars(JSON.parse(savedCars));
+      } catch (e) {
+        // use empty
+      }
+    } else {
+      // Seed default Pakistani city vehicles
+      const initial: RentalCar[] = [
+        {
+          id: 'rc-1',
+          name: 'Honda Civic Pro (VTEC)',
+          transmission: 'Automatic',
+          rentPrice: '12,000',
+          rentUnit: 'Day',
+          imageUrl: 'https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600',
+          city: 'Faisalabad',
+          status: 'Available'
+        },
+        {
+          id: 'rc-2',
+          name: 'Toyota Yaris Ativ',
+          transmission: 'Automatic',
+          rentPrice: '6,500',
+          rentUnit: 'Day',
+          imageUrl: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=600',
+          city: 'Lahore',
+          status: 'Available'
+        },
+        {
+          id: 'rc-3',
+          name: 'Toyota Corolla Altis',
+          transmission: 'Manual',
+          rentPrice: '7,500',
+          rentUnit: 'Day',
+          imageUrl: 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600',
+          city: 'Islamabad',
+          status: 'Booked'
+        },
+        {
+          id: 'rc-4',
+          name: 'Suzuki Swift GLX',
+          transmission: 'Automatic',
+          rentPrice: '5,500',
+          rentUnit: 'Day',
+          imageUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=600',
+          city: 'Karachi',
+          status: 'Available'
+        }
+      ];
+      setRentalCars(initial);
+      localStorage.setItem('rental_cars', JSON.stringify(initial));
+    }
   }, []);
+
+  const handleCarImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          setNewCar(prev => ({ ...prev, imageUrl: reader.result as string }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const addRentalCar = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCar.name || !newCar.rentPrice || !newCar.city) {
+      alert('Please fill out the name, rent price, and city fields.');
+      return;
+    }
+
+    const cleanPrice = newCar.rentPrice.replace(/,/g, '').trim();
+    const priceNum = parseFloat(cleanPrice);
+    if (isNaN(priceNum)) {
+      alert('Please enter a valid rental price.');
+      return;
+    }
+
+    const finalPrice = priceNum.toLocaleString();
+
+    const carId = 'rc-' + Date.now().toString();
+    const finalCar: RentalCar = {
+      id: carId,
+      name: newCar.name,
+      transmission: newCar.transmission,
+      rentPrice: finalPrice,
+      rentUnit: newCar.rentUnit,
+      imageUrl: newCar.imageUrl || PRESET_CAR_IMAGES[0].url,
+      city: newCar.city,
+      status: newCar.status
+    };
+
+    const updated = [finalCar, ...rentalCars];
+    setRentalCars(updated);
+    localStorage.setItem('rental_cars', JSON.stringify(updated));
+    
+    // Trigger a window sync event for other routes
+    window.dispatchEvent(new Event('storage'));
+
+    alert('Rental vehicle added to fleet!');
+
+    setNewCar({
+      name: '',
+      transmission: 'Automatic',
+      rentPrice: '',
+      rentUnit: 'Day',
+      imageUrl: '',
+      city: 'Faisalabad',
+      status: 'Available'
+    });
+    if (carFileInputRef.current) carFileInputRef.current.value = '';
+  };
+
+  const deleteRentalCar = (id: string) => {
+    if (window.confirm('Are you sure you want to remove this car from the fleet?')) {
+      const updated = rentalCars.filter(c => c.id !== id);
+      setRentalCars(updated);
+      localStorage.setItem('rental_cars', JSON.stringify(updated));
+      window.dispatchEvent(new Event('storage'));
+    }
+  };
+
+  const toggleCarStatus = (id: string) => {
+    const updated = rentalCars.map(c => {
+      if (c.id === id) {
+        return { ...c, status: (c.status === 'Available' ? 'Booked' : 'Available') as 'Available' | 'Booked' };
+      }
+      return c;
+    });
+    setRentalCars(updated);
+    localStorage.setItem('rental_cars', JSON.stringify(updated));
+    window.dispatchEvent(new Event('storage'));
+  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -222,14 +411,14 @@ export default function AdminPage() {
             <ArrowLeft className="w-4 h-4" /> Exit to Blogs Page
           </Link>
         </div>
-                {/* SEO & DNS Tabs */}
+                {/* SEO, DNS & Rental Fleet Tabs */}
         <div className="flex border-b border-gray-200 mb-8 overflow-x-auto scrollbar-none gap-2">
           <button 
             type="button"
             onClick={() => setActiveTab('blogs')}
             className={`pb-4 px-6 font-bold text-sm tracking-wide transition-all border-b-2 flex items-center gap-2 ${
               activeTab === 'blogs' 
-                ? 'border-red-650 text-red-650' 
+                ? 'border-red-650 text-red-650 font-black' 
                 : 'border-transparent text-gray-500 hover:text-gray-800'
             }`}
           >
@@ -241,16 +430,28 @@ export default function AdminPage() {
             onClick={() => setActiveTab('dns')}
             className={`pb-4 px-6 font-bold text-sm tracking-wide transition-all border-b-2 flex items-center gap-2 ${
               activeTab === 'dns' 
-                ? 'border-red-650 text-red-650' 
+                ? 'border-red-650 text-red-650 font-black' 
                 : 'border-transparent text-gray-500 hover:text-gray-800'
             }`}
           >
             <ShieldAlert className="w-4 h-4 text-red-650 animate-pulse" />
             SEO & DNS Settings (DMARC-Detections)
           </button>
+          <button 
+            type="button"
+            onClick={() => setActiveTab('rentals')}
+            className={`pb-4 px-6 font-bold text-sm tracking-wide transition-all border-b-2 flex items-center gap-2 ${
+              activeTab === 'rentals' 
+                ? 'border-red-650 text-red-650 font-black' 
+                : 'border-transparent text-gray-500 hover:text-gray-800'
+            }`}
+          >
+            <Car className="w-4 h-4 text-red-650" />
+            Manage Car Fleet (رینٹل کار مینیجر)
+          </button>
         </div>
 
-        {activeTab === 'blogs' ? (
+        {activeTab === 'blogs' && (
           <div className="grid lg:grid-cols-12 gap-8">
             {/* Post Form (Create or Edit) */}
             <div className="lg:col-span-7 space-y-6">
@@ -481,7 +682,9 @@ export default function AdminPage() {
               </div>
             </div>
           </div>
-        ) : (
+        )}
+
+        {activeTab === 'dns' && (
           /* SEO, DMARC & DNS Recommendations Dashboard */
           <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-8">
             <div className="border-b border-gray-100 pb-5">
@@ -721,6 +924,276 @@ export default function AdminPage() {
                 <li>Enter <code className="bg-white px-1.5 py-0.5 rounded border font-mono">_dmarc</code> for the Name/Host, select TTL to Auto/Default, and paste the copied Value content there.</li>
                 <li>Click <strong>Save</strong>. In 1 to 24 hours, the record will propagate and verification tools like theHoth will show perfect 100% SEO Compliance!</li>
               </ol>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'rentals' && (
+          <div className="grid lg:grid-cols-12 gap-8 animate-fade-in">
+            {/* Add New Rental Car Form */}
+            <div className="lg:col-span-6 space-y-6">
+              <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm transition">
+                <div className="flex items-center gap-2 mb-6 border-b border-gray-100 pb-4">
+                  <span className="p-2 bg-red-50 text-red-600 rounded-lg">
+                    <Car className="w-5 h-5" />
+                  </span>
+                  <h2 className="text-xl font-bold text-gray-900">Add New Rental Car</h2>
+                </div>
+
+                <form onSubmit={addRentalCar} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-1">Car Model Name *</label>
+                    <input 
+                      required
+                      type="text" 
+                      className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition text-sm font-medium" 
+                      placeholder="e.g. Toyota Civic, Honda City, Fortuner 2024" 
+                      value={newCar.name} 
+                      onChange={e => setNewCar({...newCar, name: e.target.value})} 
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">Transmission *</label>
+                      <select 
+                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none bg-white transition text-xs sm:text-sm font-medium"
+                        value={newCar.transmission}
+                        onChange={e => setNewCar({...newCar, transmission: e.target.value as 'Automatic' | 'Manual' })}
+                      >
+                        <option value="Automatic">Automatic (آٹومیٹک)</option>
+                        <option value="Manual">Manual (مینول)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">City Hub *</label>
+                      <select 
+                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none bg-white transition text-xs sm:text-sm font-medium"
+                        value={newCar.city}
+                        onChange={e => setNewCar({...newCar, city: e.target.value})}
+                      >
+                        <option value="Faisalabad">Faisalabad</option>
+                        <option value="Lahore">Lahore</option>
+                        <option value="Islamabad">Islamabad</option>
+                        <option value="Karachi">Karachi</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">Rent Cost (PKR) *</label>
+                      <input 
+                        required
+                        type="text" 
+                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition text-sm font-mono font-bold" 
+                        placeholder="e.g. 6,500" 
+                        value={newCar.rentPrice} 
+                        onChange={e => setNewCar({...newCar, rentPrice: e.target.value})}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">Billing Interval *</label>
+                      <select 
+                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none bg-white transition text-xs sm:text-sm font-medium"
+                        value={newCar.rentUnit}
+                        onChange={e => setNewCar({...newCar, rentUnit: e.target.value as 'Day' | 'Hour' })}
+                      >
+                        <option value="Day">Per Day (روزانہ)</option>
+                        <option value="Hour">Per Hour (گھنٹہ)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-1">Car Cover Image URL</label>
+                    <input 
+                      type="text" 
+                      className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition text-xs font-mono" 
+                      placeholder="Or enter custom URL instead of preset" 
+                      value={newCar.imageUrl} 
+                      onChange={e => setNewCar({...newCar, imageUrl: e.target.value})} 
+                    />
+                  </div>
+
+                  {/* Preset Library Grid & Custom uploader */}
+                  <div className="bg-gray-50 p-4 rounded-xl border border-dashed border-gray-300 space-y-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                      <div>
+                        <h4 className="font-bold text-xs text-gray-800 flex items-center gap-1.5 uppercase tracking-wide">
+                          <ImageIcon className="w-4 h-4 text-gray-500" /> Choose Car Preset
+                        </h4>
+                      </div>
+                      <div>
+                        <label className="inline-flex items-center gap-1.5 bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-3.5 py-1.5 rounded-lg cursor-pointer text-xs font-bold transition">
+                          <Upload className="w-3.5 h-3.5 text-gray-500" />
+                          Upload Device File
+                          <input 
+                            type="file" 
+                            ref={carFileInputRef} 
+                            accept="image/*" 
+                            className="hidden" 
+                            onChange={handleCarImageUpload} 
+                          />
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                      {PRESET_CAR_IMAGES.map((img, i) => {
+                        const isSelected = newCar.imageUrl === img.url;
+                        return (
+                          <button
+                            key={i}
+                            type="button"
+                            title={img.label}
+                            onClick={() => setNewCar(prev => ({ ...prev, imageUrl: img.url }))}
+                            className={`relative aspect-video rounded-lg overflow-hidden border-2 transition-all ${
+                              isSelected ? 'border-red-650 scale-95 ring-2 ring-red-100' : 'border-transparent hover:border-gray-400'
+                            }`}
+                          >
+                            <img src={img.url} alt={img.label} className="w-full h-full object-cover" />
+                            {isSelected && (
+                              <div className="absolute inset-0 bg-red-600/20 flex items-center justify-center">
+                                <span className="bg-red-600 text-white rounded-full p-0.5">
+                                  <Check className="w-3 h-3" />
+                                </span>
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {newCar.imageUrl && (
+                      <div className="flex items-center gap-3 bg-white p-2.5 rounded-lg border border-gray-200">
+                        <img src={newCar.imageUrl} alt="Car Preview" className="w-16 h-10 object-cover rounded-md" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-bold text-gray-800 truncate">Selected Image Preview</p>
+                          <p className="text-[10px] text-gray-500 truncate">{newCar.imageUrl}</p>
+                        </div>
+                        <button 
+                          type="button" 
+                          onClick={() => setNewCar(prev => ({ ...prev, imageUrl: '' }))} 
+                          className="text-gray-400 hover:text-red-500 p-1 rounded-full hover:bg-gray-100 transition"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-1">Availability Status</label>
+                    <div className="flex gap-4">
+                      {['Available', 'Booked'].map((status) => (
+                        <button
+                          key={status}
+                          type="button"
+                          onClick={() => setNewCar(prev => ({ ...prev, status: status as 'Available' | 'Booked' }))}
+                          className={`flex-1 py-2.5 rounded-xl text-xs font-bold font-mono tracking-wide border-2 transition-all cursor-pointer ${
+                            newCar.status === status 
+                              ? status === 'Available'
+                                ? 'bg-green-50 text-green-700 border-green-500 scale-98'
+                                : 'bg-red-50 text-red-750 border-red-550 scale-98'
+                              : 'bg-white text-gray-600 border-gray-200'
+                          }`}
+                        >
+                          {status}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <button 
+                    type="submit" 
+                    className="w-full bg-red-600 hover:bg-red-700 text-white py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-md shadow-red-200 cursor-pointer text-sm"
+                  >
+                    <Plus className="w-4 h-4" /> Add Car to Active Fleet
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            {/* Inventory Fleet List */}
+            <div className="lg:col-span-6">
+              <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm h-full flex flex-col">
+                <div className="mb-6 border-b border-gray-100 pb-4">
+                  <h2 className="text-xl font-bold text-gray-900 font-black">Inventory Fleet ({rentalCars.length} Cars)</h2>
+                  <p className="text-xs text-gray-500 mt-1">Select availability toggles to change lease status or delete vehicles.</p>
+                </div>
+
+                {rentalCars.length === 0 ? (
+                  <div className="text-center py-20 flex-grow flex flex-col justify-center items-center bg-gray-50 border border-dashed rounded-xl p-6">
+                    <Car className="w-12 h-12 text-gray-300 mb-3" />
+                    <p className="text-gray-500 font-bold text-sm">Your rental fleet is empty.</p>
+                    <p className="text-xs text-gray-400 mt-1 max-w-[200px]">Add vehicles using the form panel on the left.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3.5 max-h-[650px] overflow-y-auto pr-1 flex-grow">
+                    {rentalCars.map((car) => {
+                      const isAvailable = car.status === 'Available';
+                      return (
+                        <div 
+                          key={car.id} 
+                          className="p-3.5 rounded-2xl border border-gray-200 hover:border-gray-250 bg-white transition flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                        >
+                          <div className="flex items-center gap-3.5">
+                            <img 
+                              src={car.imageUrl || PRESET_CAR_IMAGES[0].url} 
+                              alt={car.name} 
+                              className="w-20 h-14 object-cover rounded-xl border border-gray-100 shrink-0 bg-gray-50" 
+                            />
+                            <div className="min-w-0">
+                              <h3 className="font-extrabold text-gray-900 text-sm sm:text-base leading-snug">{car.name}</h3>
+                              
+                              <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                                <span className="bg-slate-50 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded border border-gray-100 uppercase">
+                                  {car.transmission}
+                                </span>
+                                <span className="bg-red-50 text-red-650 text-[10px] font-semibold px-2 py-0.5 rounded border border-red-100/50">
+                                  {car.city}
+                                </span>
+                                <span className="text-gray-900 text-xs font-black font-mono">
+                                  PKR {car.rentPrice}/{car.rentUnit || 'Day'}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center sm:self-center justify-between w-full sm:w-auto gap-3.5 border-t sm:border-0 pt-2.5 sm:pt-0">
+                            {/* Toggle availability status */}
+                            <button
+                              type="button"
+                              onClick={() => toggleCarStatus(car.id)}
+                              title="Toggle Availability State"
+                              className={`text-[10px] sm:text-xs font-black uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${
+                                isAvailable 
+                                  ? 'bg-green-100 text-green-700 border-green-200 hover:bg-green-200' 
+                                  : 'bg-red-50 text-red-750 border-red-200 hover:bg-red-100'
+                              }`}
+                            >
+                              {car.status}
+                            </button>
+
+                            {/* Delete Button */}
+                            <button 
+                              onClick={() => deleteRentalCar(car.id)} 
+                              title="Remove vehicle from inventory"
+                              type="button"
+                              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition cursor-pointer"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}

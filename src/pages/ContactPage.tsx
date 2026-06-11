@@ -40,8 +40,10 @@ export default function ContactPage() {
       },
       "url": "https://smartdrivefd.com/",
       "sameAs": [
-        "https://www.facebook.com/SmartDriveFSD",
-        "https://www.instagram.com/SmartDriveFSD",
+        "https://www.facebook.com/GoDriveify/",
+        "https://www.instagram.com/godriveify/",
+        "https://www.youtube.com/@godriveify",
+        "https://x.com/godriveify?s=11",
         "https://maps.google.com/?q=Smart+Drive+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan"
       ]
     }
@@ -228,7 +230,7 @@ export default function ContactPage() {
                 <p className="text-xs text-gray-600">Get quick consultation coordinates anytime from your mobile screen.</p>
               </div>
               <a 
-                href="https://wa.me/923001115429" 
+                href="https://wa.me/923097666928" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="bg-green-600 hover:bg-green-700 text-white p-3 rounded-2xl flex items-center justify-center transition-all shadow-md shadow-green-100 ring-4 ring-green-600/10 hover:scale-105 shrink-0"

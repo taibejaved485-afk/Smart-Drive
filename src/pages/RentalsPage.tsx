@@ -1,0 +1,587 @@
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import SEO from '../components/SEO';
+import { Car, MapPin, Calendar, Sliders, CheckCircle2, X, Phone, DollarSign, Clock, HelpCircle } from 'lucide-react';
+
+interface RentalCar {
+  id: string;
+  name: string;
+  transmission: 'Automatic' | 'Manual';
+  rentPrice: string; // e.g. "6500" or "12000"
+  rentUnit: 'Day' | 'Hour';
+  imageUrl: string;
+  city: string; // e.g. Faisalabad, Lahore, Islamabad, Karachi
+  status: 'Available' | 'Booked';
+}
+
+const DEFAULT_RENTAL_CARS: RentalCar[] = [
+  {
+    id: 'rc-1',
+    name: 'Honda Civic Pro (VTEC)',
+    transmission: 'Automatic',
+    rentPrice: '12,000',
+    rentUnit: 'Day',
+    imageUrl: 'https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600',
+    city: 'Faisalabad',
+    status: 'Available'
+  },
+  {
+    id: 'rc-2',
+    name: 'Toyota Yaris Ativ',
+    transmission: 'Automatic',
+    rentPrice: '6,500',
+    rentUnit: 'Day',
+    imageUrl: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=600',
+    city: 'Lahore',
+    status: 'Available'
+  },
+  {
+    id: 'rc-3',
+    name: 'Toyota Corolla Altis',
+    transmission: 'Manual',
+    rentPrice: '7,500',
+    rentUnit: 'Day',
+    imageUrl: 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600',
+    city: 'Islamabad',
+    status: 'Booked'
+  },
+  {
+    id: 'rc-4',
+    name: 'Suzuki Swift GLX',
+    transmission: 'Automatic',
+    rentPrice: '5,500',
+    rentUnit: 'Day',
+    imageUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=600',
+    city: 'Karachi',
+    status: 'Available'
+  },
+  {
+    id: 'rc-5',
+    name: 'Hyundai Elantra GLS',
+    transmission: 'Automatic',
+    rentPrice: '9,000',
+    rentUnit: 'Day',
+    imageUrl: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=600',
+    city: 'Lahore',
+    status: 'Available'
+  },
+  {
+    id: 'rc-6',
+    name: 'Honda City Aspire',
+    transmission: 'Manual',
+    rentPrice: '6,000',
+    rentUnit: 'Day',
+    imageUrl: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=600',
+    city: 'Faisalabad',
+    status: 'Available'
+  }
+];
+
+export default function RentalsPage() {
+  const [cars, setCars] = useState<RentalCar[]>([]);
+  const [selectedCity, setSelectedCity] = useState<string>('All Cities');
+  
+  // Booking modal state
+  const [selectedCar, setSelectedCar] = useState<RentalCar | null>(null);
+  const [bookingName, setBookingName] = useState<string>('');
+  const [bookingPhone, setBookingPhone] = useState<string>('');
+  const [bookingDate, setBookingDate] = useState<string>('');
+  const [bookingDuration, setBookingDuration] = useState<number>(3);
+  const [bookingSuccess, setBookingSuccess] = useState<boolean>(false);
+
+  // Load cars from localStorage, or seed default data
+  useEffect(() => {
+    const savedCars = localStorage.getItem('rental_cars');
+    if (savedCars) {
+      try {
+        const parsed = JSON.parse(savedCars);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setCars(parsed);
+        } else {
+          setCars(DEFAULT_RENTAL_CARS);
+          localStorage.setItem('rental_cars', JSON.stringify(DEFAULT_RENTAL_CARS));
+        }
+      } catch (e) {
+        setCars(DEFAULT_RENTAL_CARS);
+        localStorage.setItem('rental_cars', JSON.stringify(DEFAULT_RENTAL_CARS));
+      }
+    } else {
+      setCars(DEFAULT_RENTAL_CARS);
+      localStorage.setItem('rental_cars', JSON.stringify(DEFAULT_RENTAL_CARS));
+    }
+  }, []);
+
+  // Listen for storage changes in case admin updates cars in background
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedCars = localStorage.getItem('rental_cars');
+      if (savedCars) {
+        try {
+          setCars(JSON.parse(savedCars));
+        } catch (e) {
+          // ignore
+        }
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  // Unique list of cities for filtration tabs
+  const cities = ['All Cities', 'Lahore', 'Faisalabad', 'Islamabad', 'Karachi'];
+
+  const filteredCars = selectedCity === 'All Cities' 
+    ? cars 
+    : cars.filter(car => car.city.toLowerCase() === selectedCity.toLowerCase());
+
+  const handleOpenBooking = (car: RentalCar) => {
+    setSelectedCar(car);
+    setBookingName('');
+    setBookingPhone('');
+    setBookingDate(new Date().toISOString().split('T')[0]);
+    setBookingDuration(3);
+    setBookingSuccess(false);
+  };
+
+  const handleCloseBooking = () => {
+    setSelectedCar(null);
+  };
+
+  const submitBooking = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bookingName || !bookingPhone || !bookingDate) {
+      alert('Please fill in your Name, Phone Number and Dates.');
+      return;
+    }
+
+    if (selectedCar) {
+      // Set the booked car to Booked in state and localStorage
+      const updatedCars = cars.map(car => {
+        if (car.id === selectedCar.id) {
+          return { ...car, status: 'Booked' as const };
+        }
+        return car;
+      });
+      setCars(updatedCars);
+      localStorage.setItem('rental_cars', JSON.stringify(updatedCars));
+      
+      // Also trigger a storage event so other open tabs update
+      window.dispatchEvent(new Event('storage'));
+
+      setBookingSuccess(true);
+      setTimeout(() => {
+        setSelectedCar(null);
+        setBookingSuccess(false);
+      }, 4000);
+    }
+  };
+
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "ProductCollection",
+    "name": "Smart Drive Car Rental Fleet Pakistan",
+    "description": "Rent premium Honda Civic, Toyota Yaris, or Suzuki Swift manual or automatic cars for practice sessions, driving test preparation, or personal travel in Lahore, Faisalabad, Islamabad, and Karachi.",
+    "url": "https://smartdrivefd.com/rentals"
+  };
+
+  return (
+    <div className="bg-gray-50 min-h-screen">
+      <SEO 
+        title="Rent a Car for Driving Practice & Travel | Smart Drive"
+        description="Browse our luxury and economy manual/automatic car rental fleet in Faisalabad, Lahore, Islamabad, and Karachi. High-end rentals starting from 5,500 PKR with smooth booking."
+        keywords="car rental for driving test, rent car Faisalabad, rent driving practice car Lahore, automatic car rental Islamabad, manual transmission car rent, car rental packages Pakistan"
+        schema={schema}
+      />
+      <Navbar />
+
+      {/* Hero Header */}
+      <section className="relative py-24 bg-gray-950 text-white overflow-hidden bg-[url('https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=1600')] bg-cover bg-center">
+        <div className="absolute inset-0 bg-gray-950/85"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <motion.p 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-red-500 font-extrabold tracking-widest text-xs uppercase mb-3"
+          >
+            Premium Transport Fleet
+          </motion.p>
+          <motion.h1 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-4xl sm:text-5xl md:text-6xl font-black mb-4 tracking-tight"
+          >
+            Rent a Car for Practice or Travel
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="text-gray-400 max-w-xl mx-auto text-sm sm:text-base leading-relaxed"
+          >
+            Learn to drive on public roads, pass your driver's licensing test, or enjoy comfortable weekend rentals in major Pakistani cities.
+          </motion.p>
+        </div>
+      </section>
+
+      {/* Main Content & Fleet Section */}
+      <section className="py-16 sm:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          {/* Section Introduction */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+            <div className="max-w-2xl">
+              <span className="text-red-650 font-black tracking-wider text-xs uppercase block mb-2">Our Vehicle Fleet</span>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-950 tracking-tight leading-none">
+                Select Your Desired Transmission & City
+              </h2>
+              <p className="text-gray-500 text-sm mt-3 leading-relaxed">
+                We provide premium manual and automatic cars equipped with robust dual auxiliary passenger controls upon practice request to ensure 100% security during your road session. Select your preferred location below.
+              </p>
+            </div>
+
+            {/* Quick trust seals */}
+            <div className="flex items-center gap-4 shrink-0 bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+              <div className="bg-red-50 p-2.5 rounded-xl text-red-600">
+                <Sliders className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-black text-gray-900">Dual Control Brakes</p>
+                <p className="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">Available upon request</p>
+              </div>
+            </div>
+          </div>
+
+          {/* City Filter System */}
+          <div className="mb-10">
+            <div className="flex flex-wrap items-center gap-2 border-b border-gray-200 pb-3">
+              <span className="text-xs font-black text-gray-400 uppercase tracking-widest mr-2">Filter Location:</span>
+              {cities.map((city) => {
+                const isActive = selectedCity.toLowerCase() === city.toLowerCase();
+                return (
+                  <button
+                    key={city}
+                    onClick={() => {
+                      setSelectedCity(city);
+                    }}
+                    type="button"
+                    className={`px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all duration-350 cursor-pointer ${
+                      isActive 
+                        ? 'bg-red-650 text-white shadow-md shadow-red-100 scale-102' 
+                        : 'bg-white hover:bg-gray-100 text-gray-700 border border-gray-200'
+                    }`}
+                  >
+                    {city}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Cars Grid */}
+          <AnimatePresence mode="wait">
+            {filteredCars.length === 0 ? (
+              <motion.div 
+                key="empty"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="bg-white rounded-3xl p-12 text-center border border-gray-200 shadow-sm max-w-xl mx-auto my-8"
+              >
+                <div className="w-16 h-16 bg-red-50 text-red-650 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Car className="w-8 h-8" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">No cars available in {selectedCity} at the moment</h3>
+                <p className="text-gray-500 text-sm leading-relaxed max-w-sm mx-auto">
+                  We are constantly updating our Pakistani regional fleets. Please contact our support office or choose another major city to browse available cars.
+                </p>
+                <div className="mt-6 flex flex-col sm:flex-row justify-center gap-3">
+                  <button 
+                    onClick={() => setSelectedCity('All Cities')}
+                    type="button"
+                    className="bg-gray-900 hover:bg-black text-white font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-lg transition-all"
+                  >
+                    See All Cities
+                  </button>
+                  <a 
+                    href="tel:03001115429"
+                    className="border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-lg transition-all inline-flex items-center justify-center gap-2"
+                  >
+                    <Phone className="w-3.5 h-3.5" /> Call Support
+                  </a>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div 
+                key="grid"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8"
+              >
+                {filteredCars.map((car) => {
+                  const isAvailable = car.status === 'Available';
+                  return (
+                    <motion.div
+                      layout
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      whileHover={{ y: -6 }}
+                      transition={{ duration: 0.25 }}
+                      key={car.id}
+                      className="bg-white rounded-3xl overflow-hidden border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-lg transition-all flex flex-col justify-between"
+                    >
+                      {/* Card Image and City Badge */}
+                      <div className="relative aspect-[16/10] bg-gray-100 overflow-hidden group">
+                        <img 
+                          src={car.imageUrl || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=600'} 
+                          alt={car.name} 
+                          referrerPolicy="no-referrer"
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <div className="absolute top-4 left-4 flex gap-1.5 items-center">
+                          <span className="bg-gray-900/95 backdrop-blur-sm text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md flex items-center gap-1">
+                            <MapPin className="w-3 h-3 text-red-500" />
+                            {car.city}
+                          </span>
+                        </div>
+                        <div className="absolute top-4 right-4">
+                          <span className={`text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-md ${
+                            isAvailable 
+                              ? 'bg-green-100 text-green-800 border border-green-200' 
+                              : 'bg-red-50 text-red-750 border border-red-100'
+                          }`}>
+                            {car.status}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Card Info Content */}
+                      <div className="p-6 flex-grow flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-start justify-between mb-2">
+                            <h3 className="font-extrabold text-xl text-gray-900 tracking-tight leading-tight">
+                              {car.name}
+                            </h3>
+                          </div>
+                          
+                          {/* Transmission features */}
+                          <div className="flex items-center gap-3 my-4 text-xs font-bold text-gray-500">
+                            <span className="bg-gray-100 px-2.5 py-1 rounded-md text-gray-700 font-semibold">
+                              {car.transmission}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Sliders className="w-3.5 h-3.5 text-red-500" /> Dual-Control Compatible
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Rent Rates & Action */}
+                        <div className="pt-4 border-t border-gray-100 mt-4 flex items-center justify-between">
+                          <div>
+                            <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest">Rental Cost</p>
+                            <p className="text-gray-950 font-black text-xl">
+                              PKR {car.rentPrice}
+                              <span className="text-xs font-bold text-gray-500"> / {car.rentUnit || 'Day'}</span>
+                            </p>
+                          </div>
+
+                          <button
+                            onClick={() => handleOpenBooking(car)}
+                            type="button"
+                            disabled={!isAvailable}
+                            className={`px-5 py-3 rounded-xl text-xs font-extrabold uppercase tracking-widest transition-all duration-300 cursor-pointer ${
+                              isAvailable 
+                                ? 'bg-red-650 text-white hover:bg-red-700 hover:shadow-md' 
+                                : 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                            }`}
+                          >
+                            {isAvailable ? 'Book Now' : 'Booked'}
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
+          {/* Driving School Practices Note */}
+          <div className="mt-16 bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-sm max-w-5xl mx-auto flex flex-col sm:flex-row items-center gap-6">
+            <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-red-650 shrink-0">
+              <HelpCircle className="w-7 h-7" />
+            </div>
+            <div>
+              <h4 className="font-extrabold text-lg text-gray-950 mb-1">Are you an absolute beginner with zero road experience?</h4>
+              <p className="text-gray-500 text-sm leading-relaxed max-w-3xl">
+                We strongly recommend joining our <a href="/programs" className="text-red-650 underline font-bold">10-day intensive driving courses</a> first. Our instructors provide fully certified manual and automatic gear coaching on official, dual-clutch training vehicles with systematic supervision to teach defense maneuvers prior to renting private practice models.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* Booking Dialog Modal */}
+      <AnimatePresence>
+        {selectedCar && (
+          <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4">
+            {/* Overlay backdrop */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={handleCloseBooking}
+              className="fixed inset-0 bg-gray-950/70 backdrop-blur-sm"
+            />
+            
+            {/* Modal Body container */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              className="bg-white rounded-3xl overflow-hidden shadow-2xl max-w-lg w-full relative z-10 border border-gray-100"
+            >
+              {/* Image Banner Header */}
+              <div className="relative aspect-[21/9] bg-gray-900">
+                <img 
+                  src={selectedCar.imageUrl} 
+                  alt={selectedCar.name} 
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover brightness-75"
+                />
+                <button 
+                  onClick={handleCloseBooking}
+                  type="button"
+                  className="absolute top-4 right-4 bg-black/50 hover:bg-black/80 text-white rounded-full p-1.5 transition cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+                <div className="absolute bottom-4 left-6 text-white">
+                  <span className="text-[9px] uppercase font-black bg-red-600 px-2 py-0.5 rounded tracking-widest">Booking Request</span>
+                  <h3 className="font-extrabold text-xl mt-1 tracking-tight">{selectedCar.name}</h3>
+                </div>
+              </div>
+
+              {/* Form Content */}
+              <div className="p-6">
+                {bookingSuccess ? (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-center py-8 space-y-4"
+                  >
+                    <div className="w-16 h-16 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto">
+                      <CheckCircle2 className="w-10 h-10" />
+                    </div>
+                    <h4 className="text-2xl font-black text-gray-900 tracking-tight">Booking Request Logged!</h4>
+                    <p className="text-sm text-gray-500 max-w-sm mx-auto leading-relaxed">
+                      Assigned dynamic rental vehicle <strong className="text-red-650">{selectedCar.name}</strong> for <strong className="text-gray-900">{bookingDuration} Days</strong>. Our Faisalabad branch desk officer will call you shortly on <strong>{bookingPhone}</strong> to schedule vehicle pickup.
+                    </p>
+                    <div className="text-xs text-gray-400 bg-gray-50 p-2.5 rounded-xl border max-w-xs mx-auto">
+                      Assigned Location: <strong>{selectedCar.city} Office Hub</strong>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <form onSubmit={submitBooking} className="space-y-4">
+                    
+                    {/* Car Rates details bar */}
+                    <div className="bg-gray-50 p-3 rounded-xl border flex items-center justify-between text-xs sm:text-sm">
+                      <span className="font-bold text-gray-600">Location Area:</span>
+                      <span className="font-extrabold text-gray-900 flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 text-red-500" /> {selectedCar.city} Office
+                      </span>
+                    </div>
+
+                    <div className="bg-red-50/55 p-3 rounded-xl border border-red-100 flex items-center justify-between text-xs sm:text-sm">
+                      <span className="font-bold text-red-800">Price Rate:</span>
+                      <span className="font-black text-red-650">
+                        PKR {selectedCar.rentPrice} / {selectedCar.rentUnit || 'Day'}
+                      </span>
+                    </div>
+
+                    {/* Inputs */}
+                    <div>
+                      <label className="block text-xs font-black uppercase text-gray-500 tracking-wider mb-1">Full Name (مکمل نام) *</label>
+                      <input 
+                        required
+                        type="text"
+                        placeholder="e.g. Hammad Javed"
+                        value={bookingName}
+                        onChange={e => setBookingName(e.target.value)}
+                        className="w-full border border-gray-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black uppercase text-gray-500 tracking-wider mb-1">Phone / WhatsApp Number *</label>
+                      <input 
+                        required
+                        type="tel"
+                        placeholder="e.g. 0300-1234567"
+                        value={bookingPhone}
+                        onChange={e => setBookingPhone(e.target.value)}
+                        className="w-full border border-gray-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition font-mono"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-black uppercase text-gray-500 tracking-wider mb-1">Start Date *</label>
+                        <input 
+                          required
+                          type="date"
+                          value={bookingDate}
+                          onChange={e => setBookingDate(e.target.value)}
+                          className="w-full border border-gray-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition font-mono"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-black uppercase text-gray-500 tracking-wider mb-1">Duration (No. of {selectedCar.rentUnit}s) *</label>
+                        <input 
+                          required
+                          type="number"
+                          min="1"
+                          max="30"
+                          value={bookingDuration}
+                          onChange={e => setBookingDuration(Number(e.target.value))}
+                          className="w-full border border-gray-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition font-mono"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Total Price Estimate */}
+                    {bookingDuration > 0 && (
+                      <div className="bg-gray-900 text-white rounded-2xl p-4 flex items-center justify-between">
+                        <div>
+                          <p className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Total Rent Estimate</p>
+                          <p className="text-xl font-black text-red-500">
+                            PKR {(parseInt(selectedCar.rentPrice.replace(/,/g, '')) * bookingDuration).toLocaleString()}
+                          </p>
+                        </div>
+                        <span className="text-[10px] bg-white/10 px-2.5 py-1 rounded-md text-gray-300 max-w-[120px] text-right font-medium">
+                          Calculated for {bookingDuration} {selectedCar.rentUnit || 'Day'}s
+                        </span>
+                      </div>
+                    )}
+
+                    <button 
+                      type="submit"
+                      className="w-full bg-red-600 hover:bg-red-700 text-white font-extrabold uppercase tracking-widest text-xs py-3.5 rounded-xl transition shadow-md shadow-red-200 cursor-pointer"
+                    >
+                      Confirm Rental Appointment
+                    </button>
+                  </form>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <Footer />
+    </div>
+  );
+}

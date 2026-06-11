@@ -349,8 +349,10 @@ export default function ProgramsPage() {
         },
         "url": "https://smartdrivefd.com/",
         "sameAs": [
-          "https://www.facebook.com/SmartDriveFSD",
-          "https://www.instagram.com/SmartDriveFSD",
+          "https://www.facebook.com/GoDriveify/",
+          "https://www.instagram.com/godriveify/",
+          "https://www.youtube.com/@godriveify",
+          "https://x.com/godriveify?s=11",
           "https://maps.google.com/?q=Smart+Drive+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan"
         ]
       }

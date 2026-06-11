@@ -1,5 +1,5 @@
 import React from 'react';
-import { Facebook, Twitter, Instagram, Mail, Phone, MapPin, Clock, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin, Clock, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Footer() {
@@ -60,25 +60,40 @@ export default function Footer() {
             <div className="space-y-4 pt-2">
               <div className="flex gap-3">
                 <a 
-                  href="#" 
+                  href="https://www.facebook.com/GoDriveify/" 
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label="Facebook Link"
                   className="w-10 h-10 bg-white/5 hover:bg-red-600 text-gray-400 hover:text-white rounded-xl flex items-center justify-center transition-all border border-white/5 hover:border-transparent hover:scale-105"
                 >
                   <Facebook className="w-4 h-4" />
                 </a>
                 <a 
-                  href="#" 
+                  href="https://x.com/godriveify?s=11" 
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label="Twitter Link"
                   className="w-10 h-10 bg-white/5 hover:bg-red-600 text-gray-400 hover:text-white rounded-xl flex items-center justify-center transition-all border border-white/5 hover:border-transparent hover:scale-105"
                 >
                   <Twitter className="w-4 h-4" />
                 </a>
                 <a 
-                  href="#" 
+                  href="https://www.instagram.com/godriveify/" 
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label="Instagram Link"
                   className="w-10 h-10 bg-white/5 hover:bg-red-600 text-gray-400 hover:text-white rounded-xl flex items-center justify-center transition-all border border-white/5 hover:border-transparent hover:scale-105"
                 >
                   <Instagram className="w-4 h-4" />
+                </a>
+                <a 
+                  href="https://www.youtube.com/@godriveify" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="YouTube Link"
+                  className="w-10 h-10 bg-white/5 hover:bg-red-600 text-gray-400 hover:text-white rounded-xl flex items-center justify-center transition-all border border-white/5 hover:border-transparent hover:scale-105"
+                >
+                  <Youtube className="w-4 h-4" />
                 </a>
               </div>
             </div>
