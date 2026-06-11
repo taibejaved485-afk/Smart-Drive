@@ -41,24 +41,26 @@ export default function FeaturedCourses() {
             <motion.div 
               key={i}
               whileHover={{ y: -10 }}
-              className="group bg-white rounded-3xl overflow-hidden border border-gray-200 hover:border-red-500/50 transition-all shadow-xl"
+              className="group bg-white rounded-3xl overflow-hidden border border-gray-200 hover:border-red-500/50 transition-all shadow-xl flex flex-col h-full"
             >
               <img src={course.image} alt={course.title} className="w-full h-64 object-cover" />
-              <div className="p-8">
-                <div className="flex items-center gap-3 mb-6">
-                  <img 
-                    src={course.instructorImage}
-                    alt={course.instructorName} 
-                    className="w-12 h-12 rounded-full object-cover border border-gray-200" 
-                  />
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase">Instructor</p>
-                    <p className="font-bold">{course.instructorName}</p>
+              <div className="p-8 flex flex-col flex-grow justify-between">
+                <div>
+                  <div className="flex items-center gap-3 mb-6">
+                    <img 
+                      src={course.instructorImage}
+                      alt={course.instructorName} 
+                      className="w-12 h-12 rounded-full object-cover border border-gray-200" 
+                    />
+                    <div>
+                      <p className="text-xs text-gray-500 uppercase">Instructor</p>
+                      <p className="font-bold">{course.instructorName}</p>
+                    </div>
                   </div>
+                  <h3 className="text-2xl font-bold mb-4">{course.title}</h3>
+                  <p className="text-gray-600 mb-8">{course.desc}</p>
                 </div>
-                <h3 className="text-2xl font-bold mb-4">{course.title}</h3>
-                <p className="text-gray-600 mb-8">{course.desc}</p>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                   <Link to="/pricing" className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full font-bold transition">
                     VIEW COURSE <ArrowRight className="w-4 h-4" />
                   </Link>

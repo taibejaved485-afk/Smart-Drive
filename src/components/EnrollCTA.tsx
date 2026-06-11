@@ -25,7 +25,14 @@ export default function EnrollCTA() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-full font-bold transition mx-auto mb-16"
+          onClick={() => {
+            if ('scrollRestoration' in history) {
+              history.scrollRestoration = 'manual';
+            }
+            window.scrollTo(0, 0);
+            window.location.reload();
+          }}
+          className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-full font-bold transition mx-auto mb-16 cursor-pointer"
         >
           GET STARTED <ArrowRight className="w-5 h-5" />
         </motion.button>

@@ -65,7 +65,18 @@ export default function FAQPage() {
         <div className="py-24 px-4">
           <h2 className="text-2xl sm:text-4xl font-bold mb-6">Enroll Today</h2>
            <p className="mb-10 text-lg max-w-xl mx-auto text-gray-700">Ready to start your driving journey? Enroll in one of our courses today and become a safe, confident driver with <span className="font-bold">Smart Drive</span>.</p>
-          <button className="bg-red-600 text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest hover:bg-red-700 transition">GET STARTED →</button>
+          <button 
+            onClick={() => {
+              if ('scrollRestoration' in history) {
+                history.scrollRestoration = 'manual';
+              }
+              window.scrollTo(0, 0);
+              window.location.reload();
+            }}
+            className="bg-red-600 text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest hover:bg-red-700 transition cursor-pointer"
+          >
+            GET STARTED →
+          </button>
         </div>
       </section>
 

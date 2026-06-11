@@ -59,7 +59,18 @@ export default function PricingPage() {
                             ))}
                         </div>
                         
-                        <button className="w-full text-red-600 border-2 border-red-600 py-3 rounded-xl font-bold hover:bg-red-600 hover:text-white transition uppercase tracking-widest flex justify-center items-center gap-2">GET STARTED <span className="text-lg">→</span></button>
+                        <button 
+                            onClick={() => {
+                                if ('scrollRestoration' in history) {
+                                    history.scrollRestoration = 'manual';
+                                }
+                                window.scrollTo(0, 0);
+                                window.location.reload();
+                            }}
+                            className="w-full text-red-600 border-2 border-red-600 py-3 rounded-xl font-bold hover:bg-red-600 hover:text-white transition uppercase tracking-widest flex justify-center items-center gap-2 cursor-pointer"
+                        >
+                            GET STARTED <span className="text-lg">→</span>
+                        </button>
                     </motion.div>
                 ))}
             </div>
