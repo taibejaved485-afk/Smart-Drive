@@ -84,7 +84,7 @@ export default function Hero() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.8 }}
             onClick={() => {
-              window.location.href = 'tel:03001115429';
+              window.location.href = 'tel:03097666928';
             }}
             className="bg-red-600 hover:bg-red-700 text-white px-8 py-3.5 sm:px-10 sm:py-4.5 rounded-full font-black text-[11px] sm:text-xs uppercase tracking-widest transition-all flex items-center gap-2.5 shadow-[0_0_25px_rgba(220,38,38,0.25)] hover:shadow-red-900/50 hover:scale-105 active:scale-95 mx-auto cursor-pointer"
           >

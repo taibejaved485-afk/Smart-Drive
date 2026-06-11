@@ -461,7 +461,7 @@ export default function RentalsPage() {
                     See All Cities
                   </button>
                   <a 
-                    href="tel:03001115429"
+                    href="tel:03097666928"
                     className="border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-lg transition-all inline-flex items-center justify-center gap-2"
                   >
                     <Phone className="w-3.5 h-3.5" /> Call Support

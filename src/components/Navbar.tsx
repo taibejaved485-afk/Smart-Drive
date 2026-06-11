@@ -208,11 +208,11 @@ export default function Navbar() {
                 <Car className="w-4 h-4" /> List Your Car / Earn with Us
               </button>
               <button 
-                onClick={() => { window.location.href = 'tel:03001115429'; }}
+                onClick={() => { window.location.href = 'tel:03097666928'; }}
                 className="flex items-center gap-2 text-gray-800 bg-gray-100 hover:bg-gray-200 px-5 py-2.5 rounded-xl font-bold transition text-xs uppercase tracking-wider cursor-pointer"
                 type="button"
               >
-                <Phone className="w-4 h-4" /> 03001115429
+                <Phone className="w-4 h-4" /> 03097666928
               </button>
             </div>
 
@@ -240,7 +240,7 @@ export default function Navbar() {
                 <Car className="w-4.5 h-4.5" /> List Your Car
               </button>
               <button 
-                onClick={() => { window.location.href = 'tel:03001115429'; }}
+                onClick={() => { window.location.href = 'tel:03097666928'; }}
                 className="w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-xl font-bold transition text-xs uppercase tracking-wider cursor-pointer"
                 type="button"
               >
