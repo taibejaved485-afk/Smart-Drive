@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Car, MapPin, CheckCircle, Smartphone, SlidersHorizontal, MessageSquare, ChevronRight, HelpCircle, RefreshCw, Key, ShieldCheck } from 'lucide-react';
+import { Car, MapPin, CheckCircle, Smartphone, SlidersHorizontal, MessageSquare, ChevronRight, HelpCircle, RefreshCw, Key, ShieldCheck, Search, ChevronDown, X } from 'lucide-react';
 
 interface RentalCar {
   id: string;
@@ -106,8 +106,21 @@ const GENERAL_DEFAULT_CARS: RentalCar[] = [
 
 export default function RentalMarketplace() {
   const [activeCity, setActiveCity] = useState<string>('All Cities');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedArea, setSelectedArea] = useState<string>('');
+  const [priceFilter, setPriceFilter] = useState<string>('All Budgets');
+  const [selectedTransmission, setSelectedTransmission] = useState<string>('All');
+  const [driverPreference, setDriverPreference] = useState<string>('Any');
+
   const [cars, setCars] = useState<RentalCar[]>([]);
   const cities = ['All Cities', 'Faisalabad', 'Lahore', 'Islamabad', 'Karachi'];
+
+  const CITY_AREAS: Record<string, string[]> = {
+    'Faisalabad': ['Peoples Colony', 'D-Ground', 'Canal Road', 'Samanabad', 'Sargodha Road'],
+    'Lahore': ['DHA', 'Gulberg', 'Johar Town', 'Bahria Town', 'Model Town'],
+    'Islamabad': ['Blue Area', 'F-7', 'G-11', 'DHA Phase 2', 'E-7'],
+    'Karachi': ['Clifton', 'DHA', 'Gulshan-e-Iqbal', 'North Nazimabad']
+  };
 
   const reloadInventory = () => {
     let approvedList: RentalCar[] = [];
@@ -173,9 +186,35 @@ export default function RentalMarketplace() {
     };
   }, []);
 
-  const filteredCars = activeCity === 'All Cities'
-    ? cars
-    : cars.filter(car => car.city.toLowerCase() === activeCity.toLowerCase());
+  const filteredCars = cars.filter(car => {
+    // 1. Search Query
+    const searchString = `${car.name} ${car.description || ''} ${car.fuelType || ''} ${car.transmission}`.toLowerCase();
+    const searchMatch = !searchQuery || searchString.includes(searchQuery.toLowerCase());
+
+    // 2. City Filter
+    const cityMatch = activeCity === 'All Cities' || car.city.toLowerCase() === activeCity.toLowerCase();
+    
+    // 3. Area Filter
+    const areaMatch = !selectedArea || (car.description || '').toLowerCase().includes(selectedArea.toLowerCase());
+
+    // 4. Price filter
+    let priceMatch = true;
+    const priceNum = parseInt(car.rentPrice.replace(/,/g, '')) || 0;
+    if (priceFilter === 'Below 5k/day') priceMatch = priceNum < 5000;
+    if (priceFilter === '5k - 10k/day') priceMatch = priceNum >= 5000 && priceNum <= 10000;
+    if (priceFilter === 'Above 10k/day') priceMatch = priceNum > 10000;
+
+    // 5. Transmission
+    const transmissionMatch = selectedTransmission === 'All' || car.transmission === selectedTransmission;
+
+    // 6. Driver pref
+    let driverMatch = true;
+    const withDriver = (car as any).withDriver;
+    if (driverPreference === 'Self-Drive') driverMatch = withDriver !== true;
+    if (driverPreference === 'With Driver') driverMatch = withDriver === true;
+
+    return searchMatch && cityMatch && areaMatch && priceMatch && transmissionMatch && driverMatch;
+  });
 
   // Generate WhatsApp contact URL
   const getWhatsAppLink = (car: RentalCar) => {
@@ -202,27 +241,134 @@ export default function RentalMarketplace() {
           </p>
         </div>
 
-        {/* City Filter Segment Controls */}
-        <div className="flex justify-center mb-10 overflow-x-auto pb-2 scrollbar-none">
-          <div className="inline-flex bg-white p-1.5 rounded-2xl border border-gray-200/80 shadow-sm gap-1 sm:gap-2">
-            {cities.map(city => {
-              const isActive = activeCity.toLowerCase() === city.toLowerCase();
-              return (
+        {/* UNIFIED FLEET SEARCH BAR */}
+        <div className="bg-white rounded-2xl sm:rounded-[2rem] border border-gray-200 p-3 sm:p-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] mb-6 max-w-5xl mx-auto relative overflow-hidden z-20">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 sm:gap-4 items-center">
+            {/* Column 1: Search */}
+            <div className="relative flex items-center bg-gray-50 rounded-xl sm:rounded-2xl border border-gray-100 hover:border-gray-200 transition-colors px-4 py-3 sm:py-4 focus-within:bg-white focus-within:ring-2 focus-within:ring-red-100 focus-within:border-red-500 group">
+              <Search className="w-5 h-5 text-gray-400 group-focus-within:text-red-500 transition-colors shrink-0" />
+              <input
+                type="text"
+                placeholder="Search car brand or model (e.g. Civic, Alto)..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="bg-transparent border-none outline-none text-sm font-bold text-gray-900 placeholder:text-gray-400 w-full ml-3"
+              />
+            </div>
+
+            {/* Column 2: Main City */}
+            <div className="relative flex flex-col justify-center bg-gray-50 rounded-xl sm:rounded-2xl border border-gray-100 hover:border-gray-200 transition-colors px-4 py-2 sm:py-3 cursor-pointer group focus-within:bg-white focus-within:ring-2 focus-within:ring-red-100 focus-within:border-red-500">
+              <label className="text-[9px] font-black uppercase text-gray-400 tracking-widest pl-1 mb-0.5">Location</label>
+              <select 
+                value={activeCity} 
+                onChange={(e) => {
+                  setActiveCity(e.target.value);
+                  setSelectedArea('');
+                }}
+                className="bg-transparent border-none outline-none text-sm sm:text-base font-extrabold text-gray-900 w-full appearance-none cursor-pointer p-0 m-0 leading-tight"
+              >
+                {cities.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none group-focus-within:text-amber-500 transition-colors" />
+            </div>
+
+            {/* Column 3: Area/Locality */}
+            <div className={`relative flex flex-col justify-center bg-gray-50 rounded-xl sm:rounded-2xl border border-gray-100 transition-colors px-4 py-2 sm:py-3 cursor-pointer group ${activeCity !== 'All Cities' && activeCity ? 'hover:border-gray-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-red-100 focus-within:border-red-500' : 'opacity-60 cursor-not-allowed'}`}>
+              <label className="text-[9px] font-black uppercase text-gray-400 tracking-widest pl-1 mb-0.5">Locality</label>
+              <select 
+                value={selectedArea}
+                onChange={(e) => setSelectedArea(e.target.value)}
+                disabled={activeCity === 'All Cities' || !activeCity}
+                className="bg-transparent border-none outline-none text-sm sm:text-base font-extrabold text-gray-900 w-full appearance-none cursor-pointer p-0 m-0 leading-tight disabled:text-gray-400 disabled:cursor-not-allowed"
+              >
+                <option value="">{activeCity !== 'All Cities' && activeCity ? 'All Areas' : 'Select City First'}</option>
+                {activeCity !== 'All Cities' && CITY_AREAS[activeCity]?.map(a => <option key={a} value={a}>{a}</option>)}
+              </select>
+              <ChevronDown className={`absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none transition-colors ${activeCity !== 'All Cities' && activeCity ? 'group-focus-within:text-amber-500' : 'opacity-50'}`} />
+            </div>
+
+            {/* Column 4: Search Action Button */}
+            <button className="bg-gray-950 hover:bg-gray-900 text-white rounded-xl sm:rounded-2xl font-black uppercase text-xs tracking-widest py-4 sm:py-5 px-6 transition-all shadow-[0_5px_15px_rgba(3,7,18,0.2)] hover:shadow-[0_8px_25px_rgba(3,7,18,0.3)] hover:scale-[1.02] flex items-center justify-center gap-2 cursor-pointer w-full h-full">
+              <Search className="w-4 h-4 text-amber-500" />
+              Search Fleet
+            </button>
+          </div>
+        </div>
+
+        {/* SMART FILTERS (Below Main Bar) */}
+        <div className="flex flex-wrap items-center justify-center gap-3 mb-12 px-2 max-w-5xl mx-auto">
+          {/* Price Filter Pill */}
+          <div className="relative group inline-block">
+            <select 
+              value={priceFilter}
+              onChange={(e) => setPriceFilter(e.target.value)}
+              className="appearance-none bg-white border border-gray-200 hover:border-gray-300 text-xs font-bold text-gray-700 px-4 py-2 rounded-full cursor-pointer transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-red-100 pr-8"
+            >
+              <option value="All Budgets">All Budgets</option>
+              <option value="Below 5k/day">Below 5k/day</option>
+              <option value="5k - 10k/day">5k - 10k/day</option>
+              <option value="Above 10k/day">Above 10k/day</option>
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none group-hover:text-gray-600" />
+          </div>
+
+          {/* Transmission Mode */}
+          <div className="inline-flex items-center bg-white border border-gray-200 rounded-full p-1 shadow-sm">
+              {['All', 'Automatic', 'Manual'].map(trans => (
                 <button
-                  key={city}
-                  onClick={() => setActiveCity(city)}
+                  key={trans}
                   type="button"
-                  className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all whitespace-nowrap cursor-pointer ${
-                    isActive 
-                      ? 'bg-red-600 text-white shadow-md' 
-                      : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'
+                  onClick={() => setSelectedTransmission(trans)}
+                  className={`text-[10px] sm:text-xs font-bold tracking-wide px-3 sm:px-4 py-1.5 rounded-full transition-all cursor-pointer ${
+                    selectedTransmission === trans 
+                    ? 'bg-gray-900 text-white shadow-sm'
+                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
                   }`}
                 >
-                  {city}
+                  {trans}
                 </button>
-              );
-            })}
+              ))}
           </div>
+
+          {/* Driver Preference Pill Option Toggle */}
+          <div className="inline-flex items-center bg-white border border-gray-200 rounded-full p-1 shadow-sm">
+              {['Any', 'Self-Drive', 'With Driver'].map(pref => (
+                <button
+                  key={pref}
+                  type="button"
+                  onClick={() => setDriverPreference(pref)}
+                  className={`text-[10px] sm:text-xs font-bold tracking-wide px-3 sm:px-4 py-1.5 rounded-full transition-all cursor-pointer ${
+                    driverPreference === pref 
+                    ? 'bg-gray-900 text-white shadow-sm'
+                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                >
+                  {pref}
+                </button>
+              ))}
+          </div>
+
+            {/* Clear Filters (if active) */}
+            <div className="ml-auto flex flex-wrap items-center gap-4">
+              <span className="text-xs font-semibold text-gray-500 font-mono hidden sm:inline-block">
+                Found <strong className="text-gray-950 font-black">{filteredCars.length}</strong> matches
+              </span>
+              {(searchQuery || activeCity !== 'All Cities' || selectedArea || priceFilter !== 'All Budgets' || driverPreference !== 'Any' || selectedTransmission !== 'All') && (
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    setActiveCity('All Cities');
+                    setSelectedArea('');
+                    setPriceFilter('All Budgets');
+                    setDriverPreference('Any');
+                    setSelectedTransmission('All');
+                  }}
+                  className="text-[10px] font-black uppercase text-red-650 hover:text-red-750 transition-colors cursor-pointer tracking-wider flex items-center gap-1"
+                >
+                  <X className="w-3.5 h-3.5" /> Clear All Filters
+                </button>
+              )}
+            </div>
         </div>
 
         {/* Marketplace Dynamic Grid */}

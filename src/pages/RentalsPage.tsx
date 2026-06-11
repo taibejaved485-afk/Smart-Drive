@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import SEO from '../components/SEO';
 import EarningsCalculator from '../components/EarningsCalculator';
-import { Car, MapPin, Calendar, Sliders, CheckCircle2, ShieldCheck, X, Phone, DollarSign, Clock, HelpCircle, Filter, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Car, MapPin, Calendar, Sliders, CheckCircle2, ShieldCheck, X, Phone, DollarSign, Clock, HelpCircle, Filter, Sparkles, ChevronLeft, ChevronRight, Search, ChevronDown, Check } from 'lucide-react';
 
 interface RentalCar {
   id: string;
@@ -188,8 +188,11 @@ function CarImageCarousel({ car }: { car: RentalCar }) {
 
 export default function RentalsPage() {
   const [cars, setCars] = useState<RentalCar[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCity, setSelectedCity] = useState<string>('All Cities');
-  const [selectedVehicleType, setSelectedVehicleType] = useState<string>('All');
+  const [selectedArea, setSelectedArea] = useState<string>('');
+  const [priceFilter, setPriceFilter] = useState<string>('All Budgets');
+  const [driverPreference, setDriverPreference] = useState<string>('Any');
   const [selectedTransmission, setSelectedTransmission] = useState<string>('All');
   
   // Booking modal state
@@ -239,30 +242,42 @@ export default function RentalsPage() {
   }, []);
 
   // Unique list of cities for filtration tabs
-  const cities = ['All Cities', 'Lahore', 'Faisalabad', 'Islamabad', 'Karachi'];
+  const cities = ['All Cities', 'Faisalabad', 'Lahore', 'Islamabad', 'Karachi'];
+  
+  const CITY_AREAS: Record<string, string[]> = {
+    'Faisalabad': ['Peoples Colony', 'D-Ground', 'Canal Road', 'Samanabad', 'Sargodha Road'],
+    'Lahore': ['DHA', 'Gulberg', 'Johar Town', 'Bahria Town', 'Model Town'],
+    'Islamabad': ['Blue Area', 'F-7', 'G-11', 'DHA Phase 2', 'E-7'],
+    'Karachi': ['Clifton', 'DHA', 'Gulshan-e-Iqbal', 'North Nazimabad']
+  };
 
   const filteredCars = cars.filter(car => {
-    // 1. City Filter
+    // 1. Search filter
+    const searchString = `${car.name} ${car.description || ''} ${car.type} ${car.transmission}`.toLowerCase();
+    const matchesSearch = !searchQuery || searchString.includes(searchQuery.toLowerCase());
+
+    // 2. City Filter
     const matchesCity = selectedCity === 'All Cities' || car.city.toLowerCase() === selectedCity.toLowerCase();
     
-    // 2. Vehicle Type Filter
-    let carType = car.type;
-    if (!carType) {
-      const nameLower = car.name.toLowerCase();
-      if (nameLower.includes('fortuner') || nameLower.includes('audi') || nameLower.includes('mercedes') || nameLower.includes('c-class') || nameLower.includes('montero') || nameLower.includes('v8')) {
-        carType = 'Luxury';
-      } else if (nameLower.includes('swift') || nameLower.includes('city') || nameLower.includes('alto') || nameLower.includes('cultus') || nameLower.includes('picanto') || nameLower.includes('vitz')) {
-        carType = 'Economy';
-      } else {
-        carType = 'Sedan';
-      }
-    }
-    const matchesType = selectedVehicleType === 'All' || carType === selectedVehicleType;
+    // 3. Area Filter
+    const matchesArea = !selectedArea || car.area === selectedArea || (car.description || '').includes(selectedArea);
 
-    // 3. Transmission Filter
+    // 4. Price Filter
+    let matchesPrice = true;
+    const priceNum = parseInt(car.rentPrice.replace(/,/g, '')) || 0;
+    if (priceFilter === 'Below 5k/day') matchesPrice = priceNum < 5000;
+    if (priceFilter === '5k - 10k/day') matchesPrice = priceNum >= 5000 && priceNum <= 10000;
+    if (priceFilter === 'Above 10k/day') matchesPrice = priceNum > 10000;
+
+    // 5. Driver Preference
+    let matchesDriver = true;
+    if (driverPreference === 'Self-Drive') matchesDriver = car.withDriver !== true;
+    if (driverPreference === 'With Driver') matchesDriver = car.withDriver === true;
+
+    // 6. Transmission Filter
     const matchesTransmission = selectedTransmission === 'All' || car.transmission === selectedTransmission;
 
-    return matchesCity && matchesType && matchesTransmission;
+    return matchesSearch && matchesCity && matchesArea && matchesPrice && matchesDriver && matchesTransmission;
   });
 
   const handleOpenBooking = (car: RentalCar) => {
@@ -394,104 +409,135 @@ export default function RentalsPage() {
             </div>
           </div>
 
-          {/* ADVANCED MULTI-CRITERIA FILTERS BAR */}
-          <div className="bg-white rounded-3xl border border-gray-200 p-6 sm:p-8 mb-10 shadow-sm relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 via-amber-500 to-amber-600" />
-            
-            <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-150">
-              <div className="flex items-center gap-2">
-                <Filter className="w-5 h-5 text-gray-800" />
-                <h3 className="font-extrabold text-xs sm:text-sm text-gray-950 uppercase tracking-widest font-display">Fleet Filter Dashboard</h3>
+          {/* UNIFIED FLEET SEARCH BAR */}
+          <div className="bg-white rounded-2xl sm:rounded-[2rem] border border-gray-200 p-3 sm:p-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] mb-6 mx-auto relative overflow-hidden z-20">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3 sm:gap-4 items-center">
+              {/* Column 1: Search */}
+              <div className="relative flex items-center bg-gray-50 rounded-xl sm:rounded-2xl border border-gray-100 hover:border-gray-200 transition-colors px-4 py-3 sm:py-4 focus-within:bg-white focus-within:ring-2 focus-within:ring-red-100 focus-within:border-red-500 group">
+                <Search className="w-5 h-5 text-gray-400 group-focus-within:text-red-500 transition-colors shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Search car brand or model (e.g. Civic, Alto)..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bg-transparent border-none outline-none text-sm font-bold text-gray-900 placeholder:text-gray-400 w-full ml-3"
+                />
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-xs font-semibold text-gray-500 font-mono">
+
+              {/* Column 2: Main City */}
+              <div className="relative flex flex-col justify-center bg-gray-50 rounded-xl sm:rounded-2xl border border-gray-100 hover:border-gray-200 transition-colors px-4 py-2 sm:py-3 cursor-pointer group focus-within:bg-white focus-within:ring-2 focus-within:ring-red-100 focus-within:border-red-500">
+                <label className="text-[9px] font-black uppercase text-gray-400 tracking-widest pl-1 mb-0.5">Location</label>
+                <select 
+                  value={selectedCity} 
+                  onChange={(e) => {
+                    setSelectedCity(e.target.value);
+                    setSelectedArea('');
+                  }}
+                  className="bg-transparent border-none outline-none text-sm sm:text-base font-extrabold text-gray-900 w-full appearance-none cursor-pointer p-0 m-0 leading-tight"
+                >
+                  <option value="" disabled>Select Main City</option>
+                  {cities.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none group-focus-within:text-amber-500 transition-colors" />
+              </div>
+
+              {/* Column 3: Area/Locality */}
+              <div className={`relative flex flex-col justify-center bg-gray-50 rounded-xl sm:rounded-2xl border border-gray-100 transition-colors px-4 py-2 sm:py-3 cursor-pointer group ${selectedCity !== 'All Cities' && selectedCity ? 'hover:border-gray-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-red-100 focus-within:border-red-500' : 'opacity-60 cursor-not-allowed'}`}>
+                <label className="text-[9px] font-black uppercase text-gray-400 tracking-widest pl-1 mb-0.5">Locality</label>
+                <select 
+                  value={selectedArea}
+                  onChange={(e) => setSelectedArea(e.target.value)}
+                  disabled={selectedCity === 'All Cities' || !selectedCity}
+                  className="bg-transparent border-none outline-none text-sm sm:text-base font-extrabold text-gray-900 w-full appearance-none cursor-pointer p-0 m-0 leading-tight disabled:text-gray-400 disabled:cursor-not-allowed"
+                >
+                  <option value="">{selectedCity !== 'All Cities' && selectedCity ? 'All Areas' : 'Select City First'}</option>
+                  {selectedCity !== 'All Cities' && CITY_AREAS[selectedCity]?.map(a => <option key={a} value={a}>{a}</option>)}
+                </select>
+                <ChevronDown className={`absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none transition-colors ${selectedCity !== 'All Cities' && selectedCity ? 'group-focus-within:text-amber-500' : 'opacity-50'}`} />
+              </div>
+
+              {/* Column 4: Search Action Button */}
+              <button className="bg-gray-950 hover:bg-gray-900 text-white rounded-xl sm:rounded-2xl font-black uppercase text-xs tracking-widest py-4 sm:py-5 px-6 transition-all shadow-[0_5px_15px_rgba(3,7,18,0.2)] hover:shadow-[0_8px_25px_rgba(3,7,18,0.3)] hover:scale-[1.02] flex items-center justify-center gap-2 cursor-pointer w-full h-full">
+                <Search className="w-4 h-4 text-amber-500" />
+                Search Fleet
+              </button>
+            </div>
+          </div>
+
+          {/* SMART FILTERS (Below Main Bar) */}
+          <div className="flex flex-wrap items-center gap-3 mb-10 px-2">
+            {/* Price Filter Pill */}
+            <div className="relative group inline-block">
+              <select 
+                value={priceFilter}
+                onChange={(e) => setPriceFilter(e.target.value)}
+                className="appearance-none bg-white border border-gray-200 hover:border-gray-300 text-xs font-bold text-gray-700 px-4 py-2 rounded-full cursor-pointer transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-red-100 pr-8"
+              >
+                <option value="All Budgets">All Budgets</option>
+                <option value="Below 5k/day">Below 5k/day</option>
+                <option value="5k - 10k/day">5k - 10k/day</option>
+                <option value="Above 10k/day">Above 10k/day</option>
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none group-hover:text-gray-600" />
+            </div>
+
+            {/* Transmission Mode */}
+            <div className="inline-flex items-center bg-white border border-gray-200 rounded-full p-1 shadow-sm">
+               {['All', 'Automatic', 'Manual'].map(trans => (
+                 <button
+                   key={trans}
+                   type="button"
+                   onClick={() => setSelectedTransmission(trans)}
+                   className={`text-[10px] sm:text-xs font-bold tracking-wide px-3 sm:px-4 py-1.5 rounded-full transition-all cursor-pointer ${
+                     selectedTransmission === trans 
+                     ? 'bg-gray-900 text-white shadow-sm'
+                     : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                   }`}
+                 >
+                   {trans}
+                 </button>
+               ))}
+            </div>
+
+            {/* Driver Preference Pill Option Toggle */}
+            <div className="inline-flex items-center bg-white border border-gray-200 rounded-full p-1 shadow-sm">
+               {['Any', 'Self-Drive', 'With Driver'].map(pref => (
+                 <button
+                   key={pref}
+                   type="button"
+                   onClick={() => setDriverPreference(pref)}
+                   className={`text-[10px] sm:text-xs font-bold tracking-wide px-3 sm:px-4 py-1.5 rounded-full transition-all cursor-pointer ${
+                     driverPreference === pref 
+                     ? 'bg-gray-900 text-white shadow-sm'
+                     : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                   }`}
+                 >
+                   {pref}
+                 </button>
+               ))}
+            </div>
+
+             {/* Clear Filters (if active) */}
+             <div className="ml-auto flex flex-wrap items-center gap-4">
+               <span className="text-xs font-semibold text-gray-500 font-mono hidden sm:inline-block">
                   Found <strong className="text-gray-950 font-black">{filteredCars.length}</strong> matches
                 </span>
-                {(selectedCity !== 'All Cities' || selectedVehicleType !== 'All' || selectedTransmission !== 'All') && (
+                {(searchQuery || selectedCity !== 'All Cities' || selectedArea || priceFilter !== 'All Budgets' || driverPreference !== 'Any' || selectedTransmission !== 'All') && (
                   <button
                     onClick={() => {
+                      setSearchQuery('');
                       setSelectedCity('All Cities');
-                      setSelectedVehicleType('All');
+                      setSelectedArea('');
+                      setPriceFilter('All Budgets');
+                      setDriverPreference('Any');
                       setSelectedTransmission('All');
                     }}
-                    className="text-xs font-bold text-red-600 hover:text-red-750 transition-all underline cursor-pointer"
+                    className="text-[10px] font-black uppercase text-red-650 hover:text-red-750 transition-colors cursor-pointer tracking-wider flex items-center gap-1"
                   >
-                    Reset Filters
+                    <X className="w-3.5 h-3.5" /> Clear All Filters
                   </button>
                 )}
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-12 gap-6 items-end">
-              {/* 1. City Filter */}
-              <div className="md:col-span-4 space-y-2">
-                <label className="block text-[10px] font-black uppercase text-gray-400 tracking-widest">
-                  Hometown Hub (City)
-                </label>
-                <select
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none bg-white transition text-xs sm:text-sm font-semibold text-gray-800 cursor-pointer"
-                >
-                  {cities.map((city) => (
-                    <option key={city} value={city}>{city}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* 2. Vehicle Class Tabs */}
-              <div className="md:col-span-5 space-y-2">
-                <label className="block text-[10px] font-black uppercase text-gray-400 tracking-widest">
-                  Vehicle Type Class
-                </label>
-                <div className="grid grid-cols-4 gap-1 p-1 bg-gray-100/80 rounded-xl border border-gray-200">
-                  {['All', 'Economy', 'Sedan', 'Luxury'].map((type) => {
-                    const isActive = selectedVehicleType === type;
-                    return (
-                      <button
-                        key={type}
-                        type="button"
-                        onClick={() => setSelectedVehicleType(type)}
-                        className={`py-1.5 px-1 rounded-lg text-[10px] sm:text-xs font-bold tracking-wide transition-all cursor-pointer truncate ${
-                          isActive
-                            ? 'bg-red-650 text-white shadow-sm font-extrabold'
-                            : 'text-gray-600 hover:text-gray-900 hover:bg-white/40'
-                        }`}
-                      >
-                        {type}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* 3. Transmission Toggle Select */}
-              <div className="md:col-span-3 space-y-2">
-                <label className="block text-[10px] font-black uppercase text-gray-400 tracking-widest">
-                  Transmission Type
-                </label>
-                <div className="grid grid-cols-3 gap-1 p-1 bg-gray-100/80 rounded-xl border border-gray-200">
-                  {['All', 'Automatic', 'Manual'].map((trans) => {
-                    const isActive = selectedTransmission === trans;
-                    const label = trans === 'All' ? 'All' : trans === 'Automatic' ? 'Auto' : 'Manual';
-                    return (
-                      <button
-                        key={trans}
-                        type="button"
-                        onClick={() => setSelectedTransmission(trans)}
-                        className={`py-1.5 px-0.5 rounded-lg text-[10px] sm:text-xs font-bold tracking-wide transition-all cursor-pointer truncate ${
-                          isActive
-                            ? 'bg-red-650 text-white shadow-sm font-extrabold'
-                            : 'text-gray-600 hover:text-gray-900 hover:bg-white/40'
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
+             </div>
           </div>
 
           {/* Cars Grid */}
@@ -507,9 +553,12 @@ export default function RentalsPage() {
                 </p>
                 <div className="mt-6 flex flex-col sm:flex-row justify-center gap-3">
                   <button 
-                    onClick={() => setSelectedCity('All Cities')}
+                    onClick={() => {
+                      setSelectedCity('');
+                      setSelectedArea('');
+                    }}
                     type="button"
-                    className="bg-gray-900 hover:bg-black text-white font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-lg transition-all"
+                    className="bg-gray-900 hover:bg-black text-white font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-lg transition-all cursor-pointer"
                   >
                     See All Cities
                   </button>
