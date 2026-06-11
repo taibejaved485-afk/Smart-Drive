@@ -20,6 +20,7 @@ interface RentalCar {
   rentPrice: string;
   rentUnit: 'Day' | 'Hour';
   imageUrl: string;
+  images?: string[];
   city: string;
   status: 'Available' | 'Booked';
 }
@@ -1298,7 +1299,7 @@ export default function AdminPage() {
                         {/* Visual Asset */}
                         <div className="w-full sm:w-28 h-20 sm:h-24 rounded-xl overflow-hidden bg-white shrink-0 border relative">
                           <img 
-                            src={car.imageUrl || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=300'} 
+                            src={car.images && car.images.length > 0 ? car.images[0] : (car.imageUrl || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=300')} 
                             alt={car.name} 
                             className="w-full h-full object-cover"
                             referrerPolicy="no-referrer"
@@ -1613,7 +1614,7 @@ export default function AdminPage() {
                         >
                           <div className="flex items-center gap-3.5">
                             <img 
-                              src={car.imageUrl || PRESET_CAR_IMAGES[0].url} 
+                              src={car.images && car.images.length > 0 ? car.images[0] : (car.imageUrl || PRESET_CAR_IMAGES[0].url)} 
                               alt={car.name} 
                               className="w-20 h-14 object-cover rounded-xl border border-gray-100 shrink-0 bg-gray-50" 
                             />

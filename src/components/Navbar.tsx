@@ -1,6 +1,6 @@
-import { useState, useEffect, FormEvent } from 'react';
+import React, { useState, useEffect, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Phone, Car, Plus, Check, ChevronRight, User, ShieldCheck, Mail, Info } from 'lucide-react';
+import { Menu, X, Phone, Car, Plus, Check, ChevronRight, User, ShieldCheck, Mail, Info, UploadCloud, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 const PRESET_CAR_IMAGE_OPTIONS = [
@@ -59,6 +59,7 @@ export default function Navbar() {
     rentUnit: 'Day' as 'Day' | 'Hour',
     description: '',
     imageUrl: PRESET_CAR_IMAGE_OPTIONS[0].url,
+    imageUrls: [] as string[],
     registrationNumber: ''
   });
 
@@ -134,7 +135,8 @@ export default function Navbar() {
       rentPrice: parsedPrice.toLocaleString(),
       rentUnit: formData.rentUnit,
       description: formData.description || 'Stunning family car listed by registered local owner. Perfect mechanical running order, fully functional AC, comfortable layout.',
-      imageUrl: formData.imageUrl,
+      imageUrl: formData.imageUrls.length > 0 ? formData.imageUrls[0] : formData.imageUrl,
+      images: formData.imageUrls,
       registrationNumber: formData.registrationNumber,
       status: 'Available' as 'Available' | 'Booked',
       createdAt: new Date().toISOString(),
@@ -174,8 +176,44 @@ export default function Navbar() {
       rentUnit: 'Day',
       description: '',
       imageUrl: PRESET_CAR_IMAGE_OPTIONS[0].url,
+      imageUrls: [],
       registrationNumber: ''
     });
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const remainingSlots = 4 - formData.imageUrls.length;
+    if (remainingSlots <= 0) {
+      alert('You can only upload a maximum of 4 images.');
+      return;
+    }
+
+    const filesToProcess = Array.from(files as FileList).slice(0, remainingSlots);
+
+    filesToProcess.forEach(file => {
+      if (file.size > 5 * 1024 * 1024) {
+        alert(`${file.name} exceeds the 5MB limit.`);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({
+          ...prev,
+          imageUrls: [...prev.imageUrls, reader.result as string]
+        }));
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeImage = (indexToRemove: number) => {
+    setFormData(prev => ({
+      ...prev,
+      imageUrls: prev.imageUrls.filter((_, index) => index !== indexToRemove)
+    }));
   };
 
   return (
@@ -454,32 +492,48 @@ export default function Navbar() {
                           </div>
                         </div>
 
-                        {/* Image Presets Selector */}
+                        {/* File Upload Zone */}
                         <div className="bg-gray-50 border border-gray-200 p-4 rounded-2xl mt-4">
-                          <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2">Select Car Visual Representation</label>
-                          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                            {PRESET_CAR_IMAGE_OPTIONS.map((imgUrl, idx) => {
-                              const isSelected = formData.imageUrl === imgUrl.url;
-                              return (
-                                <button
-                                  key={idx}
-                                  type="button"
-                                  onClick={() => setFormData({...formData, imageUrl: imgUrl.url})}
-                                  className={`aspect-video rounded-xl overflow-hidden border-2 relative transition ${isSelected ? 'border-red-650 scale-95 ring-2 ring-red-100' : 'border-transparent opacity-80 hover:opacity-100'}`}
-                                  title={imgUrl.label}
-                                >
-                                  <img src={imgUrl.url} className="w-full h-full object-cover" alt="Car Visual Option" />
-                                  {isSelected && (
-                                    <div className="absolute inset-0 bg-red-600/10 flex items-center justify-center">
-                                      <span className="bg-red-600 text-white p-0.5 rounded-full"><Check className="w-3 h-3 stroke-[3]" /></span>
+                          <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2">Upload Car Images (Max 4 pics)</label>
+                          <p className="text-[10px] text-gray-500 mb-3 font-medium">PNG, JPG, JPEG up to 5MB</p>
+                          
+                          <div className="relative border-2 border-dashed border-gray-300 hover:border-red-500 bg-white rounded-xl p-8 flex flex-col items-center justify-center transition-colors group cursor-pointer text-center overflow-hidden">
+                            <input 
+                              type="file" 
+                              multiple 
+                              accept="image/*" 
+                              onChange={handleImageUpload}
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+                              title="" 
+                            />
+                            <div className="bg-red-50 text-red-650 p-3 rounded-full mb-3 group-hover:scale-110 transition-transform">
+                              <UploadCloud className="w-6 h-6" />
+                            </div>
+                            <span className="text-sm font-bold text-gray-700">Click or drag images here</span>
+                            <span className="text-xs text-gray-400 mt-1">First image will be used as the primary cover photo</span>
+                          </div>
+
+                          {/* Preview Matrix */}
+                          {formData.imageUrls.length > 0 && (
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
+                              {formData.imageUrls.map((url, index) => (
+                                <div key={index} className="relative aspect-video rounded-xl overflow-hidden border border-gray-200 shadow-sm group">
+                                  <img src={url} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
+                                  <button 
+                                    type="button" 
+                                    onClick={() => removeImage(index)}
+                                    className="absolute top-1.5 right-1.5 bg-red-600/90 text-white p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700 shadow-sm cursor-pointer"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                  {index === 0 && (
+                                    <div className="absolute bottom-0 left-0 w-full bg-black/60 backdrop-blur-sm">
+                                      <p className="text-[9px] text-white font-extrabold uppercase tracking-widest py-1 text-center">Cover Photo</p>
                                     </div>
                                   )}
-                                </button>
-                              );
-                            })}
-                          </div>
-                          {formData.imageUrl && (
-                            <p className="text-[10px] text-gray-500 mt-2 font-mono truncate">Selected Asset: {formData.imageUrl}</p>
+                                </div>
+                              ))}
+                            </div>
                           )}
                         </div>
                       </div>

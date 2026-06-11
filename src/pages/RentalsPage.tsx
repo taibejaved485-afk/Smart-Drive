@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import SEO from '../components/SEO';
 import EarningsCalculator from '../components/EarningsCalculator';
-import { Car, MapPin, Calendar, Sliders, CheckCircle2, ShieldCheck, X, Phone, DollarSign, Clock, HelpCircle, Filter, Sparkles } from 'lucide-react';
+import { Car, MapPin, Calendar, Sliders, CheckCircle2, ShieldCheck, X, Phone, DollarSign, Clock, HelpCircle, Filter, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface RentalCar {
   id: string;
@@ -13,6 +13,7 @@ interface RentalCar {
   rentPrice: string; // e.g. "6500" or "12000"
   rentUnit: 'Day' | 'Hour';
   imageUrl: string;
+  images?: string[];
   city: string; // e.g. Faisalabad, Lahore, Islamabad, Karachi
   status: 'Available' | 'Booked';
   type: 'Economy' | 'Sedan' | 'Luxury';
@@ -132,6 +133,58 @@ const DEFAULT_RENTAL_CARS: RentalCar[] = [
     fuelType: 'Petrol'
   }
 ];
+
+function CarImageCarousel({ car }: { car: RentalCar }) {
+  const images = car.images && car.images.length > 0 ? car.images : [car.imageUrl];
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const nextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const prevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  return (
+    <div className="w-full h-full relative group/carousel">
+      <img 
+        src={images[currentIndex] || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=600'} 
+        alt={`${car.name} - View ${currentIndex + 1}`} 
+        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+      />
+      {images.length > 1 && (
+        <>
+          <button 
+            type="button" 
+            onClick={prevImage}
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1.5 opacity-0 group-hover/carousel:opacity-100 transition-opacity backdrop-blur-sm shadow-md cursor-pointer"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button 
+            type="button" 
+            onClick={nextImage}
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1.5 opacity-0 group-hover/carousel:opacity-100 transition-opacity backdrop-blur-sm shadow-md cursor-pointer"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+          
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
+            {images.map((_, idx) => (
+              <div 
+                key={idx} 
+                className={`h-1.5 rounded-full transition-all ${idx === currentIndex ? 'w-4 bg-white shadow-[0_0_5px_rgba(255,255,255,0.8)]' : 'w-1.5 bg-white/50 hover:bg-white/80'}`} 
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 export default function RentalsPage() {
   const [cars, setCars] = useState<RentalCar[]>([]);
@@ -479,13 +532,8 @@ export default function RentalsPage() {
                     >
                       {/* Card Image and City Badge */}
                       <div className="relative aspect-[16/10] bg-gray-100 overflow-hidden group">
-                        <img 
-                          src={car.imageUrl || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=600'} 
-                          alt={car.name} 
-                          referrerPolicy="no-referrer"
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                        <div className="absolute top-4 left-4 flex flex-col gap-1.5 items-start z-10">
+                        <CarImageCarousel car={car} />
+                        <div className="absolute top-4 left-4 flex flex-col gap-1.5 items-start z-10 pointer-events-none">
                           <span className="bg-gray-900/95 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow-md">
                             <MapPin className="w-3.5 h-3.5 text-red-500" />
                             {car.city}
