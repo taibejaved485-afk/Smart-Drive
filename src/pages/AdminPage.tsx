@@ -152,6 +152,13 @@ export default function AdminPage() {
     setTimeout(() => setCopiedText(null), 3000);
   };
 
+  const purgeLocalStorage = () => {
+    if (window.confirm("CRITICAL WARNING: This will permanently wipe all local application state (fleet listings, customer requests, and academy bookings). This action is non-reversible. Proceed with full system reset?")) {
+      localStorage.clear();
+      window.location.reload();
+    }
+  };
+
   const loadDataAndSync = () => {
     // 1. Load blog posts
     const savedPosts = localStorage.getItem('blogPosts');
@@ -415,11 +422,20 @@ export default function AdminPage() {
 
   const removeBookingRecord = (id: string) => {
     if (window.confirm('Are you sure you want to permanently delete this scheduling request?')) {
-      const updated = bookings.filter(b => b.id !== id);
-      setBookings(updated);
-      localStorage.setItem('driving_bookings', JSON.stringify(updated));
-      window.dispatchEvent(new Event('driving_bookings_updated'));
-      window.dispatchEvent(new Event('storage'));
+      const saved = localStorage.getItem('driving_bookings');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            const updated = parsed.filter(b => String(b.id) !== String(id));
+            setBookings(updated);
+            localStorage.setItem('driving_bookings', JSON.stringify(updated));
+            showToast('Booking record removed.', 'info');
+            window.dispatchEvent(new Event('driving_bookings_updated'));
+            window.dispatchEvent(new Event('storage'));
+          }
+        } catch (e) {}
+      }
     }
   };
 
@@ -575,11 +591,20 @@ export default function AdminPage() {
 
   const handleRejectRequest = (id: string) => {
     if (window.confirm('Are you sure you want to delete this customer request?')) {
-      const updated = customerRequests.filter(r => r.id !== id);
-      setCustomerRequests(updated);
-      localStorage.setItem('customer_requests', JSON.stringify(updated));
-      window.dispatchEvent(new Event('customer_requests_updated'));
-      window.dispatchEvent(new Event('storage'));
+      const saved = localStorage.getItem('customer_requests');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            const updated = parsed.filter(r => String(r.id) !== String(id));
+            setCustomerRequests(updated);
+            localStorage.setItem('customer_requests', JSON.stringify(updated));
+            showToast('Customer request deleted.', 'info');
+            window.dispatchEvent(new Event('customer_requests_updated'));
+            window.dispatchEvent(new Event('storage'));
+          }
+        } catch (e) {}
+      }
     }
   };
 
@@ -648,22 +673,31 @@ export default function AdminPage() {
 
   const deleteRentalCar = (id: string) => {
     if (window.confirm('Are you sure you want to remove this car from the fleet?')) {
-      const updated = rentalCars.filter(c => c.id !== id);
-      setRentalCars(updated);
-      localStorage.setItem('rental_cars', JSON.stringify(updated));
+      // 1. Update rental_cars key (base fleet)
+      const savedCars = localStorage.getItem('rental_cars');
+      if (savedCars) {
+        try {
+          const parsed = JSON.parse(savedCars);
+          if (Array.isArray(parsed)) {
+            const updated = parsed.filter(c => String(c.id) !== String(id));
+            localStorage.setItem('rental_cars', JSON.stringify(updated));
+          }
+        } catch (e) {}
+      }
 
-      // Also clean from list of approved custom owner cars
+      // 2. Update approved_cars key (owner-submitted fleet)
       const savedApproved = localStorage.getItem('approved_cars');
       if (savedApproved) {
         try {
           const parsed = JSON.parse(savedApproved);
           if (Array.isArray(parsed)) {
-            const updatedApproved = parsed.filter(c => c.id !== id);
+            const updatedApproved = parsed.filter(c => String(c.id) !== String(id));
             localStorage.setItem('approved_cars', JSON.stringify(updatedApproved));
           }
         } catch (e) {}
       }
 
+      showToast('Vehicle removed from inventory.', 'info');
       window.dispatchEvent(new Event('storage'));
       window.dispatchEvent(new Event('pending_cars_updated'));
       
@@ -673,31 +707,27 @@ export default function AdminPage() {
   };
 
   const toggleCarStatus = (id: string) => {
-    const updated = rentalCars.map(c => {
-      if (c.id === id) {
-        return { ...c, status: (c.status === 'Available' ? 'Booked' : 'Available') as 'Available' | 'Booked' };
+    // Helper to toggle in a specific storage key
+    const toggleInStorage = (key: string) => {
+      const saved = localStorage.getItem(key);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            const updated = parsed.map(c => {
+              if (String(c.id) === String(id)) {
+                return { ...c, status: (c.status === 'Available' ? 'Booked' : 'Available') as 'Available' | 'Booked' };
+              }
+              return c;
+            });
+            localStorage.setItem(key, JSON.stringify(updated));
+          }
+        } catch (e) {}
       }
-      return c;
-    });
-    setRentalCars(updated);
-    localStorage.setItem('rental_cars', JSON.stringify(updated));
+    };
 
-    // Also toggle in list of approved custom owner cars
-    const savedApproved = localStorage.getItem('approved_cars');
-    if (savedApproved) {
-      try {
-        const parsed = JSON.parse(savedApproved);
-        if (Array.isArray(parsed)) {
-          const updatedApproved = parsed.map(c => {
-            if (c.id === id) {
-              return { ...c, status: (c.status === 'Available' ? 'Booked' : 'Available') as 'Available' | 'Booked' };
-            }
-            return c;
-          });
-          localStorage.setItem('approved_cars', JSON.stringify(updatedApproved));
-        }
-      } catch (e) {}
-    }
+    toggleInStorage('rental_cars');
+    toggleInStorage('approved_cars');
 
     window.dispatchEvent(new Event('storage'));
     window.dispatchEvent(new Event('pending_cars_updated'));
@@ -791,11 +821,20 @@ export default function AdminPage() {
 
   const deletePost = (id: string) => {
     if (window.confirm('Are you sure you want to delete this blog post?')) {
-      const updatedPosts = posts.filter(p => p.id !== id);
-      setPosts(updatedPosts);
-      localStorage.setItem('blogPosts', JSON.stringify(updatedPosts));
-      if (editingPostId === id) {
-        cancelEdit();
+      const savedPosts = localStorage.getItem('blogPosts');
+      if (savedPosts) {
+        try {
+          const parsed = JSON.parse(savedPosts);
+          if (Array.isArray(parsed)) {
+            const updatedPosts = parsed.filter(p => String(p.id) !== String(id));
+            setPosts(updatedPosts);
+            localStorage.setItem('blogPosts', JSON.stringify(updatedPosts));
+            showToast('Blog post deleted successfully.', 'info');
+            if (editingPostId === id) {
+              cancelEdit();
+            }
+          }
+        } catch (e) {}
       }
     }
   };
@@ -889,9 +928,18 @@ export default function AdminPage() {
             </h1>
             <p className="text-gray-500">Create, edit, delete, and curate premium driving blogs.</p>
           </div>
-          <Link to="/blog" className="self-start md:self-auto bg-gray-900 hover:bg-gray-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition shadow-sm">
-            <ArrowLeft className="w-4 h-4" /> Exit to Blogs Page
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link to="/blog" className="self-start md:self-auto bg-gray-900 hover:bg-gray-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition shadow-sm">
+              <ArrowLeft className="w-4 h-4" /> Exit to Blogs Page
+            </Link>
+            <button 
+              onClick={purgeLocalStorage}
+              className="p-2.5 bg-white border border-gray-200 text-gray-300 hover:text-red-500 hover:border-red-100 hover:bg-red-50 rounded-xl transition-all opacity-20 hover:opacity-100 cursor-pointer"
+              title="Factory Reset Application State"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
         </div>
         {/* DUAL-PURPOSE PLATFORM ADMIN STRIP TABS */}
         <div className="flex flex-wrap border-b border-gray-200 mb-8 gap-2 pb-2">
@@ -1778,13 +1826,13 @@ export default function AdminPage() {
               </div>
 
               {pendingCars.length === 0 ? (
-                <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-155 select-none p-6">
-                  <div className="w-12 h-12 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Check className="w-6 h-6 stroke-[3]" />
+                <div className="flex flex-col items-center justify-center py-20 bg-gray-50/40 rounded-3xl border border-dashed border-gray-200 text-center animate-fade-in px-6">
+                  <div className="w-14 h-14 bg-white rounded-2xl shadow-sm border border-gray-150 flex items-center justify-center mb-5 text-gray-300">
+                    <Car className="w-7 h-7" />
                   </div>
-                  <h3 className="font-extrabold text-gray-800 text-sm">All Owner Requests Processed</h3>
-                  <p className="text-xs text-gray-400 mt-1 max-w-sm mx-auto">
-                    No pending custom listings in localStorage queue. New customer peer onboarding requests will appear here dynamically.
+                  <h3 className="text-gray-900 font-extrabold text-lg tracking-tight">Approval Queue is Clear</h3>
+                  <p className="text-gray-500 text-sm mt-1.5 max-w-sm font-medium">
+                    No pending owner submissions are currently awaiting moderation. All new peer-to-peer registrations will appear here for verification.
                   </p>
                 </div>
               ) : (
@@ -2207,11 +2255,13 @@ export default function AdminPage() {
             </div>
 
             {customerRequests.length === 0 ? (
-              <div className="text-center py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200 p-6">
-                <FileSpreadsheet className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <h3 className="font-extrabold text-gray-850">No Requests Recorded</h3>
-                <p className="text-xs text-gray-400 mt-1 max-w-sm mx-auto">
-                  When customers submit car rental requests, they will populate here for your approval.
+              <div className="flex flex-col items-center justify-center py-20 bg-gray-50/40 rounded-3xl border border-dashed border-gray-200 text-center animate-fade-in px-6">
+                <div className="w-14 h-14 bg-white rounded-2xl shadow-sm border border-gray-150 flex items-center justify-center mb-5 text-gray-300">
+                  <Clock className="w-7 h-7" />
+                </div>
+                <h3 className="text-gray-900 font-extrabold text-lg tracking-tight">No Active Requests</h3>
+                <p className="text-gray-500 text-sm mt-1.5 max-w-sm font-medium">
+                  When customers submit car rental requirements through the reverse directory, they will appear here for verification and approval.
                 </p>
               </div>
             ) : (

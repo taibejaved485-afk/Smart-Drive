@@ -383,7 +383,7 @@ export default function RentalsPage() {
     if (savedCars) {
       try {
         const parsed = JSON.parse(savedCars);
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        if (Array.isArray(parsed)) {
           baseList = parsed;
         } else {
           baseList = DEFAULT_RENTAL_CARS;
@@ -801,31 +801,30 @@ export default function RentalsPage() {
           {/* Cars Grid */}
           <div>
             {filteredCars.length === 0 ? (
-              <div className="bg-white rounded-3xl p-12 text-center border border-gray-200 shadow-sm max-w-xl mx-auto my-8">
-                <div className="w-16 h-16 bg-red-50 text-red-650 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <div className="flex flex-col items-center justify-center py-24 bg-white rounded-[2.5rem] border border-gray-200 text-center animate-fade-in shadow-sm px-6 max-w-2xl mx-auto my-8">
+                <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-6 text-gray-300">
                   <Car className="w-8 h-8" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">No cars available in {selectedCity} at the moment</h3>
-                <p className="text-gray-500 text-sm leading-relaxed max-w-sm mx-auto">
-                  We are constantly updating our Pakistani regional fleets. Please contact our support office or choose another major city to browse available cars.
+                <h3 className="text-gray-950 font-black text-2xl tracking-tight">No cars available in this region yet</h3>
+                <p className="text-gray-500 text-sm mt-3 max-w-sm font-medium leading-relaxed">
+                  We are constantly expanding our vetted peer-to-peer fleet. If you can't find what you need, post a custom request and let owners find you!
                 </p>
-                <div className="mt-6 flex flex-col sm:flex-row justify-center gap-3">
+                <div className="mt-10 flex flex-col sm:flex-row gap-4">
+                  <button 
+                    onClick={() => setViewMode('requests')}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs uppercase tracking-widest px-8 py-4 rounded-xl transition-all shadow-lg shadow-indigo-100 cursor-pointer"
+                  >
+                    Post a Request
+                  </button>
                   <button 
                     onClick={() => {
-                      setSelectedCity('');
+                      setSelectedCity('All Cities');
                       setSelectedArea('');
                     }}
-                    type="button"
-                    className="bg-gray-900 hover:bg-black text-white font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-lg transition-all cursor-pointer"
+                    className="bg-gray-950 hover:bg-black text-white font-black text-xs uppercase tracking-widest px-8 py-4 rounded-xl transition-all shadow-lg cursor-pointer"
                   >
-                    See All Cities
+                    Browse All Cities
                   </button>
-                  <a 
-                    href="tel:03097666928"
-                    className="border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-lg transition-all inline-flex items-center justify-center gap-2"
-                  >
-                    <Phone className="w-3.5 h-3.5" /> Call Support
-                  </a>
                 </div>
               </div>
             ) : (

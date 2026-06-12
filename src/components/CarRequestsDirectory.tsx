@@ -428,10 +428,14 @@ export function CarRequestsGrid() {
       </div>
 
       {requests.length === 0 ? (
-        <div className="py-20 text-center bg-gray-50/50 border border-dashed border-gray-200 rounded-3xl max-w-3xl mx-auto">
-          <HelpCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <h4 className="font-extrabold text-gray-900 text-lg">No Active Requests Right Now</h4>
-          <p className="text-sm text-gray-500 mt-2">New customer requests will surface here once moderated by our team.</p>
+        <div className="flex flex-col items-center justify-center py-24 bg-gray-50/40 rounded-[2.5rem] border border-dashed border-gray-200 text-center animate-fade-in px-6 max-w-3xl mx-auto">
+          <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-gray-150 flex items-center justify-center mb-6 text-gray-300">
+            <Send className="w-8 h-8" />
+          </div>
+          <h3 className="text-gray-900 font-extrabold text-2xl tracking-tight">No Active Requests Found</h3>
+          <p className="text-gray-500 text-sm mt-3 max-w-md font-medium leading-relaxed">
+            There are currently no live customer rental inquiries. New requests will appear here once they pass through our moderation quality check.
+          </p>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
