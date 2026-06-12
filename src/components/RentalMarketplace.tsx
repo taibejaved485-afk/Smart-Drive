@@ -267,18 +267,7 @@ function MarketplaceCarCard({ car, waUrl }: { car: RentalCar; waUrl: string; key
   const [showMapModal, setShowMapModal] = useState(false);
   const [showLightbox, setShowLightbox] = useState(false);
 
-  // Generate next 7 days structure
-  const next7Days = Array.from({ length: 7 }).map((_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() + i);
-    const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
-    const dayNum = d.getDate();
-    // Simulate some booked dates for demo purposes: e.g. Day 1 and 3 are booked
-    const isBooked = (car.id === '3' && (i === 1 || i === 2)) || (car.status === 'Booked' && i < 2);
-    return { dayName, dayNum, isBooked };
-  });
-
-  const isTodayBooked = next7Days[0].isBooked;
+  const isTodayBooked = car.status === 'Booked';
 
   const nextImage = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -464,36 +453,7 @@ function MarketplaceCarCard({ car, waUrl }: { car: RentalCar; waUrl: string; key
           )}
         </div>
 
-        {/* Inline Availability Date Scheduler Matrix */}
-        <div className="mb-4">
-          <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-1.5 flex items-center justify-between">
-            <span>7-Day Availability Matrix</span>
-            <span className="text-[8px] text-gray-400 font-medium lowercase">Starts Today</span>
-          </p>
-          <div className="flex gap-1 justify-between">
-            {next7Days.map((day, idx) => (
-              <div 
-                key={idx} 
-                className={`flex-1 flex flex-col items-center justify-center py-1.5 rounded-lg border relative ${
-                  day.isBooked 
-                    ? 'bg-red-50 border-red-100 text-red-500' 
-                    : 'bg-green-50 border-green-100 text-green-700'
-                }`}
-                title={day.isBooked ? 'Booked' : 'Available'}
-              >
-                <span className="text-[8px] font-bold uppercase">{day.dayName}</span>
-                <span className={`text-xs font-black ${day.isBooked ? 'opacity-50' : ''}`}>
-                  {day.dayNum}
-                </span>
-                {day.isBooked && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <X className="w-4 h-4 text-red-500 opacity-60" />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+
 
         {/* Bottom Price & Contact Area */}
         <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between gap-3 relative">
