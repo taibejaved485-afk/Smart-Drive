@@ -19,6 +19,7 @@ interface RentalCar {
   isVerified?: boolean;
   landlordRating?: number;
   withDriver?: boolean;
+  area?: string;
 }
 
 const GENERAL_DEFAULT_CARS: RentalCar[] = [
@@ -148,7 +149,7 @@ const GENERAL_DEFAULT_CARS: RentalCar[] = [
   }
 ];
 
-function MarketplaceCarCard({ car, waUrl }: { car: RentalCar; waUrl: string }) {
+function MarketplaceCarCard({ car, waUrl }: { car: RentalCar; waUrl: string; key?: any }) {
   const images = car.images && car.images.length > 0 ? car.images : [car.imageUrl];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
