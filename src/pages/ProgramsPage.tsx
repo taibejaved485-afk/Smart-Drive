@@ -405,28 +405,54 @@ export default function ProgramsPage() {
         </div>
       </section>
 
-      {/* Trust & Accreditations Info Bar */}
-      <section className="bg-white border-b border-gray-200 py-6">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          {[
-            { label: 'Active Programs', count: '12+ Courses', icon: Car, color: 'text-red-500 bg-red-50' },
-            { label: 'Certified Trainers', count: 'Male & Female Team', icon: Users, color: 'text-blue-500 bg-blue-50' },
-            { label: 'Learning Materials', count: 'Comprehensive Syllabus', icon: Compass, color: 'text-green-500 bg-green-50' },
-            { label: 'Accredited Academy', count: 'Faisalabad Registered', icon: Shield, color: 'text-amber-500 bg-amber-50' }
-          ].map((stat, idx) => {
-            const Icon = stat.icon;
-            return (
-              <div key={idx} className="flex flex-col items-center sm:flex-row sm:text-left gap-3 justify-center">
-                <div className={`p-2.5 rounded-xl shrink-0 ${stat.color}`}>
-                  <Icon className="w-5 h-5" />
+      {/* Premium Trust & Accreditations Info Hub */}
+      <section className="bg-gray-50/50 py-12 relative z-20">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="bg-white rounded-[2.5rem] p-8 sm:p-12 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] border border-gray-150/50 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
+            {[
+              { 
+                label: 'PRACTICAL SESSIONS', 
+                count: '1-on-1 Guided Driving', 
+                icon: Car, 
+                color: 'text-red-600 bg-red-50 border-red-100/50' 
+              },
+              { 
+                label: 'MALE & FEMALE TEAM', 
+                count: 'Professional Certified Instructors', 
+                icon: Users, 
+                color: 'text-blue-600 bg-blue-50 border-blue-100/50' 
+              },
+              { 
+                label: 'TRAFFIC LAW SYLLABUS', 
+                count: 'Complete Theory & Safety Guide', 
+                icon: Compass, 
+                color: 'text-green-600 bg-green-50 border-green-100/50' 
+              },
+              { 
+                label: 'GOVT. CERTIFIED ACADEMY', 
+                count: 'Verified Legal Testing Standards', 
+                icon: Shield, 
+                color: 'text-amber-600 bg-amber-50 border-amber-200',
+                premium: true
+              }
+            ].map((stat, idx) => {
+              const Icon = stat.icon;
+              return (
+                <div 
+                  key={idx} 
+                  className={`flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4.5 group`}
+                >
+                  <div className={`p-4 rounded-2xl shrink-0 border transition-all duration-500 group-hover:scale-110 ${stat.color} ${stat.premium ? 'shadow-[0_12px_24px_-8px_rgba(217,119,6,0.3)] border-amber-300/50' : 'shadow-sm shadow-gray-100 border-gray-100'}`}>
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <div className="flex flex-col pt-1">
+                    <span className="text-[10px] uppercase font-black tracking-[0.15em] text-gray-400 leading-none mb-2">{stat.label}</span>
+                    <span className="text-gray-950 font-black text-sm lg:text-[15px] tracking-tight leading-tight max-w-[180px]">{stat.count}</span>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-gray-400 block">{stat.label}</span>
-                  <span className="text-gray-900 font-black text-sm">{stat.count}</span>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </section>
 
