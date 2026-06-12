@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { INITIAL_RENTAL_FLEET, RentalCar } from '../data/inventory';
 
 interface BlogPost {
   id: string;
@@ -11,19 +12,6 @@ interface BlogPost {
   imageUrl: string;
   content: string;
   date: string;
-}
-
-interface RentalCar {
-  id: string;
-  name: string;
-  transmission: 'Automatic' | 'Manual';
-  rentPrice: string;
-  rentUnit: 'Day' | 'Hour';
-  imageUrl: string;
-  images?: string[];
-  city: string;
-  status: 'Available' | 'Booked';
-  availabilityStatus?: 'Available' | 'Rented Out';
 }
 
 const PRESET_CAR_IMAGES = [
@@ -131,7 +119,9 @@ export default function AdminPage() {
     rentUnit: 'Day' as 'Day' | 'Hour',
     imageUrl: '',
     city: 'Faisalabad',
-    status: 'Available' as 'Available' | 'Booked'
+    status: 'Available' as 'Available' | 'Booked',
+    type: 'Sedan' as 'Economy' | 'Sedan' | 'Luxury',
+    availabilityStatus: 'Available' as 'Available' | 'Rented Out'
   });
 
   // Driving Academy Bookings & Pending Onboard Cars State
@@ -243,7 +233,24 @@ export default function AdminPage() {
       setPendingCars([]);
     }
 
-    // 4. Load approved active car fleet combining base rentals and custom approved listings
+    // 4. Load approved active car fleet
+    const savedCars = localStorage.getItem('rental_cars');
+    let baseList: RentalCar[] = [];
+    if (savedCars) {
+      try {
+        const parsed = JSON.parse(savedCars);
+        if (Array.isArray(parsed)) {
+          baseList = parsed;
+        } else {
+          baseList = INITIAL_RENTAL_FLEET;
+        }
+      } catch (e) {
+        baseList = INITIAL_RENTAL_FLEET;
+      }
+    } else {
+      baseList = INITIAL_RENTAL_FLEET;
+    }
+
     let approvedList: RentalCar[] = [];
     const savedApproved = localStorage.getItem('approved_cars');
     if (savedApproved) {
@@ -255,109 +262,6 @@ export default function AdminPage() {
       } catch (e) {
         approvedList = [];
       }
-    }
-
-    const savedCars = localStorage.getItem('rental_cars');
-    let baseList: RentalCar[] = [];
-    if (savedCars) {
-      try {
-        const parsed = JSON.parse(savedCars);
-        if (Array.isArray(parsed)) {
-          baseList = parsed;
-        } else {
-          const initial: RentalCar[] = [
-            {
-              id: 'rc-1',
-              name: 'Honda Civic Pro (VTEC)',
-              transmission: 'Automatic',
-              rentPrice: '12,000',
-              rentUnit: 'Day',
-              imageUrl: 'https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600',
-              city: 'Faisalabad',
-              status: 'Available'
-            },
-            {
-              id: 'rc-2',
-              name: 'Toyota Yaris Ativ',
-              transmission: 'Automatic',
-              rentPrice: '6,500',
-              rentUnit: 'Day',
-              imageUrl: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=600',
-              city: 'Lahore',
-              status: 'Available'
-            },
-            {
-              id: 'rc-3',
-              name: 'Toyota Corolla Altis',
-              transmission: 'Manual',
-              rentPrice: '7,500',
-              rentUnit: 'Day',
-              imageUrl: 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600',
-              city: 'Islamabad',
-              status: 'Available'
-            },
-            {
-              id: 'rc-4',
-              name: 'Suzuki Swift GLX',
-              transmission: 'Automatic',
-              rentPrice: '5,500',
-              rentUnit: 'Day',
-              imageUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=600',
-              city: 'Karachi',
-              status: 'Available'
-            }
-          ];
-          baseList = initial;
-          localStorage.setItem('rental_cars', JSON.stringify(initial));
-        }
-      } catch (e) {
-        baseList = [];
-      }
-    } else {
-      const initial: RentalCar[] = [
-        {
-          id: 'rc-1',
-          name: 'Honda Civic Pro (VTEC)',
-          transmission: 'Automatic',
-          rentPrice: '12,000',
-          rentUnit: 'Day',
-          imageUrl: 'https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600',
-          city: 'Faisalabad',
-          status: 'Available'
-        },
-        {
-          id: 'rc-2',
-          name: 'Toyota Yaris Ativ',
-          transmission: 'Automatic',
-          rentPrice: '6,500',
-          rentUnit: 'Day',
-          imageUrl: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=600',
-          city: 'Lahore',
-          status: 'Available'
-        },
-        {
-          id: 'rc-3',
-          name: 'Toyota Corolla Altis',
-          transmission: 'Manual',
-          rentPrice: '7,500',
-          rentUnit: 'Day',
-          imageUrl: 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600',
-          city: 'Islamabad',
-          status: 'Available'
-        },
-        {
-          id: 'rc-4',
-          name: 'Suzuki Swift GLX',
-          transmission: 'Automatic',
-          rentPrice: '5,500',
-          rentUnit: 'Day',
-          imageUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=600',
-          city: 'Karachi',
-          status: 'Available'
-        }
-      ];
-      baseList = initial;
-      localStorage.setItem('rental_cars', JSON.stringify(initial));
     }
 
     // Combine safely to filter duplicate IDs (prioritizing custom approved)
@@ -508,11 +412,13 @@ export default function AdminPage() {
       }
       
       // Add new vetted id active
-      const vettedCar = {
+      const vettedCar: RentalCar = {
         ...car,
         id: car.id || 'owner-' + Date.now().toString(),
         status: 'Available' as const,
-        isVerified: isVerified
+        isVerified: isVerified,
+        type: car.type || 'Sedan',
+        availabilityStatus: car.availabilityStatus || 'Available'
       };
       
       // Save to approved_cars avoiding duplicate id
@@ -648,7 +554,10 @@ export default function AdminPage() {
       rentUnit: newCar.rentUnit,
       imageUrl: newCar.imageUrl || PRESET_CAR_IMAGES[0].url,
       city: newCar.city,
-      status: newCar.status
+      status: newCar.status,
+      type: newCar.type,
+      availabilityStatus: newCar.availabilityStatus,
+      isVerified: false
     };
 
     const updated = [finalCar, ...rentalCars];
@@ -674,17 +583,17 @@ export default function AdminPage() {
 
   const deleteRentalCar = (id: string) => {
     if (window.confirm('Are you sure you want to remove this car from the fleet?')) {
-      // 1. Update rental_cars key (base fleet)
+      // 1. Get current base fleet (ensuring we use defaults if key is missing/null)
       const savedCars = localStorage.getItem('rental_cars');
+      let currentBase: RentalCar[] = INITIAL_RENTAL_FLEET;
       if (savedCars) {
         try {
           const parsed = JSON.parse(savedCars);
-          if (Array.isArray(parsed)) {
-            const updated = parsed.filter(c => String(c.id) !== String(id));
-            localStorage.setItem('rental_cars', JSON.stringify(updated));
-          }
+          if (Array.isArray(parsed)) currentBase = parsed;
         } catch (e) {}
       }
+      const updatedBase = currentBase.filter(c => String(c.id) !== String(id));
+      localStorage.setItem('rental_cars', JSON.stringify(updatedBase));
 
       // 2. Update approved_cars key (owner-submitted fleet)
       const savedApproved = localStorage.getItem('approved_cars');

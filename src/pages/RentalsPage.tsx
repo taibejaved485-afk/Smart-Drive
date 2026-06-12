@@ -6,164 +6,8 @@ import Footer from '../components/Footer';
 import SEO from '../components/SEO';
 import EarningsCalculator from '../components/EarningsCalculator';
 import { CarRequestsForm, CarRequestsGrid } from '../components/CarRequestsDirectory';
+import { INITIAL_RENTAL_FLEET, RentalCar } from '../data/inventory';
 import { Car, MapPin, Calendar, Sliders, CheckCircle2, ShieldCheck, X, Phone, DollarSign, Clock, HelpCircle, Filter, Sparkles, ChevronLeft, ChevronRight, Search, ChevronDown, Check, Users, Maximize2 } from 'lucide-react';
-
-interface RentalCar {
-  id: string;
-  name: string;
-  transmission: 'Automatic' | 'Manual';
-  rentPrice: string; // e.g. "6500" or "12000"
-  rentUnit: 'Day' | 'Hour';
-  imageUrl: string;
-  images?: string[];
-  city: string; // e.g. Faisalabad, Lahore, Islamabad, Karachi
-  status: 'Available' | 'Booked';
-  availabilityStatus?: 'Available' | 'Rented Out';
-  type: 'Economy' | 'Sedan' | 'Luxury';
-  isVerified?: boolean;
-  registrationNumber?: string;
-  ownerName?: string;
-  ownerPhone?: string;
-  fuelType?: string;
-  description?: string;
-  withDriver?: boolean;
-  area?: string;
-  rentalsCompleted?: number;
-  rating?: number;
-  landlordRating?: number;
-}
-
-const DEFAULT_RENTAL_CARS: RentalCar[] = [
-  {
-    id: 'rc-1',
-    name: 'Honda Civic Pro (VTEC)',
-    transmission: 'Automatic',
-    rentPrice: '12,000',
-    rentUnit: 'Day',
-    imageUrl: 'https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600',
-    city: 'Faisalabad',
-    status: 'Available',
-    type: 'Sedan',
-    isVerified: true,
-    registrationNumber: 'FSD-22-6710',
-    rentalsCompleted: 14,
-    rating: 4.9,
-    landlordRating: 4.9
-  },
-  {
-    id: 'rc-2',
-    name: 'Toyota Yaris Ativ',
-    transmission: 'Automatic',
-    rentPrice: '6,500',
-    rentUnit: 'Day',
-    imageUrl: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=600',
-    city: 'Lahore',
-    status: 'Available',
-    type: 'Sedan',
-    isVerified: true,
-    registrationNumber: 'LHR-21-9954',
-    rentalsCompleted: 8,
-    rating: 4.85,
-    landlordRating: 4.85
-  },
-  {
-    id: 'rc-3',
-    name: 'Toyota Corolla Altis',
-    transmission: 'Manual',
-    rentPrice: '7,500',
-    rentUnit: 'Day',
-    imageUrl: 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600',
-    city: 'Islamabad',
-    status: 'Booked',
-    type: 'Sedan',
-    isVerified: false,
-    registrationNumber: 'ICT-18-5002',
-    rentalsCompleted: 1,
-    rating: 4.2
-  },
-  {
-    id: 'rc-4',
-    name: 'Suzuki Swift GLX',
-    transmission: 'Automatic',
-    rentPrice: '5,500',
-    rentUnit: 'Day',
-    imageUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=600',
-    city: 'Karachi',
-    status: 'Available',
-    type: 'Economy',
-    isVerified: true,
-    registrationNumber: 'KHI-23-4551',
-    rentalsCompleted: 7,
-    rating: 4.92,
-    landlordRating: 4.92
-  },
-  {
-    id: 'rc-5',
-    name: 'Hyundai Elantra GLS',
-    transmission: 'Automatic',
-    rentPrice: '9,000',
-    rentUnit: 'Day',
-    imageUrl: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=600',
-    city: 'Lahore',
-    status: 'Available',
-    type: 'Sedan',
-    isVerified: true,
-    registrationNumber: 'LHR-22-3810',
-    rentalsCompleted: 4,
-    rating: 4.7,
-    landlordRating: 4.7
-  },
-  {
-    id: 'rc-6',
-    name: 'Honda City Aspire',
-    transmission: 'Manual',
-    rentPrice: '6,000',
-    rentUnit: 'Day',
-    imageUrl: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=600',
-    city: 'Faisalabad',
-    status: 'Available',
-    type: 'Economy',
-    isVerified: false,
-    registrationNumber: 'FSD-19-4402',
-    rentalsCompleted: 2,
-    rating: 4.4,
-    landlordRating: 4.4
-  },
-  {
-    id: 'rc-7',
-    name: 'Toyota Fortuner Legender',
-    transmission: 'Automatic',
-    rentPrice: '45,000',
-    rentUnit: 'Day',
-    imageUrl: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=600',
-    city: 'Islamabad',
-    status: 'Available',
-    type: 'Luxury',
-    isVerified: true,
-    registrationNumber: 'ICT-23-4001',
-    fuelType: 'Diesel',
-    rentalsCompleted: 15,
-    rating: 4.95,
-    landlordRating: 4.95
-  },
-  {
-    id: 'rc-8',
-    name: 'Mercedes Benz C-Class',
-    transmission: 'Automatic',
-    rentPrice: '38,000',
-    rentUnit: 'Day',
-    imageUrl: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=600',
-    city: 'Lahore',
-    status: 'Available',
-    type: 'Luxury',
-    isVerified: true,
-    registrationNumber: 'LHR-22-9901',
-    fuelType: 'Petrol',
-    rentalsCompleted: 9,
-    rating: 4.88,
-    landlordRating: 4.88
-  }
-];
 
 interface ImageLightboxProps {
   images: string[];
@@ -387,16 +231,13 @@ export default function RentalsPage() {
         if (Array.isArray(parsed)) {
           baseList = parsed;
         } else {
-          baseList = DEFAULT_RENTAL_CARS;
-          localStorage.setItem('rental_cars', JSON.stringify(DEFAULT_RENTAL_CARS));
+          baseList = INITIAL_RENTAL_FLEET;
         }
       } catch (e) {
-        baseList = DEFAULT_RENTAL_CARS;
-        localStorage.setItem('rental_cars', JSON.stringify(DEFAULT_RENTAL_CARS));
+        baseList = INITIAL_RENTAL_FLEET;
       }
     } else {
-      baseList = DEFAULT_RENTAL_CARS;
-      localStorage.setItem('rental_cars', JSON.stringify(DEFAULT_RENTAL_CARS));
+      baseList = INITIAL_RENTAL_FLEET;
     }
 
     // Combine them safely and remove duplicate IDs (prefer approved custom cars details if same ID exists)

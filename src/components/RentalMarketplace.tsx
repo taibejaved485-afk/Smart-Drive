@@ -3,166 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Car, MapPin, CheckCircle, Smartphone, SlidersHorizontal, MessageSquare, ChevronRight, HelpCircle, RefreshCw, Key, ShieldCheck, Search, ChevronDown, X, ChevronLeft, Star, Maximize2 } from 'lucide-react';
 
-interface RentalCar {
-  id: string;
-  name: string;
-  transmission: 'Automatic' | 'Manual';
-  rentPrice: string;
-  rentUnit: 'Day' | 'Hour';
-  imageUrl: string;
-  images?: string[];
-  city: string;
-  status: 'Available' | 'Booked';
-  ownerName?: string;
-  ownerPhone?: string;
-  fuelType?: string;
-  description?: string;
-  isVerified?: boolean;
-  landlordRating?: number;
-  withDriver?: boolean;
-  area?: string;
-  rentalsCompleted?: number;
-  rating?: number;
-}
-
-const GENERAL_DEFAULT_CARS: RentalCar[] = [
-  {
-    id: 'rc-1',
-    name: 'Honda Civic Pro (VTEC)',
-    transmission: 'Automatic',
-    rentPrice: '12,000',
-    rentUnit: 'Day',
-    imageUrl: 'https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1590362891991-f70281b373ee?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1549314488-87cc9c3bc89a?auto=format&fit=crop&q=80&w=600'
-    ],
-    city: 'Faisalabad',
-    status: 'Available',
-    ownerName: 'Smart Drive Official',
-    ownerPhone: '923097666928',
-    fuelType: 'Petrol',
-    description: 'Pristine, fully loaded automatic sedan.',
-    isVerified: true,
-    landlordRating: 4.8,
-    withDriver: false,
-    rentalsCompleted: 8,
-    rating: 4.8
-  },
-  {
-    id: 'rc-2',
-    name: 'Toyota Yaris Ativ',
-    transmission: 'Automatic',
-    rentPrice: '6,500',
-    rentUnit: 'Day',
-    imageUrl: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=600'
-    ],
-    city: 'Lahore',
-    status: 'Available',
-    ownerName: 'Mian Fawad',
-    ownerPhone: '923015467812',
-    fuelType: 'Petrol',
-    description: 'Clean compact sedan with phenomenal fuel average.',
-    isVerified: true,
-    landlordRating: 4.5,
-    withDriver: true,
-    rentalsCompleted: 2,
-    rating: 4.5
-  },
-  {
-    id: 'rc-3',
-    name: 'Toyota Corolla Altis Grande',
-    transmission: 'Automatic',
-    rentPrice: '7,500',
-    rentUnit: 'Day',
-    imageUrl: 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=600'
-    ],
-    city: 'Islamabad',
-    status: 'Available',
-    ownerName: 'Chaudhary Bilal',
-    ownerPhone: '923214567890',
-    fuelType: 'Petrol',
-    description: 'Highly comfortable luxury cruiser.',
-    isVerified: false,
-    withDriver: false,
-    rentalsCompleted: 0,
-    rating: 0
-  },
-  {
-    id: 'rc-4',
-    name: 'Suzuki Swift GLX',
-    transmission: 'Automatic',
-    rentPrice: '5,500',
-    rentUnit: 'Day',
-    imageUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=600'
-    ],
-    city: 'Karachi',
-    status: 'Available',
-    ownerName: 'Hamza Malik',
-    ownerPhone: '923331234567',
-    fuelType: 'Petrol',
-    description: 'Nifty and dynamic city hatchback.',
-    isVerified: true,
-    landlordRating: 4.9,
-    withDriver: false,
-    rentalsCompleted: 11,
-    rating: 4.9
-  },
-  {
-    id: 'rc-5',
-    name: 'Hyundai Elantra GLS',
-    transmission: 'Automatic',
-    rentPrice: '9,000',
-    rentUnit: 'Day',
-    imageUrl: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1549314488-87cc9c3bc89a?auto=format&fit=crop&q=80&w=600'
-    ],
-    city: 'Lahore',
-    status: 'Available',
-    ownerName: 'Mian Fawad',
-    ownerPhone: '923015467812',
-    fuelType: 'Petrol',
-    description: 'Luxurious premium ride with standard leather suite.',
-    isVerified: true,
-    landlordRating: 4.7,
-    withDriver: true,
-    rentalsCompleted: 4,
-    rating: 4.7
-  },
-  {
-    id: 'rc-6',
-    name: 'Honda City Aspire',
-    transmission: 'Manual',
-    rentPrice: '6,000',
-    rentUnit: 'Day',
-    imageUrl: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=600',
-    images: [
-      'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=600'
-    ],
-    city: 'Faisalabad',
-    status: 'Available',
-    ownerName: 'Anas Gujjar',
-    ownerPhone: '923097666928',
-    fuelType: 'Petrol',
-    description: 'Responsive manual drive option, spacious trunk.',
-    isVerified: false,
-    withDriver: false,
-    rentalsCompleted: 1,
-    rating: 4.1
-  }
-];
+import { INITIAL_RENTAL_FLEET, RentalCar } from '../data/inventory';
 
 interface MarketplaceImageLightboxProps {
   images: string[];
@@ -603,11 +444,11 @@ export default function RentalMarketplace() {
     // Also fall back to loading from standard rental_cars if approved_cars doesn't exist
     // to preserve cross-tab compatibility
     const savedRentalCars = localStorage.getItem('rental_cars');
-    let baseList = GENERAL_DEFAULT_CARS;
+    let baseList = INITIAL_RENTAL_FLEET;
     if (savedRentalCars) {
       try {
         const parsedRentals = JSON.parse(savedRentalCars);
-        if (Array.isArray(parsedRentals) && parsedRentals.length > 0) {
+        if (Array.isArray(parsedRentals)) {
           // Map standard rental cars to make sure they have owners
           baseList = parsedRentals.map(car => ({
             ...car,
@@ -620,8 +461,6 @@ export default function RentalMarketplace() {
       } catch (err) {
         // use default
       }
-    } else {
-      localStorage.setItem('rental_cars', JSON.stringify(GENERAL_DEFAULT_CARS));
     }
 
     // Combine standard list with specifically approved user owner cars
