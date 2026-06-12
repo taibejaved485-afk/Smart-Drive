@@ -87,7 +87,7 @@ export default function HomePage() {
   return (
     <div className="font-sans text-gray-900 bg-gray-50">
       <SEO 
-        title="Male & Female Driving School & Multi-Vendor Car Rentals | Smart Drive"
+        title="Male & Female Driving School & Car Rentals | Smart Drive"
         description="Faisalabad's top dual-platform: Learn physical manual & automatic driving with certified instructors OR rent verified cars directly from verified local owners."
         keywords="driving school Faisalabad, female driving instructor, rent a car Faisalabad, car rentals Pakistan, peer-to-peer car hire, automatic driving class, manual driving lessons"
         schema={homeSchema}
