@@ -30,7 +30,7 @@ export default function About() {
           {/* Text Section */}
           <div>
             <p className="text-gray-600 leading-relaxed mb-8">
-              Welcome to <strong>Smart Drive Driving School</strong>. Learning to drive is no longer just a basic skill; it is an essential part of independent and responsible living. This is why choosing a professional driving school plays a vital role in developing safe and confident drivers. A high-quality driving school offers structured training that covers traffic laws, road discipline, vehicle control, and defensive driving techniques designed for real road conditions.
+              Welcome to <strong>GoDriveify Driving School</strong>. Learning to drive is no longer just a basic skill; it is an essential part of independent and responsible living. This is why choosing a professional driving school plays a vital role in developing safe and confident drivers. A high-quality driving school offers structured training that covers traffic laws, road discipline, vehicle control, and defensive driving techniques designed for real road conditions.
             </p>
 
             {/* Feature Grid */}

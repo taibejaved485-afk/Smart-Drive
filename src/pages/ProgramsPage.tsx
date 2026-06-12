@@ -107,7 +107,7 @@ const programsList: Program[] = [
     title: 'Automatic Transmission Course',
     description: 'Designed exclusively for learning in modern automatic vehicles, eliminating the stress of gear shifting so you can focus entirely on road rules and lane positioning.',
     category: 'core',
-    duration: '12 Days Smart Track',
+    duration: '12 Days GoDrive Track',
     lessons: 10,
     highlight: 'Painless Steering Control',
     badge: 'Easiest To Learn',
@@ -330,10 +330,10 @@ export default function ProgramsPage() {
       "description": prog.description,
       "provider": {
         "@type": "LocalBusiness",
-        "name": "Smart Drive Driving School",
+        "name": "GoDriveify Driving School",
         "telephone": "0300-1115429",
         "email": "trainingdrivingschool@gmail.com",
-        "hasMap": "https://maps.google.com/?q=Smart+Drive+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan",
+        "hasMap": "https://maps.google.com/?q=GoDriveify+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan",
         "address": {
           "@type": "PostalAddress",
           "streetAddress": "Main Jaranwala Road",
@@ -347,13 +347,13 @@ export default function ProgramsPage() {
           "latitude": "31.4175",
           "longitude": "73.1350"
         },
-        "url": "https://smartdrivefd.com/",
+        "url": "https://godriveify.com/",
         "sameAs": [
           "https://www.facebook.com/GoDriveify/",
           "https://www.instagram.com/godriveify/",
           "https://www.youtube.com/@godriveify",
           "https://x.com/godriveify?s=11",
-          "https://maps.google.com/?q=Smart+Drive+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan"
+          "https://maps.google.com/?q=GoDriveify+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan"
         ]
       }
     }))
@@ -362,7 +362,7 @@ export default function ProgramsPage() {
   return (
     <div className="font-sans text-gray-800 bg-gray-50/50 min-h-screen flex flex-col justify-between">
       <SEO 
-        title="Driving School Programs & Courses | Smart Drive Academy"
+        title="Driving School Programs & Courses | GoDriveify Academy"
         description="Choose from tailored driving lessons in Faisalabad. We offer automatic car classes, heavy bike courses, female trainer sessions, and license tests."
         keywords="automatic car lessons Faisalabad, manual gear training, motorcycle classes Pakistan, drive tutoring, female driving trainer, local driving simulator, passing driving test license"
         schema={coursesSchema}
@@ -400,7 +400,7 @@ export default function ProgramsPage() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-gray-600 text-base sm:text-lg max-w-3xl mx-auto leading-relaxed"
           >
-            At <span className="font-bold text-red-600">Smart Drive</span>, we prepare learners at every level to become skilled, completely safe, and confident lifetime drivers. We offer specialized automatic and manual vehicle courses, along with dedicated <span className="text-red-600 font-bold underline decoration-red-500/30 decoration-2 underline-offset-4">Female Driving Instructors</span>.
+            At <span className="font-bold text-red-600">GoDriveify</span>, we prepare learners at every level to become skilled, completely safe, and confident lifetime drivers. We offer specialized automatic and manual vehicle courses, along with dedicated <span className="text-red-600 font-bold underline decoration-red-500/30 decoration-2 underline-offset-4">Female Driving Instructors</span>.
           </motion.p>
         </div>
       </section>

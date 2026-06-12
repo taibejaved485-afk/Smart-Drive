@@ -452,7 +452,7 @@ export default function RentalMarketplace() {
           // Map standard rental cars to make sure they have owners
           baseList = parsedRentals.map(car => ({
             ...car,
-            ownerName: car.ownerName || 'Smart Drive Partner',
+            ownerName: car.ownerName || 'GoDriveify Partner',
             ownerPhone: car.ownerPhone || '923097666928',
             fuelType: car.fuelType || 'Petrol',
             description: car.description || 'Pristine rental fleet vehicle.'
@@ -532,7 +532,7 @@ export default function RentalMarketplace() {
     // Construct rich text organized layout representing an executive inquiry invoice of the car
     const invoiceParts = [
       "=============================",
-      "    📄 SMART DRIVE INQUIRY INVOICE   ",
+      "    📄 GODRIVEIFY INQUIRY INVOICE   ",
       "=============================",
       "👤 CLIENT DETAILS:",
       "• Name: Valued Guest (Inquiry)",

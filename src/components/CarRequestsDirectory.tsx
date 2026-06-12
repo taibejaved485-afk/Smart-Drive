@@ -386,7 +386,7 @@ export function CarRequestsGrid() {
     // Construct rich text organized layout representing an executive proposal matching client request
     const invoiceParts = [
       "=============================",
-      "    📧 SMART DRIVE PARTNER MATCH   ",
+      "    📧 GODRIVEIFY PARTNER MATCH   ",
       "=============================",
       "👤 CLIENT DETAILS:",
       `• Name: ${req.name}`,
@@ -404,7 +404,7 @@ export function CarRequestsGrid() {
       "💰 TRANSACTION VALUES:",
       `• Client's Max Budget Rate: PKR ${req.maxBudget}`,
       "=============================",
-      "Hello! I am a Verified Partner of Smart Drive. I have the requested car ready. Let's configure your reservation!"
+      "Hello! I am a Verified Partner of GoDriveify. I have the requested car ready. Let's configure your reservation!"
     ];
 
     return `https://wa.me/${cleanNumber}?text=${encodeURIComponent(invoiceParts.join("\n"))}`;

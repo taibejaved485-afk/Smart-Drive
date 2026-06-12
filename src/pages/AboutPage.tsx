@@ -10,14 +10,14 @@ export default function AboutPage() {
   const aboutSchema = {
     "@context": "https://schema.org",
     "@type": "AboutPage",
-    "name": "About Smart Drive Driving School Faisalabad",
-    "description": "Discover our values, our professional instructors, and our history. Smart Drive is the most trusted driving academy in Faisalabad for female and male students.",
+    "name": "About GoDriveify Driving School Faisalabad",
+    "description": "Discover our values, our professional instructors, and our history. GoDriveify is the most trusted driving academy in Faisalabad for female and male students.",
     "publisher": {
       "@type": "LocalBusiness",
-      "name": "Smart Drive Driving School",
+      "name": "GoDriveify Driving School",
       "telephone": "0300-1115429",
       "email": "trainingdrivingschool@gmail.com",
-      "hasMap": "https://maps.google.com/?q=Smart+Drive+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan",
+      "hasMap": "https://maps.google.com/?q=GoDriveify+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan",
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "Main Jaranwala Road",
@@ -31,13 +31,13 @@ export default function AboutPage() {
         "latitude": "31.4175",
         "longitude": "73.1350"
       },
-      "url": "https://smartdrivefd.com/",
+      "url": "https://godriveify.com/",
       "sameAs": [
         "https://www.facebook.com/GoDriveify/",
         "https://www.instagram.com/godriveify/",
         "https://www.youtube.com/@godriveify",
         "https://x.com/godriveify?s=11",
-        "https://maps.google.com/?q=Smart+Drive+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan"
+        "https://maps.google.com/?q=GoDriveify+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan"
       ]
     }
   };
@@ -64,8 +64,8 @@ export default function AboutPage() {
   return (
     <div className="font-sans text-gray-900 bg-white">
       <SEO 
-        title="About Our Driving School in Faisalabad | Smart Drive"
-        description="Learn more about Smart Drive Driving School. We are Faisalabad's highly-rated educational institution with dedicated courses for manual & automatic vehicles."
+        title="About Our Driving School in Faisalabad | GoDriveify"
+        description="Learn more about GoDriveify Driving School. We are Faisalabad's highly-rated educational institution with dedicated courses for manual & automatic vehicles."
         keywords="about driving school, learn manual driving Faisalabad, professional driving lessons, certified car instructors Pakistan, defensive driving training, female driving school history"
         schema={aboutSchema}
       />
@@ -113,7 +113,7 @@ export default function AboutPage() {
           {/* Text & Grid Section on Right */}
           <div className="lg:col-span-6">
             <p className="text-gray-600 leading-relaxed text-base sm:text-lg mb-8">
-              Welcome to <span className="text-red-600 font-semibold underline underline-offset-4 decoration-red-600/30">Smart Drive</span>, the leading <span className="text-red-600 font-semibold underline underline-offset-4 decoration-red-600/30">Driving lessons in Faisalabad</span>, dedicated to helping learners become skilled, responsible, and confident drivers. Whether you're a beginner or looking to refine your driving skills, our expert instructors ensure a smooth learning experience tailored to your needs.
+              Welcome to <span className="text-red-600 font-semibold underline underline-offset-4 decoration-red-600/30">GoDriveify</span>, the leading <span className="text-red-600 font-semibold underline underline-offset-4 decoration-red-600/30">Driving lessons in Faisalabad</span>, dedicated to helping learners become skilled, responsible, and confident drivers. Whether you're a beginner or looking to refine your driving skills, our expert instructors ensure a smooth learning experience tailored to your needs.
             </p>
 
             {/* Custom Grid Layout with thin separators */}
@@ -172,11 +172,11 @@ export default function AboutPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Text Content */}
             <div className="space-y-6">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-gray-950 leading-tight tracking-tight">
+              <h2 className="text-3xl lg:text-4xl xl:text-5xl font-display font-bold text-gray-950 leading-tight tracking-tight">
                 Our Commitment To Excellence
               </h2>
               <p className="text-gray-600 leading-relaxed text-base sm:text-lg">
-                At Smart Drive, we are committed to providing the highest standard of driver education. Our focus is on safety, skill development, and building confidence behind the wheel. We ensure that all our instructors are fully licensed, highly trained, and dedicated to each student's success. Whether you're a beginner or looking to refine your skills, we offer personalized lessons tailored to your needs. We believe in making the learning process enjoyable, effective, and stress-free. Our commitment to excellence drives us to continuously improve our methods and resources, ensuring every student becomes a competent, safe, and responsible driver.
+                At GoDriveify, we are committed to providing the highest standard of driver education. Our focus is on safety, skill development, and building confidence behind the wheel. We ensure that all our instructors are fully licensed, highly trained, and dedicated to each student's success. Whether you're a beginner or looking to refine your skills, we offer personalized lessons tailored to your needs. We believe in making the learning process enjoyable, effective, and stress-free. Our commitment to excellence drives us to continuously improve our methods and resources, ensuring every student becomes a competent, safe, and responsible driver.
               </p>
             </div>
 
@@ -216,7 +216,7 @@ export default function AboutPage() {
               <p className="text-red-600 font-bold tracking-widest uppercase text-sm">
                 OUR HISTORY
               </p>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-gray-950 leading-tight tracking-tight">
+              <h2 className="text-3xl lg:text-4xl xl:text-5xl font-display font-bold text-gray-950 leading-tight tracking-tight">
                 The History Behind How We Were Founded
               </h2>
               <p className="text-gray-600 leading-relaxed text-base sm:text-lg">

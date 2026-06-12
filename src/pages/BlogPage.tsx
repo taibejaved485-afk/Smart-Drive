@@ -26,18 +26,18 @@ export default function BlogPage() {
   const blogSchema = {
     "@context": "https://schema.org",
     "@type": "Blog",
-    "name": "Smart Drive Driving Academy Advice Blog",
+    "name": "GoDriveify Driving Academy Advice Blog",
     "description": "Helpful tips, rules, tutorials, and guidelines on safe manual/automatic driving from experts in Faisalabad PK.",
     "publisher": {
       "@type": "LocalBusiness",
-      "name": "Smart Drive Driving School"
+      "name": "GoDriveify Driving School"
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <SEO 
-        title="Driving Tips, Guides & Road Safety Blog | Smart Drive"
+        title="Driving Tips, Guides & Road Safety Blog | GoDriveify"
         description="Learn safe driving with expert tips and tutorials. We post practical guides on road tests, parallel parking, and traffic rules in Faisalabad, Pakistan."
         keywords="learn car guide, defensive driver tips Pakistan, parallel parking how-to, heavy bike tricks, female driver guidelines"
         schema={blogSchema}

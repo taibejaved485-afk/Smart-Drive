@@ -43,7 +43,7 @@ export const INITIAL_RENTAL_FLEET: RentalCar[] = [
     type: 'Sedan',
     isVerified: true,
     registrationNumber: 'FSD-22-6710',
-    ownerName: 'Smart Drive Official',
+    ownerName: 'GoDriveify Official',
     ownerPhone: '923097666928',
     fuelType: 'Petrol',
     description: 'Pristine, fully loaded automatic sedan.',

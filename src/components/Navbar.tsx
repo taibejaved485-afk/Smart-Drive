@@ -243,9 +243,9 @@ export default function Navbar() {
       <nav className="sticky top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-gray-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-20 items-center">
-            <Link to="/" className="font-display font-black text-2xl text-red-600 flex items-center gap-1.5 leading-none tracking-tight">
-              <span>SMART</span>
-              <span className="text-gray-950 font-extrabold text-xl">DRIVE</span>
+            <Link to="/" className="font-display font-black text-2xl text-red-600 flex items-center gap-0.5 leading-none tracking-tighter">
+              <span>GO</span>
+              <span className="text-gray-950 font-extrabold text-xl">DRIVEIFY</span>
             </Link>
             
             <div className="hidden lg:flex space-x-6 font-sans font-medium text-sm text-gray-700">
@@ -643,7 +643,7 @@ export default function Navbar() {
                         <div className="border border-dashed border-red-200 bg-red-50/50 p-4 rounded-2xl flex items-start gap-3 text-xs leading-relaxed text-red-800 font-medium">
                           <input type="checkbox" required className="mt-1 shrink-0 accent-red-650 cursor-pointer" id="agree-terms" />
                           <label htmlFor="agree-terms" className="cursor-pointer select-none">
-                            I confirm that the vehicle details, registration documents, and rental parameters supplied are authentic and comply with Smart Drive marketplace guidelines. I authorize customer contact via WhatsApp.
+                            I confirm that the vehicle details, registration documents, and rental parameters supplied are authentic and comply with GoDriveify marketplace guidelines. I authorize customer contact via WhatsApp.
                           </label>
                         </div>
                       </div>

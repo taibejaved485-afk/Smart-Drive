@@ -75,7 +75,7 @@ export default function AppointmentForm() {
               Get Appointments With Our Best Instructors
             </h2>
             <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed">
-              Ready to start your driving journey? Booking an appointment with Smart Drive is quick and easy. Whether you're a beginner, need a refresher, or want to prepare for your driving test, we've got the perfect course for you.
+              Ready to start your driving journey? Booking an appointment with GoDriveify is quick and easy. Whether you're a beginner, need a refresher, or want to prepare for your driving test, we've got the perfect course for you.
             </p>
             
             <div className="space-y-3.5">

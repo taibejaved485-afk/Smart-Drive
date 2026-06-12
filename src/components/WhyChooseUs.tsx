@@ -29,7 +29,7 @@ export default function WhyChooseUs() {
             whileInView={{ opacity: 1, x: 0 }}
             className="text-gray-600 text-lg leading-relaxed"
           >
-            Choosing the right driving school is the first step toward becoming a skilled and responsible driver. At Smart Drive, we don't just teach you how to drive—we prepare you for real-world road challenges with confidence and competence.
+            Choosing the right driving school is the first step toward becoming a skilled and responsible driver. At GoDriveify, we don't just teach you how to drive—we prepare you for real-world road challenges with confidence and competence.
           </motion.p>
         </div>
 

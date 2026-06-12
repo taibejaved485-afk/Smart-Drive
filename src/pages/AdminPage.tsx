@@ -355,13 +355,13 @@ export default function AdminPage() {
     // Construct pre-filled dynamic message depending on booker current status
     let messageText = '';
     if (b.status === 'Confirmed') {
-      messageText = `===============================\n  🚗 SMART DRIVE TRAINING UPDATE  \n===============================\n\nAssalam-o-Alaikum ${b.fullName}!\n\nWe are pleased to inform you that your registration appointment for "${b.subject}" at Smart Drive Academy has been officially CONFIRMED!\n\nOur certified instructor will cooperate with you soon on the scheduled slot timings.\n\nThank you for choosing Smart Drive!`;
+      messageText = `===============================\n  🚗 GODRIVEIFY TRAINING UPDATE  \n===============================\n\nAssalam-o-Alaikum ${b.fullName}!\n\nWe are pleased to inform you that your registration appointment for "${b.subject}" at GoDriveify Academy has been officially CONFIRMED!\n\nOur certified instructor will cooperate with you soon on the scheduled slot timings.\n\nThank you for choosing GoDriveify!`;
     } else if (b.status === 'Rescheduled') {
-      messageText = `===============================\n  🚗 SMART DRIVE TIMING RESCHEDULE  \n===============================\n\nAssalam-o-Alaikum ${b.fullName}!\n\nRegarding your lesson appointment for "${b.subject}", we need to modify or reschedule the timing slot. Kindly send us your available hourly timings so we can configure your calendar!`;
+      messageText = `===============================\n  🚗 GODRIVEIFY TIMING RESCHEDULE  \n===============================\n\nAssalam-o-Alaikum ${b.fullName}!\n\nRegarding your lesson appointment for "${b.subject}", we need to modify or reschedule the timing slot. Kindly send us your available hourly timings so we can configure your calendar!`;
     } else if (b.status === 'Cancelled') {
-      messageText = `===============================\n  🚗 SMART DRIVE LESSON CANCELLED  \n===============================\n\nAssalam-o-Alaikum ${b.fullName}!\n\nYour appointment/booking for "${b.subject}" has been cancelled due to slot non-availability. Please share alternate timing slots so we can accommodate your schedule!`;
+      messageText = `===============================\n  🚗 GODRIVEIFY LESSON CANCELLED  \n===============================\n\nAssalam-o-Alaikum ${b.fullName}!\n\nYour appointment/booking for "${b.subject}" has been cancelled due to slot non-availability. Please share alternate timing slots so we can accommodate your schedule!`;
     } else {
-      messageText = `===============================\n  🚗 SMART DRIVE ENROLLMENT INQUIRY \n===============================\n\nAssalam-o-Alaikum ${b.fullName}!\n\nThank you for registering for "${b.subject}" with Smart Drive Academy! We have received your enrollment and are checking instructor slots. Let's arrange your timing plan!`;
+      messageText = `===============================\n  🚗 GODRIVEIFY ENROLLMENT INQUIRY \n===============================\n\nAssalam-o-Alaikum ${b.fullName}!\n\nThank you for registering for "${b.subject}" with GoDriveify Academy! We have received your enrollment and are checking instructor slots. Let's arrange your timing plan!`;
     }
     
     return `https://wa.me/${cleanNumber}?text=${encodeURIComponent(messageText)}`;
@@ -713,7 +713,7 @@ export default function AdminPage() {
           return {
             ...p,
             title: newPost.title,
-            author: newPost.author || 'Smart Drive Team',
+            author: newPost.author || 'GoDriveify Team',
             imageUrl: finalImageUrl,
             content: newPost.content,
           };
@@ -727,7 +727,7 @@ export default function AdminPage() {
     } else {
       const post: BlogPost = {
         title: newPost.title,
-        author: newPost.author || 'Smart Drive Team',
+        author: newPost.author || 'GoDriveify Team',
         imageUrl: finalImageUrl,
         content: newPost.content,
         id: Date.now().toString(),
@@ -1243,7 +1243,7 @@ export default function AdminPage() {
                       <label className="block text-sm font-bold text-gray-700 mb-1">Author Name</label>
                       <input 
                         className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition" 
-                        placeholder="e.g. Smart Drive Instructor" 
+                        placeholder="e.g. GoDriveify Instructor" 
                         value={newPost.author} 
                         onChange={e => setNewPost({...newPost, author: e.target.value})} 
                       />
@@ -1402,7 +1402,7 @@ export default function AdminPage() {
                           />
                           <div className="min-w-0 flex-1">
                             <h3 className="font-bold text-gray-900 text-sm truncate leading-snug">{post.title}</h3>
-                            <p className="text-xs text-gray-500 mt-0.5 truncate">By {post.author || 'Smart Drive'}</p>
+                            <p className="text-xs text-gray-500 mt-0.5 truncate">By {post.author || 'GoDriveify'}</p>
                             <p className="text-[10px] text-gray-400 mt-1">{post.date}</p>
                           </div>
                           <div className="flex flex-col sm:flex-row items-center gap-1.5 shrink-0 self-center">
@@ -1442,7 +1442,7 @@ export default function AdminPage() {
                 <h2 className="text-2xl font-black text-gray-900 tracking-tight">SEO &amp; Email Authentication settings</h2>
               </div>
               <p className="text-gray-500 text-sm max-w-3xl leading-relaxed">
-                theHoth SEO Checker has recommended configuring email security protocols to protect your official domain address <strong className="text-red-650">smartdrivefd.com</strong>. Setting up a DMARC and SPF policy boosts your general email deliverability rates to clients (preventing Gmail/Outlook spam filters) and strengthens your overall online authority ranking.
+                theHoth SEO Checker has recommended configuring email security protocols to protect your official domain address <strong className="text-red-650">godriveify.com</strong>. Setting up a DMARC and SPF policy boosts your general email deliverability rates to clients (preventing Gmail/Outlook spam filters) and strengthens your overall online authority ranking.
               </p>
               <div className="mt-4 bg-yellow-50 border border-yellow-200/80 rounded-xl p-4 text-xs sm:text-sm text-yellow-800 leading-relaxed">
                 <strong>Urdu Guide (رہنمائی):</strong> اپنے ڈومین رجسٹرار (جیسے Cloudflare, Namecheap, GoDaddy یا cPanel) کی DNS Settings میں جا کر نیچے دیے گئے <strong>TXT</strong> ریکارڈز کو کاپی کر کے شامل کریں۔ DMARC آپ کی Driving School ای میلز کی سیکیورٹی اور ڈیلیوری کو بہترین بناتا ہے اور دوسروں کو آپ کے نام پر جعلی ای میلز بھیجنے سے روکتا ہے۔
@@ -1533,7 +1533,7 @@ export default function AdminPage() {
                   </div>
                   <h3 className="font-bold text-gray-900 text-sm mb-1.5">Configure TXT record for Sender Policy Framework</h3>
                   <p className="text-xs text-gray-500 mb-4 leading-relaxed">
-                    Authorizes Google Workspace or custom mail servers to send communications on behalf of smartdrivefd.com, dramatically lowering bounce rates.
+                    Authorizes Google Workspace or custom mail servers to send communications on behalf of godriveify.com, dramatically lowering bounce rates.
                   </p>
 
                   <div className="space-y-3">

@@ -16,15 +16,15 @@ export default function ContactPage() {
   const contactSchema = {
     "@context": "https://schema.org",
     "@type": "ContactPage",
-    "name": "Contact Smart Drive Driving School",
-    "description": "Contact Smart Drive Driving Academy. Enroll in manual or automatic driving courses, request female coach availability, or ask for pricing quotes in Faisalabad.",
-    "url": "https://smartdrivefd.com/contact",
+    "name": "Contact GoDriveify Driving School",
+    "description": "Contact GoDriveify Driving Academy. Enroll in manual or automatic driving courses, request female coach availability, or ask for pricing quotes in Faisalabad.",
+    "url": "https://godriveify.com/contact",
     "mainEntity": {
       "@type": "LocalBusiness",
-      "name": "Smart Drive Driving School",
+      "name": "GoDriveify Driving School",
       "telephone": "0300-1115429",
       "email": "trainingdrivingschool@gmail.com",
-      "hasMap": "https://maps.google.com/?q=Smart+Drive+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan",
+      "hasMap": "https://maps.google.com/?q=GoDriveify+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan",
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "Main Jaranwala Road",
@@ -38,13 +38,13 @@ export default function ContactPage() {
         "latitude": "31.4175",
         "longitude": "73.1350"
       },
-      "url": "https://smartdrivefd.com/",
+      "url": "https://godriveify.com/",
       "sameAs": [
         "https://www.facebook.com/GoDriveify/",
         "https://www.instagram.com/godriveify/",
         "https://www.youtube.com/@godriveify",
         "https://x.com/godriveify?s=11",
-        "https://maps.google.com/?q=Smart+Drive+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan"
+        "https://maps.google.com/?q=GoDriveify+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan"
       ]
     }
   };
@@ -103,7 +103,7 @@ export default function ContactPage() {
   return (
     <div className="font-sans text-gray-800 bg-slate-50 min-h-screen flex flex-col justify-between selection:bg-red-650 selection:text-white">
       <SEO 
-        title="Contact Us & Driving Course Registration | Smart Drive"
+        title="Contact Us & Driving Course Registration | GoDriveify"
         description="Connect with Faisalabad's top driving school. Book lessons, find our location on Jaranwala Road, call 0300-1115429, or submit our online registration form."
         keywords="contact driving school Faisalabad, register driving classes, female driving instructor booking, learn driving school address Pakistan"
         schema={contactSchema}
@@ -427,7 +427,7 @@ export default function ContactPage() {
               </div>
 
               <a 
-                href="https://maps.google.com/?q=Smart+Drive+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan" 
+                href="https://maps.google.com/?q=GoDriveify+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs uppercase tracking-wider px-6 py-3.5 rounded-xl border border-gray-300 inline-flex items-center gap-2 transition-all cursor-pointer"
@@ -467,7 +467,7 @@ export default function ContactPage() {
                     </div>
                   </div>
                   <div className="bg-gray-950 text-white font-bold text-[10px] px-2.5 py-1 rounded-md shadow-md mt-1.5 uppercase tracking-wide">
-                    Smart Drive HQ
+                    GoDriveify HQ
                   </div>
                 </div>
               </div>

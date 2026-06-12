@@ -33,8 +33,8 @@ export default function FAQPage() {
   return (
     <div className="min-h-screen bg-white">
       <SEO 
-        title="Driving School FAQ - Questions & Answers | Smart Drive"
-        description="Got driving questions? Find answers on learner permits, course duration, refunds, and driver test preparation at Faisalabad's smart driving academy."
+        title="Driving School FAQ - Questions & Answers | GoDriveify"
+        description="Got driving questions? Find answers on learner permits, course duration, refunds, and driver test preparation at Faisalabad's GoDriveify driving academy."
         keywords="driving school queries Faisalabad, learner permit age limit Pakistan, heavy bike training rules, fast track driving course FAQ"
         schema={faqSchema}
       />
@@ -85,7 +85,7 @@ export default function FAQPage() {
       >
         <div className="py-24 px-4">
           <h2 className="text-2xl sm:text-4xl font-bold mb-6">Enroll Today</h2>
-           <p className="mb-10 text-lg max-w-xl mx-auto text-gray-700">Ready to start your driving journey? Enroll in one of our courses today and become a safe, confident driver with <span className="font-bold">Smart Drive</span>.</p>
+           <p className="mb-10 text-lg max-w-xl mx-auto text-gray-700">Ready to start your driving journey? Enroll in one of our courses today and become a safe, confident driver with <span className="font-bold">GoDriveify</span>.</p>
           <button 
             onClick={() => {
               if ('scrollRestoration' in history) {

@@ -1,17 +1,17 @@
 {
-  "short_name": "Smart Drive",
-  "name": "Smart Drive Driving & Rental Marketplace",
+  "short_name": "GoDriveify",
+  "name": "GoDriveify Driving & Rental Marketplace",
   "description": "Premium driving school and verified car rental marketplace in Faisalabad, Lahore, and Islamabad.",
   "icons": [
     {
-      "src": "https://trainingdrivingschool.pk/wp-content/uploads/2025/02/map-pattern-dark.png",
-      "type": "image/png",
+      "src": "https://i.pinimg.com/736x/ca/5b/12/ca5b1205f038143bc578baaa8f07ff29.jpg",
+      "type": "image/jpeg",
       "sizes": "192x192",
       "purpose": "any maskable"
     },
     {
-      "src": "https://trainingdrivingschool.pk/wp-content/uploads/2025/02/map-pattern-dark.png",
-      "type": "image/png",
+      "src": "https://i.pinimg.com/736x/ca/5b/12/ca5b1205f038143bc578baaa8f07ff29.jpg",
+      "type": "image/jpeg",
       "sizes": "512x512",
       "purpose": "any maskable"
     }

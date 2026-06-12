@@ -13,7 +13,7 @@ export default function PricingPage() {
   const pricingSchema = {
     "@context": "https://schema.org",
     "@type": "OfferCatalog",
-    "name": "Smart Drive Driving School Lesson Rates",
+    "name": "GoDriveify Driving School Lesson Rates",
     "itemListElement": [
       {
         "@type": "Offer",
@@ -51,7 +51,7 @@ export default function PricingPage() {
   return (
     <div className="bg-gray-50 min-h-screen">
       <SEO 
-        title="Driving School Fees & Lesson Packages | Smart Drive"
+        title="Driving School Fees & Lesson Packages | GoDriveify"
         description="Check out our low-cost manual & automatic driving school pricing plans in Faisalabad. Learn in a high-end Honda Civic starting from 25,000 PKR only."
         keywords="driving school fee Faisalabad, car driving class packages, heavy bike license course rates, cheap driving instructor cost, automatic car lesson prices Punjab"
         schema={pricingSchema}
@@ -73,8 +73,8 @@ export default function PricingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-16">
                 <p className="text-red-500 font-bold tracking-widest text-sm mb-4">PRICING PACKAGE</p>
-                <h2 className="text-5xl font-bold text-gray-950 mb-8">Choose A Package That Suits Your Needs</h2>
-                <p className="text-gray-600 text-lg leading-relaxed">At Smart Drive, we offer a range of driving packages to suit your needs, skill level, and budget. Whether you're a beginner or looking to refine your driving skills, we've got the perfect package for you.</p>
+                <h2 className="text-3xl md:text-5xl font-bold text-gray-950 mb-8">Choose A Package That Suits Your Needs</h2>
+                <p className="text-gray-600 text-lg leading-relaxed">At GoDriveify, we offer a range of driving packages to suit your needs, skill level, and budget. Whether you're a beginner or looking to refine your driving skills, we've got the perfect package for you.</p>
             </div>
 
             {/* Packages Grid */}

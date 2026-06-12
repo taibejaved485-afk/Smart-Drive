@@ -381,7 +381,7 @@ export default function RentalsPage() {
     // Construct rich text organized layout representing an executive inquiry invoice of the car
     const invoiceParts = [
       "=============================",
-      "    📄 SMART DRIVE INQUIRY INVOICE   ",
+      "    📄 GODRIVEIFY INQUIRY INVOICE   ",
       "=============================",
       "👤 CLIENT DETAILS:",
       "• Name: Valued Guest (Inquiry)",
@@ -404,15 +404,15 @@ export default function RentalsPage() {
   const schema = {
     "@context": "https://schema.org",
     "@type": "ProductCollection",
-    "name": "Smart Drive Car Rental Fleet Pakistan",
+    "name": "GoDriveify Car Rental Fleet Pakistan",
     "description": "Rent premium Honda Civic, Toyota Yaris, or Suzuki Swift manual or automatic cars for practice sessions, driving test preparation, or personal travel in Lahore, Faisalabad, Islamabad, and Karachi.",
-    "url": "https://smartdrivefd.com/rentals"
+    "url": "https://godriveify.com/rentals"
   };
 
   return (
     <div className="bg-gray-50 min-h-screen">
       <SEO 
-        title="Rent a Car for Driving Practice & Travel | Smart Drive"
+        title="Rent a Car for Driving Practice & Travel | GoDriveify"
         description="Browse our luxury and economy manual/automatic car rental fleet in Faisalabad, Lahore, Islamabad, and Karachi. High-end rentals starting from 5,500 PKR with smooth booking."
         keywords="car rental for driving test, rent car Faisalabad, rent driving practice car Lahore, automatic car rental Islamabad, manual transmission car rent, car rental packages Pakistan"
         schema={schema}
@@ -433,7 +433,7 @@ export default function RentalsPage() {
           <motion.h1 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl sm:text-5xl md:text-6xl font-black mb-4 tracking-tight"
+            className="text-3xl sm:text-5xl md:text-6xl font-black mb-4 tracking-tight"
           >
             Rent a Car for Practice or Travel
           </motion.h1>
@@ -489,7 +489,7 @@ export default function RentalsPage() {
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
             <div className="max-w-2xl">
               <span className="text-red-650 font-black tracking-wider text-xs uppercase block mb-2">Our Vehicle Fleet</span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-950 tracking-tight leading-none">
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-gray-950 tracking-tight leading-none">
                 Select Your Desired Transmission & City
               </h2>
               <p className="text-gray-500 text-sm mt-3 leading-relaxed">
@@ -741,7 +741,7 @@ export default function RentalsPage() {
                               <span className="text-gray-400 font-medium">Vetted Owner:</span>
                               <span className="font-extrabold text-gray-800 flex items-center gap-1">
                                 <CheckCircle2 className="w-3.5 h-3.5 text-green-600 shrink-0" />
-                                {car.ownerName || 'Smart Drive Partner'}
+                                {car.ownerName || 'GoDriveify Partner'}
                               </span>
                             </div>
                             {car.ownerPhone && (
@@ -899,7 +899,7 @@ export default function RentalsPage() {
                         href={`https://wa.me/${(selectedCar.ownerPhone || '923097666928').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
                           [
                             "=============================",
-                            "      📄 SMART DRIVE RENTAL INVOICE   ",
+                            "    📄 GODRIVEIFY RENTAL INVOICE   ",
                             "=============================",
                             "👤 CLIENT DETAILS:",
                             `• Name: ${bookingName}`,
@@ -919,7 +919,7 @@ export default function RentalsPage() {
                             "💰 FINANCIAL SUMMARY:",
                             `• Total Estimated Rent: PKR ${(parseInt(String(selectedCar.rentPrice || '0').replace(/,/g, '')) * bookingDuration).toLocaleString()}`,
                             "=============================",
-                            "Generated via Smart Drive Marketplace",
+                            "Generated via GoDriveify Marketplace",
                             "Please confirm reservation slot for this vehicle!"
                           ].join("\n")
                         )}`}

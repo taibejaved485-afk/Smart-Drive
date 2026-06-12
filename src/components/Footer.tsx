@@ -51,8 +51,8 @@ export default function Footer() {
           {/* Brand Identity Column */}
           <div className="space-y-6">
             <Link to="/" className="font-display font-black text-3xl text-red-600 flex items-center gap-1 leading-none tracking-tight">
-              <span>SMART</span>
-              <span className="text-white">DRIVE</span>
+              <span>GO</span>
+              <span className="text-white font-extrabold text-2xl">DRIVEIFY</span>
             </Link>
             <p className="text-sm leading-relaxed text-gray-500">
               Transforming raw beginners into safe, fully defensive, and licensed professional drivers across Faisalabad since 2018.
@@ -200,7 +200,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
           <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-            <p>&copy; 2026 Smart Drive. All rights reserved.</p>
+            <p>&copy; 2026 GoDriveify. All rights reserved.</p>
             <span className="hidden sm:inline text-white/10">|</span>
             <div className="flex items-center gap-1 text-xs text-gray-400 bg-white/5 py-1 px-2.5 rounded-full border border-white/5">
               <ShieldCheck className="w-3.5 h-3.5 text-red-500" />

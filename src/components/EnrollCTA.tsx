@@ -19,7 +19,7 @@ export default function EnrollCTA() {
           transition={{ delay: 0.1 }}
           className="text-gray-400 text-lg mb-10 max-w-2xl mx-auto"
         >
-          Ready to start your driving journey? Enroll in one of our courses today and become a safe, confident driver with Smart Drive.
+          Ready to start your driving journey? Enroll in one of our courses today and become a safe, confident driver with GoDriveify.
         </motion.p>
         <motion.button 
           initial={{ opacity: 0, y: 20 }}

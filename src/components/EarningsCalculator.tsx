@@ -61,7 +61,7 @@ export default function EarningsCalculator() {
             Calculate Your Earnings
           </h2>
           <p className="text-slate-450 mt-3 text-sm max-w-xl mx-auto leading-relaxed">
-            Own an idle vehicle in Pakistan? List it on Smart Drive's multi-vendor rental directory, choose your availability slots, and start generating monthly revenue in major cities.
+            Own an idle vehicle in Pakistan? List it on GoDriveify's multi-vendor rental directory, choose your availability slots, and start generating monthly revenue in major cities.
           </p>
         </div>
 

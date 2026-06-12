@@ -2,9 +2,9 @@ import { motion } from 'motion/react';
 import { Star } from 'lucide-react';
 
 const reviews = [
-  { name: 'Abdul Majeed', text: 'Well done sir g bhot hi acha work kr raha ga apka Smart Drive driving school Faisalabad', rating: 5, avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=120&h=120' },
+  { name: 'Abdul Majeed', text: 'Well done sir g bhot hi acha work kr raha ga apka GoDriveify driving school Faisalabad', rating: 5, avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=120&h=120' },
   { name: 'Awais Iqbal', text: 'Sir good job ap buhat acha kaam kr rahy han ap ki service buhat achai ha', rating: 5, avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120&h=120' },
-  { name: 'Malik Orangzaib', text: 'Mashallah Allah AP ko sir apke staff or apke Smart Drive driving school ko hameshs salamat rakhe', rating: 5, avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=120&h=120' },
+  { name: 'Malik Orangzaib', text: 'Mashallah Allah AP ko sir apke staff or apke GoDriveify driving school ko hameshs salamat rakhe', rating: 5, avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=120&h=120' },
   { name: 'Sajid Ali', text: 'Best driving school in the city! Instructors are very patient and professional.', rating: 5, avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=120&h=120' },
   { name: 'Fatima Naz', text: 'Highly recommend, passed my test on the first attempt thanks to their guidance.', rating: 5, avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=120&h=120' },
   { name: 'Hassan Khan', text: 'Great experience, learned a lot about road safety. Thank you!', rating: 4, avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=120&h=120' },

@@ -27,12 +27,12 @@ export default function HomePage() {
     "@graph": [
       {
         "@type": "LocalBusiness",
-        "@id": "https://smartdrivefd.com/#localbusiness",
-        "name": "Smart Drive Driving School",
+        "@id": "https://godriveify.com/#localbusiness",
+        "name": "GoDriveify Driving School",
         "image": "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=600&auto=format&fit=crop",
         "telephone": "0300-1115429",
         "email": "trainingdrivingschool@gmail.com",
-        "hasMap": "https://maps.google.com/?q=Smart+Drive+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan",
+        "hasMap": "https://maps.google.com/?q=GoDriveify+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan",
         "address": {
           "@type": "PostalAddress",
           "streetAddress": "Main Jaranwala Road",
@@ -46,7 +46,7 @@ export default function HomePage() {
           "latitude": "31.4175",
           "longitude": "73.1350"
         },
-        "url": "https://smartdrivefd.com/",
+        "url": "https://godriveify.com/",
         "priceRange": "$$",
         "openingHoursSpecification": {
           "@type": "OpeningHoursSpecification",
@@ -67,12 +67,12 @@ export default function HomePage() {
           "https://www.instagram.com/godriveify/",
           "https://www.youtube.com/@godriveify",
           "https://x.com/godriveify?s=11",
-          "https://maps.google.com/?q=Smart+Drive+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan"
+          "https://maps.google.com/?q=GoDriveify+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan"
         ]
       },
       {
         "@type": "EducationalOrganization",
-        "name": "Smart Drive Driving Academy",
+        "name": "GoDriveify Driving Academy",
         "description": "Learn physical manual and automatic car driving with male and female instructors in Faisalabad, Pakistan.",
         "aggregateRating": {
           "@type": "AggregateRating",
@@ -87,7 +87,7 @@ export default function HomePage() {
   return (
     <div className="font-sans text-gray-900 bg-gray-50">
       <SEO 
-        title="Male & Female Driving School & Car Rentals | Smart Drive"
+        title="Male & Female Driving School & Car Rentals | GoDriveify"
         description="Faisalabad's top dual-platform: Learn physical manual & automatic driving with certified instructors OR rent verified cars directly from verified local owners."
         keywords="driving school Faisalabad, female driving instructor, rent a car Faisalabad, car rentals Pakistan, peer-to-peer car hire, automatic driving class, manual driving lessons"
         schema={homeSchema}
@@ -100,7 +100,7 @@ export default function HomePage() {
         <div className="bg-white rounded-3xl p-4 sm:p-6 shadow-2xl border border-gray-150 flex flex-col md:flex-row gap-5 items-center justify-between">
           <div className="text-center md:text-left">
             <h3 className="text-base sm:text-lg font-black text-gray-950 flex items-center gap-1.5 justify-center md:justify-start">
-              <span>Smart Drive Hub</span>
+              <span>GoDriveify Hub</span>
               <Sparkles className="w-4 h-4 text-red-500 fill-red-500/10" />
             </h3>
             <p className="text-xs text-gray-400 font-medium">Choose a portal to start your journey</p>
