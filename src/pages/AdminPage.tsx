@@ -79,6 +79,24 @@ const PRESET_IMAGES = [
   }
 ];
 
+interface CustomerRequest {
+  id: string;
+  name: string;
+  whatsapp: string;
+  carModel: string;
+  transmission: 'Automatic' | 'Manual' | 'Any';
+  city: string;
+  area: string;
+  startDate: string;
+  endDate: string;
+  maxBudget: string;
+  driverRequired: 'Yes' | 'No';
+  status: 'pending' | 'live';
+  createdAt: string;
+  cnicDoc?: string;
+  licenseDoc?: string;
+}
+
 export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
@@ -86,7 +104,7 @@ export default function AdminPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [newPost, setNewPost] = useState({ title: '', author: '', imageUrl: '', content: '' });
-  const [activeTab, setActiveTab] = useState<'bookings' | 'blogs' | 'dns' | 'rentals'>('bookings');
+  const [activeTab, setActiveTab] = useState<'bookings' | 'blogs' | 'dns' | 'rentals' | 'requests'>('bookings');
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const carFileInputRef = useRef<HTMLInputElement>(null);
@@ -107,6 +125,12 @@ export default function AdminPage() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [pendingCars, setPendingCars] = useState<any[]>([]);
   const [verifiedToggles, setVerifiedToggles] = useState<Record<string, boolean>>({});
+  
+  // Customer Requests State
+  const [customerRequests, setCustomerRequests] = useState<CustomerRequest[]>([]);
+
+  // Vault Modal State
+  const [vaultSelectedDocs, setVaultSelectedDocs] = useState<{ cnic?: string, registration?: string, license?: string, title: string } | null>(null);
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -220,6 +244,16 @@ export default function AdminPage() {
       setRentalCars(initial);
       localStorage.setItem('rental_cars', JSON.stringify(initial));
     }
+    
+    // 5. Load Customer Requests
+    const savedCustomerRequests = localStorage.getItem('customer_requests');
+    if (savedCustomerRequests) {
+      try {
+        setCustomerRequests(JSON.parse(savedCustomerRequests));
+      } catch (err) {
+        setCustomerRequests([]);
+      }
+    }
   };
 
   useEffect(() => {
@@ -229,11 +263,13 @@ export default function AdminPage() {
     window.addEventListener('storage', loadDataAndSync);
     window.addEventListener('driving_bookings_updated', loadDataAndSync);
     window.addEventListener('pending_cars_updated', loadDataAndSync);
+    window.addEventListener('customer_requests_updated', loadDataAndSync);
     
     return () => {
       window.removeEventListener('storage', loadDataAndSync);
       window.removeEventListener('driving_bookings_updated', loadDataAndSync);
       window.removeEventListener('pending_cars_updated', loadDataAndSync);
+      window.removeEventListener('customer_requests_updated', loadDataAndSync);
     };
   }, []);
 
@@ -297,6 +333,25 @@ export default function AdminPage() {
       localStorage.setItem('pending_cars', JSON.stringify(remainingPending));
       
       window.dispatchEvent(new Event('pending_cars_updated'));
+      window.dispatchEvent(new Event('storage'));
+    }
+  };
+
+  // Handler methods for Customer Rental Requests
+  const handleApproveRequest = (id: string) => {
+    const updated = customerRequests.map(r => r.id === id ? { ...r, status: 'live' as const } : r);
+    setCustomerRequests(updated);
+    localStorage.setItem('customer_requests', JSON.stringify(updated));
+    window.dispatchEvent(new Event('customer_requests_updated'));
+    window.dispatchEvent(new Event('storage'));
+  };
+
+  const handleRejectRequest = (id: string) => {
+    if (window.confirm('Are you sure you want to delete this customer request?')) {
+      const updated = customerRequests.filter(r => r.id !== id);
+      setCustomerRequests(updated);
+      localStorage.setItem('customer_requests', JSON.stringify(updated));
+      window.dispatchEvent(new Event('customer_requests_updated'));
       window.dispatchEvent(new Event('storage'));
     }
   };
@@ -599,6 +654,20 @@ export default function AdminPage() {
           >
             <ShieldAlert className="w-4 h-4 text-yellow-500 animate-pulse" />
             SEO & DNS Settings (DMARC)
+          </button>
+
+          {/* Tab 5: Customer Requests */}
+          <button 
+            type="button"
+            onClick={() => setActiveTab('requests')}
+            className={`pb-4 px-6 font-bold text-sm tracking-wide transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'requests' 
+                ? 'border-red-650 text-red-650 font-black' 
+                : 'border-transparent text-gray-500 hover:text-gray-800'
+            }`}
+          >
+            <Clock className="w-4 h-4 text-indigo-500" />
+            Approve Car Requests (کسٹمرز)
           </button>
         </div>
 
@@ -1375,6 +1444,17 @@ export default function AdminPage() {
                             </label>
                           </div>
 
+                          {/* Verification Vault Trigger */}
+                          <div className="mt-3">
+                            <button
+                              type="button"
+                              onClick={() => setVaultSelectedDocs({ cnic: car.cnicDoc, registration: car.registrationDoc, title: `Verification Lockbox: ${car.ownerName}` })}
+                              className="w-full flex items-center justify-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs uppercase tracking-wide py-2.5 rounded-xl transition border border-indigo-200 cursor-pointer"
+                            >
+                              <ShieldCheck className="w-4 h-4" /> Review Verification Vault
+                            </button>
+                          </div>
+
                           {/* Approval Actions */}
                           <div className="flex gap-2.5 mt-3 pt-3 border-t border-gray-100">
                             <button
@@ -1670,7 +1750,159 @@ export default function AdminPage() {
           </div>
           </div>
         )}
+
+        {activeTab === 'requests' && (
+          <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm p-6 sm:p-8 animate-fade-in space-y-6">
+            <div className="border-b border-gray-100 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+                  <Clock className="w-6 h-6 text-indigo-600" />
+                  Approve Car Requests
+                </h2>
+                <p className="text-gray-500 text-xs sm:text-sm mt-1">
+                  Review and publish customer requests for rental cars. Approved requests appear on the public directory.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <span className="bg-gray-100 text-gray-700 px-3.5 py-1.5 rounded-xl text-xs font-bold border border-gray-200">
+                  Total: {customerRequests.length}
+                </span>
+                <span className="bg-yellow-50 text-yellow-700 px-3.5 py-1.5 rounded-xl text-xs font-bold border border-yellow-100">
+                  Pending: {customerRequests.filter(r => r.status === 'pending').length}
+                </span>
+              </div>
+            </div>
+
+            {customerRequests.length === 0 ? (
+              <div className="text-center py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200 p-6">
+                <FileSpreadsheet className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <h3 className="font-extrabold text-gray-850">No Requests Recorded</h3>
+                <p className="text-xs text-gray-400 mt-1 max-w-sm mx-auto">
+                  When customers submit car rental requests, they will populate here for your approval.
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto rounded-xl border border-gray-150">
+                <table className="w-full text-left border-collapse text-xs sm:text-sm">
+                  <thead>
+                    <tr className="bg-gray-50 border-b border-gray-150 text-gray-400 font-extrabold uppercase tracking-wider text-[10px]">
+                      <th className="p-4">Customer Details</th>
+                      <th className="p-4">Car Wanted</th>
+                      <th className="p-4">Duration & Budget</th>
+                      <th className="p-4">Status</th>
+                      <th className="p-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-150">
+                    {customerRequests.map((req) => (
+                      <tr key={req.id} className="hover:bg-gray-50/60 transition-colors">
+                        <td className="p-4">
+                          <p className="font-extrabold text-gray-900">{req.name}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">{req.whatsapp}</p>
+                          <p className="text-xs text-gray-400">{req.city} {req.area && `(${req.area})`}</p>
+                        </td>
+                        <td className="p-4">
+                          <p className="font-bold text-gray-800">{req.carModel}</p>
+                          <p className="text-[10px] text-gray-500 uppercase mt-0.5">{req.transmission} • Driver: {req.driverRequired}</p>
+                        </td>
+                        <td className="p-4">
+                          <p className="font-mono font-bold text-gray-800">{req.startDate} to {req.endDate}</p>
+                          <p className="text-xs text-indigo-600 font-black mt-0.5">{req.maxBudget} PKR/Day</p>
+                        </td>
+                        <td className="p-4">
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] uppercase font-bold tracking-wider ${req.status === 'live' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-750'}`}>
+                            {req.status}
+                          </span>
+                        </td>
+                        <td className="p-4 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => setVaultSelectedDocs({ cnic: req.cnicDoc, license: req.licenseDoc, title: `Customer Docs: ${req.name}` })}
+                              className="px-3 py-1.5 rounded-lg bg-indigo-50 border border-indigo-100 text-indigo-700 hover:bg-indigo-100 font-bold text-[10px] uppercase tracking-wide transition cursor-pointer"
+                              title="Review Vault"
+                            >
+                              <ShieldCheck className="w-3.5 h-3.5" /> Vault
+                            </button>
+                            {req.status === 'pending' && (
+                              <button
+                                onClick={() => handleApproveRequest(req.id)}
+                                className="px-3 py-1.5 rounded-lg bg-green-600 hover:bg-green-700 text-white font-extrabold text-[10px] uppercase tracking-wide cursor-pointer flex items-center gap-1"
+                              >
+                                <Check className="w-3.5 h-3.5" /> Approve
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleRejectRequest(req.id)}
+                              className="p-1.5 text-gray-400 hover:text-red-650 hover:bg-red-50 rounded-lg transition cursor-pointer"
+                              title="Delete Request"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* Verification Vault Modal */}
+      {vaultSelectedDocs && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setVaultSelectedDocs(null)} />
+          <div className="bg-white rounded-3xl overflow-hidden shadow-2xl relative w-full max-w-2xl max-h-[90vh] flex flex-col z-10 animate-fade-in relative">
+            <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-gray-50/50">
+              <h3 className="font-black text-gray-900 tracking-tight flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-indigo-600" />
+                {vaultSelectedDocs.title}
+              </h3>
+              <button 
+                onClick={() => setVaultSelectedDocs(null)}
+                className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-500 rounded-full transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto space-y-8 h-full">
+              {vaultSelectedDocs.cnic ? (
+                <div>
+                  <h4 className="text-xs font-black uppercase tracking-wider text-gray-700 mb-3 border-b pb-1">CNIC Document (Front & Back)</h4>
+                  <img src={vaultSelectedDocs.cnic} alt="CNIC Document" className="w-full rounded-xl border border-gray-200 shadow-sm object-contain max-h-96" />
+                </div>
+              ) : (
+                <div className="bg-gray-50 text-gray-400 text-center p-4 rounded-xl text-sm italic font-medium">No CNIC uploaded</div>
+              )}
+
+              {vaultSelectedDocs.registration && (
+                <div>
+                  <h4 className="text-xs font-black uppercase tracking-wider text-gray-700 mb-3 border-b pb-1">Vehicle Registration Book</h4>
+                  <img src={vaultSelectedDocs.registration} alt="Registration Document" className="w-full rounded-xl border border-gray-200 shadow-sm object-contain max-h-96" />
+                </div>
+              )}
+
+              {vaultSelectedDocs.license && (
+                <div>
+                  <h4 className="text-xs font-black uppercase tracking-wider text-gray-700 mb-3 border-b pb-1">Driving License</h4>
+                  <img src={vaultSelectedDocs.license} alt="Driving License" className="w-full rounded-xl border border-gray-200 shadow-sm object-contain max-h-96" />
+                </div>
+              )}
+            </div>
+            <div className="p-5 border-t border-gray-100 bg-gray-50 flex justify-end">
+              <button 
+                onClick={() => setVaultSelectedDocs(null)}
+                className="px-6 py-2.5 bg-gray-900 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition hover:bg-gray-800"
+              >
+                Close Vault
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );

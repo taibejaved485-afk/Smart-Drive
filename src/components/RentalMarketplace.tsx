@@ -152,6 +152,20 @@ function MarketplaceCarCard({ car, waUrl }: { car: RentalCar; waUrl: string }) {
   const images = car.images && car.images.length > 0 ? car.images : [car.imageUrl];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [showMapModal, setShowMapModal] = useState(false);
+
+  // Generate next 7 days structure
+  const next7Days = Array.from({ length: 7 }).map((_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
+    const dayNum = d.getDate();
+    // Simulate some booked dates for demo purposes: e.g. Day 1 and 3 are booked
+    const isBooked = (car.id === '3' && (i === 1 || i === 2)) || (car.status === 'Booked' && i < 2);
+    return { dayName, dayNum, isBooked };
+  });
+
+  const isTodayBooked = next7Days[0].isBooked;
 
   const nextImage = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -240,10 +254,21 @@ function MarketplaceCarCard({ car, waUrl }: { car: RentalCar; waUrl: string }) {
           {car.status}
         </span>
 
-        {/* City Hub Indicator */}
-        <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full text-[10px] font-bold text-white shadow-sm">
-          <MapPin className="w-3 h-3 text-red-500" />
-          <span>{car.city}</span>
+        {/* City Hub Indicator & Area */}
+        <div className="absolute top-4 right-4 z-20 flex flex-col items-end gap-1.5">
+          <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full text-[10px] font-bold text-white shadow-sm">
+            <MapPin className="w-3 h-3 text-red-500" />
+            <span>{car.city}</span>
+          </div>
+          {(car.area || car.id === '1') && (
+            <button 
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowMapModal(true); }}
+              className="flex items-center gap-1 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[9px] font-bold text-gray-800 shadow-sm border border-gray-200/50 hover:bg-white transition"
+            >
+              <MapPin className="w-2.5 h-2.5 text-indigo-500" />
+              <span>{car.area || 'Downtown Area'}</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -304,8 +329,39 @@ function MarketplaceCarCard({ car, waUrl }: { car: RentalCar; waUrl: string }) {
           )}
         </div>
 
+        {/* Inline Availability Date Scheduler Matrix */}
+        <div className="mb-4">
+          <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-1.5 flex items-center justify-between">
+            <span>7-Day Availability Matrix</span>
+            <span className="text-[8px] text-gray-400 font-medium lowercase">Starts Today</span>
+          </p>
+          <div className="flex gap-1 justify-between">
+            {next7Days.map((day, idx) => (
+              <div 
+                key={idx} 
+                className={`flex-1 flex flex-col items-center justify-center py-1.5 rounded-lg border relative ${
+                  day.isBooked 
+                    ? 'bg-red-50 border-red-100 text-red-500' 
+                    : 'bg-green-50 border-green-100 text-green-700'
+                }`}
+                title={day.isBooked ? 'Booked' : 'Available'}
+              >
+                <span className="text-[8px] font-bold uppercase">{day.dayName}</span>
+                <span className={`text-xs font-black ${day.isBooked ? 'opacity-50' : ''}`}>
+                  {day.dayNum}
+                </span>
+                {day.isBooked && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <X className="w-4 h-4 text-red-500 opacity-60" />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Bottom Price & Contact Area */}
-        <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
+        <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between gap-3 relative">
           <div>
             <div className="flex items-baseline gap-1 leading-none">
               <span className="text-xs font-black text-gray-400">PKR</span>
@@ -314,21 +370,93 @@ function MarketplaceCarCard({ car, waUrl }: { car: RentalCar; waUrl: string }) {
             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mt-1.5">Per {car.rentUnit.toUpperCase()}</span>
           </div>
 
-          {/* Direct WhatsApp Call to Action */}
           <a 
-            href={waUrl} 
-            target="_blank" 
+            href={isTodayBooked ? '#' : waUrl} 
+            target={isTodayBooked ? '_self' : '_blank'} 
             rel="noopener noreferrer"
-            className="bg-[#25D366] hover:bg-[#128C7E] text-white px-4.5 py-2.5 rounded-xl font-extrabold text-xs uppercase tracking-wider flex items-center gap-1.5 transition shadow-lg shadow-green-100 cursor-pointer transform hover:scale-105 active:scale-95"
-            title="Contact owner on WhatsApp"
+            onClick={(e) => {
+              if (isTodayBooked) {
+                e.preventDefault();
+                alert('This car is marked as BOOKED for today. Please wait for an available slot to initiate booking.');
+              }
+            }}
+            className={`px-4.5 py-2.5 rounded-xl font-extrabold text-xs uppercase tracking-wider flex items-center gap-1.5 transition shadow-lg cursor-pointer transform hover:scale-105 active:scale-95 ${
+              isTodayBooked 
+                ? 'bg-gray-200 text-gray-400 shadow-none cursor-not-allowed hidden' 
+                : 'bg-[#25D366] hover:bg-[#128C7E] text-white shadow-green-100'
+            }`}
+            style={isTodayBooked ? { display: 'none' } : {}}
+            title={isTodayBooked ? 'Currently Booked' : 'Contact owner on WhatsApp'}
           >
+            {isTodayBooked ? <span className="opacity-0 w-0 h-0 inline-block overflow-hidden absolute">Booked</span> : (
+              <>
             <svg className="w-4 h-4 fill-white text-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.455 5.703 1.455h.008c6.56 0 11.895-5.335 11.898-11.893a11.821 11.821 0 00-3.48-8.413z" />
             </svg>
             <span>WhatsApp</span>
+            </>
+            )}
           </a>
+          
+          {isTodayBooked && (
+            <span className="bg-red-50 text-red-600 px-4 py-2.5 rounded-xl font-extrabold text-[10px] sm:text-xs uppercase tracking-wider flex items-center justify-center border border-red-100 flex-1 ml-2 text-center">
+              Unavailable Today
+            </span>
+          )}
         </div>
       </div>
+
+      {/* Static Map Placement Modal */}
+      {showMapModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowMapModal(false); }} />
+          <div className="bg-white rounded-3xl overflow-hidden shadow-2xl relative w-full max-w-2xl flex flex-col z-10 animate-fade-in" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-gray-50/50">
+              <h3 className="font-black text-gray-900 tracking-tight flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-indigo-600" />
+                Vicinity View: {car.area || 'Downtown Area'}, {car.city}
+              </h3>
+              <button 
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowMapModal(false); }}
+                className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-500 rounded-full transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4 bg-gray-50/50 relative">
+              {/* Simulated Map Container with Grayscale/Navy Theme */}
+              <div className="w-full h-80 bg-gray-900 rounded-2xl relative overflow-hidden flex items-center justify-center border border-gray-200 shadow-inner">
+                <div className="absolute inset-0 opacity-40 bg-[url('https://trainingdrivingschool.pk/wp-content/uploads/2025/02/map-pattern-dark.png')] bg-cover bg-center blend-overlay" style={{backgroundImage: 'radial-gradient(circle at center, transparent 0%, #111827 100%), repeating-linear-gradient(45deg, #1f2937 25%, transparent 25%, transparent 75%, #1f2937 75%, #1f2937), repeating-linear-gradient(45deg, #1f2937 25%, #111827 25%, #111827 75%, #1f2937 75%, #1f2937)', backgroundSize: '100% 100%, 20px 20px, 20px 20px', backgroundPosition: '0 0, 0 0, 10px 10px'}}></div>
+                
+                {/* Radar Ripple Effect */}
+                <span className="absolute flex h-24 w-24">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-20"></span>
+                  <span className="relative inline-flex rounded-full h-24 w-24 bg-indigo-500/10 border border-indigo-500/30"></span>
+                </span>
+                
+                <div className="relative z-10 flex flex-col items-center">
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(79,70,229,0.5)] mb-2">
+                    <MapPin className="w-6 h-6 text-indigo-600" />
+                  </div>
+                  <div className="bg-white/90 backdrop-blur px-4 py-2 rounded-xl text-center shadow-lg border border-gray-200/50">
+                    <p className="text-xs font-black uppercase tracking-wider text-gray-900">{car.area || 'Downtown Area'}</p>
+                    <p className="text-[10px] font-bold text-gray-500 mt-0.5">{car.city}, Region</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="p-5 border-t border-gray-100 flex items-center justify-between bg-white">
+              <p className="text-xs text-gray-500 max-w-sm">Precise pickup coordinates are provided by the owner upon confirmed WhatsApp booking.</p>
+              <button 
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowMapModal(false); }}
+                className="px-6 py-2.5 bg-gray-900 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition hover:bg-gray-800"
+              >
+                Close Map
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

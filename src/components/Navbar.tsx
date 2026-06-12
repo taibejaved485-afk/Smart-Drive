@@ -60,7 +60,9 @@ export default function Navbar() {
     description: '',
     imageUrl: PRESET_CAR_IMAGE_OPTIONS[0].url,
     imageUrls: [] as string[],
-    registrationNumber: ''
+    registrationNumber: '',
+    cnicDoc: '',
+    registrationDoc: ''
   });
 
   const navLinks = [
@@ -74,17 +76,13 @@ export default function Navbar() {
 
   const handleNextStep = () => {
     if (step === 1) {
-      if (!formData.ownerName.trim() || !formData.ownerPhone.trim()) {
-        alert('Please fill out your name and phone number to continue.');
+      if (!formData.ownerName.trim() || !formData.ownerPhone.trim() || !formData.cnicDoc) {
+        alert('Please fill out your name, phone number, and upload CNIC to continue.');
         return;
       }
     } else if (step === 2) {
-      if (!formData.name.trim()) {
-        alert('Please enter your Car Model Name and Year.');
-        return;
-      }
-      if (!formData.registrationNumber.trim()) {
-        alert('Please enter your Car Registration Number.');
+      if (!formData.name.trim() || !formData.registrationNumber.trim() || !formData.registrationDoc) {
+        alert('Please fill out car details and upload Vehicle Registration Book.');
         return;
       }
     }
@@ -138,6 +136,8 @@ export default function Navbar() {
       imageUrl: formData.imageUrls.length > 0 ? formData.imageUrls[0] : formData.imageUrl,
       images: formData.imageUrls,
       registrationNumber: formData.registrationNumber,
+      cnicDoc: formData.cnicDoc,
+      registrationDoc: formData.registrationDoc,
       status: 'Available' as 'Available' | 'Booked',
       createdAt: new Date().toISOString(),
       approved: false
@@ -207,6 +207,20 @@ export default function Navbar() {
       };
       reader.readAsDataURL(file);
     });
+  };
+
+  const handleDocFileUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'cnic' | 'registration') => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({
+          ...prev,
+          [type === 'cnic' ? 'cnicDoc' : 'registrationDoc']: reader.result as string
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const removeImage = (indexToRemove: number) => {
@@ -421,6 +435,24 @@ export default function Navbar() {
                             </select>
                           </div>
                         </div>
+
+                        <div>
+                          <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-1.5">Upload CNIC (Front & Back) *</label>
+                          <div className={`relative border-2 border-dashed rounded-xl p-4 transition-colors ${formData.cnicDoc ? 'border-green-300 bg-green-50' : 'border-gray-300 bg-gray-50 hover:border-red-500'}`}>
+                            <input 
+                              type="file" accept="image/*" required
+                              onChange={(e) => handleDocFileUpload(e, 'cnic')}
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            />
+                            <div className="flex flex-col items-center justify-center text-center">
+                              <ShieldCheck className={`w-6 h-6 mb-2 ${formData.cnicDoc ? 'text-green-500' : 'text-red-400'}`} />
+                              <span className={`text-xs font-bold ${formData.cnicDoc ? 'text-green-700' : 'text-gray-700'}`}>
+                                {formData.cnicDoc ? 'CNIC Uploaded ✓' : 'Click to upload CNIC'}
+                              </span>
+                              <span className="text-[10px] text-gray-500 mt-1">Required for Identity Verification</span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     )}
 
@@ -448,6 +480,24 @@ export default function Navbar() {
                             value={formData.registrationNumber} 
                             onChange={e => setFormData({...formData, registrationNumber: e.target.value})} 
                           />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-1.5">Upload Vehicle Registration Book *</label>
+                          <div className={`relative border-2 border-dashed rounded-xl p-4 transition-colors ${formData.registrationDoc ? 'border-green-300 bg-green-50' : 'border-gray-300 bg-gray-50 hover:border-red-500'}`}>
+                            <input 
+                              type="file" accept="image/*" required
+                              onChange={(e) => handleDocFileUpload(e, 'registration')}
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            />
+                            <div className="flex flex-col items-center justify-center text-center">
+                              <Car className={`w-6 h-6 mb-2 ${formData.registrationDoc ? 'text-green-500' : 'text-red-400'}`} />
+                              <span className={`text-xs font-bold ${formData.registrationDoc ? 'text-green-700' : 'text-gray-700'}`}>
+                                {formData.registrationDoc ? 'Registration Uploaded ✓' : 'Click to upload Registration Book'}
+                              </span>
+                              <span className="text-[10px] text-gray-500 mt-1">Proof of Ownership</span>
+                            </div>
+                          </div>
                         </div>
 
                         <div className="grid sm:grid-cols-3 gap-4">

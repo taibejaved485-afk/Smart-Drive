@@ -4,7 +4,8 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import SEO from '../components/SEO';
 import EarningsCalculator from '../components/EarningsCalculator';
-import { Car, MapPin, Calendar, Sliders, CheckCircle2, ShieldCheck, X, Phone, DollarSign, Clock, HelpCircle, Filter, Sparkles, ChevronLeft, ChevronRight, Search, ChevronDown, Check } from 'lucide-react';
+import { CarRequestsForm, CarRequestsGrid } from '../components/CarRequestsDirectory';
+import { Car, MapPin, Calendar, Sliders, CheckCircle2, ShieldCheck, X, Phone, DollarSign, Clock, HelpCircle, Filter, Sparkles, ChevronLeft, ChevronRight, Search, ChevronDown, Check, Users } from 'lucide-react';
 
 interface RentalCar {
   id: string;
@@ -23,6 +24,8 @@ interface RentalCar {
   ownerPhone?: string;
   fuelType?: string;
   description?: string;
+  withDriver?: boolean;
+  area?: string;
 }
 
 const DEFAULT_RENTAL_CARS: RentalCar[] = [
@@ -187,6 +190,7 @@ function CarImageCarousel({ car }: { car: RentalCar }) {
 }
 
 export default function RentalsPage() {
+  const [viewMode, setViewMode] = useState<'fleet' | 'requests'>('fleet');
   const [cars, setCars] = useState<RentalCar[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCity, setSelectedCity] = useState<string>('All Cities');
@@ -385,7 +389,35 @@ export default function RentalsPage() {
       <section className="py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          {/* Section Introduction */}
+          {/* View Toggle */}
+          <div className="flex justify-center mb-12">
+            <div className="inline-flex bg-gray-100 p-1.5 rounded-2xl shadow-sm border border-gray-200">
+              <button
+                onClick={() => setViewMode('fleet')}
+                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-extrabold text-sm sm:text-base tracking-tight transition-all ${
+                  viewMode === 'fleet' 
+                    ? 'bg-white text-gray-950 shadow-sm border border-gray-150' 
+                    : 'text-gray-500 hover:text-gray-800'
+                }`}
+              >
+                <Car className="w-5 h-5" /> Browse Fleet
+              </button>
+              <button
+                onClick={() => setViewMode('requests')}
+                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-extrabold text-sm sm:text-base tracking-tight transition-all ${
+                  viewMode === 'requests' 
+                    ? 'bg-white text-indigo-700 shadow-sm border border-gray-150' 
+                    : 'text-gray-500 hover:text-gray-800'
+                }`}
+              >
+                <Users className="w-5 h-5" /> Car Requests (Reverse Directory)
+              </button>
+            </div>
+          </div>
+
+          {viewMode === 'fleet' ? (
+            <>
+              {/* Section Introduction */}
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
             <div className="max-w-2xl">
               <span className="text-red-650 font-black tracking-wider text-xs uppercase block mb-2">Our Vehicle Fleet</span>
@@ -711,6 +743,13 @@ export default function RentalsPage() {
               </p>
             </div>
           </div>
+            </>
+          ) : (
+            <div className="space-y-16 animate-fade-in">
+              <CarRequestsForm />
+              <CarRequestsGrid />
+            </div>
+          )}
 
         </div>
       </section>

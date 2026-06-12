@@ -13,13 +13,14 @@ import AppointmentForm from './components/AppointmentForm';
 import OurProcess from './components/OurProcess';
 import Reviews from './components/Reviews';
 import RentalMarketplace from './components/RentalMarketplace';
+import { CarRequestsForm, CarRequestsGrid } from './components/CarRequestsDirectory';
 import Footer from './components/Footer';
 import SEO from './components/SEO';
-import { Award, Car, Sparkles, ShieldCheck } from 'lucide-react';
+import { Award, Car, Sparkles, ShieldCheck, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function HomePage() {
-  const [activeService, setActiveService] = useState<'learn' | 'rent'>('learn');
+  const [activeService, setActiveService] = useState<'learn' | 'rent' | 'requests'>('learn');
 
   const homeSchema = {
     "@context": "https://schema.org",
@@ -105,7 +106,7 @@ export default function HomePage() {
             <p className="text-xs text-gray-400 font-medium">Choose a portal to start your journey</p>
           </div>
 
-          <div className="flex bg-gray-50/80 p-1.5 rounded-2xl border border-gray-250/20 w-full md:w-auto max-w-lg gap-2">
+          <div className="flex flex-col sm:flex-row bg-gray-50/80 p-1.5 rounded-2xl border border-gray-250/20 w-full md:w-auto gap-2">
             <button 
               onClick={() => setActiveService('learn')}
               className={`flex-1 sm:flex-initial flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider transition-all cursor-pointer ${
@@ -130,13 +131,25 @@ export default function HomePage() {
               <Car className="w-4.5 h-4.5" />
               <span>Rent a Car</span>
             </button>
+            <button 
+              onClick={() => setActiveService('requests')}
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider transition-all cursor-pointer ${
+                activeService === 'requests' 
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' 
+                  : 'text-gray-500 hover:text-gray-800 hover:bg-gray-200/50'
+              }`}
+              type="button"
+            >
+              <Users className="w-4.5 h-4.5" />
+              <span>Car Requests</span>
+            </button>
           </div>
         </div>
       </div>
 
       {/* CONDITIONAL COMPONENT TREE RENDERING WITH INTERACTIVE TRANSITIONS */}
       <AnimatePresence mode="wait">
-        {activeService === 'learn' ? (
+        {activeService === 'learn' && (
           <motion.div
             key="driving-school-portal"
             initial={{ opacity: 0, y: 15 }}
@@ -155,7 +168,8 @@ export default function HomePage() {
             <OurProcess />
             <Reviews />
           </motion.div>
-        ) : (
+        )}
+        {activeService === 'rent' && (
           <motion.div
             key="rent-car-marketplace"
             initial={{ opacity: 0, y: 15 }}
@@ -164,6 +178,19 @@ export default function HomePage() {
             transition={{ duration: 0.4 }}
           >
             <RentalMarketplace />
+          </motion.div>
+        )}
+        {activeService === 'requests' && (
+          <motion.div
+            key="car-requests-directory"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.4 }}
+            className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16"
+          >
+            <CarRequestsForm />
+            <CarRequestsGrid />
           </motion.div>
         )}
       </AnimatePresence>
