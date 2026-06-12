@@ -392,11 +392,15 @@ export default function AdminPage() {
     window.addEventListener('pending_cars_updated', loadDataAndSync);
     window.addEventListener('customer_requests_updated', loadDataAndSync);
     
+    // Background polling interval for extra visual reactivity safety (every 3s)
+    const syncInterval = setInterval(loadDataAndSync, 3000);
+    
     return () => {
       window.removeEventListener('storage', loadDataAndSync);
       window.removeEventListener('driving_bookings_updated', loadDataAndSync);
       window.removeEventListener('pending_cars_updated', loadDataAndSync);
       window.removeEventListener('customer_requests_updated', loadDataAndSync);
+      clearInterval(syncInterval);
     };
   }, []);
 
@@ -444,15 +448,21 @@ export default function AdminPage() {
 
   // Handler methods for Car Owner Registration Onboarding
   const approveCarOnboarding = (car: any, isVerified: boolean = false) => {
-    const cardEl = document.getElementById(`pending-card-${car.id}`);
+    const cardId = `pending-card-${car.id}`;
+    const cardEl = document.getElementById(cardId);
     const btnEl = document.getElementById(`btn-approve-${car.id}`);
 
     // Create a micro-state change feedback right before the card disappears.
     // Force the card's border to flash green and smoothly transition out
     if (cardEl) {
       cardEl.classList.remove('border-gray-200', 'hover:border-gray-300');
-      cardEl.classList.add('border-emerald-500', 'ring-4', 'ring-emerald-500/20', 'bg-emerald-50/30', 'opacity-0', 'scale-95');
+      cardEl.classList.add('border-emerald-500', 'ring-4', 'ring-emerald-500/20', 'bg-emerald-50/30');
       cardEl.style.transition = 'all 0.6s ease-in-out';
+      
+      // User strictly requested a physically .remove() cleanup sequence
+      // We'll apply a fade out animation then remove it from DOM as a safety fallback
+      cardEl.style.opacity = '0';
+      cardEl.style.transform = 'scale(0.95)';
     }
 
     // Replace the "Approve" button text with temporary check text "✓ Approved" or icon
@@ -519,12 +529,22 @@ export default function AdminPage() {
         return remainingPending;
       });
 
+      // 4. Final physical DOM cleanup as requested
+      if (cardEl) {
+        cardEl.remove();
+      }
+
       // Dispatch storage updates
       window.dispatchEvent(new Event('pending_cars_updated'));
       window.dispatchEvent(new Event('storage'));
       
       // Trigger local state re-load immediately
       loadDataAndSync();
+      
+      // Secondary safety check: if multiple cards exist with same ID (not expected but good for robust UI)
+      const remnants = document.querySelectorAll(`[id="${cardId}"]`);
+      remnants.forEach(el => el.remove());
+      
     }, 750);
   };
 
@@ -1092,9 +1112,20 @@ export default function AdminPage() {
                               <p className="font-extrabold text-gray-900">{b.fullName}</p>
                               <p className="text-xs text-gray-400 font-mono select-all mt-0.5">{b.email}</p>
                               {b.phone ? (
-                                <p className="text-xs text-green-750 font-mono font-bold mt-1.5 flex items-center gap-1 bg-green-50 px-2 py-0.5 rounded border border-green-100 w-fit">
-                                  <span>📞 {b.phone}</span>
-                                </p>
+                                <div className="flex flex-col gap-1.5 mt-2">
+                                  <p className="text-xs text-green-750 font-mono font-bold flex items-center gap-1 bg-green-50 px-2.5 py-1 rounded border border-green-100 w-fit">
+                                    <span>📞 {b.phone}</span>
+                                  </p>
+                                  <a 
+                                    href={`https://wa.me/${b.phone.replace(/[^0-9]/g, '')}`} 
+                                    target="_blank" 
+                                    rel="noreferrer"
+                                    className="flex items-center gap-1.5 bg-[#25D366] hover:bg-[#20ba59] text-white px-2.5 py-1 rounded text-[10px] font-bold transition w-fit shadow-sm shadow-green-100"
+                                  >
+                                    <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 1.996-1.413.242-.695.242-1.291.171-1.413-.072-.123-.267-.197-.565-.346zM12.008 21c-1.623 0-3.212-.436-4.598-1.261L3 21l1.288-4.274A8.95 8.95 0 013 12.008c0-4.964 4.044-9.008 9.008-9.008 4.964 0 9.008 4.044 9.008 9.008 0 4.964-4.044 9.008-9.008 9.008zM12 2.045a9.948 9.948 0 00-9.943 9.943c0 1.758.455 3.475 1.319 4.99L2.045 22l5.183-1.359c1.466.8 3.111 1.22 4.772 1.22 5.482 0 9.943-4.461 9.943-9.943 0-5.482-4.461-9.943-9.943-9.943z"/></svg>
+                                    Chat with Student
+                                  </a>
+                                </div>
                               ) : (
                                 <span className="text-[10px] text-gray-450 font-semibold italic block mt-1">No phone supplied</span>
                               )}
@@ -1165,9 +1196,12 @@ export default function AdminPage() {
                                   href={getStudentWhatsAppLink(b)}
                                   target="_blank"
                                   referrerPolicy="no-referrer"
-                                  className="px-2.5 py-1 rounded bg-[#25D366] hover:bg-[#20ba5a] text-white font-extrabold text-[10px] uppercase tracking-wide cursor-pointer flex items-center gap-1 shadow-sm font-sans"
+                                  className="px-2.5 py-1 rounded bg-[#25D366] hover:bg-[#20ba5a] text-white font-extrabold text-[10px] uppercase tracking-wide cursor-pointer flex items-center gap-1.5 shadow-sm font-sans transition-colors"
                                   title="Send WhatsApp update to this student"
                                 >
+                                  <svg className="w-3 h-3 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.455 5.703 1.455h.008c6.56 0 11.895-5.335 11.898-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                                  </svg>
                                   WhatsApp Update
                                 </a>
 

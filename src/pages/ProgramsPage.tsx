@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import SEO from '../components/SEO';
 import { 
   Car, Shield, Award, HelpCircle, ArrowRight, CheckCircle2, 
-  Search, Bike, Info, Clock, Check, X, Compass, Users, Calendar, Sparkles
+  Search, Bike, Info, Clock, Check, X, Compass, Users, ClipboardList as ProgramIcon, Sparkles
 } from 'lucide-react';
 
 
@@ -615,7 +615,7 @@ export default function ProgramsPage() {
           <div className="bg-gray-50 border border-gray-200 rounded-3xl p-6 sm:p-10 shadow-sm relative">
             {!isSurveyActive ? (
               <div className="text-center py-8">
-                <Calendar className="w-12 h-12 text-red-600 mx-auto mb-4 animate-pulse" />
+                <ProgramIcon className="w-12 h-12 text-red-600 mx-auto mb-4 animate-pulse" />
                 <h4 className="text-gray-900 font-black text-xl mb-2">Find Your Ideal Class in seconds</h4>
                 <p className="text-xs text-gray-500 max-w-md mx-auto mb-8 font-medium">
                   We will evaluate your driving experience and scheduling requirements step by step.

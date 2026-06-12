@@ -1,9 +1,9 @@
 import { motion } from 'motion/react';
-import { ShieldCheck, CalendarClock, Route, Package, Users } from 'lucide-react';
+import { ShieldCheck, Clock as ClockIcon, Route, Package, Users } from 'lucide-react';
 
 const features = [
   { icon: ShieldCheck, title: 'Best Safety Measures', desc: 'Experienced & Professional Instructors' },
-  { icon: CalendarClock, title: 'Customized Training Programs', desc: 'We understand that every learner is unique.' },
+  { icon: ClockIcon, title: 'Customized Training Programs', desc: 'We understand that every learner is unique.' },
   { icon: Route, title: 'Focus On Road Safety', desc: 'Safety is at the core of everything we do.' },
   { icon: Package, title: 'Affordable Packages', desc: 'Get top-quality driving lessons without breaking the bank.' },
   { icon: Users, title: 'Courses For Everyone', desc: 'No matter your background or experience.' },

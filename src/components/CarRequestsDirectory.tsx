@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Calendar, MapPin, Car, DollarSign, Send, ShieldCheck, HelpCircle, CheckCircle2, ChevronDown, Check } from 'lucide-react';
+import { MapPin, Car, DollarSign, Send, ShieldCheck, HelpCircle, CheckCircle2, ChevronDown, Check, Clock } from 'lucide-react';
 
 export interface CustomerRequest {
   id: string;
@@ -270,20 +270,13 @@ export function CarRequestsForm() {
         </div>
 
         <div className="grid sm:grid-cols-3 gap-5">
-          <div>
-            <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2">Start Date *</label>
+          <div className="col-span-2">
+            <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2">Duration / Timings (مدت - مثال: 3 دن یا تاریخیں)</label>
             <input 
-              required type="date"
-              className="w-full p-3 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition text-sm font-mono text-gray-700" 
+              required type="text"
+              className="w-full p-3 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition text-sm font-medium text-gray-700" 
+              placeholder="e.g. 5 Days, or Oct 10th to Oct 15th"
               value={formData.startDate} onChange={e => setFormData({...formData, startDate: e.target.value})} 
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2">End Date *</label>
-            <input 
-              required type="date"
-              className="w-full p-3 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition text-sm font-mono text-gray-700" 
-              value={formData.endDate} onChange={e => setFormData({...formData, endDate: e.target.value})} 
             />
           </div>
           <div>
@@ -483,9 +476,9 @@ export function CarRequestsGrid() {
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Calendar className="w-4 h-4 text-indigo-500 shrink-0 mt-0.5" />
+                  <Clock className="w-4 h-4 text-indigo-500 shrink-0 mt-0.5" />
                   <span>
-                    <strong className="text-gray-900">{req.startDate}</strong> to <strong className="text-gray-900">{req.endDate}</strong> <span className="text-gray-400">({calculateDays(req.startDate, req.endDate)} Days)</span>
+                    Duration: <strong className="text-gray-900">{req.startDate}</strong>
                   </span>
                 </div>
                 <div className="flex items-start gap-3">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Coins, Calendar, ShieldCheck, TrendingUp, Info } from 'lucide-react';
+import { Coins, Clock, ShieldCheck, TrendingUp, Info } from 'lucide-react';
 
 type CarType = 'Economy' | 'Sedan' | 'Luxury';
 
