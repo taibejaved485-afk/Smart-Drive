@@ -4,14 +4,14 @@
   "description": "Premium driving school and verified car rental marketplace in Faisalabad, Lahore, and Islamabad.",
   "icons": [
     {
-      "src": "/favicon.jpg",
-      "type": "image/jpeg",
+      "src": "/favicon.png",
+      "type": "image/png",
       "sizes": "192x192",
       "purpose": "any maskable"
     },
     {
-      "src": "/favicon.jpg",
-      "type": "image/jpeg",
+      "src": "/favicon.png",
+      "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"
     }
