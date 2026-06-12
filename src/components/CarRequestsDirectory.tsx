@@ -18,6 +18,10 @@ export interface CustomerRequest {
   createdAt: string;
   cnicDoc?: string;
   licenseDoc?: string;
+  travelScope?: 'Within City (Local)' | 'Outstation (Long Trip)';
+  fuelPreference?: 'Any Fuel' | 'Petrol' | 'Hybrid' | 'Diesel';
+  urgency?: 'Standard' | 'Urgent';
+  estimatedKM?: 'Under 500 KM' | '500 - 1500 KM' | '1500+ KM';
 }
 
 export function CarRequestsForm() {
@@ -32,6 +36,10 @@ export function CarRequestsForm() {
     endDate: '',
     maxBudget: '',
     driverRequired: 'No' as 'Yes' | 'No',
+    travelScope: 'Within City (Local)' as 'Within City (Local)' | 'Outstation (Long Trip)',
+    fuelPreference: 'Any Fuel' as 'Any Fuel' | 'Petrol' | 'Hybrid' | 'Diesel',
+    urgency: 'Standard' as 'Standard' | 'Urgent',
+    estimatedKM: 'Under 500 KM' as 'Under 500 KM' | '500 - 1500 KM' | '1500+ KM',
     cnicDoc: '',
     licenseDoc: ''
   });
@@ -80,7 +88,7 @@ export function CarRequestsForm() {
           onClick={() => {
             setSubmitted(false);
             setFormData({
-              name: '', whatsapp: '', carModel: '', transmission: 'Any', city: 'Faisalabad', area: '', startDate: '', endDate: '', maxBudget: '', driverRequired: 'No', cnicDoc: '', licenseDoc: ''
+              name: '', whatsapp: '', carModel: '', transmission: 'Any', city: 'Faisalabad', area: '', startDate: '', endDate: '', maxBudget: '', driverRequired: 'No', travelScope: 'Within City (Local)', fuelPreference: 'Any Fuel', urgency: 'Standard', estimatedKM: 'Under 500 KM', cnicDoc: '', licenseDoc: ''
             });
           }}
           className="mt-6 bg-gray-900 hover:bg-gray-800 text-white font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-xl transition-all inline-block"
@@ -200,6 +208,64 @@ export function CarRequestsForm() {
               placeholder="e.g. DHA Phase 2, Peoples Colony" 
               value={formData.area} onChange={e => setFormData({...formData, area: e.target.value})} 
             />
+          </div>
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div>
+            <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2">Travel Scope</label>
+            <div className="relative">
+              <select 
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition text-sm font-medium appearance-none cursor-pointer"
+                value={formData.travelScope} onChange={e => setFormData({...formData, travelScope: e.target.value as any})}
+              >
+                <option value="Within City (Local)">Within City (Local)</option>
+                <option value="Outstation (Long Trip)">Outstation (Long Trip)</option>
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2">Fuel Preference</label>
+            <div className="relative">
+              <select 
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition text-sm font-medium appearance-none cursor-pointer"
+                value={formData.fuelPreference} onChange={e => setFormData({...formData, fuelPreference: e.target.value as any})}
+              >
+                <option value="Any Fuel">Any Fuel</option>
+                <option value="Petrol">Petrol</option>
+                <option value="Hybrid">Hybrid</option>
+                <option value="Diesel">Diesel</option>
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2">Est. Distance</label>
+            <div className="relative">
+              <select 
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition text-sm font-medium appearance-none cursor-pointer"
+                value={formData.estimatedKM} onChange={e => setFormData({...formData, estimatedKM: e.target.value as any})}
+              >
+                <option value="Under 500 KM">Under 500 KM</option>
+                <option value="500 - 1500 KM">500 - 1500 KM</option>
+                <option value="1500+ KM">1500+ KM</option>
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2">Urgency</label>
+            <div className="relative">
+              <select 
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition text-sm font-medium appearance-none cursor-pointer"
+                value={formData.urgency} onChange={e => setFormData({...formData, urgency: e.target.value as any})}
+              >
+                <option value="Standard">Standard</option>
+                <option value="Urgent">Urgent (within 24 hours)</option>
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            </div>
           </div>
         </div>
 
@@ -341,8 +407,14 @@ export function CarRequestsGrid() {
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {requests.map(req => (
-            <div key={req.id} className="bg-white rounded-[1.5rem] border border-gray-200 shadow-sm hover:shadow-xl hover:border-indigo-200 transition-all duration-300 flex flex-col group p-6 sm:p-8">
+            <div key={req.id} className="relative bg-white rounded-[1.5rem] border border-gray-200 shadow-sm hover:shadow-xl hover:border-indigo-200 transition-all duration-300 flex flex-col group p-6 sm:p-8 mt-4">
               
+              {req.urgency === 'Urgent' && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-red-600 text-white px-4 py-1.5 rounded-full font-black text-[10px] uppercase tracking-widest shadow-[0_4px_15px_rgba(220,38,38,0.4)] flex items-center gap-1.5 animate-bounce z-10 border border-red-500">
+                  <span className="text-xs">🔥</span> URGENT REQUEST
+                </div>
+              )}
+
               <div className="flex items-start justify-between mb-4">
                 <div className="inline-flex items-center gap-1.5 bg-indigo-50 border border-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg">
                   <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
@@ -394,7 +466,20 @@ export function CarRequestsGrid() {
                 </div>
               </div>
 
-              <div className="mt-8 pt-5 border-t border-gray-100 flex items-center gap-3">
+              {/* New Workflow Metadata Grid */}
+              <div className="grid grid-cols-2 gap-2 mt-4 bg-gray-50/80 p-3 rounded-xl border border-gray-100">
+                <div className="bg-white border border-gray-200 rounded-lg text-[9px] font-mono text-gray-700 px-2 py-1.5 flex items-center shadow-sm">
+                  <span className="font-extrabold mr-1 text-gray-900">SCOPE:</span> {req.travelScope || 'Within City (Local)'}
+                </div>
+                <div className="bg-white border border-gray-200 rounded-lg text-[9px] font-mono text-gray-700 px-2 py-1.5 flex items-center shadow-sm">
+                  <span className="font-extrabold mr-1 text-gray-900">FUEL:</span> {req.fuelPreference || 'Any Fuel'}
+                </div>
+                <div className="bg-white border border-gray-200 rounded-lg text-[9px] font-mono text-gray-700 px-2 py-1.5 flex items-center shadow-sm col-span-2 text-center justify-center">
+                  <span className="font-extrabold mr-1 text-gray-900">EST. DISTANCE:</span> {req.estimatedKM || 'Under 500 KM'}
+                </div>
+              </div>
+
+              <div className="mt-6 pt-5 border-t border-gray-100 flex items-center gap-3">
                 <a 
                   href={getWhatsAppLink(req)}
                   target="_blank" rel="noopener noreferrer"

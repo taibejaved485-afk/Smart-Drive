@@ -95,6 +95,10 @@ interface CustomerRequest {
   createdAt: string;
   cnicDoc?: string;
   licenseDoc?: string;
+  travelScope?: 'Within City (Local)' | 'Outstation (Long Trip)';
+  fuelPreference?: 'Any Fuel' | 'Petrol' | 'Hybrid' | 'Diesel';
+  urgency?: 'Standard' | 'Urgent';
+  estimatedKM?: 'Under 500 KM' | '500 - 1500 KM' | '1500+ KM';
 }
 
 export default function AdminPage() {
@@ -599,7 +603,7 @@ export default function AdminPage() {
           </Link>
         </div>
         {/* DUAL-PURPOSE PLATFORM ADMIN STRIP TABS */}
-        <div className="flex border-b border-gray-200 mb-8 overflow-x-auto scrollbar-none gap-2">
+        <div className="flex flex-wrap border-b border-gray-200 mb-8 gap-2 pb-2">
           {/* Tab 1: Manage Driving School Bookings */}
           <button 
             type="button"
@@ -1802,8 +1806,9 @@ export default function AdminPage() {
                           <p className="text-xs text-gray-400">{req.city} {req.area && `(${req.area})`}</p>
                         </td>
                         <td className="p-4">
-                          <p className="font-bold text-gray-800">{req.carModel}</p>
-                          <p className="text-[10px] text-gray-500 uppercase mt-0.5">{req.transmission} • Driver: {req.driverRequired}</p>
+                          <p className="font-bold text-gray-800">{req.carModel} {req.urgency === 'Urgent' && <span className="text-red-600 text-[10px] font-black uppercase ml-1 animate-pulse">🔥 URGENT</span>}</p>
+                          <p className="text-[10px] text-gray-500 uppercase mt-0.5">{req.transmission} • {req.fuelPreference || 'Any Fuel'} • Driver: {req.driverRequired}</p>
+                          <p className="text-[10px] text-indigo-600 mt-0.5 font-bold bg-indigo-50 px-1.5 py-0.5 rounded inline-block">{req.travelScope || 'Local'} ({req.estimatedKM || 'Under 500 KM'})</p>
                         </td>
                         <td className="p-4">
                           <p className="font-mono font-bold text-gray-800">{req.startDate} to {req.endDate}</p>
