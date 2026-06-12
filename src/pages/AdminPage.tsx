@@ -211,7 +211,18 @@ export default function AdminPage() {
       try {
         const parsed = JSON.parse(savedPending);
         if (Array.isArray(parsed)) {
-          setPendingCars(parsed);
+          let updated = false;
+          const sanitized = parsed.map((car, idx) => {
+            if (!car.id) {
+              car.id = 'owner-' + idx + '-' + Date.now().toString();
+              updated = true;
+            }
+            return car;
+          });
+          if (updated) {
+            localStorage.setItem('pending_cars', JSON.stringify(sanitized));
+          }
+          setPendingCars(sanitized);
         } else {
           setPendingCars([]);
         }
