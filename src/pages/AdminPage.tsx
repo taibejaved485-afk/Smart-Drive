@@ -235,21 +235,77 @@ export default function AdminPage() {
       setPendingCars([]);
     }
 
-    // 4. Load approved active car fleet
+    // 4. Load approved active car fleet combining base rentals and custom approved listings
+    let approvedList: RentalCar[] = [];
+    const savedApproved = localStorage.getItem('approved_cars');
+    if (savedApproved) {
+      try {
+        const parsed = JSON.parse(savedApproved);
+        if (Array.isArray(parsed)) {
+          approvedList = parsed;
+        }
+      } catch (e) {
+        approvedList = [];
+      }
+    }
+
     const savedCars = localStorage.getItem('rental_cars');
+    let baseList: RentalCar[] = [];
     if (savedCars) {
       try {
         const parsed = JSON.parse(savedCars);
         if (Array.isArray(parsed)) {
-          setRentalCars(parsed);
+          baseList = parsed;
         } else {
-          setRentalCars([]);
+          const initial: RentalCar[] = [
+            {
+              id: 'rc-1',
+              name: 'Honda Civic Pro (VTEC)',
+              transmission: 'Automatic',
+              rentPrice: '12,000',
+              rentUnit: 'Day',
+              imageUrl: 'https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600',
+              city: 'Faisalabad',
+              status: 'Available'
+            },
+            {
+              id: 'rc-2',
+              name: 'Toyota Yaris Ativ',
+              transmission: 'Automatic',
+              rentPrice: '6,500',
+              rentUnit: 'Day',
+              imageUrl: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=600',
+              city: 'Lahore',
+              status: 'Available'
+            },
+            {
+              id: 'rc-3',
+              name: 'Toyota Corolla Altis',
+              transmission: 'Manual',
+              rentPrice: '7,500',
+              rentUnit: 'Day',
+              imageUrl: 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600',
+              city: 'Islamabad',
+              status: 'Available'
+            },
+            {
+              id: 'rc-4',
+              name: 'Suzuki Swift GLX',
+              transmission: 'Automatic',
+              rentPrice: '5,500',
+              rentUnit: 'Day',
+              imageUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=600',
+              city: 'Karachi',
+              status: 'Available'
+            }
+          ];
+          baseList = initial;
+          localStorage.setItem('rental_cars', JSON.stringify(initial));
         }
       } catch (e) {
-        setRentalCars([]);
+        baseList = [];
       }
     } else {
-      // Seed default Pakistani city vehicles
       const initial: RentalCar[] = [
         {
           id: 'rc-1',
@@ -292,9 +348,22 @@ export default function AdminPage() {
           status: 'Available'
         }
       ];
-      setRentalCars(initial);
+      baseList = initial;
       localStorage.setItem('rental_cars', JSON.stringify(initial));
     }
+
+    // Combine safely to filter duplicate IDs (prioritizing custom approved)
+    const merged = [...approvedList, ...baseList];
+    const uniqueCars: RentalCar[] = [];
+    const seenIds = new Set<string>();
+    
+    for (const car of merged) {
+      if (!seenIds.has(car.id)) {
+        seenIds.add(car.id);
+        uniqueCars.push(car);
+      }
+    }
+    setRentalCars(uniqueCars);
     
     // 5. Load Customer Requests
     const savedCustomerRequests = localStorage.getItem('customer_requests');
@@ -394,10 +463,12 @@ export default function AdminPage() {
       status: 'Available' as const,
       isVerified: isVerified
     };
-    customApprovedList = [vettedCar, ...customApprovedList];
+    
+    // Save to approved_cars avoiding duplicate id
+    customApprovedList = [vettedCar, ...customApprovedList.filter(c => c.id !== vettedCar.id)];
     localStorage.setItem('approved_cars', JSON.stringify(customApprovedList));
 
-    // 2. Insert into basic rental_cars fleet too so it shows in fallback
+    // 2. Insert into basic rental_cars fleet too of local storage
     const savedActiveFleet = localStorage.getItem('rental_cars');
     let activeFleet: any[] = [];
     if (savedActiveFleet) {
@@ -408,18 +479,27 @@ export default function AdminPage() {
         }
       } catch (e) {}
     }
-    activeFleet = [vettedCar, ...activeFleet];
-    setRentalCars(activeFleet);
+    activeFleet = [vettedCar, ...activeFleet.filter(c => c.id !== vettedCar.id)];
     localStorage.setItem('rental_cars', JSON.stringify(activeFleet));
 
-    // 3. Delete from pending
-    const remainingPending = pendingCars.filter(c => c.id !== car.id);
+    // 3. Delete from pending (using robust comparison)
+    const remainingPending = pendingCars.filter(c => {
+      const matchesId = c.id && car.id && c.id === car.id;
+      const matchesDetails = c.name === car.name && 
+                             c.registrationNumber === car.registrationNumber && 
+                             c.ownerPhone === car.ownerPhone;
+      return !(matchesId || matchesDetails);
+    });
     setPendingCars(remainingPending);
     localStorage.setItem('pending_cars', JSON.stringify(remainingPending));
 
     // Despach storage updates
     window.dispatchEvent(new Event('pending_cars_updated'));
     window.dispatchEvent(new Event('storage'));
+    
+    // Trigger local state re-load immediately
+    loadDataAndSync();
+
     showToast(`Vehicle registered and Approved! "${vettedCar.name}" is now live on the driving platform renting directory.`, 'success');
   };
 
@@ -431,6 +511,9 @@ export default function AdminPage() {
       
       window.dispatchEvent(new Event('pending_cars_updated'));
       window.dispatchEvent(new Event('storage'));
+      
+      // Trigger local state re-load immediately
+      loadDataAndSync();
     }
   };
 
@@ -521,7 +604,24 @@ export default function AdminPage() {
       const updated = rentalCars.filter(c => c.id !== id);
       setRentalCars(updated);
       localStorage.setItem('rental_cars', JSON.stringify(updated));
+
+      // Also clean from list of approved custom owner cars
+      const savedApproved = localStorage.getItem('approved_cars');
+      if (savedApproved) {
+        try {
+          const parsed = JSON.parse(savedApproved);
+          if (Array.isArray(parsed)) {
+            const updatedApproved = parsed.filter(c => c.id !== id);
+            localStorage.setItem('approved_cars', JSON.stringify(updatedApproved));
+          }
+        } catch (e) {}
+      }
+
       window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new Event('pending_cars_updated'));
+      
+      // Refresh local state lists instantly
+      loadDataAndSync();
     }
   };
 
@@ -534,7 +634,29 @@ export default function AdminPage() {
     });
     setRentalCars(updated);
     localStorage.setItem('rental_cars', JSON.stringify(updated));
+
+    // Also toggle in list of approved custom owner cars
+    const savedApproved = localStorage.getItem('approved_cars');
+    if (savedApproved) {
+      try {
+        const parsed = JSON.parse(savedApproved);
+        if (Array.isArray(parsed)) {
+          const updatedApproved = parsed.map(c => {
+            if (c.id === id) {
+              return { ...c, status: (c.status === 'Available' ? 'Booked' : 'Available') as 'Available' | 'Booked' };
+            }
+            return c;
+          });
+          localStorage.setItem('approved_cars', JSON.stringify(updatedApproved));
+        }
+      } catch (e) {}
+    }
+
     window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new Event('pending_cars_updated'));
+    
+    // Refresh local state lists instantly
+    loadDataAndSync();
   };
 
   const handleLogin = (e: React.FormEvent) => {
