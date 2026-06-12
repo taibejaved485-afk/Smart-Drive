@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface BlogPost {
@@ -135,6 +135,8 @@ export default function AdminPage() {
 
   // Driving Academy Bookings & Pending Onboard Cars State
   const [bookings, setBookings] = useState<any[]>([]);
+  const [bookingSearch, setBookingSearch] = useState('');
+  const [bookingStatusFilter, setBookingStatusFilter] = useState('All');
   const [pendingCars, setPendingCars] = useState<any[]>([]);
   const [verifiedToggles, setVerifiedToggles] = useState<Record<string, boolean>>({});
   
@@ -346,6 +348,29 @@ export default function AdminPage() {
       window.dispatchEvent(new Event('driving_bookings_updated'));
       window.dispatchEvent(new Event('storage'));
     }
+  };
+
+  const getStudentWhatsAppLink = (b: any) => {
+    const defaultPhone = '923097666928'; // fallback
+    let rawPhone = b.phone || defaultPhone;
+    let cleanNumber = rawPhone.replace(/[^0-9]/g, '');
+    if (cleanNumber.startsWith('0')) {
+      cleanNumber = '92' + cleanNumber.substring(1);
+    }
+    
+    // Construct pre-filled dynamic message depending on booker current status
+    let messageText = '';
+    if (b.status === 'Confirmed') {
+      messageText = `===============================\n  🚗 SMART DRIVE TRAINING UPDATE  \n===============================\n\nAssalam-o-Alaikum ${b.fullName}!\n\nWe are pleased to inform you that your registration appointment for "${b.subject}" at Smart Drive Academy has been officially CONFIRMED!\n\nOur certified instructor will cooperate with you soon on the scheduled slot timings.\n\nThank you for choosing Smart Drive!`;
+    } else if (b.status === 'Rescheduled') {
+      messageText = `===============================\n  🚗 SMART DRIVE TIMING RESCHEDULE  \n===============================\n\nAssalam-o-Alaikum ${b.fullName}!\n\nRegarding your lesson appointment for "${b.subject}", we need to modify or reschedule the timing slot. Kindly send us your available hourly timings so we can configure your calendar!`;
+    } else if (b.status === 'Cancelled') {
+      messageText = `===============================\n  🚗 SMART DRIVE LESSON CANCELLED  \n===============================\n\nAssalam-o-Alaikum ${b.fullName}!\n\nYour appointment/booking for "${b.subject}" has been cancelled due to slot non-availability. Please share alternate timing slots so we can accommodate your schedule!`;
+    } else {
+      messageText = `===============================\n  🚗 SMART DRIVE ENROLLMENT INQUIRY \n===============================\n\nAssalam-o-Alaikum ${b.fullName}!\n\nThank you for registering for "${b.subject}" with Smart Drive Academy! We have received your enrollment and are checking instructor slots. Let's arrange your timing plan!`;
+    }
+    
+    return `https://wa.me/${cleanNumber}?text=${encodeURIComponent(messageText)}`;
   };
 
   // Handler methods for Car Owner Registration Onboarding
@@ -779,7 +804,7 @@ export default function AdminPage() {
                 <div>
                   <h2 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
                     <FileSpreadsheet className="w-6 h-6 text-red-600" />
-                    Manage Driving Academy Bookings
+                    Manage Driving Academy Bookings (بکنگز مینیجر)
                   </h2>
                   <p className="text-gray-500 text-xs sm:text-sm mt-1">
                     Process incoming course submissions. Select appropriate status modes like Confirm, Reschedule, or Cancel to coordinate with driver education pupils.
@@ -798,6 +823,56 @@ export default function AdminPage() {
               </div>
             </div>
 
+            {/* Search & Filter Controls */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-gray-50 p-4 rounded-xl border border-gray-150">
+              {/* Search text input */}
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search student, email, phone number, or course..."
+                  value={bookingSearch}
+                  onChange={(e) => setBookingSearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-250 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none text-xs sm:text-sm bg-white text-gray-800 transition"
+                />
+                {bookingSearch && (
+                  <button
+                    onClick={() => setBookingSearch('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 font-bold"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+
+              {/* Status categories badges */}
+              <div className="flex gap-2 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+                {['All', 'Pending', 'Confirmed', 'Rescheduled', 'Cancelled'].map((status) => {
+                  const isActive = bookingStatusFilter === status;
+                  const count = status === 'All' 
+                    ? bookings.length 
+                    : bookings.filter(b => b.status === status).length;
+
+                  return (
+                    <button
+                      key={status}
+                      onClick={() => setBookingStatusFilter(status)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-black min-w-[64px] transition cursor-pointer select-none text-center ${
+                        isActive
+                          ? 'bg-red-600 text-white shadow-sm'
+                          : 'bg-white text-gray-650 hover:bg-gray-100 hover:text-gray-900 border border-gray-200'
+                      }`}
+                    >
+                      {status}
+                      <span className={`ml-1 text-[10px] ${isActive ? 'text-white/80' : 'text-gray-400'}`}>
+                        ({count})
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {bookings.length === 0 ? (
               <div className="text-center py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200 p-6">
                 <FileSpreadsheet className="w-12 h-12 text-gray-300 mx-auto mb-3" />
@@ -806,93 +881,165 @@ export default function AdminPage() {
                   When visitors submit timing slots via the academy "Get Appointments" form on the homepage, listings will populate right here.
                 </p>
               </div>
-            ) : (
-              <div className="overflow-x-auto rounded-xl border border-gray-150">
-                <table className="w-full text-left border-collapse text-xs sm:text-sm">
-                  <thead>
-                    <tr className="bg-gray-50 border-b border-gray-150 text-gray-400 font-extrabold uppercase tracking-wider text-[10px]">
-                      <th className="p-4">Student (طالب علم)</th>
-                      <th className="p-4">Course Requested</th>
-                      <th className="p-4">Date Submited</th>
-                      <th className="p-4">Academy Status</th>
-                      <th className="p-4 text-right">Actions (انتظامی کنٹرول)</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-150">
-                    {bookings.map((b) => {
-                      const isPending = b.status === 'Pending';
-                      const isConfirmed = b.status === 'Confirmed';
-                      const isRescheduled = b.status === 'Rescheduled';
-                      const isCancelled = b.status === 'Cancelled';
+            ) : (() => {
+              const filteredBookings = bookings.filter((b) => {
+                if (bookingStatusFilter !== 'All' && b.status !== bookingStatusFilter) {
+                  return false;
+                }
+                if (bookingSearch.trim() !== '') {
+                  const query = bookingSearch.toLowerCase();
+                  const nameMatch = b.fullName?.toLowerCase().includes(query);
+                  const emailMatch = b.email?.toLowerCase().includes(query);
+                  const phoneMatch = b.phone ? b.phone.toLowerCase().includes(query) : false;
+                  const subjectMatch = b.subject?.toLowerCase().includes(query);
+                  const commentMatch = b.comments?.toLowerCase().includes(query);
+                  return nameMatch || emailMatch || phoneMatch || subjectMatch || commentMatch;
+                }
+                return true;
+              });
 
-                      let badgeCol = 'bg-gray-100 text-gray-600';
-                      if (isConfirmed) badgeCol = 'bg-green-100 text-green-700 font-bold';
-                      if (isPending) badgeCol = 'bg-yellow-50 text-yellow-750 font-bold border border-yellow-100';
-                      if (isRescheduled) badgeCol = 'bg-blue-50 text-blue-700 font-bold border border-blue-100';
-                      if (isCancelled) badgeCol = 'bg-red-55 text-red-750 font-bold border border-red-150';
+              if (filteredBookings.length === 0) {
+                return (
+                  <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200 p-4">
+                    <p className="text-gray-400 text-xs sm:text-sm">No bookings fit the search queries or status criteria.</p>
+                    <button 
+                      onClick={() => { setBookingSearch(''); setBookingStatusFilter('All'); }}
+                      className="mt-3 text-xs text-red-650 font-bold hover:underline font-sans cursor-pointer"
+                    >
+                      Clear filters & view all
+                    </button>
+                  </div>
+                );
+              }
 
-                      return (
-                        <tr key={b.id} className="hover:bg-gray-50/60 transition-colors">
-                          <td className="p-4">
-                            <p className="font-extrabold text-gray-900">{b.fullName}</p>
-                            <p className="text-xs text-gray-400 font-mono select-all mt-0.5">{b.email}</p>
-                          </td>
-                          <td className="p-4">
-                            <span className="font-bold text-gray-800">{b.subject}</span>
-                            {b.comments && (
-                              <p className="text-[11px] text-gray-400 italic mt-1 line-clamp-1 max-w-xs" title={b.comments}>
-                                "{b.comments}"
-                              </p>
-                            )}
-                          </td>
-                          <td className="p-4 text-xs font-medium text-gray-400 font-mono">
-                            {b.createdAt ? new Date(b.createdAt).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }) : 'Today'}
-                          </td>
-                          <td className="p-4">
-                            <span className={`px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider ${badgeCol}`}>
-                              {b.status || 'Pending'}
-                            </span>
-                          </td>
-                          <td className="p-4 text-right">
-                            <div className="flex items-center justify-end gap-1.5 flex-wrap">
-                              <button
-                                onClick={() => changeBookingStatus(b.id, 'Confirmed')}
-                                className="px-2.5 py-1 rounded bg-green-600 hover:bg-green-700 text-white font-extrabold text-[10px] uppercase tracking-wide cursor-pointer shadow-sm shadow-green-100"
-                                type="button"
-                              >
-                                Confirm
-                              </button>
-                              <button
-                                onClick={() => changeBookingStatus(b.id, 'Rescheduled')}
-                                className="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-[10px] uppercase tracking-wide cursor-pointer shadow-sm shadow-blue-100"
-                                type="button"
-                              >
-                                Reschedule
-                              </button>
-                              <button
-                                onClick={() => changeBookingStatus(b.id, 'Cancelled')}
-                                className="px-2.5 py-1 rounded bg-orange-600 hover:bg-orange-700 text-white font-extrabold text-[10px] uppercase tracking-wide cursor-pointer"
-                                type="button"
-                              >
-                                Cancel
-                              </button>
-                              <button
-                                onClick={() => removeBookingRecord(b.id)}
-                                className="p-1.5 text-gray-400 hover:text-red-650 hover:bg-red-50 rounded transition cursor-pointer ml-1"
-                                title="Delete Booking Permanently"
-                                type="button"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
+              return (
+                <div className="overflow-x-auto rounded-xl border border-gray-150">
+                  <table className="w-full text-left border-collapse text-xs sm:text-sm">
+                    <thead>
+                      <tr className="bg-gray-50 border-b border-gray-150 text-gray-400 font-extrabold uppercase tracking-wider text-[10px]">
+                        <th className="p-4">Student (طالب علم)</th>
+                        <th className="p-4">Course Requested</th>
+                        <th className="p-4">Date Submited</th>
+                        <th className="p-4">Academy Status</th>
+                        <th className="p-4 text-right">Actions (انتظامی کنٹرول)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-150">
+                      {filteredBookings.map((b) => {
+                        const isPending = b.status === 'Pending';
+                        const isConfirmed = b.status === 'Confirmed';
+                        const isRescheduled = b.status === 'Rescheduled';
+                        const isCancelled = b.status === 'Cancelled';
+
+                        let badgeCol = 'bg-gray-100 text-gray-600';
+                        if (isConfirmed) badgeCol = 'bg-green-100 text-green-700 font-bold';
+                        if (isPending) badgeCol = 'bg-yellow-50 text-yellow-750 font-bold border border-yellow-100';
+                        if (isRescheduled) badgeCol = 'bg-blue-50 text-blue-700 font-bold border border-blue-100';
+                        if (isCancelled) badgeCol = 'bg-red-55 text-red-750 font-bold border border-red-150';
+
+                        return (
+                          <tr key={b.id} className="hover:bg-gray-50/60 transition-colors">
+                            <td className="p-4">
+                              <p className="font-extrabold text-gray-900">{b.fullName}</p>
+                              <p className="text-xs text-gray-400 font-mono select-all mt-0.5">{b.email}</p>
+                              {b.phone ? (
+                                <p className="text-xs text-green-750 font-mono font-bold mt-1.5 flex items-center gap-1 bg-green-50 px-2 py-0.5 rounded border border-green-100 w-fit">
+                                  <span>📞 {b.phone}</span>
+                                </p>
+                              ) : (
+                                <span className="text-[10px] text-gray-450 font-semibold italic block mt-1">No phone supplied</span>
+                              )}
+                            </td>
+                            <td className="p-4">
+                              <span className="font-bold text-gray-800">{b.subject}</span>
+                              {b.comments && (
+                                <p className="text-[11px] text-gray-400 italic mt-1 line-clamp-1 max-w-xs" title={b.comments}>
+                                  "{b.comments}"
+                                </p>
+                              )}
+                            </td>
+                            <td className="p-4 text-xs font-medium text-gray-400 font-mono">
+                              {b.createdAt ? new Date(b.createdAt).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }) : 'Today'}
+                            </td>
+                            <td className="p-4">
+                              <span className={`px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider ${badgeCol}`}>
+                                {b.status || 'Pending'}
+                              </span>
+                            </td>
+                            <td className="p-4 text-right">
+                              <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                                <button
+                                  onClick={() => {
+                                    changeBookingStatus(b.id, 'Confirmed');
+                                    showToast(`Booking for ${b.fullName} has been Confirmed!`, 'success');
+                                  }}
+                                  className={`px-2.5 py-1 rounded font-extrabold text-[10px] uppercase tracking-wide cursor-pointer shadow-sm transition ${
+                                    isConfirmed 
+                                      ? 'bg-green-700 text-white border border-green-800' 
+                                      : 'bg-green-600 hover:bg-green-700 text-white shadow-green-100'
+                                  }`}
+                                  type="button"
+                                >
+                                  {isConfirmed ? '✓ Confirmed' : 'Confirm'}
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    changeBookingStatus(b.id, 'Rescheduled');
+                                    showToast(`Booking for ${b.fullName} set to Rescheduled status.`, 'info');
+                                  }}
+                                  className={`px-2.5 py-1 rounded font-extrabold text-[10px] uppercase tracking-wide cursor-pointer shadow-sm transition ${
+                                    isRescheduled
+                                      ? 'bg-blue-700 text-white border border-blue-850'
+                                      : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-100'
+                                  }`}
+                                  type="button"
+                                >
+                                  {isRescheduled ? '✓ Rescheduled' : 'Reschedule'}
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    changeBookingStatus(b.id, 'Cancelled');
+                                    showToast(`Booking for ${b.fullName} marked as Cancelled.`, 'error');
+                                  }}
+                                  className={`px-2.5 py-1 rounded font-extrabold text-[10px] uppercase tracking-wide cursor-pointer transition ${
+                                    isCancelled
+                                      ? 'bg-red-700 text-white border border-red-800'
+                                      : 'bg-red-650 hover:bg-red-700 text-white'
+                                  }`}
+                                  type="button"
+                                >
+                                  {isCancelled ? '✓ Cancelled' : 'Cancel'}
+                                </button>
+
+                                {/* WhatsApp notification shortcut launcher */}
+                                <a
+                                  href={getStudentWhatsAppLink(b)}
+                                  target="_blank"
+                                  referrerPolicy="no-referrer"
+                                  className="px-2.5 py-1 rounded bg-[#25D366] hover:bg-[#20ba5a] text-white font-extrabold text-[10px] uppercase tracking-wide cursor-pointer flex items-center gap-1 shadow-sm font-sans"
+                                  title="Send WhatsApp update to this student"
+                                >
+                                  WhatsApp Update
+                                </a>
+
+                                <button
+                                  onClick={() => removeBookingRecord(b.id)}
+                                  className="p-1.5 text-gray-400 hover:text-red-650 hover:bg-red-50 rounded transition cursor-pointer ml-1"
+                                  title="Delete Booking Permanently"
+                                  type="button"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              );
+            })()}
           </div>
         )}
 

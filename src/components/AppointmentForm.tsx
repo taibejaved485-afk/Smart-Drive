@@ -6,14 +6,15 @@ export default function AppointmentForm() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [subject, setSubject] = useState('Beginner Class Driving Session');
   const [comments, setComments] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
 
   const handleBookingSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!firstName.trim() || !lastName.trim() || !email.trim()) {
-      alert('Please fill in all required fields.');
+    if (!firstName.trim() || !lastName.trim() || !email.trim() || !phone.trim()) {
+      alert('Please fill in all required fields, including your Phone Number.');
       return;
     }
 
@@ -21,6 +22,7 @@ export default function AppointmentForm() {
       id: 'bk-' + Date.now().toString(),
       fullName: `${firstName} ${lastName}`.trim(),
       email: email,
+      phone: phone.trim(),
       subject: subject,
       comments: comments || 'No comments specified.',
       status: 'Pending',
@@ -47,6 +49,7 @@ export default function AppointmentForm() {
     setFirstName('');
     setLastName('');
     setEmail('');
+    setPhone('');
     setSubject('Beginner Class Driving Session');
     setComments('');
     setIsSuccess(false);
@@ -174,6 +177,17 @@ export default function AppointmentForm() {
                       placeholder="e.g. ahmad@gmail.com" 
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-400">WhatsApp Phone Number * (رابطہ نمبر - مثال: 03001234567)</label>
+                    <input 
+                      type="tel" 
+                      required 
+                      className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none text-white text-sm transition" 
+                      placeholder="e.g. 03097666928" 
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
                     />
                   </div>
                   <div>

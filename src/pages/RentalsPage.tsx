@@ -233,45 +233,72 @@ export default function RentalsPage() {
   const [bookingDuration, setBookingDuration] = useState<number>(3);
   const [bookingSuccess, setBookingSuccess] = useState<boolean>(false);
 
-  // Load cars from localStorage, or seed default data
-  useEffect(() => {
+  // Load inventory of cars combining base cars and custom admin-approved cars
+  const loadInventory = () => {
+    // 1. Get specifically approved custom owner cars
+    let approvedList: RentalCar[] = [];
+    const savedApproved = localStorage.getItem('approved_cars');
+    if (savedApproved) {
+      try {
+        const parsed = JSON.parse(savedApproved);
+        if (Array.isArray(parsed)) {
+          approvedList = parsed;
+        }
+      } catch (e) {
+        approvedList = [];
+      }
+    }
+
+    // 2. Get base rental cars
     const savedCars = localStorage.getItem('rental_cars');
+    let baseList: RentalCar[] = [];
     if (savedCars) {
       try {
         const parsed = JSON.parse(savedCars);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setCars(parsed);
+          baseList = parsed;
         } else {
-          setCars(DEFAULT_RENTAL_CARS);
+          baseList = DEFAULT_RENTAL_CARS;
           localStorage.setItem('rental_cars', JSON.stringify(DEFAULT_RENTAL_CARS));
         }
       } catch (e) {
-        setCars(DEFAULT_RENTAL_CARS);
+        baseList = DEFAULT_RENTAL_CARS;
         localStorage.setItem('rental_cars', JSON.stringify(DEFAULT_RENTAL_CARS));
       }
     } else {
-      setCars(DEFAULT_RENTAL_CARS);
+      baseList = DEFAULT_RENTAL_CARS;
       localStorage.setItem('rental_cars', JSON.stringify(DEFAULT_RENTAL_CARS));
     }
+
+    // Combine them safely and remove duplicate IDs (prefer approved custom cars details if same ID exists)
+    const merged = [...approvedList, ...baseList];
+    const uniqueCars: RentalCar[] = [];
+    const seenIds = new Set<string>();
+    
+    for (const car of merged) {
+      if (!seenIds.has(car.id)) {
+        seenIds.add(car.id);
+        uniqueCars.push(car);
+      }
+    }
+
+    setCars(uniqueCars);
+  };
+
+  // Load cars on mount
+  useEffect(() => {
+    loadInventory();
   }, []);
 
-  // Listen for storage changes in case admin updates cars in background
+  // Listen for storage changes & custom events in case admin updates cars in same SPA thread or background
   useEffect(() => {
-    const handleStorageChange = () => {
-      const savedCars = localStorage.getItem('rental_cars');
-      if (savedCars) {
-        try {
-          const parsed = JSON.parse(savedCars);
-          if (Array.isArray(parsed)) {
-            setCars(parsed);
-          }
-        } catch (e) {
-          // ignore
-        }
-      }
+    window.addEventListener('storage', loadInventory);
+    window.addEventListener('pending_cars_updated', loadInventory);
+    
+    return () => {
+      window.removeEventListener('storage', loadInventory);
+      window.removeEventListener('pending_cars_updated', loadInventory);
     };
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   // Unique list of cities for filtration tabs
@@ -346,8 +373,28 @@ export default function RentalsPage() {
       setCars(updatedCars);
       localStorage.setItem('rental_cars', JSON.stringify(updatedCars));
       
+      // Keep approved_cars synchronized too if this is a custom owner car
+      const savedApproved = localStorage.getItem('approved_cars');
+      if (savedApproved) {
+        try {
+          const parsed = JSON.parse(savedApproved);
+          if (Array.isArray(parsed)) {
+            const updatedApproved = parsed.map(car => {
+              if (car.id === selectedCar.id) {
+                return { ...car, status: 'Booked' as const };
+              }
+              return car;
+            });
+            localStorage.setItem('approved_cars', JSON.stringify(updatedApproved));
+          }
+        } catch (err) {
+          // ignore
+        }
+      }
+      
       // Also trigger a storage event so other open tabs update
       window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new Event('pending_cars_updated'));
 
       setBookingSuccess(true);
       setTimeout(() => {
