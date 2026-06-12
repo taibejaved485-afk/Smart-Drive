@@ -448,10 +448,10 @@ export default function AdminPage() {
     const btnEl = document.getElementById(`btn-approve-${car.id}`);
 
     // Create a micro-state change feedback right before the card disappears.
-    // Force the card's border to flash green ("border-emerald-500") and apply smooth transition
+    // Force the card's border to flash green and smoothly transition out
     if (cardEl) {
       cardEl.classList.remove('border-gray-200', 'hover:border-gray-300');
-      cardEl.classList.add('border-emerald-500', 'ring-4', 'ring-emerald-500/20', 'bg-emerald-50/30');
+      cardEl.classList.add('border-emerald-500', 'ring-4', 'ring-emerald-500/20', 'bg-emerald-50/30', 'opacity-0', 'scale-95');
       cardEl.style.transition = 'all 0.6s ease-in-out';
     }
 
@@ -506,23 +506,20 @@ export default function AdminPage() {
       activeFleet = [vettedCar, ...activeFleet.filter(c => c.id !== vettedCar.id)];
       localStorage.setItem('rental_cars', JSON.stringify(activeFleet));
 
-      // Physically remove the clicked car's DOM node element card directly from the UI view 
-      if (cardEl) {
-        cardEl.remove();
-      }
-
-      // 3. Delete from pending (using robust comparison)
-      const remainingPending = pendingCars.filter(c => {
-        const matchesId = c.id && car.id && c.id === car.id;
-        const matchesDetails = c.name === car.name && 
-                               c.registrationNumber === car.registrationNumber && 
-                               c.ownerPhone === car.ownerPhone;
-        return !(matchesId || matchesDetails);
+      // 3. Delete from pending (using robust comparison in a functional update to prevent React state closure/refresh issues)
+      setPendingCars(prev => {
+        const remainingPending = prev.filter(c => {
+          const matchesId = c.id && car.id && c.id === car.id;
+          const matchesDetails = c.name === car.name && 
+                                 c.registrationNumber === car.registrationNumber && 
+                                 c.ownerPhone === car.ownerPhone;
+          return !(matchesId || matchesDetails);
+        });
+        localStorage.setItem('pending_cars', JSON.stringify(remainingPending));
+        return remainingPending;
       });
-      setPendingCars(remainingPending);
-      localStorage.setItem('pending_cars', JSON.stringify(remainingPending));
 
-      // Despach storage updates
+      // Dispatch storage updates
       window.dispatchEvent(new Event('pending_cars_updated'));
       window.dispatchEvent(new Event('storage'));
       
@@ -533,9 +530,11 @@ export default function AdminPage() {
 
   const rejectCarOnboarding = (id: string) => {
     if (window.confirm('Reject and permanently discard this owner submission?')) {
-      const remainingPending = pendingCars.filter(c => c.id !== id);
-      setPendingCars(remainingPending);
-      localStorage.setItem('pending_cars', JSON.stringify(remainingPending));
+      setPendingCars(prev => {
+        const remainingPending = prev.filter(c => c.id !== id);
+        localStorage.setItem('pending_cars', JSON.stringify(remainingPending));
+        return remainingPending;
+      });
       
       window.dispatchEvent(new Event('pending_cars_updated'));
       window.dispatchEvent(new Event('storage'));

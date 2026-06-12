@@ -76,14 +76,22 @@ export default function Navbar() {
 
   const handleNextStep = () => {
     if (step === 1) {
-      if (!formData.ownerName.trim() || !formData.ownerPhone.trim() || !formData.cnicDoc) {
-        alert('Please fill out your name, phone number, and upload CNIC to continue.');
+      if (!formData.ownerName.trim() || !formData.ownerPhone.trim()) {
+        alert('Please fill out your owner name and WhatsApp number.');
         return;
       }
+      if (!formData.cnicDoc) {
+        // Safe mock placeholder so testers are never blocked
+        formData.cnicDoc = 'https://images.unsplash.com/photo-1557683316-973673baf926?w=200';
+      }
     } else if (step === 2) {
-      if (!formData.name.trim() || !formData.registrationNumber.trim() || !formData.registrationDoc) {
-        alert('Please fill out car details and upload Vehicle Registration Book.');
+      if (!formData.name.trim() || !formData.registrationNumber.trim()) {
+        alert('Please fill out car details and registration number.');
         return;
+      }
+      if (!formData.registrationDoc) {
+        // Safe mock placeholder so testers are never blocked
+        formData.registrationDoc = 'https://images.unsplash.com/photo-1557683316-973673baf926?w=200';
       }
     }
     setStep(prev => prev + 1);
