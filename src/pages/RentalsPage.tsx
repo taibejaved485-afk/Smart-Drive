@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import SEO from '../components/SEO';
 import EarningsCalculator from '../components/EarningsCalculator';
 import { CarRequestsForm, CarRequestsGrid } from '../components/CarRequestsDirectory';
-import { Car, MapPin, Calendar, Sliders, CheckCircle2, ShieldCheck, X, Phone, DollarSign, Clock, HelpCircle, Filter, Sparkles, ChevronLeft, ChevronRight, Search, ChevronDown, Check, Users } from 'lucide-react';
+import { Car, MapPin, Calendar, Sliders, CheckCircle2, ShieldCheck, X, Phone, DollarSign, Clock, HelpCircle, Filter, Sparkles, ChevronLeft, ChevronRight, Search, ChevronDown, Check, Users, Maximize2 } from 'lucide-react';
 
 interface RentalCar {
   id: string;
@@ -163,9 +164,106 @@ const DEFAULT_RENTAL_CARS: RentalCar[] = [
   }
 ];
 
+interface ImageLightboxProps {
+  images: string[];
+  initialIndex: number;
+  carName: string;
+  onClose: () => void;
+}
+
+function ImageLightbox({ images, initialIndex, carName, onClose }: ImageLightboxProps) {
+  const [index, setIndex] = useState(initialIndex);
+
+  const next = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const prev = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowRight' && images.length > 1) next();
+      if (e.key === 'ArrowLeft' && images.length > 1) prev();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [images.length]);
+
+  return createPortal(
+    <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black/95 backdrop-blur-md p-4 sm:p-6" onClick={onClose}>
+      {/* Top bar */}
+      <div className="absolute top-5 left-5 right-5 flex items-center justify-between text-white z-50">
+        <div>
+          <h3 className="font-extrabold text-base sm:text-lg tracking-tight select-none">{carName}</h3>
+          {images.length > 1 && (
+            <span className="text-xs text-gray-400 font-mono">
+              Image {index + 1} of {images.length}
+            </span>
+          )}
+        </div>
+        <button
+          onClick={(e) => { e.stopPropagation(); onClose(); }}
+          className="bg-white/15 hover:bg-white/25 text-white p-2 sm:p-2.5 rounded-full transition-all cursor-pointer shadow-lg active:scale-90"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Main Image Stage */}
+      <div className="relative max-w-5xl max-h-[75vh] w-full flex items-center justify-center pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+        <img
+          src={images[index]}
+          className="max-w-full max-h-[75vh] object-contain rounded-xl select-none shadow-2xl border border-white/10"
+          alt={`${carName} full screen`}
+          referrerPolicy="no-referrer"
+        />
+
+        {images.length > 1 && (
+          <>
+            <button
+              onClick={prev}
+              className="absolute left-3 sm:-left-16 bg-white/10 hover:bg-white/25 text-white p-2.5 sm:p-3 rounded-full backdrop-blur-sm transition-all shadow-lg active:scale-95 cursor-pointer"
+            >
+              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5]" />
+            </button>
+            <button
+              onClick={next}
+              className="absolute right-3 sm:-right-16 bg-white/10 hover:bg-white/25 text-white p-2.5 sm:p-3 rounded-full backdrop-blur-sm transition-all shadow-lg active:scale-95 cursor-pointer"
+            >
+              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5]" />
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* Thumbnails list at bottom */}
+      {images.length > 1 && (
+        <div className="absolute bottom-6 flex gap-2 overflow-x-auto max-w-full px-4 py-2 z-50 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+          {images.map((img, idx) => (
+            <button
+              key={idx}
+              onClick={() => setIndex(idx)}
+              className={`w-12 h-12 rounded-lg overflow-hidden border-2 flex-shrink-0 transition-all ${idx === index ? 'border-red-500 scale-105' : 'border-transparent opacity-60 hover:opacity-100'}`}
+            >
+              <img src={img} className="w-full h-full object-cover" alt="" referrerPolicy="no-referrer" />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>,
+    document.body
+  );
+}
+
 function CarImageCarousel({ car }: { car: RentalCar }) {
   const images = car.images && car.images.length > 0 ? car.images : [car.imageUrl];
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showLightbox, setShowLightbox] = useState(false);
 
   const nextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -178,40 +276,70 @@ function CarImageCarousel({ car }: { car: RentalCar }) {
   };
 
   return (
-    <div className="w-full h-full relative group/carousel">
-      <img 
-        src={images[currentIndex] || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=600'} 
-        alt={`${car.name} - View ${currentIndex + 1}`} 
-        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-      />
-      {images.length > 1 && (
-        <>
-          <button 
-            type="button" 
-            onClick={prevImage}
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1.5 opacity-0 group-hover/carousel:opacity-100 transition-opacity backdrop-blur-sm shadow-md cursor-pointer"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <button 
-            type="button" 
-            onClick={nextImage}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1.5 opacity-0 group-hover/carousel:opacity-100 transition-opacity backdrop-blur-sm shadow-md cursor-pointer"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-          
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
-            {images.map((_, idx) => (
-              <div 
-                key={idx} 
-                className={`h-1.5 rounded-full transition-all ${idx === currentIndex ? 'w-4 bg-white shadow-[0_0_5px_rgba(255,255,255,0.8)]' : 'w-1.5 bg-white/50 hover:bg-white/80'}`} 
-              />
-            ))}
-          </div>
-        </>
-      )}
-    </div>
+    <>
+      <div 
+        className="w-full h-full relative group/carousel cursor-zoom-in"
+        onClick={() => setShowLightbox(true)}
+      >
+        <img 
+          src={images[currentIndex] || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=600'} 
+          alt={`${car.name} - View ${currentIndex + 1}`} 
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+        
+        {/* Sleek Floating View Full Pic Icon Button */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowLightbox(true);
+          }}
+          className="absolute bottom-3 right-3 z-30 bg-black/60 shadow-lg hover:bg-red-650 hover:bg-red-600 text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-lg backdrop-blur-md opacity-0 group-hover/carousel:opacity-100 transition-all duration-300 flex items-center gap-1.5 cursor-pointer"
+        >
+          <Maximize2 className="w-3.5 h-3.5 text-white" />
+          View Full Pic
+        </button>
+
+        {images.length > 1 && (
+          <>
+            <button 
+              type="button" 
+              onClick={prevImage}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1.5 opacity-0 group-hover/carousel:opacity-100 transition-opacity backdrop-blur-sm shadow-md cursor-pointer z-10"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button 
+              type="button" 
+              onClick={nextImage}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1.5 opacity-0 group-hover/carousel:opacity-100 transition-opacity backdrop-blur-sm shadow-md cursor-pointer z-10"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+            
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-25">
+              {images.map((_, idx) => (
+                <div 
+                  key={idx} 
+                  className={`h-1.5 rounded-full transition-all ${idx === currentIndex ? 'w-4 bg-white shadow-[0_0_5px_rgba(255,255,255,0.8)]' : 'w-1.5 bg-white/50 hover:bg-white/80'}`} 
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      <AnimatePresence>
+        {showLightbox && (
+          <ImageLightbox
+            images={images}
+            initialIndex={currentIndex}
+            carName={car.name}
+            onClose={() => setShowLightbox(false)}
+          />
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Car, MapPin, CheckCircle, Smartphone, SlidersHorizontal, MessageSquare, ChevronRight, HelpCircle, RefreshCw, Key, ShieldCheck, Search, ChevronDown, X, ChevronLeft, Star } from 'lucide-react';
+import { Car, MapPin, CheckCircle, Smartphone, SlidersHorizontal, MessageSquare, ChevronRight, HelpCircle, RefreshCw, Key, ShieldCheck, Search, ChevronDown, X, ChevronLeft, Star, Maximize2 } from 'lucide-react';
 
 interface RentalCar {
   id: string;
@@ -163,11 +164,108 @@ const GENERAL_DEFAULT_CARS: RentalCar[] = [
   }
 ];
 
+interface MarketplaceImageLightboxProps {
+  images: string[];
+  initialIndex: number;
+  carName: string;
+  onClose: () => void;
+}
+
+function MarketplaceImageLightbox({ images, initialIndex, carName, onClose }: MarketplaceImageLightboxProps) {
+  const [index, setIndex] = useState(initialIndex);
+
+  const next = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const prev = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowRight' && images.length > 1) next();
+      if (e.key === 'ArrowLeft' && images.length > 1) prev();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [images.length]);
+
+  return createPortal(
+    <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black/95 backdrop-blur-md p-4 sm:p-6" onClick={onClose}>
+      {/* Top bar info */}
+      <div className="absolute top-5 left-5 right-5 flex items-center justify-between text-white z-50">
+        <div>
+          <h3 className="font-extrabold text-base sm:text-lg tracking-tight select-none">{carName}</h3>
+          {images.length > 1 && (
+            <span className="text-xs text-gray-400 font-mono">
+              Image {index + 1} of {images.length}
+            </span>
+          )}
+        </div>
+        <button
+          onClick={(e) => { e.stopPropagation(); onClose(); }}
+          className="bg-white/15 hover:bg-white/25 text-white p-2 sm:p-2.5 rounded-full transition-all cursor-pointer shadow-lg active:scale-90"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Main image stage */}
+      <div className="relative max-w-5xl max-h-[75vh] w-full flex items-center justify-center pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+        <img
+          src={images[index]}
+          className="max-w-full max-h-[75vh] object-contain rounded-xl select-none shadow-2xl border border-white/10"
+          alt={`${carName} full screen`}
+          referrerPolicy="no-referrer"
+        />
+
+        {images.length > 1 && (
+          <>
+            <button
+              onClick={prev}
+              className="absolute left-3 sm:-left-16 bg-white/10 hover:bg-white/25 text-white p-2.5 sm:p-3 rounded-full backdrop-blur-sm transition-all shadow-lg active:scale-95 cursor-pointer animate-fade-in"
+            >
+              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5]" />
+            </button>
+            <button
+              onClick={next}
+              className="absolute right-3 sm:-right-16 bg-white/10 hover:bg-white/25 text-white p-2.5 sm:p-3 rounded-full backdrop-blur-sm transition-all shadow-lg active:scale-95 cursor-pointer animate-fade-in"
+            >
+              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5]" />
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* Thumbnails at bottom */}
+      {images.length > 1 && (
+        <div className="absolute bottom-6 flex gap-2 overflow-x-auto max-w-full px-4 py-2 z-50 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+          {images.map((img, idx) => (
+            <button
+              key={idx}
+              onClick={() => setIndex(idx)}
+              className={`w-12 h-12 rounded-lg overflow-hidden border-2 flex-shrink-0 transition-all ${idx === index ? 'border-amber-500 scale-105' : 'border-transparent opacity-60 hover:opacity-100'}`}
+            >
+              <img src={img} className="w-full h-full object-cover" alt="" referrerPolicy="no-referrer" />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>,
+    document.body
+  );
+}
+
 function MarketplaceCarCard({ car, waUrl }: { car: RentalCar; waUrl: string; key?: any }) {
   const images = car.images && car.images.length > 0 ? car.images : [car.imageUrl];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [showMapModal, setShowMapModal] = useState(false);
+  const [showLightbox, setShowLightbox] = useState(false);
 
   // Generate next 7 days structure
   const next7Days = Array.from({ length: 7 }).map((_, i) => {
@@ -195,70 +293,87 @@ function MarketplaceCarCard({ car, waUrl }: { car: RentalCar; waUrl: string; key
   };
 
   return (
-    <div
-      className="bg-white rounded-3xl overflow-hidden border border-gray-200/90 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 hover:border-gray-300 transition-all duration-300 transform hover:-translate-y-1 group flex flex-col h-full opacity-100"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {/* Visual Media Header - CAROUSEL */}
-      <div className="relative h-48 sm:h-52 overflow-hidden bg-gray-100">
-        <AnimatePresence initial={false}>
-          {images.map((img, index) => (
-            index === currentImageIndex && (
-              <motion.img
-                key={`${car.id}-img-${index}`}
-                src={img}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                alt={`${car.name} - ${index + 1}`}
-                referrerPolicy="no-referrer"
-              />
-            )
-          ))}
-        </AnimatePresence>
-
-        {/* Carousel Navigation (Hidden until hover on Desktop, visible on Mobile swipe theoretically) */}
-        {images.length > 1 && (
-          <>
-            <div className={`absolute inset-0 flex items-center justify-between px-2 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-              <button
-                onClick={prevImage}
-                className="bg-black/40 hover:bg-black/60 text-white p-1.5 rounded-full backdrop-blur-sm transition-all transform hover:scale-110"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                onClick={nextImage}
-                className="bg-black/40 hover:bg-black/60 text-white p-1.5 rounded-full backdrop-blur-sm transition-all transform hover:scale-110"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Pagination Dots */}
-            <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-20">
-              {images.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setCurrentImageIndex(idx);
-                  }}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    idx === currentImageIndex 
-                      ? 'w-4 bg-amber-500 shadow-sm' 
-                      : 'w-1.5 bg-white/60 hover:bg-white'
-                  }`}
-                  aria-label={`Go to slide ${idx + 1}`}
+    <>
+      <div
+        className="bg-white rounded-3xl overflow-hidden border border-gray-200/90 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 hover:border-gray-300 transition-all duration-300 transform hover:-translate-y-1 group flex flex-col h-full opacity-100"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        {/* Visual Media Header - CAROUSEL */}
+        <div 
+          className="relative h-48 sm:h-52 overflow-hidden bg-gray-100 cursor-zoom-in"
+          onClick={() => setShowLightbox(true)}
+        >
+          <AnimatePresence initial={false}>
+            {images.map((img, index) => (
+              index === currentImageIndex && (
+                <motion.img
+                  key={`${car.id}-img-${index}`}
+                  src={img}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  alt={`${car.name} - ${index + 1}`}
+                  referrerPolicy="no-referrer"
                 />
-              ))}
-            </div>
-          </>
-        )}
+              )
+            ))}
+          </AnimatePresence>
+
+          {/* Floating View Full Pic Icon Badge */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowLightbox(true);
+            }}
+            className="absolute bottom-3 right-3 z-30 bg-black/60 shadow-lg hover:bg-amber-600 text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-lg backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center gap-1.5 cursor-pointer"
+          >
+            <Maximize2 className="w-3.5 h-3.5 text-white" />
+            View Full Pic
+          </button>
+
+          {/* Carousel Navigation (Hidden until hover on Desktop, visible on Mobile swipe theoretically) */}
+          {images.length > 1 && (
+            <>
+              <div className={`absolute inset-0 flex items-center justify-between px-2 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+                <button
+                  onClick={prevImage}
+                  className="bg-black/40 hover:bg-black/60 text-white p-1.5 rounded-full backdrop-blur-sm transition-all transform hover:scale-110 z-10"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={nextImage}
+                  className="bg-black/40 hover:bg-black/60 text-white p-1.5 rounded-full backdrop-blur-sm transition-all transform hover:scale-110 z-10"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Pagination Dots */}
+              <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-20">
+                {images.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setCurrentImageIndex(idx);
+                    }}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      idx === currentImageIndex 
+                        ? 'w-4 bg-amber-500 shadow-sm' 
+                        : 'w-1.5 bg-white/60 hover:bg-white'
+                    }`}
+                    aria-label={`Go to slide ${idx + 1}`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         
         {/* Availability Label Tag */}
         <span className={`absolute top-4 left-4 z-20 px-3.5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md ${
@@ -478,6 +593,18 @@ function MarketplaceCarCard({ car, waUrl }: { car: RentalCar; waUrl: string; key
         </div>
       )}
     </div>
+
+    <AnimatePresence>
+      {showLightbox && (
+        <MarketplaceImageLightbox
+          images={images}
+          initialIndex={currentImageIndex}
+          carName={car.name}
+          onClose={() => setShowLightbox(false)}
+        />
+      )}
+    </AnimatePresence>
+    </>
   );
 }
 

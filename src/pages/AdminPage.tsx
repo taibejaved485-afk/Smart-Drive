@@ -444,63 +444,91 @@ export default function AdminPage() {
 
   // Handler methods for Car Owner Registration Onboarding
   const approveCarOnboarding = (car: any, isVerified: boolean = false) => {
-    // 1. Save to approved cars
-    const savedCustomApproved = localStorage.getItem('approved_cars');
-    let customApprovedList: any[] = [];
-    if (savedCustomApproved) {
-      try {
-        const parsed = JSON.parse(savedCustomApproved);
-        if (Array.isArray(parsed)) {
-          customApprovedList = parsed;
-        }
-      } catch (e) {}
+    const cardEl = document.getElementById(`pending-card-${car.id}`);
+    const btnEl = document.getElementById(`btn-approve-${car.id}`);
+
+    // Create a micro-state change feedback right before the card disappears.
+    // Force the card's border to flash green ("border-emerald-500") and apply smooth transition
+    if (cardEl) {
+      cardEl.classList.remove('border-gray-200', 'hover:border-gray-300');
+      cardEl.classList.add('border-emerald-500', 'ring-4', 'ring-emerald-500/20', 'bg-emerald-50/30');
+      cardEl.style.transition = 'all 0.6s ease-in-out';
     }
-    
-    // Add new vetted id active
-    const vettedCar = {
-      ...car,
-      id: car.id || 'owner-' + Date.now().toString(),
-      status: 'Available' as const,
-      isVerified: isVerified
-    };
-    
-    // Save to approved_cars avoiding duplicate id
-    customApprovedList = [vettedCar, ...customApprovedList.filter(c => c.id !== vettedCar.id)];
-    localStorage.setItem('approved_cars', JSON.stringify(customApprovedList));
 
-    // 2. Insert into basic rental_cars fleet too of local storage
-    const savedActiveFleet = localStorage.getItem('rental_cars');
-    let activeFleet: any[] = [];
-    if (savedActiveFleet) {
-      try {
-        const parsed = JSON.parse(savedActiveFleet);
-        if (Array.isArray(parsed)) {
-          activeFleet = parsed;
-        }
-      } catch (e) {}
+    // Replace the "Approve" button text with temporary check text "✓ Approved" or icon
+    if (btnEl) {
+      btnEl.innerHTML = '✓ Approved';
+      btnEl.classList.remove('bg-green-600', 'hover:bg-green-700');
+      btnEl.classList.add('bg-emerald-600', 'hover:bg-emerald-600');
+      btnEl.style.transition = 'all 0.3s ease-in-out';
     }
-    activeFleet = [vettedCar, ...activeFleet.filter(c => c.id !== vettedCar.id)];
-    localStorage.setItem('rental_cars', JSON.stringify(activeFleet));
 
-    // 3. Delete from pending (using robust comparison)
-    const remainingPending = pendingCars.filter(c => {
-      const matchesId = c.id && car.id && c.id === car.id;
-      const matchesDetails = c.name === car.name && 
-                             c.registrationNumber === car.registrationNumber && 
-                             c.ownerPhone === car.ownerPhone;
-      return !(matchesId || matchesDetails);
-    });
-    setPendingCars(remainingPending);
-    localStorage.setItem('pending_cars', JSON.stringify(remainingPending));
+    // Trigger professional UI browser notification or toast alert
+    showToast(`Vehicle approved successfully! "${car.name}" is now live on the public fleet directory.`, 'success');
 
-    // Despach storage updates
-    window.dispatchEvent(new Event('pending_cars_updated'));
-    window.dispatchEvent(new Event('storage'));
-    
-    // Trigger local state re-load immediately
-    loadDataAndSync();
+    // Smooth delays to satisfy visual persistence before elements are removed/synchronized
+    setTimeout(() => {
+      // 1. Save to approved cars
+      const savedCustomApproved = localStorage.getItem('approved_cars');
+      let customApprovedList: any[] = [];
+      if (savedCustomApproved) {
+        try {
+          const parsed = JSON.parse(savedCustomApproved);
+          if (Array.isArray(parsed)) {
+            customApprovedList = parsed;
+          }
+        } catch (e) {}
+      }
+      
+      // Add new vetted id active
+      const vettedCar = {
+        ...car,
+        id: car.id || 'owner-' + Date.now().toString(),
+        status: 'Available' as const,
+        isVerified: isVerified
+      };
+      
+      // Save to approved_cars avoiding duplicate id
+      customApprovedList = [vettedCar, ...customApprovedList.filter(c => c.id !== vettedCar.id)];
+      localStorage.setItem('approved_cars', JSON.stringify(customApprovedList));
 
-    showToast(`Vehicle registered and Approved! "${vettedCar.name}" is now live on the driving platform renting directory.`, 'success');
+      // 2. Insert into basic rental_cars fleet too of local storage
+      const savedActiveFleet = localStorage.getItem('rental_cars');
+      let activeFleet: any[] = [];
+      if (savedActiveFleet) {
+        try {
+          const parsed = JSON.parse(savedActiveFleet);
+          if (Array.isArray(parsed)) {
+            activeFleet = parsed;
+          }
+        } catch (e) {}
+      }
+      activeFleet = [vettedCar, ...activeFleet.filter(c => c.id !== vettedCar.id)];
+      localStorage.setItem('rental_cars', JSON.stringify(activeFleet));
+
+      // Physically remove the clicked car's DOM node element card directly from the UI view 
+      if (cardEl) {
+        cardEl.remove();
+      }
+
+      // 3. Delete from pending (using robust comparison)
+      const remainingPending = pendingCars.filter(c => {
+        const matchesId = c.id && car.id && c.id === car.id;
+        const matchesDetails = c.name === car.name && 
+                               c.registrationNumber === car.registrationNumber && 
+                               c.ownerPhone === car.ownerPhone;
+        return !(matchesId || matchesDetails);
+      });
+      setPendingCars(remainingPending);
+      localStorage.setItem('pending_cars', JSON.stringify(remainingPending));
+
+      // Despach storage updates
+      window.dispatchEvent(new Event('pending_cars_updated'));
+      window.dispatchEvent(new Event('storage'));
+      
+      // Trigger local state re-load immediately
+      loadDataAndSync();
+    }, 750);
   };
 
   const rejectCarOnboarding = (id: string) => {
@@ -1727,12 +1755,13 @@ export default function AdminPage() {
                   </p>
                 </div>
               ) : (
-                <div className="grid md:grid-cols-2 gap-6">
+                <div id="admin-cars-container" className="grid md:grid-cols-2 gap-6">
                   {pendingCars.map((car) => {
                     const isVerifiedChecked = verifiedToggles[car.id] !== false; // checked by default
                     return (
                       <div 
                         key={car.id} 
+                        id={`pending-card-${car.id}`}
                         className="bg-gray-50 border border-gray-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row gap-4 relative overflow-hidden group hover:border-gray-300 transition hover:shadow-md"
                       >
                         {/* Visual Asset */}
@@ -1828,6 +1857,7 @@ export default function AdminPage() {
                           {/* Approval Actions */}
                           <div className="flex gap-2.5 mt-3 pt-3 border-t border-gray-100">
                             <button
+                              id={`btn-approve-${car.id}`}
                               type="button"
                               onClick={() => approveCarOnboarding(car, isVerifiedChecked)}
                               className="flex-1 bg-green-600 hover:bg-green-700 text-white font-extrabold text-xs uppercase tracking-wider py-2.5 rounded-xl transition shadow-md shadow-green-150 cursor-pointer"
