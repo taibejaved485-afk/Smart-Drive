@@ -549,18 +549,20 @@ export default function RentalMarketplace() {
 
   const filteredCars = cars.filter(car => {
     // 1. Search Query
-    const searchString = `${car.name} ${car.description || ''} ${car.fuelType || ''} ${car.transmission}`.toLowerCase();
+    const searchString = `${car.name || ''} ${car.description || ''} ${car.fuelType || ''} ${car.transmission || ''}`.toLowerCase();
     const searchMatch = !searchQuery || searchString.includes(searchQuery.toLowerCase());
 
     // 2. City Filter
-    const cityMatch = activeCity === 'All Cities' || car.city.toLowerCase() === activeCity.toLowerCase();
+    const cityStr = car.city || 'Faisalabad';
+    const cityMatch = activeCity === 'All Cities' || cityStr.toLowerCase() === activeCity.toLowerCase();
     
     // 3. Area Filter
     const areaMatch = !selectedArea || (car.description || '').toLowerCase().includes(selectedArea.toLowerCase());
 
     // 4. Price filter
     let priceMatch = true;
-    const priceNum = parseInt(car.rentPrice.replace(/,/g, '')) || 0;
+    const rentPriceStr = car.rentPrice ? String(car.rentPrice) : '0';
+    const priceNum = parseInt(rentPriceStr.replace(/,/g, '')) || 0;
     if (priceFilter === 'Below 5k/day') priceMatch = priceNum < 5000;
     if (priceFilter === '5k - 10k/day') priceMatch = priceNum >= 5000 && priceNum <= 10000;
     if (priceFilter === 'Above 10k/day') priceMatch = priceNum > 10000;

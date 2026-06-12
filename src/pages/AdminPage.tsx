@@ -110,8 +110,16 @@ export default function AdminPage() {
   const [newPost, setNewPost] = useState({ title: '', author: '', imageUrl: '', content: '' });
   const [activeTab, setActiveTab] = useState<'bookings' | 'blogs' | 'dns' | 'rentals' | 'requests'>('bookings');
   const [copiedText, setCopiedText] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const carFileInputRef = useRef<HTMLInputElement>(null);
+
+  const showToast = (text: string, type: 'success' | 'info' | 'error' = 'success') => {
+    setToastMessage({ text, type });
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 4500);
+  };
 
   // Car Fleet State
   const [rentalCars, setRentalCars] = useState<RentalCar[]>([]);
@@ -376,7 +384,7 @@ export default function AdminPage() {
     // Despach storage updates
     window.dispatchEvent(new Event('pending_cars_updated'));
     window.dispatchEvent(new Event('storage'));
-    alert(`Vehicle registered and Approved! "${vettedCar.name}" is now live on the driving platform renting directory.`);
+    showToast(`Vehicle registered and Approved! "${vettedCar.name}" is now live on the driving platform renting directory.`, 'success');
   };
 
   const rejectCarOnboarding = (id: string) => {
@@ -426,14 +434,14 @@ export default function AdminPage() {
   const addRentalCar = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCar.name || !newCar.rentPrice || !newCar.city) {
-      alert('Please fill out the name, rent price, and city fields.');
+      showToast('Please fill out the name, rent price, and city fields.', 'error');
       return;
     }
 
     const cleanPrice = newCar.rentPrice.replace(/,/g, '').trim();
     const priceNum = parseFloat(cleanPrice);
     if (isNaN(priceNum)) {
-      alert('Please enter a valid rental price.');
+      showToast('Please enter a valid rental price.', 'error');
       return;
     }
 
@@ -458,7 +466,7 @@ export default function AdminPage() {
     // Trigger a window sync event for other routes
     window.dispatchEvent(new Event('storage'));
 
-    alert('Rental vehicle added to fleet!');
+    showToast('Rental vehicle added to fleet!', 'success');
 
     setNewCar({
       name: '',
@@ -498,7 +506,7 @@ export default function AdminPage() {
     if (username === 'admin' && password === 'admin123') {
       setIsLoggedIn(true);
     } else {
-      alert('Invalid credentials! Default is admin / admin123');
+      showToast('Invalid credentials! Default is admin / admin123', 'error');
     }
   };
 
@@ -534,7 +542,7 @@ export default function AdminPage() {
 
   const publishPost = () => {
     if (!newPost.title || !newPost.content) {
-      alert('Please fill out the Title and Content fields.');
+      showToast('Please fill out the Title and Content fields.', 'error');
       return;
     }
 
@@ -556,7 +564,7 @@ export default function AdminPage() {
       setPosts(updatedPosts);
       localStorage.setItem('blogPosts', JSON.stringify(updatedPosts));
       setEditingPostId(null);
-      alert('Post updated successfully!');
+      showToast('Post updated successfully!', 'success');
     } else {
       const post: BlogPost = {
         title: newPost.title,
@@ -569,7 +577,7 @@ export default function AdminPage() {
       const updatedPosts = [post, ...posts]; // Add new posts at the top
       setPosts(updatedPosts);
       localStorage.setItem('blogPosts', JSON.stringify(updatedPosts));
-      alert('Post published successfully!');
+      showToast('Post published successfully!', 'success');
     }
 
     setNewPost({ title: '', author: '', imageUrl: '', content: '' });
@@ -632,6 +640,35 @@ export default function AdminPage() {
             </Link>
           </div>
         </form>
+
+        {toastMessage && (
+          <div className="fixed z-50 bottom-6 right-6 max-w-sm w-full bg-slate-900 border border-slate-800 text-white rounded-2xl p-4 shadow-2xl flex items-start gap-3 animate-slide-up">
+            <div className={`p-1.5 rounded-lg shrink-0 mt-0.5 ${
+              toastMessage.type === 'success' ? 'bg-emerald-500/10 text-emerald-400' :
+              toastMessage.type === 'error' ? 'bg-red-500/10 text-red-400' :
+              'bg-blue-500/10 text-blue-400'
+            }`}>
+              {toastMessage.type === 'success' ? <Check className="w-5 h-5" /> :
+               toastMessage.type === 'error' ? <AlertCircle className="w-5 h-5" /> :
+               <Sparkles className="w-5 h-5" />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                System Notification
+              </p>
+              <p className="text-xs sm:text-sm font-semibold text-slate-100 mt-1 leading-relaxed">
+                {toastMessage.text}
+              </p>
+            </div>
+            <button 
+              onClick={() => setToastMessage(null)}
+              className="text-slate-500 hover:text-slate-300 p-1 rounded-lg transition"
+              type="button"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
     );
   }
@@ -1954,6 +1991,35 @@ export default function AdminPage() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {toastMessage && (
+        <div className="fixed z-50 bottom-12 right-6 max-w-sm w-full bg-slate-950 border border-slate-800 text-white rounded-2xl p-4 shadow-2xl flex items-start gap-3 animate-slide-up">
+          <div className={`p-1.5 rounded-lg shrink-0 mt-0.5 ${
+            toastMessage.type === 'success' ? 'bg-emerald-500/10 text-emerald-400' :
+            toastMessage.type === 'error' ? 'bg-red-500/10 text-red-400' :
+            'bg-blue-500/10 text-blue-400'
+          }`}>
+            {toastMessage.type === 'success' ? <CheckCircle2 className="w-5 h-5 text-emerald-400" /> :
+             toastMessage.type === 'error' ? <AlertCircle className="w-5 h-5 text-red-400" /> :
+             <Sparkles className="w-5 h-5 text-amber-400" />}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              System Notification
+            </p>
+            <p className="text-xs sm:text-sm font-semibold text-slate-100 mt-1 leading-relaxed">
+              {toastMessage.text}
+            </p>
+          </div>
+          <button 
+            onClick={() => setToastMessage(null)}
+            className="text-slate-500 hover:text-slate-300 p-1 rounded-lg transition"
+            type="button"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
       )}
 

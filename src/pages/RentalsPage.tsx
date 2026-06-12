@@ -260,18 +260,20 @@ export default function RentalsPage() {
 
   const filteredCars = cars.filter(car => {
     // 1. Search filter
-    const searchString = `${car.name} ${car.description || ''} ${car.type} ${car.transmission}`.toLowerCase();
+    const searchString = `${car.name || ''} ${car.description || ''} ${car.type || ''} ${car.transmission || ''}`.toLowerCase();
     const matchesSearch = !searchQuery || searchString.includes(searchQuery.toLowerCase());
 
     // 2. City Filter
-    const matchesCity = selectedCity === 'All Cities' || car.city.toLowerCase() === selectedCity.toLowerCase();
+    const cityStr = car.city || 'Faisalabad';
+    const matchesCity = selectedCity === 'All Cities' || cityStr.toLowerCase() === selectedCity.toLowerCase();
     
     // 3. Area Filter
     const matchesArea = !selectedArea || car.area === selectedArea || (car.description || '').includes(selectedArea);
 
     // 4. Price Filter
     let matchesPrice = true;
-    const priceNum = parseInt(car.rentPrice.replace(/,/g, '')) || 0;
+    const rentPriceStr = car.rentPrice ? String(car.rentPrice) : '0';
+    const priceNum = parseInt(rentPriceStr.replace(/,/g, '')) || 0;
     if (priceFilter === 'Below 5k/day') matchesPrice = priceNum < 5000;
     if (priceFilter === '5k - 10k/day') matchesPrice = priceNum >= 5000 && priceNum <= 10000;
     if (priceFilter === 'Above 10k/day') matchesPrice = priceNum > 10000;
@@ -891,7 +893,7 @@ export default function RentalsPage() {
                         <div>
                           <p className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Total Rent Estimate</p>
                           <p className="text-xl font-black text-red-500">
-                            PKR {(parseInt(selectedCar.rentPrice.replace(/,/g, '')) * bookingDuration).toLocaleString()}
+                            PKR {(parseInt(String(selectedCar.rentPrice || '0').replace(/,/g, '')) * bookingDuration).toLocaleString()}
                           </p>
                         </div>
                         <span className="text-[10px] bg-white/10 px-2.5 py-1 rounded-md text-gray-300 max-w-[120px] text-right font-medium">
