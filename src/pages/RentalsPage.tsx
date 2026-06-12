@@ -26,6 +26,9 @@ interface RentalCar {
   description?: string;
   withDriver?: boolean;
   area?: string;
+  rentalsCompleted?: number;
+  rating?: number;
+  landlordRating?: number;
 }
 
 const DEFAULT_RENTAL_CARS: RentalCar[] = [
@@ -40,7 +43,10 @@ const DEFAULT_RENTAL_CARS: RentalCar[] = [
     status: 'Available',
     type: 'Sedan',
     isVerified: true,
-    registrationNumber: 'FSD-22-6710'
+    registrationNumber: 'FSD-22-6710',
+    rentalsCompleted: 14,
+    rating: 4.9,
+    landlordRating: 4.9
   },
   {
     id: 'rc-2',
@@ -53,7 +59,10 @@ const DEFAULT_RENTAL_CARS: RentalCar[] = [
     status: 'Available',
     type: 'Sedan',
     isVerified: true,
-    registrationNumber: 'LHR-21-9954'
+    registrationNumber: 'LHR-21-9954',
+    rentalsCompleted: 8,
+    rating: 4.85,
+    landlordRating: 4.85
   },
   {
     id: 'rc-3',
@@ -66,7 +75,9 @@ const DEFAULT_RENTAL_CARS: RentalCar[] = [
     status: 'Booked',
     type: 'Sedan',
     isVerified: false,
-    registrationNumber: 'ICT-18-5002'
+    registrationNumber: 'ICT-18-5002',
+    rentalsCompleted: 1,
+    rating: 4.2
   },
   {
     id: 'rc-4',
@@ -79,7 +90,10 @@ const DEFAULT_RENTAL_CARS: RentalCar[] = [
     status: 'Available',
     type: 'Economy',
     isVerified: true,
-    registrationNumber: 'KHI-23-4551'
+    registrationNumber: 'KHI-23-4551',
+    rentalsCompleted: 7,
+    rating: 4.92,
+    landlordRating: 4.92
   },
   {
     id: 'rc-5',
@@ -92,7 +106,10 @@ const DEFAULT_RENTAL_CARS: RentalCar[] = [
     status: 'Available',
     type: 'Sedan',
     isVerified: true,
-    registrationNumber: 'LHR-22-3810'
+    registrationNumber: 'LHR-22-3810',
+    rentalsCompleted: 4,
+    rating: 4.7,
+    landlordRating: 4.7
   },
   {
     id: 'rc-6',
@@ -105,7 +122,10 @@ const DEFAULT_RENTAL_CARS: RentalCar[] = [
     status: 'Available',
     type: 'Economy',
     isVerified: false,
-    registrationNumber: 'FSD-19-4402'
+    registrationNumber: 'FSD-19-4402',
+    rentalsCompleted: 2,
+    rating: 4.4,
+    landlordRating: 4.4
   },
   {
     id: 'rc-7',
@@ -119,7 +139,10 @@ const DEFAULT_RENTAL_CARS: RentalCar[] = [
     type: 'Luxury',
     isVerified: true,
     registrationNumber: 'ICT-23-4001',
-    fuelType: 'Diesel'
+    fuelType: 'Diesel',
+    rentalsCompleted: 15,
+    rating: 4.95,
+    landlordRating: 4.95
   },
   {
     id: 'rc-8',
@@ -133,7 +156,10 @@ const DEFAULT_RENTAL_CARS: RentalCar[] = [
     type: 'Luxury',
     isVerified: true,
     registrationNumber: 'LHR-22-9901',
-    fuelType: 'Petrol'
+    fuelType: 'Petrol',
+    rentalsCompleted: 9,
+    rating: 4.88,
+    landlordRating: 4.88
   }
 ];
 
@@ -334,8 +360,28 @@ export default function RentalsPage() {
   const getWhatsAppLink = (car: RentalCar) => {
     const defaultPhone = '923097666928';
     const ownerPhone = car.ownerPhone ? car.ownerPhone.replace(/[^0-9]/g, '') : defaultPhone;
-    const message = `Hi, I am interested in renting your ${car.name} listed on the Driving & Rental platform.`;
-    return `https://wa.me/${ownerPhone}?text=${encodeURIComponent(message)}`;
+    
+    // Construct rich text organized layout representing an executive inquiry invoice of the car
+    const invoiceParts = [
+      "=============================",
+      "    📄 SMART DRIVE INQUIRY INVOICE   ",
+      "=============================",
+      "👤 CLIENT DETAILS:",
+      "• Name: Valued Guest (Inquiry)",
+      "",
+      "🚗 VEHICLE DETAILS:",
+      `• Model: ${car.name}`,
+      `• Type: ${car.type || 'Sedan'}`,
+      `• Transmission: ${car.transmission}`,
+      `• City Hub: ${car.city} Office Hub`,
+      "",
+      "💰 RENTAL ESTIMATES:",
+      `• Rate: PKR ${car.rentPrice} / ${car.rentUnit || 'Day'}`,
+      "=============================",
+      "Kindly check and confirm vehicle booking slot availability!"
+    ];
+    
+    return `https://wa.me/${ownerPhone}?text=${encodeURIComponent(invoiceParts.join("\n"))}`;
   };
 
   const schema = {
@@ -630,6 +676,11 @@ export default function RentalsPage() {
                               Verified Car
                             </span>
                           )}
+                          {car.rentalsCompleted !== undefined && car.rentalsCompleted > 5 && (car.rating !== undefined && car.rating >= 4.8) && (
+                            <span className="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-550 backdrop-blur-md text-gray-950 text-[10px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow-md border border-amber-300 animate-pulse">
+                              <span>⭐</span> Top Partner
+                            </span>
+                          )}
                         </div>
                         <div className="absolute top-4 right-4">
                           <span className={`text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-md ${
@@ -806,17 +857,59 @@ export default function RentalsPage() {
                   <motion.div 
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="text-center py-8 space-y-4"
+                    className="text-center py-6 space-y-4 font-sans"
                   >
-                    <div className="w-16 h-16 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto">
+                    <div className="w-16 h-16 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
                       <CheckCircle2 className="w-10 h-10" />
                     </div>
                     <h4 className="text-2xl font-black text-gray-900 tracking-tight">Booking Request Logged!</h4>
-                    <p className="text-sm text-gray-500 max-w-sm mx-auto leading-relaxed">
-                      Assigned dynamic rental vehicle <strong className="text-red-650">{selectedCar.name}</strong> for <strong className="text-gray-900">{bookingDuration} Days</strong>. Our Faisalabad branch desk officer will call you shortly on <strong>{bookingPhone}</strong> to schedule vehicle pickup.
+                    <p className="text-xs sm:text-sm text-gray-500 max-w-sm mx-auto leading-relaxed">
+                      Assigned dynamic rental vehicle <strong className="text-red-650">{selectedCar.name}</strong> for <strong className="text-gray-900">{bookingDuration} Days</strong>. To secure your slot instantly, tap the button below to send your **Executive Invoice Statement** to our branch desk officer.
                     </p>
-                    <div className="text-xs text-gray-400 bg-gray-50 p-2.5 rounded-xl border max-w-xs mx-auto">
-                      Assigned Location: <strong>{selectedCar.city} Office Hub</strong>
+                    
+                    <div className="text-xs text-gray-400 bg-gray-50 p-3 rounded-xl border max-w-sm mx-auto text-left space-y-1">
+                      <div>Assigned Location: <strong className="text-gray-800">{selectedCar.city} Office Hub</strong></div>
+                      <div>Total Price Estimate: <strong className="text-red-600 font-mono">PKR {(parseInt(String(selectedCar.rentPrice || '0').replace(/,/g, '')) * bookingDuration).toLocaleString()}</strong></div>
+                    </div>
+
+                    <div className="pt-2">
+                      <a 
+                        href={`https://wa.me/${(selectedCar.ownerPhone || '923097666928').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+                          [
+                            "=============================",
+                            "      📄 SMART DRIVE RENTAL INVOICE   ",
+                            "=============================",
+                            "👤 CLIENT DETAILS:",
+                            `• Name: ${bookingName}`,
+                            `• Phone: ${bookingPhone}`,
+                            "",
+                            "🚗 VEHICLE DETAILS:",
+                            `• Model: ${selectedCar.name}`,
+                            `• Type: ${selectedCar.type || 'Sedan'}`,
+                            `• Transmission: ${selectedCar.transmission}`,
+                            `• City Hub: ${selectedCar.city} Office Hub`,
+                            "",
+                            "📅 TRIP SCHEDULE:",
+                            `• Start Date: ${bookingDate}`,
+                            `• Duration: ${bookingDuration} ${selectedCar.rentUnit || 'Day'}(s)`,
+                            `• Rate: PKR ${selectedCar.rentPrice} / ${selectedCar.rentUnit || 'Day'}`,
+                            "",
+                            "💰 FINANCIAL SUMMARY:",
+                            `• Total Estimated Rent: PKR ${(parseInt(String(selectedCar.rentPrice || '0').replace(/,/g, '')) * bookingDuration).toLocaleString()}`,
+                            "=============================",
+                            "Generated via Smart Drive Marketplace",
+                            "Please confirm reservation slot for this vehicle!"
+                          ].join("\n")
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex w-full items-center justify-center gap-2 bg-[#25D366] hover:bg-[#128C7E] text-white py-3.5 px-6 rounded-2xl font-extrabold text-sm uppercase tracking-wide transition shadow-lg shadow-green-100 cursor-pointer"
+                      >
+                        <svg className="w-5 h-5 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.455 5.703 1.455h.008c6.56 0 11.895-5.335 11.898-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                        </svg>
+                        <span>Send Executive Message</span>
+                      </a>
                     </div>
                   </motion.div>
                 ) : (

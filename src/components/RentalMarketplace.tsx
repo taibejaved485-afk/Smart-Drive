@@ -20,6 +20,8 @@ interface RentalCar {
   landlordRating?: number;
   withDriver?: boolean;
   area?: string;
+  rentalsCompleted?: number;
+  rating?: number;
 }
 
 const GENERAL_DEFAULT_CARS: RentalCar[] = [
@@ -44,7 +46,9 @@ const GENERAL_DEFAULT_CARS: RentalCar[] = [
     description: 'Pristine, fully loaded automatic sedan.',
     isVerified: true,
     landlordRating: 4.8,
-    withDriver: false
+    withDriver: false,
+    rentalsCompleted: 8,
+    rating: 4.8
   },
   {
     id: 'rc-2',
@@ -65,7 +69,9 @@ const GENERAL_DEFAULT_CARS: RentalCar[] = [
     description: 'Clean compact sedan with phenomenal fuel average.',
     isVerified: true,
     landlordRating: 4.5,
-    withDriver: true
+    withDriver: true,
+    rentalsCompleted: 2,
+    rating: 4.5
   },
   {
     id: 'rc-3',
@@ -85,7 +91,9 @@ const GENERAL_DEFAULT_CARS: RentalCar[] = [
     fuelType: 'Petrol',
     description: 'Highly comfortable luxury cruiser.',
     isVerified: false,
-    withDriver: false
+    withDriver: false,
+    rentalsCompleted: 0,
+    rating: 0
   },
   {
     id: 'rc-4',
@@ -105,7 +113,9 @@ const GENERAL_DEFAULT_CARS: RentalCar[] = [
     description: 'Nifty and dynamic city hatchback.',
     isVerified: true,
     landlordRating: 4.9,
-    withDriver: false
+    withDriver: false,
+    rentalsCompleted: 11,
+    rating: 4.9
   },
   {
     id: 'rc-5',
@@ -126,7 +136,9 @@ const GENERAL_DEFAULT_CARS: RentalCar[] = [
     description: 'Luxurious premium ride with standard leather suite.',
     isVerified: true,
     landlordRating: 4.7,
-    withDriver: true
+    withDriver: true,
+    rentalsCompleted: 4,
+    rating: 4.7
   },
   {
     id: 'rc-6',
@@ -145,7 +157,9 @@ const GENERAL_DEFAULT_CARS: RentalCar[] = [
     fuelType: 'Petrol',
     description: 'Responsive manual drive option, spacious trunk.',
     isVerified: false,
-    withDriver: false
+    withDriver: false,
+    rentalsCompleted: 1,
+    rating: 4.1
   }
 ];
 
@@ -302,6 +316,11 @@ function MarketplaceCarCard({ car, waUrl }: { car: RentalCar; waUrl: string; key
           ) : (
             <span className="bg-gray-50 border border-gray-200 text-gray-500 text-[10px] uppercase font-bold px-2.5 py-1 rounded-lg">
               Standard Listing
+            </span>
+          )}
+          {car.rentalsCompleted !== undefined && car.rentalsCompleted > 5 && (car.rating !== undefined && car.rating >= 4.8) && (
+            <span className="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-gray-950 text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-sm border border-amber-300 animate-pulse">
+              ⭐ Top Partner
             </span>
           )}
         </div>
@@ -583,8 +602,28 @@ export default function RentalMarketplace() {
   const getWhatsAppLink = (car: RentalCar) => {
     const defaultPhone = '923097666928';
     const ownerPhone = car.ownerPhone ? car.ownerPhone.replace(/[^0-9]/g, '') : defaultPhone;
-    const message = `Hi, I am interested in renting your ${car.name} listed on the Driving & Rental platform.`;
-    return `https://wa.me/${ownerPhone}?text=${encodeURIComponent(message)}`;
+    
+    // Construct rich text organized layout representing an executive inquiry invoice of the car
+    const invoiceParts = [
+      "=============================",
+      "    📄 SMART DRIVE INQUIRY INVOICE   ",
+      "=============================",
+      "👤 CLIENT DETAILS:",
+      "• Name: Valued Guest (Inquiry)",
+      "",
+      "🚗 VEHICLE DETAILS:",
+      `• Model: ${car.name}`,
+      `• Type: ${car.isVerified ? 'Verified Fleet' : 'General Classified'}`,
+      `• Transmission: ${car.transmission}`,
+      `• City Hub: ${car.city} Office Hub`,
+      "",
+      "💰 RENTAL ESTIMATES:",
+      `• Rate: PKR ${car.rentPrice} / ${car.rentUnit || 'Day'}`,
+      "=============================",
+      "Kindly check and confirm vehicle booking slot availability!"
+    ];
+
+    return `https://wa.me/${ownerPhone}?text=${encodeURIComponent(invoiceParts.join("\n"))}`;
   };
 
   return (

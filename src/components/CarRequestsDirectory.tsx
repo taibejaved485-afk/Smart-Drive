@@ -387,8 +387,34 @@ export function CarRequestsGrid() {
   const getWhatsAppLink = (req: CustomerRequest) => {
     let cleanNumber = req.whatsapp.replace(/[^0-9]/g, '');
     if (cleanNumber.startsWith('0')) cleanNumber = '92' + cleanNumber.substring(1);
-    const message = `Hi ${req.name}, I am an owner on Smart Drive. I have the car you requested (${req.carModel}) available for rent from ${req.startDate} to ${req.endDate}. Let's chat!`;
-    return `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
+    
+    const days = calculateDays(req.startDate, req.endDate);
+    
+    // Construct rich text organized layout representing an executive proposal matching client request
+    const invoiceParts = [
+      "=============================",
+      "    📧 SMART DRIVE PARTNER MATCH   ",
+      "=============================",
+      "👤 CLIENT DETAILS:",
+      `• Name: ${req.name}`,
+      `• Requested City: ${req.city} (${req.area || 'All Areas'})`,
+      "",
+      "🚗 REQUEST DETAILS:",
+      `• Vehicle Model Wanted: ${req.carModel}`,
+      `• Transmission: ${req.transmission}`,
+      "",
+      "📅 SCHEDULE SLOTS:",
+      `• Start Date: ${req.startDate}`,
+      `• End Date: ${req.endDate}`,
+      `• Duration: ${days} Day(s)`,
+      "",
+      "💰 TRANSACTION VALUES:",
+      `• Client's Max Budget Rate: PKR ${req.maxBudget}`,
+      "=============================",
+      "Hello! I am a Verified Partner of Smart Drive. I have the requested car ready. Let's configure your reservation!"
+    ];
+
+    return `https://wa.me/${cleanNumber}?text=${encodeURIComponent(invoiceParts.join("\n"))}`;
   };
 
   const calculateDays = (start: string, end: string) => {

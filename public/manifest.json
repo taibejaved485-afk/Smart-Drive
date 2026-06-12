@@ -1,0 +1,24 @@
+{
+  "short_name": "Smart Drive",
+  "name": "Smart Drive Driving & Rental Marketplace",
+  "description": "Premium driving school and verified car rental marketplace in Faisalabad, Lahore, and Islamabad.",
+  "icons": [
+    {
+      "src": "https://trainingdrivingschool.pk/wp-content/uploads/2025/02/map-pattern-dark.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://trainingdrivingschool.pk/wp-content/uploads/2025/02/map-pattern-dark.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#030712",
+  "theme_color": "#dc2626",
+  "display": "standalone",
+  "orientation": "portrait"
+}

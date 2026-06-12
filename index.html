@@ -34,6 +34,13 @@
     <link rel="icon" type="image/png" href="/src/assets/images/favicon_logo_1781159782932.png" />
     <meta name="theme-color" content="#dc2626" />
 
+    <!-- PWA Manifest & iOS Standalone Optimization Tags -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Smart Drive" />
+    <link rel="apple-touch-icon" href="/src/assets/images/favicon_logo_1781159782932.png" />
+
     <!-- Google Analytics (GA4) tracking script for SEO analysis -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-8L7Y8XJDPV"></script>
     <script>
@@ -101,6 +108,19 @@
       </footer>
     </div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => {
+              console.log('[PWA] Service Worker registered scope:', reg.scope);
+            })
+            .catch(err => {
+              console.error('[PWA] Service Worker registration failed:', err);
+            });
+        });
+      }
+    </script>
   </body>
 </html>
 
