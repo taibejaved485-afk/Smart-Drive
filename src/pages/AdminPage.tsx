@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search } from 'lucide-react';
+import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface BlogPost {
@@ -23,6 +23,7 @@ interface RentalCar {
   images?: string[];
   city: string;
   status: 'Available' | 'Booked';
+  availabilityStatus?: 'Available' | 'Rented Out';
 }
 
 const PRESET_CAR_IMAGES = [
@@ -706,7 +707,7 @@ export default function AdminPage() {
     }
   };
 
-  const toggleCarStatus = (id: string) => {
+  const toggleCarStatus = (id: string, newStatusOverride?: 'Available' | 'Rented Out') => {
     // Helper to toggle in a specific storage key
     const toggleInStorage = (key: string) => {
       const saved = localStorage.getItem(key);
@@ -716,7 +717,21 @@ export default function AdminPage() {
           if (Array.isArray(parsed)) {
             const updated = parsed.map(c => {
               if (String(c.id) === String(id)) {
-                return { ...c, status: (c.status === 'Available' ? 'Booked' : 'Available') as 'Available' | 'Booked' };
+                // If override provided, use it. Otherwise toggle standard status.
+                if (newStatusOverride) {
+                  return { 
+                    ...c, 
+                    availabilityStatus: newStatusOverride,
+                    status: newStatusOverride === 'Available' ? 'Available' : 'Booked'
+                  };
+                }
+                const isCurrentlyAvailable = (c.availabilityStatus || c.status) === 'Available';
+                const nextStatus = isCurrentlyAvailable ? 'Rented Out' : 'Available';
+                return { 
+                  ...c, 
+                  availabilityStatus: nextStatus as 'Available' | 'Rented Out',
+                  status: nextStatus === 'Available' ? 'Available' : 'Booked'
+                };
               }
               return c;
             });
@@ -2197,19 +2212,22 @@ export default function AdminPage() {
                           </div>
 
                           <div className="flex items-center sm:self-center justify-between w-full sm:w-auto gap-3.5 border-t sm:border-0 pt-2.5 sm:pt-0">
-                            {/* Toggle availability status */}
-                            <button
-                              type="button"
-                              onClick={() => toggleCarStatus(car.id)}
-                              title="Toggle Availability State"
-                              className={`text-[10px] sm:text-xs font-black uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${
-                                isAvailable 
-                                  ? 'bg-green-100 text-green-700 border-green-200 hover:bg-green-200' 
-                                  : 'bg-red-50 text-red-750 border-red-200 hover:bg-red-100'
-                              }`}
-                            >
-                              {car.status}
-                            </button>
+                            {/* Toggle availability status dropdown */}
+                            <div className="relative group/select">
+                              <select 
+                                value={car.availabilityStatus || (car.status === 'Booked' ? 'Rented Out' : 'Available')}
+                                onChange={(e) => toggleCarStatus(car.id, e.target.value as 'Available' | 'Rented Out')}
+                                className={`text-[10px] sm:text-xs font-black uppercase tracking-wider px-3 py-2 rounded-xl border appearance-none outline-none transition-all cursor-pointer pr-8 ${
+                                  (car.availabilityStatus || (car.status === 'Booked' ? 'Rented Out' : 'Available')) === 'Available'
+                                    ? 'bg-green-50 text-green-700 border-green-200 hover:border-green-400' 
+                                    : 'bg-amber-50 text-amber-700 border-amber-200 hover:border-amber-400'
+                                }`}
+                              >
+                                <option value="Available">Mark as Available</option>
+                                <option value="Rented Out">Mark as Rented Out</option>
+                              </select>
+                              <ChevronDown className="w-3 h-3 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none opacity-50" />
+                            </div>
 
                             {/* Delete Button */}
                             <button 
