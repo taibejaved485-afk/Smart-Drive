@@ -146,14 +146,28 @@ export default function AdminPage() {
     // 1. Load blog posts
     const savedPosts = localStorage.getItem('blogPosts');
     if (savedPosts) {
-      setPosts(JSON.parse(savedPosts));
+      try {
+        const parsed = JSON.parse(savedPosts);
+        if (Array.isArray(parsed)) {
+          setPosts(parsed);
+        } else {
+          setPosts([]);
+        }
+      } catch (e) {
+        setPosts([]);
+      }
     }
 
     // 2. Load Driving School Bookings
     const savedBookings = localStorage.getItem('driving_bookings');
     if (savedBookings) {
       try {
-        setBookings(JSON.parse(savedBookings));
+        const parsed = JSON.parse(savedBookings);
+        if (Array.isArray(parsed)) {
+          setBookings(parsed);
+        } else {
+          setBookings([]);
+        }
       } catch (err) {
         setBookings([]);
       }
@@ -187,19 +201,31 @@ export default function AdminPage() {
     const savedPending = localStorage.getItem('pending_cars');
     if (savedPending) {
       try {
-        setPendingCars(JSON.parse(savedPending));
+        const parsed = JSON.parse(savedPending);
+        if (Array.isArray(parsed)) {
+          setPendingCars(parsed);
+        } else {
+          setPendingCars([]);
+        }
       } catch (err) {
         setPendingCars([]);
       }
+    } else {
+      setPendingCars([]);
     }
 
     // 4. Load approved active car fleet
     const savedCars = localStorage.getItem('rental_cars');
     if (savedCars) {
       try {
-        setRentalCars(JSON.parse(savedCars));
+        const parsed = JSON.parse(savedCars);
+        if (Array.isArray(parsed)) {
+          setRentalCars(parsed);
+        } else {
+          setRentalCars([]);
+        }
       } catch (e) {
-        // use empty
+        setRentalCars([]);
       }
     } else {
       // Seed default Pakistani city vehicles
@@ -253,10 +279,17 @@ export default function AdminPage() {
     const savedCustomerRequests = localStorage.getItem('customer_requests');
     if (savedCustomerRequests) {
       try {
-        setCustomerRequests(JSON.parse(savedCustomerRequests));
+        const parsed = JSON.parse(savedCustomerRequests);
+        if (Array.isArray(parsed)) {
+          setCustomerRequests(parsed);
+        } else {
+          setCustomerRequests([]);
+        }
       } catch (err) {
         setCustomerRequests([]);
       }
+    } else {
+      setCustomerRequests([]);
     }
   };
 
@@ -300,7 +333,15 @@ export default function AdminPage() {
   const approveCarOnboarding = (car: any, isVerified: boolean = false) => {
     // 1. Save to approved cars
     const savedCustomApproved = localStorage.getItem('approved_cars');
-    let customApprovedList = savedCustomApproved ? JSON.parse(savedCustomApproved) : [];
+    let customApprovedList: any[] = [];
+    if (savedCustomApproved) {
+      try {
+        const parsed = JSON.parse(savedCustomApproved);
+        if (Array.isArray(parsed)) {
+          customApprovedList = parsed;
+        }
+      } catch (e) {}
+    }
     
     // Add new vetted id active
     const vettedCar = {
@@ -314,7 +355,15 @@ export default function AdminPage() {
 
     // 2. Insert into basic rental_cars fleet too so it shows in fallback
     const savedActiveFleet = localStorage.getItem('rental_cars');
-    let activeFleet = savedActiveFleet ? JSON.parse(savedActiveFleet) : [];
+    let activeFleet: any[] = [];
+    if (savedActiveFleet) {
+      try {
+        const parsed = JSON.parse(savedActiveFleet);
+        if (Array.isArray(parsed)) {
+          activeFleet = parsed;
+        }
+      } catch (e) {}
+    }
     activeFleet = [vettedCar, ...activeFleet];
     setRentalCars(activeFleet);
     localStorage.setItem('rental_cars', JSON.stringify(activeFleet));

@@ -485,7 +485,10 @@ export default function RentalMarketplace() {
     const savedApproved = localStorage.getItem('approved_cars');
     if (savedApproved) {
       try {
-        approvedList = JSON.parse(savedApproved);
+        const parsed = JSON.parse(savedApproved);
+        if (Array.isArray(parsed)) {
+          approvedList = parsed;
+        }
       } catch (e) {
         approvedList = [];
       }

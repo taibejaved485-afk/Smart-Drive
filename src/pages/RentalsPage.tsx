@@ -235,7 +235,10 @@ export default function RentalsPage() {
       const savedCars = localStorage.getItem('rental_cars');
       if (savedCars) {
         try {
-          setCars(JSON.parse(savedCars));
+          const parsed = JSON.parse(savedCars);
+          if (Array.isArray(parsed)) {
+            setCars(parsed);
+          }
         } catch (e) {
           // ignore
         }

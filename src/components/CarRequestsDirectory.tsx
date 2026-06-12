@@ -359,8 +359,18 @@ export function CarRequestsGrid() {
   const fetchRequests = () => {
     const data = localStorage.getItem('customer_requests');
     if (data) {
-      const parsed = JSON.parse(data) as CustomerRequest[];
-      setRequests(parsed.filter(r => r.status === 'live'));
+      try {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed)) {
+          setRequests(parsed.filter(r => r?.status === 'live'));
+        } else {
+          setRequests([]);
+        }
+      } catch (err) {
+        setRequests([]);
+      }
+    } else {
+      setRequests([]);
     }
   };
 
