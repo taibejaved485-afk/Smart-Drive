@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Car, MapPin, CheckCircle, Smartphone, SlidersHorizontal, MessageSquare, ChevronRight, HelpCircle, RefreshCw, Key, ShieldCheck, Search, ChevronDown, X } from 'lucide-react';
+import { Car, MapPin, CheckCircle, Smartphone, SlidersHorizontal, MessageSquare, ChevronRight, HelpCircle, RefreshCw, Key, ShieldCheck, Search, ChevronDown, X, ChevronLeft, Star } from 'lucide-react';
 
 interface RentalCar {
   id: string;
@@ -9,12 +9,16 @@ interface RentalCar {
   rentPrice: string;
   rentUnit: 'Day' | 'Hour';
   imageUrl: string;
+  images?: string[];
   city: string;
   status: 'Available' | 'Booked';
   ownerName?: string;
   ownerPhone?: string;
   fuelType?: string;
   description?: string;
+  isVerified?: boolean;
+  landlordRating?: number;
+  withDriver?: boolean;
 }
 
 const GENERAL_DEFAULT_CARS: RentalCar[] = [
@@ -25,12 +29,21 @@ const GENERAL_DEFAULT_CARS: RentalCar[] = [
     rentPrice: '12,000',
     rentUnit: 'Day',
     imageUrl: 'https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600',
+    images: [
+      'https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600',
+      'https://images.unsplash.com/photo-1590362891991-f70281b373ee?auto=format&fit=crop&q=80&w=600',
+      'https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&q=80&w=600',
+      'https://images.unsplash.com/photo-1549314488-87cc9c3bc89a?auto=format&fit=crop&q=80&w=600'
+    ],
     city: 'Faisalabad',
     status: 'Available',
     ownerName: 'Smart Drive Official',
     ownerPhone: '923097666928',
     fuelType: 'Petrol',
-    description: 'Pristine, fully loaded automatic sedan.'
+    description: 'Pristine, fully loaded automatic sedan.',
+    isVerified: true,
+    landlordRating: 4.8,
+    withDriver: false
   },
   {
     id: 'rc-2',
@@ -39,12 +52,19 @@ const GENERAL_DEFAULT_CARS: RentalCar[] = [
     rentPrice: '6,500',
     rentUnit: 'Day',
     imageUrl: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=600',
+    images: [
+      'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=600',
+      'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=600'
+    ],
     city: 'Lahore',
     status: 'Available',
     ownerName: 'Mian Fawad',
     ownerPhone: '923015467812',
     fuelType: 'Petrol',
-    description: 'Clean compact sedan with phenomenal fuel average.'
+    description: 'Clean compact sedan with phenomenal fuel average.',
+    isVerified: true,
+    landlordRating: 4.5,
+    withDriver: true
   },
   {
     id: 'rc-3',
@@ -53,12 +73,18 @@ const GENERAL_DEFAULT_CARS: RentalCar[] = [
     rentPrice: '7,500',
     rentUnit: 'Day',
     imageUrl: 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600',
+    images: [
+      'https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600',
+      'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=600'
+    ],
     city: 'Islamabad',
     status: 'Available',
     ownerName: 'Chaudhary Bilal',
     ownerPhone: '923214567890',
     fuelType: 'Petrol',
-    description: 'Highly comfortable luxury cruiser.'
+    description: 'Highly comfortable luxury cruiser.',
+    isVerified: false,
+    withDriver: false
   },
   {
     id: 'rc-4',
@@ -67,12 +93,18 @@ const GENERAL_DEFAULT_CARS: RentalCar[] = [
     rentPrice: '5,500',
     rentUnit: 'Day',
     imageUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=600',
+    images: [
+      'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=600'
+    ],
     city: 'Karachi',
     status: 'Available',
     ownerName: 'Hamza Malik',
     ownerPhone: '923331234567',
     fuelType: 'Petrol',
-    description: 'Nifty and dynamic city hatchback.'
+    description: 'Nifty and dynamic city hatchback.',
+    isVerified: true,
+    landlordRating: 4.9,
+    withDriver: false
   },
   {
     id: 'rc-5',
@@ -81,12 +113,19 @@ const GENERAL_DEFAULT_CARS: RentalCar[] = [
     rentPrice: '9,000',
     rentUnit: 'Day',
     imageUrl: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=600',
+    images: [
+      'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=600',
+      'https://images.unsplash.com/photo-1549314488-87cc9c3bc89a?auto=format&fit=crop&q=80&w=600'
+    ],
     city: 'Lahore',
     status: 'Available',
     ownerName: 'Mian Fawad',
     ownerPhone: '923015467812',
     fuelType: 'Petrol',
-    description: 'Luxurious premium ride with standard leather suite.'
+    description: 'Luxurious premium ride with standard leather suite.',
+    isVerified: true,
+    landlordRating: 4.7,
+    withDriver: true
   },
   {
     id: 'rc-6',
@@ -95,14 +134,204 @@ const GENERAL_DEFAULT_CARS: RentalCar[] = [
     rentPrice: '6,000',
     rentUnit: 'Day',
     imageUrl: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=600',
+    images: [
+      'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=600'
+    ],
     city: 'Faisalabad',
     status: 'Available',
     ownerName: 'Anas Gujjar',
     ownerPhone: '923097666928',
     fuelType: 'Petrol',
-    description: 'Responsive manual drive option, spacious trunk.'
+    description: 'Responsive manual drive option, spacious trunk.',
+    isVerified: false,
+    withDriver: false
   }
 ];
+
+function MarketplaceCarCard({ car, waUrl }: { car: RentalCar; waUrl: string }) {
+  const images = car.images && car.images.length > 0 ? car.images : [car.imageUrl];
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const nextImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  };
+
+  const prevImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  return (
+    <div
+      className="bg-white rounded-3xl overflow-hidden border border-gray-200/90 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 hover:border-gray-300 transition-all duration-300 transform hover:-translate-y-1 group flex flex-col h-full opacity-100"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Visual Media Header - CAROUSEL */}
+      <div className="relative h-48 sm:h-52 overflow-hidden bg-gray-100">
+        <AnimatePresence initial={false}>
+          {images.map((img, index) => (
+            index === currentImageIndex && (
+              <motion.img
+                key={`${car.id}-img-${index}`}
+                src={img}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                alt={`${car.name} - ${index + 1}`}
+                referrerPolicy="no-referrer"
+              />
+            )
+          ))}
+        </AnimatePresence>
+
+        {/* Carousel Navigation (Hidden until hover on Desktop, visible on Mobile swipe theoretically) */}
+        {images.length > 1 && (
+          <>
+            <div className={`absolute inset-0 flex items-center justify-between px-2 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+              <button
+                onClick={prevImage}
+                className="bg-black/40 hover:bg-black/60 text-white p-1.5 rounded-full backdrop-blur-sm transition-all transform hover:scale-110"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                onClick={nextImage}
+                className="bg-black/40 hover:bg-black/60 text-white p-1.5 rounded-full backdrop-blur-sm transition-all transform hover:scale-110"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Pagination Dots */}
+            <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-20">
+              {images.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setCurrentImageIndex(idx);
+                  }}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    idx === currentImageIndex 
+                      ? 'w-4 bg-amber-500 shadow-sm' 
+                      : 'w-1.5 bg-white/60 hover:bg-white'
+                  }`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+        
+        {/* Availability Label Tag */}
+        <span className={`absolute top-4 left-4 z-20 px-3.5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md ${
+          car.status === 'Available'
+            ? 'bg-green-600 text-white'
+            : 'bg-amber-500 text-white'
+        }`}>
+          {car.status}
+        </span>
+
+        {/* City Hub Indicator */}
+        <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full text-[10px] font-bold text-white shadow-sm">
+          <MapPin className="w-3 h-3 text-red-500" />
+          <span>{car.city}</span>
+        </div>
+      </div>
+
+      {/* Meta Body Content */}
+      <div className="p-5 sm:p-6 flex flex-col flex-grow">
+        <div className="flex justify-between items-start gap-2 mb-2">
+          <h3 className="text-lg md:text-xl font-bold text-gray-900 tracking-tight leading-tight group-hover:text-red-700 transition-colors">
+            {car.name}
+          </h3>
+        </div>
+
+        {/* Highlight tags */}
+        <div className="flex flex-wrap gap-2 my-3">
+          <span className="bg-gray-100 text-gray-700 text-[10px] uppercase font-bold px-2.5 py-1 rounded-lg">
+            {car.transmission}
+          </span>
+          <span className="bg-gray-100 text-gray-700 text-[10px] uppercase font-bold px-2.5 py-1 rounded-lg">
+            {car.fuelType || 'Petrol'}
+          </span>
+          {car.withDriver && (
+            <span className="bg-indigo-50 border border-indigo-100 text-indigo-700 text-[10px] uppercase font-bold px-2.5 py-1 rounded-lg">
+              With Driver
+            </span>
+          )}
+          {car.isVerified ? (
+            <span className="bg-green-50 border border-green-100 text-green-700 text-[10px] uppercase font-bold px-2.5 py-1 rounded-lg flex items-center gap-1">
+              <ShieldCheck className="w-3 h-3" />
+              Verified Owner
+            </span>
+          ) : (
+            <span className="bg-gray-50 border border-gray-200 text-gray-500 text-[10px] uppercase font-bold px-2.5 py-1 rounded-lg">
+              Standard Listing
+            </span>
+          )}
+        </div>
+
+        {/* Vetted Owner Reference details */}
+        <div className="bg-gray-50 border border-gray-100 rounded-2xl p-3.5 my-3 flex flex-col gap-1.5">
+          <div className="flex justify-between items-center text-xs">
+            <span className="text-gray-500 font-medium">Landlord / Partner:</span>
+            <div className="flex flex-col items-end">
+              <span className="font-extrabold text-gray-800 flex items-center gap-1">
+                {car.isVerified && <ShieldCheck className="w-3.5 h-3.5 text-green-600 shrink-0" />}
+                {car.ownerName || 'Verified Partner'}
+              </span>
+              {car.landlordRating && (
+                <div className="flex items-center gap-0.5 mt-0.5 text-[10px] font-bold text-gray-600">
+                  <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                  <span>{car.landlordRating.toFixed(1)} Rating</span>
+                </div>
+              )}
+            </div>
+          </div>
+          {car.description && (
+            <p className="text-[11px] text-gray-500 line-clamp-2 leading-relaxed border-t border-gray-200/60 pt-2 mt-1.5">
+              {car.description}
+            </p>
+          )}
+        </div>
+
+        {/* Bottom Price & Contact Area */}
+        <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
+          <div>
+            <div className="flex items-baseline gap-1 leading-none">
+              <span className="text-xs font-black text-gray-400">PKR</span>
+              <span className="text-xl font-black text-gray-950 font-mono tracking-tight">{car.rentPrice}</span>
+            </div>
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mt-1.5">Per {car.rentUnit.toUpperCase()}</span>
+          </div>
+
+          {/* Direct WhatsApp Call to Action */}
+          <a 
+            href={waUrl} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="bg-[#25D366] hover:bg-[#128C7E] text-white px-4.5 py-2.5 rounded-xl font-extrabold text-xs uppercase tracking-wider flex items-center gap-1.5 transition shadow-lg shadow-green-100 cursor-pointer transform hover:scale-105 active:scale-95"
+            title="Contact owner on WhatsApp"
+          >
+            <svg className="w-4 h-4 fill-white text-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.455 5.703 1.455h.008c6.56 0 11.895-5.335 11.898-11.893a11.821 11.821 0 00-3.48-8.413z" />
+            </svg>
+            <span>WhatsApp</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function RentalMarketplace() {
   const [activeCity, setActiveCity] = useState<string>('All Cities');
@@ -415,103 +644,9 @@ export default function RentalMarketplace() {
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {filteredCars.map(car => {
-                const waUrl = getWhatsAppLink(car);
-                return (
-                  <div
-                    key={car.id}
-                    className="bg-white rounded-3xl overflow-hidden border border-gray-200/90 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 hover:border-gray-300 transition-all duration-300 transform hover:-translate-y-1 group flex flex-col h-full opacity-100"
-                  >
-                    {/* Visual Media Header */}
-                    <div className="relative h-48 sm:h-52 overflow-hidden bg-gray-100">
-                      <img 
-                        src={car.imageUrl} 
-                        className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500" 
-                        alt={car.name}
-                        referrerPolicy="no-referrer"
-                      />
-                      
-                      {/* Availability Label Tag */}
-                      <span className={`absolute top-4 left-4 z-10 px-3.5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md ${
-                        car.status === 'Available'
-                          ? 'bg-green-600 text-white'
-                          : 'bg-yellow-500 text-white'
-                      }`}>
-                        {car.status}
-                      </span>
-
-                      {/* City Hub Indicator */}
-                      <div className="absolute bottom-4 left-4 z-10 flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-white shadow-sm">
-                        <MapPin className="w-3.5 h-3.5 text-red-500" />
-                        <span>{car.city}</span>
-                      </div>
-                    </div>
-
-                    {/* Meta Body Content */}
-                    <div className="p-5 sm:p-6 flex flex-col flex-grow">
-                      <div className="flex justify-between items-start gap-2 mb-2">
-                        <h3 className="text-lg md:text-xl font-bold text-gray-900 tracking-tight leading-tight group-hover:text-red-650 transition">
-                          {car.name}
-                        </h3>
-                      </div>
-
-                      {/* Highlight tags */}
-                      <div className="flex flex-wrap gap-2 my-3">
-                        <span className="bg-gray-100 text-gray-700 text-[10px] uppercase font-bold px-2.5 py-1 rounded-lg">
-                          {car.transmission}
-                        </span>
-                        <span className="bg-gray-100 text-gray-700 text-[10px] uppercase font-bold px-2.5 py-1 rounded-lg">
-                          {car.fuelType || 'Petrol'}
-                        </span>
-                        <span className="bg-gray-100 text-gray-700 text-[10px] uppercase font-bold px-2.5 py-1 rounded-lg">
-                          Local Owner Vetted
-                        </span>
-                      </div>
-
-                      {/* Vetted Owner Reference details */}
-                      <div className="bg-gray-50 border border-gray-100 rounded-2xl p-3.5 my-3 flex flex-col gap-1.5">
-                        <div className="flex justify-between items-center text-xs">
-                          <span className="text-gray-400 font-medium">Vetted Landlord:</span>
-                          <span className="font-extrabold text-gray-800 flex items-center gap-1">
-                            <ShieldCheck className="w-3.5 h-3.5 text-green-600 shrink-0" />
-                            {car.ownerName || 'Verified Partner'}
-                          </span>
-                        </div>
-                        {car.description && (
-                          <p className="text-[11px] text-gray-500 line-clamp-2 leading-relaxed border-t border-gray-200/60 pt-1.5 mt-1">
-                            {car.description}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Bottom Price & Contact Area */}
-                      <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
-                        <div>
-                          <div className="flex items-baseline gap-0.5 leading-none">
-                            <span className="text-xs font-black text-gray-400">PKR</span>
-                            <span className="text-lg sm:text-xl font-black text-gray-950 font-mono tracking-tight ml-0.5">{car.rentPrice}</span>
-                          </div>
-                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mt-1">Per {car.rentUnit}</span>
-                        </div>
-
-                        {/* Direct WhatsApp Call to Action */}
-                        <a 
-                          href={waUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="bg-[#25D366] hover:bg-[#128C7E] text-white px-4.5 py-2.5 rounded-xl font-extrabold text-xs uppercase tracking-wider flex items-center gap-1.5 transition shadow-lg shadow-green-100 cursor-pointer transform hover:scale-102 active:scale-98"
-                          title="Contact owner on WhatsApp"
-                        >
-                          <svg className="w-4 h-4 fill-white text-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.455 5.703 1.455h.008c6.56 0 11.895-5.335 11.898-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                          </svg>
-                          <span>WhatsApp</span>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+              {filteredCars.map(car => (
+                <MarketplaceCarCard key={car.id} car={car} waUrl={getWhatsAppLink(car)} />
+              ))}
             </div>
           )}
         </div>
