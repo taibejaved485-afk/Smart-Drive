@@ -411,7 +411,7 @@ export default function ServicesPage() {
                 <div className="w-10 h-10 bg-red-50 text-red-700 rounded-xl flex items-center justify-center font-extrabold text-sm mb-4">
                   01
                 </div>
-                <h4 className="text-lg font-black text-slate-900 mb-2">Pristine Verification</h4>
+                <h4 className="text-lg font-black text-slate-900 mb-2">Register Your Vehicle</h4>
                 <p className="text-xs text-slate-500 leading-relaxed font-semibold">
                   List your car by keying in model, pictures, and official documents. Our executive squad verifies your files instantly.
                 </p>
@@ -423,7 +423,7 @@ export default function ServicesPage() {
                 <div className="w-10 h-10 bg-red-50 text-red-700 rounded-xl flex items-center justify-center font-extrabold text-sm mb-4">
                   02
                 </div>
-                <h4 className="text-lg font-black text-slate-900 mb-2">Inspection Check</h4>
+                <h4 className="text-lg font-black text-slate-900 mb-2">Trusted Verification</h4>
                 <p className="text-xs text-slate-500 leading-relaxed font-semibold">
                   We check your vehicle mechanical health, AC function, and suspension parameters to secure official premium certifications.
                 </p>
@@ -435,7 +435,7 @@ export default function ServicesPage() {
                 <div className="w-10 h-10 bg-red-50 text-red-700 rounded-xl flex items-center justify-center font-extrabold text-sm mb-4">
                   03
                 </div>
-                <h4 className="text-lg font-black text-slate-900 mb-2">Live Matching</h4>
+                <h4 className="text-lg font-black text-slate-900 mb-2">Receive Bookings</h4>
                 <p className="text-xs text-slate-500 leading-relaxed font-semibold">
                   Your car sits live on Faisalabad's highest traffic rental page. Booking requests flow instantly to your registered WhatsApp.
                 </p>
@@ -447,7 +447,7 @@ export default function ServicesPage() {
                 <div className="w-10 h-10 bg-red-50 text-red-700 rounded-xl flex items-center justify-center font-extrabold text-sm mb-4">
                   04
                 </div>
-                <h4 className="text-lg font-black text-slate-900 mb-2">Secure Earnings</h4>
+                <h4 className="text-lg font-black text-slate-900 mb-2">Guaranteed Earnings</h4>
                 <p className="text-xs text-slate-500 leading-relaxed font-semibold">
                   Earn up to PKR 150,000/month. Enjoy guaranteed security deposits, clear legal contracts, and robust tracing checks.
                 </p>

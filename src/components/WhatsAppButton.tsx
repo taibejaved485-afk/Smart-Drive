@@ -1,29 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 export default function WhatsAppButton() {
-  const [showTooltip, setShowTooltip] = useState(true);
 
   // WhatsApp link using the requested phone number 03097666928 in international format (923097666928)
   const whatsappUrl = 'https://wa.me/923097666928?text=Assalam%20o%20Alaikum%20GoDriveify%2C%20I%2520want%2520to%2520know%2520more%2520about%252520your%2520driving%2520programs%2520and%2520car%2520rental%2520services.';
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 font-sans pointer-events-none">
-      {/* Tooltip text bubble */}
-      {showTooltip && (
-        <div className="bg-white text-gray-900 border border-gray-150 px-4 py-2.5 rounded-2xl shadow-lg shadow-gray-200/50 flex items-center gap-2 pointer-events-auto animate-fade-in text-xs sm:text-sm font-bold border-l-4 border-l-green-500 relative">
-          <span>Chat on WhatsApp!</span>
-          <button 
-            type="button"
-            onClick={() => setShowTooltip(false)}
-            className="text-gray-400 hover:text-gray-600 font-extrabold pb-0.5 ml-1 select-none cursor-pointer"
-            title="Dismiss tool-tip"
-          >
-            ×
-          </button>
-          {/* Caret arrow on the right */}
-          <div className="absolute right-[-6px] top-1/2 -translate-y-1/2 w-3 h-3 bg-white border-t border-r border-gray-150 rotate-45" />
-        </div>
-      )}
 
       {/* Pulsing floating green button anchor */}
       <a

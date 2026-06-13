@@ -47,6 +47,21 @@ const courses = [
     image: 'https://trainingdrivingschool.pk/wp-content/uploads/2025/02/download-1-1.jpeg',
     badgeBg: 'bg-green-500/10 text-green-400 border border-green-500/20',
     link: '/pricing'
+  },
+  {
+    title: "Road Sign Test",
+    badge: "Essential Knowledge",
+    desc: "Master all road signs and traffic markings. Our comprehensive guide ensures you understand every rule of the road for a safe driving experience.",
+    duration: "Quick 2-3 Hrs Workshop",
+    features: [
+      "Comprehensive sign identification",
+      "Traffic rules & markings mastery",
+      "Interactive quizzes",
+      "Exam-readiness training"
+    ],
+    image: 'https://i.pinimg.com/736x/25/e7/a2/25e7a288c9fd2d3dd83056fa2ea0b8aa.jpg',
+    badgeBg: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
+    link: '/pricing'
   }
 ];
 
@@ -75,9 +90,10 @@ export default function Lessons() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-sans font-black leading-tight tracking-tight text-white mb-5"
+            className="text-2xl md:text-4xl lg:text-5xl font-sans font-black leading-tight tracking-tight text-white mb-5"
           >
-            Our Driving Course Classes <br className="hidden md:block"/> For All Skill Levels
+            Master the Road at Any Age. <br className="hidden md:block"/>
+            Because It's Never Too Late to Take the Wheel.
           </motion.h2>
           
           <motion.p
@@ -92,7 +108,7 @@ export default function Lessons() {
         </div>
         
         {/* Courses Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {courses.map((course, i) => (
             <motion.div 
               key={i}

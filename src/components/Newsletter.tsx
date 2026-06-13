@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Mail, CheckCircle, Sparkles, Send } from 'lucide-react';
 
@@ -6,6 +6,18 @@ export default function Newsletter() {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [headingText, setHeadingText] = useState("");
+  const targetHeading = "Join Smart Drive Insights";
+
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      setHeadingText(targetHeading.slice(0, i + 1));
+      i++;
+      if (i >= targetHeading.length) clearInterval(interval);
+    }, 50);
+    return () => clearInterval(interval);
+  }, []);
 
   // Email check
   const validateEmail = (val: string) => {
@@ -47,8 +59,20 @@ export default function Newsletter() {
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" id="newsletter-subscription">
-      <div className="bg-white border border-slate-100 rounded-3xl p-8 sm:p-12 shadow-xl shadow-slate-100/40 relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8">
+      <style>{`
+        @keyframes travel-rectangle-newsletter {
+          0%, 100% { top: -10px; left: -10px; }
+          25% { top: -10px; left: calc(100% - 6px); }
+          50% { top: calc(100% - 6px); left: calc(100% - 6px); }
+          75% { top: calc(100% - 6px); left: -10px; }
+        }
+        .animate-travel-rectangle-newsletter { animation: travel-rectangle-newsletter 6s linear infinite; }
+      `}</style>
+      <div className="bg-white border-2 border-red-500 rounded-3xl p-8 sm:p-12 shadow-xl shadow-slate-100/40 relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8 group">
         
+        {/* Rectangular Red Dot */}
+        <div className="absolute w-4 h-4 bg-red-600 rounded-full shadow-[0_0_15px_#dc2626] animate-travel-rectangle-newsletter z-0" />
+
         {/* Subtle Decorative Ambient Background Effects */}
         <div className="absolute top-0 right-0 w-80 h-80 bg-red-50/40 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-slate-50 rounded-full blur-2xl pointer-events-none" />
@@ -59,7 +83,7 @@ export default function Newsletter() {
             <Sparkles className="w-3.5 h-3.5" /> SMART DRIVE INSIGHTS
           </span>
           <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-snug mb-3">
-            Join Smart Drive Insights
+            {headingText}
           </h3>
           <p className="text-slate-500 text-xs sm:text-sm font-medium leading-relaxed">
             Get professional defensive road tips, direct car listing updates, active local Faisalabad driver guidelines, and exclusive passive-income insights sent directly to you. No spam, ever.

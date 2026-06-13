@@ -113,7 +113,17 @@ export default function ContactPage() {
 
 
       {/* Elegant Hero Header Banner */}
-      <section className="bg-white border-b border-gray-200 py-20 relative overflow-hidden">
+      <section className="relative py-24 sm:py-32 overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://images.unsplash.com/photo-1449965408869-eaa3f7221319?auto=format&fit=crop&q=80&w=2000" 
+            alt="Driving background" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-white/95" /> {/* White overlay for readability */}
+        </div>
+
         {/* Background Decorative Soft Gradients */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-red-50 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-gray-100 rounded-full blur-2xl pointer-events-none" />
@@ -161,7 +171,7 @@ export default function ContactPage() {
                 
                 <div className="space-y-6">
                   {/* Address */}
-                  <div className="flex gap-4 items-start">
+                  <div className="flex gap-4 items-start p-4 rounded-2xl transition-all duration-300 hover:bg-gray-50 border border-transparent hover:border-gray-100">
                     <div className="p-3 bg-red-50 text-red-650 rounded-2xl border border-red-100 shrink-0">
                       <MapPin className="w-6 h-6" />
                     </div>
@@ -174,7 +184,7 @@ export default function ContactPage() {
                   </div>
 
                   {/* Phone */}
-                  <div className="flex gap-4 items-start">
+                  <div className="flex gap-4 items-start p-4 rounded-2xl transition-all duration-300 hover:bg-gray-50 border border-transparent hover:border-gray-100">
                     <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl border border-blue-100 shrink-0">
                       <Phone className="w-6 h-6" />
                     </div>
@@ -188,7 +198,7 @@ export default function ContactPage() {
                   </div>
 
                   {/* Email */}
-                  <div className="flex gap-4 items-start">
+                  <div className="flex gap-4 items-start p-4 rounded-2xl transition-all duration-300 hover:bg-gray-50 border border-transparent hover:border-gray-100">
                     <div className="p-3 bg-green-50 text-green-600 rounded-2xl border border-green-100 shrink-0">
                       <Mail className="w-6 h-6" />
                     </div>
@@ -274,7 +284,7 @@ export default function ContactPage() {
                             value={formData.name}
                             onChange={(e) => setFormData({...formData, name: e.target.value})}
                             placeholder="Muhammad Ali" 
-                            className="w-full bg-gray-50 border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 rounded-xl px-4 py-3.5 focus:outline-none text-gray-900 text-sm transition-all"
+                            className="w-full bg-gray-50 border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 rounded-xl px-4 py-3.5 focus:outline-none text-gray-900 text-sm transition-all hover:border-gray-400 focus:shadow-md"
                           />
                         </div>
                         <div>
@@ -287,7 +297,7 @@ export default function ContactPage() {
                             value={formData.phone}
                             onChange={(e) => setFormData({...formData, phone: e.target.value})}
                             placeholder="0300-1234567" 
-                            className="w-full bg-gray-50 border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 rounded-xl px-4 py-3.5 focus:outline-none text-gray-900 text-sm transition-all"
+                            className="w-full bg-gray-50 border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 rounded-xl px-4 py-3.5 focus:outline-none text-gray-900 text-sm transition-all hover:border-gray-400 focus:shadow-md"
                           />
                         </div>
                       </div>
@@ -302,7 +312,7 @@ export default function ContactPage() {
                           value={formData.email}
                           onChange={(e) => setFormData({...formData, email: e.target.value})}
                           placeholder="student@gmail.com" 
-                          className="w-full bg-gray-50 border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 rounded-xl px-4 py-3.5 focus:outline-none text-gray-900 text-sm transition-all"
+                          className="w-full bg-gray-50 border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 rounded-xl px-4 py-3.5 focus:outline-none text-gray-900 text-sm transition-all hover:border-gray-400 focus:shadow-md"
                         />
                       </div>
 
@@ -314,7 +324,7 @@ export default function ContactPage() {
                           <select 
                             value={formData.course}
                             onChange={(e) => setFormData({...formData, course: e.target.value})}
-                            className="w-full bg-gray-50 border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 rounded-xl px-4 py-3.5 appearance-none focus:outline-none text-gray-950 text-sm transition-all"
+                            className="w-full bg-gray-50 border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 rounded-xl px-4 py-3.5 appearance-none focus:outline-none text-gray-950 text-sm transition-all hover:border-gray-400 focus:shadow-md"
                           >
                             {courses.map((course, idx) => (
                               <option key={idx} value={course}>
@@ -337,14 +347,14 @@ export default function ContactPage() {
                           value={formData.message}
                           onChange={(e) => setFormData({...formData, message: e.target.value})}
                           placeholder="Write down any requests such as pick/drop timings, manual or automatic transmissions, or specific training parameters..." 
-                          className="w-full bg-gray-50 border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 rounded-xl px-4 py-3.5 focus:outline-none text-gray-900 text-sm transition-all resize-none"
+                          className="w-full bg-gray-50 border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 rounded-xl px-4 py-3.5 focus:outline-none text-gray-900 text-sm transition-all resize-none hover:border-gray-400 focus:shadow-md"
                         ></textarea>
                       </div>
 
                       <button 
                         type="submit" 
                         disabled={loading}
-                        className="w-full bg-red-650 hover:bg-red-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-red-200 active:scale-[0.99] transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-wider disabled:opacity-75 cursor-pointer"
+                        className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-red-200 active:scale-[0.99] hover:scale-[1.01] transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-wider disabled:opacity-75 cursor-pointer"
                       >
                         {loading ? (
                           <span className="flex items-center gap-2">

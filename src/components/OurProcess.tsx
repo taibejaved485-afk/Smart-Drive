@@ -38,9 +38,9 @@ export default function OurProcess() {
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-6xl font-bold font-display"
+            className="text-3xl sm:text-4xl md:text-5xl font-bold font-display"
           >
-            Steps To Get Your Driving Licence With Us
+            How to Earn Your Driving Licence With Us?
           </motion.h2>
         </div>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, FormEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Phone, Car, Plus, Check, ChevronRight, User, ShieldCheck, Mail, Info, UploadCloud, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -32,7 +32,7 @@ const PRESET_CAR_IMAGE_OPTIONS = [
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [showListCarModal, setShowListCarModal] = useState(false);
+  const [modalType, setModalType] = useState<'Learning' | 'Rent' | 'Sale' | null>(null);
   const [step, setStep] = useState(1);
   const [submissionComplete, setSubmissionComplete] = useState(false);
 
@@ -40,7 +40,7 @@ export default function Navbar() {
     const handleOpenListing = () => {
       setStep(1);
       setSubmissionComplete(false);
-      setShowListCarModal(true);
+      setModalType('Rent');
     };
     window.addEventListener('open-listing-modal', handleOpenListing);
     return () => window.removeEventListener('open-listing-modal', handleOpenListing);
@@ -64,6 +64,8 @@ export default function Navbar() {
     cnicDoc: '',
     registrationDoc: ''
   });
+
+  const location = useLocation();
 
   const navLinks = [
     { name: 'Home', path: '/' },
@@ -168,7 +170,7 @@ export default function Navbar() {
   };
 
   const resetListingForm = () => {
-    setShowListCarModal(false);
+    setModalType(null);
     setSubmissionComplete(false);
     setStep(1);
     setFormData({
@@ -248,30 +250,67 @@ export default function Navbar() {
             </Link>
             
             <div className="hidden lg:flex space-x-6 font-sans font-medium text-sm text-gray-700">
-              {navLinks.map(link => (
-                <Link key={link.name} to={link.path} className="hover:text-red-600 transition tracking-wide text-uppercase">{link.name.toUpperCase()}</Link>
-              ))}
+              {navLinks.map(link => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <Link 
+                    key={link.name} 
+                    to={link.path} 
+                    className={`transition tracking-wide text-uppercase pb-1 ${isActive ? 'text-red-600 border-b-2 border-red-600' : 'hover:text-red-600'}`}
+                  >
+                    {link.name.toUpperCase()}
+                  </Link>
+                );
+              })}
             </div>
 
             <div className="hidden lg:flex items-center gap-3">
-              <button 
-                onClick={() => {
-                  setStep(1);
-                  setSubmissionComplete(false);
-                  setShowListCarModal(true);
-                }}
-                className="flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-750 hover:to-red-800 text-white px-5 py-2.5 rounded-xl font-bold transition shadow-md text-xs uppercase tracking-wider cursor-pointer transform hover:scale-102 active:scale-98"
-                type="button"
-                id="list-car-nav-btn"
-              >
-                <Car className="w-4 h-4" /> List Your Car / Earn with Us
-              </button>
+              <div className="relative group">
+                <button 
+                  className="flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-750 hover:to-red-800 text-white px-5 py-2.5 rounded-xl font-bold transition shadow-md text-xs uppercase tracking-wider cursor-pointer transform hover:scale-102 active:scale-98"
+                  type="button"
+                >
+                  <Plus className="w-4 h-4" /> APPLY NOW
+                </button>
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden hidden group-hover:block z-50">
+                  <button 
+                    onClick={() => {
+                      setStep(1);
+                      setSubmissionComplete(false);
+                      setModalType('Learning');
+                    }}
+                    className="block w-full text-left px-4 py-3 text-xs font-bold hover:bg-gray-50 uppercase tracking-wider"
+                  >
+                    Apply For Learning
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setStep(1);
+                      setSubmissionComplete(false);
+                      setModalType('Rent');
+                    }}
+                    className="block w-full text-left px-4 py-3 text-xs font-bold hover:bg-gray-50 uppercase tracking-wider"
+                  >
+                    Rent Your Car
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setStep(1);
+                      setSubmissionComplete(false);
+                      setModalType('Sale');
+                    }}
+                    className="block w-full text-left px-4 py-3 text-xs font-bold hover:bg-gray-50 uppercase tracking-wider"
+                  >
+                    Sale Your Car
+                  </button>
+                </div>
+              </div>
               <button 
                 onClick={() => { window.location.href = 'tel:03097666928'; }}
                 className="flex items-center gap-2 text-gray-800 bg-gray-100 hover:bg-gray-200 px-5 py-2.5 rounded-xl font-bold transition text-xs uppercase tracking-wider cursor-pointer"
                 type="button"
               >
-                <Phone className="w-4 h-4" /> 03097666928
+                <Phone className="w-4 h-4" /> Call Support
               </button>
             </div>
 
@@ -282,29 +321,58 @@ export default function Navbar() {
         </div>
         {isOpen && (
           <div className="lg:hidden bg-white px-4 pt-2 pb-5 space-y-3.5 border-t font-sans text-sm font-medium text-gray-700">
-            {navLinks.map(link => (
-              <Link key={link.name} to={link.path} onClick={() => setIsOpen(false)} className="block hover:text-red-600 border-b border-gray-50 pb-1.5">{link.name}</Link>
-            ))}
+            {navLinks.map(link => {
+              const isActive = location.pathname === link.path;
+              return (
+                <Link 
+                  key={link.name} 
+                  to={link.path} 
+                  onClick={() => setIsOpen(false)} 
+                  className={`block pb-1.5 border-b ${isActive ? 'text-red-600 border-red-600' : 'hover:text-red-600 border-gray-50'}`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
             <div className="flex flex-col gap-2 pt-2">
-              <button 
-                onClick={() => {
-                  setIsOpen(false);
-                  setStep(1);
-                  setSubmissionComplete(false);
-                  setShowListCarModal(true);
-                }}
-                className="w-full flex items-center justify-center gap-2 bg-red-650 hover:bg-red-700 text-white py-3 rounded-xl font-bold transition text-xs uppercase tracking-wider cursor-pointer"
-                type="button"
-              >
-                <Car className="w-4.5 h-4.5" /> List Your Car
-              </button>
-              <button 
-                onClick={() => { window.location.href = 'tel:03097666928'; }}
-                className="w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-xl font-bold transition text-xs uppercase tracking-wider cursor-pointer"
-                type="button"
-              >
-                <Phone className="w-4.5 h-4.5" /> Call support
-              </button>
+              <div className="space-y-2">
+                <button 
+                  onClick={() => {
+                    setIsOpen(false);
+                    setStep(1);
+                    setSubmissionComplete(false);
+                    setModalType('Learning');
+                  }}
+                  className="w-full flex items-center justify-center gap-2 bg-red-650 hover:bg-red-700 text-white py-3 rounded-xl font-bold transition text-xs uppercase tracking-wider cursor-pointer"
+                  type="button"
+                >
+                  Apply For Learning
+                </button>
+                <button 
+                  onClick={() => {
+                    setIsOpen(false);
+                    setStep(1);
+                    setSubmissionComplete(false);
+                    setModalType('Rent');
+                  }}
+                  className="w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-xl font-bold transition text-xs uppercase tracking-wider cursor-pointer"
+                  type="button"
+                >
+                  Rent Your Car
+                </button>
+                <button 
+                  onClick={() => {
+                    setIsOpen(false);
+                    setStep(1);
+                    setSubmissionComplete(false);
+                    setModalType('Sale');
+                  }}
+                  className="w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-xl font-bold transition text-xs uppercase tracking-wider cursor-pointer"
+                  type="button"
+                >
+                  Sale Your Car
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -312,7 +380,7 @@ export default function Navbar() {
 
       {/* MULTI-STEP CAR OWNER REGISTRATION DIALOG MODAL */}
       <AnimatePresence>
-        {showListCarModal && (
+        {modalType && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-950/70 backdrop-blur-sm overflow-y-auto">
             <motion.div 
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
@@ -327,8 +395,12 @@ export default function Navbar() {
                     <Car className="w-6 h-6" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-extrabold text-gray-900 tracking-tight">Onboard Your Vehicle</h2>
-                    <p className="text-xs text-gray-500 font-medium">Earn daily rent by listing your inactive car</p>
+                    <h2 className="text-xl font-extrabold text-gray-900 tracking-tight">
+                      {modalType === 'Learning' ? 'Apply For Learning' : modalType === 'Rent' ? 'Rent Your Car' : 'Sale Your Car'}
+                    </h2>
+                    <p className="text-xs text-gray-500 font-medium">
+                      {modalType === 'Learning' ? 'Start your driving journey' : modalType === 'Rent' ? 'Earn daily rent by listing your inactive car' : 'List your car for sale'}
+                    </p>
                   </div>
                 </div>
                 <button 

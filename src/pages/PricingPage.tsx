@@ -1,9 +1,9 @@
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import CTABanner from '../components/CTABanner';
-import { CheckCircle2, ChevronDown } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { CheckCircle2, ChevronDown, Check, MessageSquare } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
 import Reviews from '../components/Reviews';
 import OurProcess from '../components/OurProcess';
 import SEO from '../components/SEO';
@@ -24,6 +24,86 @@ interface PricingCourse {
 export default function PricingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [courses, setCourses] = useState<PricingCourse[]>([]);
+  const contactFormRef = useRef<HTMLDivElement>(null);
+
+  // Form State
+  const [formData, setFormData] = useState({
+    fullName: '',
+    fatherName: '',
+    email: '',
+    whatsappNumber: '',
+    inquiryType: 'Learn Driving / Course Inquiry',
+    message: ''
+  });
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [submissionTicketId, setSubmissionTicketId] = useState('');
+
+  // Smooth scroll to inquiry form
+  const scrollToContact = (courseTitle: string, courseFee: string) => {
+    setFormData(prev => ({
+      ...prev,
+      inquiryType: 'Learn Driving / Course Inquiry',
+      message: `Hi GoDriveify Team, I am extremely interested in enrolling in your "${courseTitle}" driving program which costs PKR ${parseInt(courseFee).toLocaleString()}/-. Please guide me on scheduling daily slots.`
+    }));
+    
+    if (contactFormRef.current) {
+      contactFormRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
+  // Handle inquiry submit
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.fullName || !formData.fatherName || !formData.whatsappNumber) {
+      alert('Please fill out all mandatory fields registered with the asterisk *');
+      return;
+    }
+
+    const ticketId = 'GD' + Math.floor(100000 + Math.random() * 900000).toString();
+    setSubmissionTicketId(ticketId);
+
+    // Persist inquiry in localStorage safely
+    try {
+      const stored = localStorage.getItem('contact_inquiries');
+      const inquiriesList = stored ? JSON.parse(stored) : [];
+      inquiriesList.unshift({
+        ticketId,
+        ...formData,
+        timestamp: new Date().toISOString()
+      });
+      localStorage.setItem('contact_inquiries', JSON.stringify(inquiriesList));
+      window.dispatchEvent(new Event('inquiry_submitted'));
+    } catch (err) {
+      console.error(err);
+    }
+
+    setFormSubmitted(true);
+  };
+
+  // Reset form
+  const handleResetForm = () => {
+    setFormSubmitted(false);
+    setFormData({
+      fullName: '',
+      fatherName: '',
+      email: '',
+      whatsappNumber: '',
+      inquiryType: 'Learn Driving / Course Inquiry',
+      message: ''
+    });
+  };
+
+  // Resume form on WhatsApp
+  const handleWhatsAppRedirect = () => {
+    const textStr = `*GoDriveify Service Ticket: ${submissionTicketId}*\n\n` + 
+                    `*Name:* ${formData.fullName}\n` +
+                    `*Father's Name:* ${formData.fatherName}\n` +
+                    `*Inquiry:* ${formData.inquiryType}\n` +
+                    `*WhatsApp:* ${formData.whatsappNumber}\n` +
+                    `*Message:* ${formData.message}`;
+    const encoded = encodeURIComponent(textStr);
+    window.open(`https://wa.me/923097666928?text=${encoded}`, '_blank');
+  };
 
   useEffect(() => {
     const syncPricingCourses = () => {
@@ -212,13 +292,7 @@ export default function PricingPage() {
                         </div>
                         
                         <button 
-                            onClick={() => {
-                                if ('scrollRestoration' in history) {
-                                    history.scrollRestoration = 'manual';
-                                }
-                                window.scrollTo(0, 0);
-                                window.location.reload();
-                            }}
+                            onClick={() => scrollToContact(pkg.courseTitle, pkg.courseFee)}
                             className="w-full text-red-600 border-2 border-red-600 py-3 rounded-xl font-bold hover:bg-red-600 hover:text-white transition uppercase tracking-widest flex justify-center items-center gap-2 cursor-pointer font-sans"
                         >
                             GET STARTED <span className="text-lg">→</span>
@@ -248,6 +322,183 @@ export default function PricingPage() {
             </div>
             <Reviews />
             <OurProcess />
+        </div>
+      </section>
+
+      {/* BOTTOM INQUIRY FORM */}
+      <section id="contact" ref={contactFormRef} className="py-24 bg-slate-50 border-t border-slate-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <span className="inline-flex items-center gap-1.5 bg-red-50 border border-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
+              <MessageSquare className="w-3.5 h-3.5 text-red-700" /> Corporate Inquiry Desk
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 leading-none mb-4">
+              Select Your Service Interest
+            </h2>
+            <p className="text-slate-500 font-medium text-sm sm:text-base leading-relaxed">
+              Fill in the form below. Our customer concierge matches your intent within 30 minutes to route you directly into our secure pipeline.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-3xl border border-slate-200/60 p-6 sm:p-10 shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-red-700" />
+            
+            <AnimatePresence mode="wait">
+              {!formSubmitted ? (
+                <motion.form 
+                  key="form"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  onSubmit={handleFormSubmit}
+                  className="space-y-6"
+                >
+                  <div className="grid sm:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-2">
+                        Full Name *
+                      </label>
+                      <input 
+                        required
+                        type="text" 
+                        placeholder="e.g. Muhammad Raza" 
+                        className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition text-sm font-medium"
+                        value={formData.fullName}
+                        onChange={e => setFormData({ ...formData, fullName: e.target.value })}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-2">
+                        Father's Name *
+                      </label>
+                      <input 
+                        required
+                        type="text" 
+                        placeholder="e.g. Malik Muhammad Ilyas" 
+                        className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition text-sm font-medium"
+                        value={formData.fatherName}
+                        onChange={e => setFormData({ ...formData, fatherName: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-2">
+                        Email Address (Optional)
+                      </label>
+                      <input 
+                        type="email" 
+                        placeholder="e.g. name@domain.com" 
+                        className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition text-sm font-medium"
+                        value={formData.email}
+                        onChange={e => setFormData({ ...formData, email: e.target.value })}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-2">
+                        WhatsApp Number *
+                      </label>
+                      <input 
+                        required
+                        type="tel" 
+                        placeholder="e.g. 03097666928" 
+                        className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition text-sm font-mono font-bold"
+                        value={formData.whatsappNumber}
+                        onChange={e => setFormData({ ...formData, whatsappNumber: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  {/* MANDATORY STYLED HTML DROPDOWN FIELD INQUIRY TYPE */}
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-2">
+                      Inquiry Type *
+                    </label>
+                    <select 
+                      required
+                      className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none bg-white transition text-xs sm:text-sm font-extrabold text-slate-900 cursor-pointer"
+                      value={formData.inquiryType}
+                      onChange={e => {
+                        const val = e.target.value;
+                        setFormData({ ...formData, inquiryType: val });
+                      }}
+                    >
+                      <option value="Learn Driving / Course Inquiry">Learn Driving / Course Inquiry</option>
+                      <option value="Rent My Vehicle out">Rent My Vehicle out</option>
+                      <option value="List My Vehicle for Selling">List My Vehicle for Selling</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-2">
+                      Message / Special Queries *
+                    </label>
+                    <textarea 
+                      required
+                      rows={4} 
+                      placeholder="Type details such as desired timing, transmission mode, vehicle configuration registration year or initial sale demand value..." 
+                      className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition text-sm font-medium resize-none leading-relaxed"
+                      value={formData.message}
+                      onChange={e => setFormData({ ...formData, message: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs font-semibold leading-relaxed text-slate-500 flex gap-2.5 items-start">
+                    <CheckCircle2 className="w-4.5 h-4.5 text-red-700 shrink-0 mt-0.5" />
+                    <p>
+                      By submitting or listing, you authorize GoDriveify support to review your registered assets and reach out directly at the WhatsApp number specified under Pakistani regulatory biometrics checks.
+                    </p>
+                  </div>
+
+                  <button 
+                    type="submit"
+                    className="w-full bg-red-700 hover:bg-red-800 text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors cursor-pointer shadow-md"
+                  >
+                    Submit Corporate Inquiry
+                  </button>
+                </motion.form>
+              ) : (
+                <motion.div 
+                  key="success"
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="text-center py-8 flex flex-col items-center justify-center"
+                >
+                  <div className="w-16 h-16 bg-green-50 border border-green-200 text-green-600 rounded-full flex items-center justify-center mb-6">
+                    <Check className="w-8 h-8 stroke-[3]" />
+                  </div>
+                  
+                  <h3 className="text-2xl font-black text-slate-900 tracking-tight">Inquiry Registered Successfully!</h3>
+                  <p className="text-xs text-slate-500 mt-2 font-bold uppercase tracking-widest">
+                    Your Ticket ID is: <span className="text-red-700 font-mono font-extrabold">{submissionTicketId}</span>
+                  </p>
+
+                  <p className="text-slate-650 text-xs sm:text-sm font-semibold max-w-md mx-auto mt-4 leading-relaxed bg-slate-50 p-4 border rounded-2xl">
+                    We have logged your request under <strong className="text-slate-900 font-black">"{formData.inquiryType}"</strong>. Our Faisalabad support agents are prepping custom schedules or evaluations for you.
+                  </p>
+
+                  <div className="mt-8 flex flex-wrap gap-4 justify-center">
+                    <button 
+                      onClick={handleWhatsAppRedirect}
+                      className="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3.5 rounded-xl text-xs uppercase tracking-wider transition-colors cursor-pointer shadow-md"
+                    >
+                      Resume On WhatsApp Instantly
+                    </button>
+                    
+                    <button 
+                      onClick={handleResetForm}
+                      className="bg-slate-200 hover:bg-slate-300 text-slate-750 font-bold px-6 py-3.5 rounded-xl text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                    >
+                      Submit Another Inquiry
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </section>
 

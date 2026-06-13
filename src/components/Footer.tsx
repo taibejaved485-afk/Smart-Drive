@@ -3,11 +3,6 @@ import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin, Clock, Arro
 import { Link } from 'react-router-dom';
 
 export default function Footer() {
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert('Thank you for subscribing to our newsletter tips!');
-  };
-
   return (
     <footer className="bg-gray-950 text-gray-400 pt-24 pb-12 relative overflow-hidden border-t border-white/5">
       {/* Decorative Lights & Shadows */}
@@ -18,7 +13,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         
         {/* Main Footer Links & Info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-16">
           
           {/* Brand Identity Column */}
           <div className="space-y-6">
@@ -105,61 +100,22 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Practice & Work Hours */}
+          {/* Contact Details */}
           <div className="space-y-5">
             <h4 className="text-white font-extrabold tracking-wider uppercase text-xs flex items-center gap-2">
-              <span className="w-1.5 h-1.5 bg-red-500 rounded-full" /> Practice Hours
+              <span className="w-1.5 h-1.5 bg-red-500 rounded-full" /> Contact Us
             </h4>
-            <div className="bg-white/5 border border-white/5 p-4 rounded-2xl space-y-3 text-xs leading-relaxed text-gray-400">
-              <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                <span className="font-bold text-gray-300">Mon - Sat</span>
-                <span className="text-white font-mono">08:00 AM - 06:00 PM</span>
-              </div>
-              <div className="flex items-center justify-between pb-1">
-                <span className="font-bold text-gray-300">Sunday</span>
-                <span className="text-red-400 uppercase font-bold">Closed (Emergency Only)</span>
-              </div>
-              <div className="text-[11px] text-gray-500 flex items-start gap-1 pb-1 pt-1">
-                <Clock className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
-                <span>Our schedules remain highly flexible for corporate drive lessons.</span>
-              </div>
-            </div>
-            
-            {/* Short Contact Coordination */}
-            <div className="space-y-2.5 text-xs">
+            <div className="space-y-2.5 text-xs pt-2">
               <p className="flex items-center gap-2 text-gray-400">
                 <Phone className="w-3.5 h-3.5 text-red-500" /> <span className="font-mono">0300 - 1115429</span>
               </p>
               <p className="flex items-center gap-2 text-gray-400">
-                <Mail className="w-3.5 h-3.5 text-red-500" /> <span>info@tds.edu.pk</span>
+                <Mail className="w-3.5 h-3.5 text-red-500" /> <span>info@godriveify.com</span>
               </p>
               <p className="flex items-center gap-2 text-gray-400">
                 <MapPin className="w-3.5 h-3.5 text-red-500" /> <span>Faisalabad, Pakistan</span>
               </p>
             </div>
-          </div>
-
-          {/* Premium Form Subscriptions info */}
-          <div className="space-y-5">
-            <h4 className="text-white font-extrabold tracking-wider uppercase text-xs flex items-center gap-2">
-              <span className="w-1.5 h-1.5 bg-red-500 rounded-full" /> Newsletter Signee
-            </h4>
-            <p className="text-sm leading-relaxed text-gray-500">
-              Receive safe driving advice, traffic regulatory updates, & license mock evaluation tests directly.
-            </p>
-            <form onSubmit={handleSubmit} className="space-y-2">
-              <div className="relative">
-                <input 
-                  type="email" 
-                  required
-                  placeholder="Enter email here"
-                  className="w-full bg-white/5 text-white border border-white/10 hover:border-white/20 p-3 rounded-xl focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none transition text-xs font-medium" 
-                />
-              </div>
-              <button className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl transition text-xs flex items-center justify-center gap-1">
-                Subscribe Updates <ArrowRight className="w-3 h-3" />
-              </button>
-            </form>
           </div>
 
         </div>

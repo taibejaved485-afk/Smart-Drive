@@ -16,7 +16,7 @@ export default function About() {
         <div className="mb-12">
           <p className="text-red-600 font-bold tracking-widest uppercase text-sm mb-2">About Us</p>
           <h2 className="text-4xl md:text-5xl font-display font-bold text-gray-900 leading-tight tracking-tight">
-            We Are Very Experienced, Trusted, Reliable And Professional Driving Course Right Now
+            We are your reliable, all-in-one platform for experienced and professional driving solutions.
           </h2>
         </div>
 
@@ -48,8 +48,8 @@ export default function About() {
 
             {/* Action Bar */}
             <div className="flex items-center justify-start">
-              <Link to="/about" className="flex items-center gap-2 border border-red-600 text-red-600 px-6 py-3 rounded-full font-bold hover:bg-red-600 hover:text-white transition shadow-sm hover:shadow-md">
-                MORE ABOUT US <ArrowRight className="w-4 h-4" />
+              <Link to="/pricing" className="flex items-center gap-2 border border-red-600 text-red-600 px-6 py-3 rounded-full font-bold hover:bg-red-600 hover:text-white transition shadow-sm hover:shadow-md">
+                APPLY NOW <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>

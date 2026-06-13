@@ -92,7 +92,7 @@ export default function AboutPage() {
         <div className="mb-12">
           <p className="text-red-600 font-bold tracking-widest uppercase text-sm mb-3">About Us</p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-gray-900 leading-tight tracking-tight max-w-4xl">
-            We Are Very Experienced, Trusted, Reliable And Professional Driving Course Right Now
+            We are your reliable, all-in-one platform for experienced and professional driving solutions.
           </h2>
         </div>
 
@@ -184,7 +184,7 @@ export default function AboutPage() {
             {/* Image Content */}
             <div className="relative">
               <img 
-                src="https://i.pinimg.com/236x/99/cf/dd/99cfdd5dcdb89fb7c604d572df8dcc38.jpg" 
+                src="https://i.pinimg.com/736x/4d/69/18/4d691812c12d4668009b98e812bf8692.jpg" 
                 alt="Driving school training session" 
                 referrerPolicy="no-referrer"
                 className="rounded-3xl shadow-xl w-full h-80 sm:h-[450px] object-cover"
