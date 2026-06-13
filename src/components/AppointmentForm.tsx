@@ -98,7 +98,7 @@ export default function AppointmentForm() {
                 </div>
                 <div>
                   <p className="text-[10px] uppercase font-bold tracking-wider text-gray-400">Our Email</p>
-                  <p className="font-semibold text-xs sm:text-sm text-white">trainingdrivingschool@gmail.com</p>
+                  <p className="font-semibold text-xs sm:text-sm text-white">info@godriveify.com</p>
                 </div>
               </div>
               <div className="flex items-center gap-4.5">
@@ -107,7 +107,7 @@ export default function AppointmentForm() {
                 </div>
                 <div>
                   <p className="text-[10px] uppercase font-bold tracking-wider text-gray-400">Our Phone</p>
-                  <p className="font-semibold text-xs sm:text-sm text-white">0300 - 1115429</p>
+                  <p className="font-semibold text-xs sm:text-sm text-white">03097666928</p>
                 </div>
               </div>
             </div>

@@ -107,7 +107,7 @@ export default function Footer() {
             </h4>
             <div className="space-y-2.5 text-xs pt-2">
               <p className="flex items-center gap-2 text-gray-400">
-                <Phone className="w-3.5 h-3.5 text-red-500" /> <span className="font-mono">0300 - 1115429</span>
+                <Phone className="w-3.5 h-3.5 text-red-500" /> <span className="font-mono">03097666928</span>
               </p>
               <p className="flex items-center gap-2 text-gray-400">
                 <Mail className="w-3.5 h-3.5 text-red-500" /> <span>info@godriveify.com</span>

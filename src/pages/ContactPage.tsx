@@ -23,8 +23,8 @@ export default function ContactPage() {
     "mainEntity": {
       "@type": "LocalBusiness",
       "name": "GoDriveify Driving School",
-      "telephone": "0300-1115429",
-      "email": "trainingdrivingschool@gmail.com",
+      "telephone": "03097666928",
+      "email": "info@godriveify.com",
       "hasMap": "https://maps.google.com/?q=GoDriveify+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan",
       "address": {
         "@type": "PostalAddress",
@@ -105,7 +105,7 @@ export default function ContactPage() {
     <div className="font-sans text-gray-800 bg-slate-50 min-h-screen flex flex-col justify-between selection:bg-red-650 selection:text-white">
       <SEO 
         title="Contact Us & Driving Course Registration | GoDriveify"
-        description="Connect with Faisalabad's top driving school. Book lessons, find our location on Jaranwala Road, call 0300-1115429, or submit our online registration form."
+        description="Connect with Faisalabad's top driving school. Book lessons, find our location on Jaranwala Road, call 03097666928, or submit our online registration form."
         keywords="contact driving school Faisalabad, register driving classes, female driving instructor booking, learn driving school address Pakistan"
         schema={contactSchema}
       />
@@ -207,7 +207,7 @@ export default function ContactPage() {
                       <div>
                         <span className="text-[10px] uppercase tracking-widest font-black text-slate-400 block mb-1">Direct Helpline</span>
                         <p className="text-slate-950 text-base sm:text-lg font-mono font-black tracking-tight scale-y-105">
-                          0300-1115429
+                          03097666928
                         </p>
                         <p className="text-xs text-slate-400 mt-0.5 font-semibold">Instant human dispatch • Mon - Sat</p>
                       </div>
@@ -221,7 +221,7 @@ export default function ContactPage() {
                       <div>
                         <span className="text-[10px] uppercase tracking-widest font-black text-slate-400 block mb-1">Encrypted Mailbox</span>
                         <p className="text-slate-700 text-sm sm:text-base font-mono font-bold">
-                          trainingdrivingschool@gmail.com
+                          info@godriveify.com
                         </p>
                       </div>
                     </div>

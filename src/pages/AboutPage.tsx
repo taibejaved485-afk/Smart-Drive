@@ -16,8 +16,8 @@ export default function AboutPage() {
     "publisher": {
       "@type": "LocalBusiness",
       "name": "GoDriveify Driving School",
-      "telephone": "0300-1115429",
-      "email": "trainingdrivingschool@gmail.com",
+      "telephone": "03097666928",
+      "email": "info@godriveify.com",
       "hasMap": "https://maps.google.com/?q=GoDriveify+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan",
       "address": {
         "@type": "PostalAddress",
