@@ -1,4 +1,4 @@
-const CACHE_NAME = 'smart-drive-v1';
+const CACHE_NAME = 'smart-drive-v4';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
