@@ -23,8 +23,12 @@ export default function About() {
         <div className="grid lg:grid-cols-2 gap-12 items-start">
           {/* Images Section */}
           <div className="grid grid-cols-2 gap-4">
-            <img src="https://i.pinimg.com/736x/a1/63/96/a1639624eb25cd6c5e373b87f7245cd5.jpg" alt="Driving Lesson 1" className="rounded-3xl shadow-2xl w-full h-80 sm:h-96 object-cover" />
-            <img src="https://i.pinimg.com/736x/a1/1a/e5/a11ae5071f90d92c3531cb1db6894d54.jpg" alt="Driving Lesson 2" className="rounded-3xl shadow-2xl w-full h-80 sm:h-96 object-cover sm:mt-16" />
+            <div className="rounded-3xl shadow-xl overflow-hidden h-80 sm:h-96 group transition-shadow duration-500 hover:shadow-2xl">
+              <img src="https://i.pinimg.com/736x/a1/63/96/a1639624eb25cd6c5e373b87f7245cd5.jpg" alt="Driving Lesson 1" className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110" />
+            </div>
+            <div className="rounded-3xl shadow-xl overflow-hidden h-80 sm:h-96 sm:mt-16 group transition-shadow duration-500 hover:shadow-2xl">
+              <img src="https://i.pinimg.com/736x/a1/1a/e5/a11ae5071f90d92c3531cb1db6894d54.jpg" alt="Driving Lesson 2" className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110" />
+            </div>
           </div>
 
           {/* Text Section */}
