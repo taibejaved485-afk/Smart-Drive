@@ -36,10 +36,10 @@ export default function About() {
             {/* Feature Grid */}
             <div className="grid sm:grid-cols-2 gap-8 mb-10">
               {features.map((feature, i) => (
-                <div key={i} className="flex gap-3">
+                <div key={i} className="flex gap-3 group cursor-default">
                   <CheckCircle2 className="w-6 h-6 text-red-600 flex-shrink-0" />
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-1">{feature.title}</h3>
+                    <h3 className="font-bold text-gray-900 mb-1 group-hover:text-red-600 transition-colors duration-300">{feature.title}</h3>
                     <p className="text-sm text-gray-600">{feature.desc}</p>
                   </div>
                 </div>

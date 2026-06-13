@@ -57,59 +57,17 @@
   </head>
   <body>
     <div id="root">
-      <!-- Fallback static content for Search Engines, LLMs and Web Crawlers when JavaScript is not executed -->
-      <header>
-        <h1>GoDriveify Driving School | Male & Female Instructors in Faisalabad</h1>
-        <p>Your premier driving academy in Pakistan offering professional, safe, and certified manual and automatic driving courses.</p>
-        <nav>
-          <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/about">About Us</a></li>
-            <li><a href="/programs">Driving Programs</a></li>
-            <li><a href="/pricing">Fees & Packages</a></li>
-            <li><a href="/faq">Questions & Answers</a></li>
-            <li><a href="/blog">Driving Blog & Tips</a></li>
-            <li><a href="/contact">Contact & Enrollment</a></li>
-          </ul>
-        </nav>
-      </header>
-      
-      <main>
-        <section>
-          <h2>Professional Manual &amp; Automatic Driving Classes</h2>
-          <p>Learn to drive with high confidence. We specialize in beginner-friendly car tutoring, road test preparation, defensive driving strategies, and license training on premium Honda Civic manual and automatic cars.</p>
-        </section>
-
-        <section>
-          <h2>Why Choose GoDriveify Fahrschule?</h2>
-          <ul>
-            <li><strong>Expert Male &amp; Female Instructors</strong>: Dedicated staff trained to assist nervous beginners and guide you patiently.</li>
-            <li><strong>Premium Training Vehicles</strong>: Practical sessions utilizing modern Honda Civic models with dual passenger control brakes for maximum safety.</li>
-            <li><strong>Affordable Course Pricing</strong>: All-inclusive packages starting from 25,000 PKR to turn you into a fully licensed driver.</li>
-            <li><strong>Comprehensive Course Curriculums</strong>: Covers road signs, highway rules, parallel parking, traffic safety regulations, and more.</li>
-          </ul>
-        </section>
-
-        <section>
-          <h2>Our Core Courses</h2>
-          <ul>
-            <li><strong>Manual Car Driving Course</strong> (Honda Civic Manual) - 10 Days comprehensive learning program.</li>
-            <li><strong>Automatic Car Driving Course</strong> (Honda Civic Automatic) - 10 Days specialized training sessions.</li>
-            <li><strong>Heavy Bike Riding Course</strong> - Expert coaching for motorbikes under certified instructors.</li>
-          </ul>
-        </section>
-
-        <section>
-          <h2>Contact GoDriveify Faisalabad</h2>
-          <p><strong>Phone:</strong> 0300-1115429</p>
-          <p><strong>Address:</strong> Main Jaranwala Road, Faisalabad, Punjab, Pakistan</p>
-          <p><strong>Opening Hours:</strong> Monday to Sunday, 06:00 AM - 08:00 PM</p>
-        </section>
-      </main>
-
-      <footer>
-        <p>&copy; 2026 GoDriveify Driving School Faisalabad. All Rights Reserved.</p>
-      </footer>
+      <!-- Visual Preloader -->
+      <div style="font-family: system-ui, -apple-system, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background-color: #f8fafc;">
+        <div style="width: 48px; height: 48px; border: 4px solid #fecaca; border-bottom-color: #dc2626; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 24px;"></div>
+        <h2 style="color: #0f172a; font-size: 24px; font-weight: 700; margin: 0; letter-spacing: -0.025em;">GoDriveify</h2>
+        <p style="color: #64748b; font-size: 14px; margin-top: 8px; font-weight: 500;">Starting your engine...</p>
+        <style>
+          @keyframes spin {
+            100% { transform: rotate(360deg); }
+          }
+        </style>
+      </div>
     </div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
