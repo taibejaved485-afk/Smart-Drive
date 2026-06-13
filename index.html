@@ -109,15 +109,26 @@
     </div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
+      // Safeguard: Unregister active service workers and clear stale caches in preview mode to prevent old plain-text cached shells from loading.
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(reg => {
-              console.log('[PWA] Service Worker registered scope:', reg.scope);
-            })
-            .catch(err => {
-              console.error('[PWA] Service Worker registration failed:', err);
-            });
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+          if (registrations.length > 0) {
+            for (let registration of registrations) {
+              registration.unregister().then(() => {
+                console.log('[PWA Cleanup] Unregistered active service worker');
+              });
+            }
+            if ('caches' in window) {
+              caches.keys().then(names => {
+                Promise.all(names.map(name => caches.delete(name))).then(() => {
+                  console.log('[PWA Cleanup] All service worker caches cleared');
+                  window.location.reload();
+                });
+              });
+            } else {
+              window.location.reload();
+            }
+          }
         });
       }
     </script>
