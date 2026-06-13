@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Coins, Clock, ShieldCheck, TrendingUp, Info } from 'lucide-react';
+import { Coins, ShieldCheck, TrendingUp, Info } from 'lucide-react';
 
 type CarType = 'Economy' | 'Sedan' | 'Luxury';
 
@@ -16,7 +16,35 @@ export default function EarningsCalculator() {
   };
 
   const currentRate = rates[carType];
-  const targetEarnings = currentRate * days;
+
+  // Calculate dynamic retention bonus based on days slider
+  let retentionBonus = 0;
+  let bonusBadge = null;
+  let bonusHelper = '';
+
+  if (days >= 1 && days <= 9) {
+    retentionBonus = 0;
+    bonusHelper = "Lock 10 days to unlock cash bonus";
+  } else if (days >= 10 && days <= 20) {
+    retentionBonus = 5000;
+    bonusHelper = "✨ Growth Tier Unlocked (+PKR 5,000)";
+    bonusBadge = (
+      <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-full text-[10px] font-extrabold tracking-wide">
+        ✨ Growth Tier Unlocked
+      </span>
+    );
+  } else if (days >= 21 && days <= 30) {
+    retentionBonus = 12000;
+    bonusHelper = "💎 Elite Partner Tier Unlocked (+PKR 12,000)";
+    bonusBadge = (
+      <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-1 rounded-full text-[10px] font-extrabold tracking-wide shadow-sm animate-pulse">
+        💎 Elite Partner Tier Unlocked
+      </span>
+    );
+  }
+
+  // Update total estimation output to include retention bonus
+  const targetEarnings = (currentRate * days) + retentionBonus;
 
   // Smooth dynamic count transition
   useEffect(() => {
@@ -46,32 +74,32 @@ export default function EarningsCalculator() {
   }, [targetEarnings]);
 
   return (
-    <div id="income-calculator-section" className="bg-slate-950 text-white rounded-3xl overflow-hidden border border-slate-800 shadow-2xl relative">
-      {/* Abstract background decorative amber glow */}
-      <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+    <div id="income-calculator-section" className="bg-white text-slate-900 rounded-3xl overflow-hidden border border-slate-100 shadow-xl relative font-sans">
+      {/* Abstract background decorative brand glows */}
+      <div className="absolute top-0 right-0 w-80 h-80 bg-red-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="p-6 sm:p-10 lg:p-12 relative z-10">
         <div className="max-w-3xl mx-auto text-center mb-10">
-          <span className="text-amber-500 font-extrabold tracking-widest text-xs uppercase bg-amber-950/60 border border-amber-500/30 px-3.5 py-1.5 rounded-full inline-flex items-center gap-1.5 mb-3">
-            <Coins className="w-3.5 h-3.5 text-amber-400" />
+          <span className="text-red-700 font-extrabold tracking-widest text-xs uppercase bg-red-50 border border-red-100 px-3.5 py-1.5 rounded-full inline-flex items-center gap-1.5 mb-3">
+            <Coins className="w-3.5 h-3.5 text-red-650" />
             Passive Income Program
           </span>
-          <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white leading-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 leading-tight">
             Calculate Your Earnings
           </h2>
-          <p className="text-slate-450 mt-3 text-sm max-w-xl mx-auto leading-relaxed">
+          <p className="text-slate-500 mt-3 text-sm max-w-xl mx-auto leading-relaxed">
             Own an idle vehicle in Pakistan? List it on GoDriveify's multi-vendor rental directory, choose your availability slots, and start generating monthly revenue in major cities.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-12 gap-8 items-center">
+        <div className="grid lg:grid-cols-12 gap-8 items-stretch">
           {/* Inputs Panel */}
-          <div className="lg:col-span-7 bg-slate-900/40 backdrop-blur-md rounded-2xl border border-slate-800 p-6 sm:p-8 space-y-6">
+          <div className="lg:col-span-7 bg-slate-50/50 backdrop-blur-md rounded-2xl border border-slate-100 p-6 sm:p-8 space-y-6 flex flex-col justify-between">
             
             {/* Step 1: Select Car Category */}
-            <div>
-              <label className="block text-xs font-black uppercase text-slate-400 tracking-wider mb-3">
+            <div className="space-y-3">
+              <label className="block text-xs font-extrabold uppercase text-slate-500 tracking-wider">
                 1. Select Vehicle Type
               </label>
               <div className="grid grid-cols-3 gap-3">
@@ -82,14 +110,14 @@ export default function EarningsCalculator() {
                       key={type}
                       type="button"
                       onClick={() => setCarType(type)}
-                      className={`py-3.5 px-3 rounded-xl border text-xs sm:text-sm font-bold tracking-wide transition-all outline-none flex flex-col items-center justify-center gap-1 cursor-pointer ${
+                      className={`py-3.5 px-3 rounded-xl border text-xs sm:text-sm font-extrabold tracking-wide transition-all outline-none flex flex-col items-center justify-center gap-1 cursor-pointer ${
                         isActive
-                          ? 'bg-amber-500 text-slate-950 border-amber-400 font-extrabold shadow-lg shadow-amber-500/10 scale-[1.02]'
-                          : 'bg-slate-900/80 border-slate-800 text-slate-350 hover:bg-slate-800/60 hover:text-white'
+                          ? 'bg-red-50 text-red-900 border-red-500 shadow-sm ring-1 ring-red-500 scale-[1.01]'
+                          : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-350 shadow-xs'
                       }`}
                     >
-                      <span>{type}</span>
-                      <span className={`text-[10px] font-mono ${isActive ? 'text-slate-950/80 font-bold' : 'text-slate-500'}`}>
+                      <span className="font-sans font-extrabold">{type}</span>
+                      <span className={`text-[10px] font-mono ${isActive ? 'text-red-700/85 font-extrabold' : 'text-slate-400'}`}>
                         PKR {rates[type].toLocaleString()}/day
                       </span>
                     </button>
@@ -99,14 +127,17 @@ export default function EarningsCalculator() {
             </div>
 
             {/* Step 2: Slider for Days Rented */}
-            <div>
-              <div className="flex justify-between items-center mb-3">
-                <label className="block text-xs font-black uppercase text-slate-400 tracking-wider">
+            <div className="space-y-3 pt-2">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                <label className="block text-xs font-extrabold uppercase text-slate-500 tracking-wider">
                   2. Days Rented Per Month
                 </label>
-                <span className="font-mono font-bold text-amber-500 bg-amber-950/40 px-3 py-1 rounded-lg border border-amber-500/20 text-sm">
-                  {days} {days === 1 ? 'Day' : 'Days'}
-                </span>
+                <div className="flex items-center gap-2">
+                  {bonusBadge}
+                  <span className="font-mono font-bold text-red-700 bg-red-50 px-3 py-1 rounded-lg border border-red-100 text-sm shrink-0">
+                    {days} {days === 1 ? 'Day' : 'Days'}
+                  </span>
+                </div>
               </div>
               <div className="relative">
                 <input
@@ -115,54 +146,66 @@ export default function EarningsCalculator() {
                   max="30"
                   value={days}
                   onChange={(e) => setDays(Number(e.target.value))}
-                  className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500 my-4"
+                  className="w-full h-2 bg-slate-205 rounded-lg appearance-none cursor-pointer accent-red-650 my-4"
                 />
-                <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+                <div className="flex justify-between text-[10px] text-slate-450 font-mono">
                   <span>1 day</span>
                   <span>15 days</span>
                   <span>30 days</span>
                 </div>
+                {/* Text helper for days selection */}
+                <p className="text-[11px] text-slate-500 mt-3.5 flex items-center gap-1.5 font-semibold bg-slate-55 bg-slate-100/40 p-2 rounded-lg border border-slate-100/80">
+                  <Info className="w-3.5 h-3.5 text-slate-450 shrink-0" />
+                  <span>{bonusHelper}</span>
+                </p>
               </div>
             </div>
 
             {/* Program perks mini bullets */}
-            <div className="border-t border-slate-800/80 pt-5 mt-2 grid grid-cols-2 gap-4 text-xs text-slate-400">
+            <div className="border-t border-slate-100 pt-5 mt-2 grid grid-cols-2 gap-4 text-xs text-slate-500">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>Verified Renters Only</span>
+                <ShieldCheck className="w-4.5 h-4.5 text-emerald-600 shrink-0" />
+                <span className="font-semibold">Verified Renters Only</span>
               </div>
               <div className="flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>100% Retained Revenue</span>
+                <TrendingUp className="w-4.5 h-4.5 text-emerald-600 shrink-0" />
+                <span className="font-semibold">100% Retained Revenue</span>
               </div>
             </div>
 
           </div>
 
           {/* Outputs Dynamic Panel */}
-          <div className="lg:col-span-5 bg-gradient-to-b from-slate-900 to-slate-950 rounded-2xl border border-slate-800/90 p-8 text-center relative overflow-hidden flex flex-col justify-between h-full min-h-[300px]">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 via-yellow-500 to-blue-500" />
+          <div className="lg:col-span-5 bg-slate-50/60 backdrop-blur-md rounded-2xl border border-slate-100 p-8 text-center relative overflow-hidden flex flex-col justify-between h-full min-h-[300px] shadow-xs">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 via-rose-600 to-red-800" />
             
-            <div className="space-y-2">
-              <span className="text-[10px] uppercase font-black tracking-widest text-slate-400 block mb-1">
+            <div className="space-y-2 mt-2">
+              <span className="text-[10px] uppercase font-bold tracking-widest text-slate-500 block mb-1">
                 Estimated Monthly Earnings
               </span>
-              <p className="text-4xl sm:text-5xl font-black text-amber-500 font-mono tracking-tight my-2">
+              <p className="text-4xl sm:text-5xl font-extrabold text-slate-900 font-sans tracking-tight my-2">
                 PKR {displayEarnings.toLocaleString()}
               </p>
-              <p className="text-xs text-slate-400 font-medium">
-                Based on <strong className="text-white font-bold">{days} days</strong> of monthly fleet deployment
+              <p className="text-xs text-slate-500 font-medium">
+                Based on <strong className="text-slate-800 font-extrabold">{days} days</strong> of monthly fleet deployment
               </p>
             </div>
 
-            <div className="bg-slate-950 border border-slate-800 p-4 rounded-xl text-left space-y-1.5 my-6">
-              <div className="flex justify-between text-xs">
-                <span className="text-slate-500">Daily Rental payout:</span>
-                <span className="font-mono font-bold text-slate-200">PKR {currentRate.toLocaleString()}</span>
+            {/* Receipts Statistics Breakdown */}
+            <div className="bg-white border border-slate-100 p-4.5 rounded-xl text-left space-y-2.5 my-6 shadow-xs">
+              <div className="flex justify-between text-xs pb-2 border-b border-slate-100/60">
+                <span className="text-slate-500 font-medium">Daily Rental payout:</span>
+                <span className="font-mono font-bold text-slate-800">PKR {currentRate.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-xs pb-2 border-b border-slate-100/60">
+                <span className="text-slate-500 font-medium">Loyalty Retention Bonus:</span>
+                <span className={`font-mono font-extrabold ${retentionBonus > 0 ? 'text-emerald-600' : 'text-slate-400'}`}>
+                  {retentionBonus > 0 ? `+ PKR ${retentionBonus.toLocaleString()}` : 'PKR 0'}
+                </span>
               </div>
               <div className="flex justify-between text-xs">
-                <span className="text-slate-500">Annual potential return:</span>
-                <span className="font-mono font-bold text-amber-400">PKR {(targetEarnings * 12).toLocaleString()}</span>
+                <span className="text-slate-500 font-medium">Annual potential return:</span>
+                <span className="font-mono font-bold text-red-650">PKR {(targetEarnings * 12).toLocaleString()}</span>
               </div>
             </div>
 
@@ -178,7 +221,7 @@ export default function EarningsCalculator() {
                   window.dispatchEvent(customModalOpen);
                 }
               }}
-              className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs uppercase tracking-widest py-3.5 rounded-xl transition-all shadow-lg shadow-amber-500/10 cursor-pointer"
+              className="w-full bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs uppercase tracking-widest py-4 rounded-xl transition-all shadow-md shadow-red-600/10 cursor-pointer active:scale-[0.98] duration-250 hover:shadow-lg hover:shadow-red-700/20"
             >
               List Your Car &amp; Earn
             </button>
