@@ -17,34 +17,6 @@ export default function Footer() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         
-        {/* Pre-footer Call to Action Panel */}
-        <div className="bg-gradient-to-r from-red-950/40 via-gray-900/90 to-slate-900/40 border border-white/5 rounded-3xl p-8 sm:p-10 mb-16 flex flex-col lg:flex-row items-center justify-between gap-8 shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-48 h-48 bg-red-500/10 rounded-full blur-3xl" />
-          <div className="space-y-3 max-w-2xl text-center lg:text-left">
-            <span className="inline-flex items-center gap-1.5 bg-red-500/10 border border-red-500/20 text-red-400 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest">
-              <Sparkles className="w-3 h-3 text-red-500" /> Start Driving Safely today
-            </span>
-            <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">Ready to Master the Driver's Seat?</h3>
-            <p className="text-gray-400 text-sm sm:text-base">
-              Book a custom driving lesson package with professional certified male and female trainers in Faisalabad.
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto shrink-0">
-            <Link 
-              to="/programs" 
-              className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-4 rounded-xl text-center shadow-lg shadow-red-900/30 transition-all text-sm uppercase tracking-wider"
-            >
-              Explore Programs
-            </Link>
-            <Link 
-              to="/contact" 
-              className="w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border border-white/10 px-8 py-4 rounded-xl text-center transition-all text-sm font-bold uppercase tracking-wider"
-            >
-              Contact Us
-            </Link>
-          </div>
-        </div>
-
         {/* Main Footer Links & Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           
@@ -116,13 +88,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to="/programs" className="hover:text-red-500 transition-colors flex items-center gap-2 text-gray-400">
-                  <ArrowRight className="w-3 h-3 text-red-600" /> Lesson Programs
-                </Link>
-              </li>
-              <li>
-                <Link to="/pricing" className="hover:text-red-500 transition-colors flex items-center gap-2 text-gray-400">
-                  <ArrowRight className="w-3 h-3 text-red-600" /> Plans & Packages
+                <Link to="/services" className="hover:text-red-500 transition-colors flex items-center gap-2 text-gray-400">
+                  <ArrowRight className="w-3 h-3 text-red-600" /> Executive Services
                 </Link>
               </li>
               <li>

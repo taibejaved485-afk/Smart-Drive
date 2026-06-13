@@ -1,5 +1,6 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import CTABanner from '../components/CTABanner';
 import Stats from '../components/Stats';
 import WhyChooseUs from '../components/WhyChooseUs';
 import Reviews from '../components/Reviews';
@@ -227,6 +228,7 @@ export default function AboutPage() {
         </div>
       </section>
 
+      <CTABanner />
       <Footer />
     </div>
   );

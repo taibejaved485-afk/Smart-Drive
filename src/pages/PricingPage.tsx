@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import CTABanner from '../components/CTABanner';
 import { CheckCircle2, ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Reviews from '../components/Reviews';
@@ -250,6 +251,7 @@ export default function PricingPage() {
         </div>
       </section>
 
+      <CTABanner />
       <Footer />
     </div>
   );

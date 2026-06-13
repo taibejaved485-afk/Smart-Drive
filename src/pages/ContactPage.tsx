@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import CTABanner from '../components/CTABanner';
 import { motion, AnimatePresence } from 'motion/react';
 import SEO from '../components/SEO';
 import { 
@@ -483,6 +484,7 @@ export default function ContactPage() {
         </div>
       </section>
 
+      <CTABanner />
       <Footer />
     </div>
   );

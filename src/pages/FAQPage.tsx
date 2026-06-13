@@ -1,5 +1,6 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import CTABanner from '../components/CTABanner';
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import Reviews from '../components/Reviews';
@@ -103,6 +104,7 @@ export default function FAQPage() {
 
       <Reviews />
 
+      <CTABanner />
       <Footer />
     </div>
   );

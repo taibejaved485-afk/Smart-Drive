@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import CTABanner from '../components/CTABanner';
 import SEO from '../components/SEO';
 import EarningsCalculator from '../components/EarningsCalculator';
 import { CarRequestsForm, CarRequestsGrid } from '../components/CarRequestsDirectory';
@@ -1031,6 +1032,7 @@ export default function RentalsPage() {
         )}
       </AnimatePresence>
 
+      <CTABanner />
       <Footer />
     </div>
   );

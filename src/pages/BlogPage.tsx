@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import CTABanner from '../components/CTABanner';
 import { Link } from 'react-router-dom';
 import SEO from '../components/SEO';
 
@@ -64,6 +65,7 @@ export default function BlogPage() {
           </div>
         )}
       </div>
+      <CTABanner />
       <Footer />
     </div>
   );

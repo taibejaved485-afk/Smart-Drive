@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import CTABanner from '../components/CTABanner';
 import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { INITIAL_RENTAL_FLEET, RentalCar } from '../data/inventory';
@@ -2805,6 +2806,7 @@ export default function AdminPage() {
         </div>
       )}
 
+      <CTABanner />
       <Footer />
     </div>
   );

@@ -13,7 +13,7 @@ import AdminPage from './pages/AdminPage';
 import FAQPage from './pages/FAQPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
-import ProgramsPage from './pages/ProgramsPage';
+import ServicesPage from './pages/ServicesPage';
 import RentalsPage from './pages/RentalsPage';
 
 export default function App() {
@@ -28,7 +28,8 @@ export default function App() {
           <Route path="/faq" element={<FAQPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/programs" element={<ProgramsPage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/programs" element={<ServicesPage />} />
           <Route path="/rentals" element={<RentalsPage />} />
         </Routes>
       <WhatsAppButton />

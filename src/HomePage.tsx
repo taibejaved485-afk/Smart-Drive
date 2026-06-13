@@ -15,9 +15,11 @@ import Reviews from './components/Reviews';
 import RentalMarketplace from './components/RentalMarketplace';
 import { CarRequestsForm, CarRequestsGrid } from './components/CarRequestsDirectory';
 import Footer from './components/Footer';
+import CTABanner from './components/CTABanner';
 import SEO from './components/SEO';
 import { Award, Car, Sparkles, ShieldCheck, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import Newsletter from './components/Newsletter';
 
 export default function HomePage() {
   const [activeService, setActiveService] = useState<'learn' | 'rent' | 'requests'>('learn');
@@ -195,6 +197,8 @@ export default function HomePage() {
         )}
       </AnimatePresence>
 
+      <Newsletter />
+      <CTABanner />
       <Footer />
     </div>
   );
