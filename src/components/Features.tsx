@@ -1,6 +1,6 @@
 import { FileText, Settings, FileCheck } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, useInView } from 'motion/react';
 
 export default function Features() {
   const features = [
@@ -26,7 +26,7 @@ export default function Features() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-3 gap-12">
           {features.map((feature, i) => (
-            <FeatureCard key={i} feature={feature} />
+            <FeatureCard key={i} feature={feature} index={i} />
           ))}
         </div>
       </div>
@@ -34,13 +34,15 @@ export default function Features() {
   );
 }
 
-const FeatureCard: React.FC<{ feature: any }> = ({ feature }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const [displayedText, setDisplayedText] = useState(feature.desc);
+const FeatureCard: React.FC<{ feature: any, index: number }> = ({ feature }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: false, amount: 0.3 });
+  const [displayedText, setDisplayedText] = useState("");
 
   useEffect(() => {
-    if (isHovered) {
+    if (isInView) {
       let i = 0;
+      setDisplayedText("");
       const interval = setInterval(() => {
         setDisplayedText(feature.desc.slice(0, i + 1));
         i++;
@@ -48,17 +50,16 @@ const FeatureCard: React.FC<{ feature: any }> = ({ feature }) => {
       }, 30);
       return () => clearInterval(interval);
     } else {
-      setDisplayedText(feature.desc);
+      setDisplayedText(feature.desc); // fallback or when out of view
     }
-  }, [isHovered, feature.desc]);
+  }, [isInView, feature.desc]);
 
   return (
     <div 
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="relative p-[1px] rounded-2xl overflow-hidden group hover:shadow-xl transition-all duration-300"
+      ref={ref}
+      className="relative p-[1px] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
     >
-      {isHovered ? (
+      {isInView ? (
         <div className="absolute inset-0 bg-red-100/50">
           <span className="absolute w-[300%] h-[300%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#dc2626_0%,transparent_15%)]" />
         </div>
