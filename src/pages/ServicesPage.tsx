@@ -214,7 +214,7 @@ export default function ServicesPage() {
       <Navbar />
 
       {/* Hero Banner Section */}
-      <section className="relative overflow-hidden bg-white border-b border-gray-100 py-20 lg:py-28">
+      <section className="relative overflow-hidden bg-white border-b border-gray-100 pt-0 pb-16 lg:pt-0 lg:pb-28">
         <div className="absolute top-0 right-0 w-96 h-96 bg-red-100/30 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-slate-100/50 rounded-full blur-2xl pointer-events-none" />
         
