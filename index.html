@@ -38,6 +38,32 @@
     <link rel="icon" type="image/png" href="/favicon.png?v=4" sizes="128x128" />
     <meta name="theme-color" content="#dc2626" />
 
+    <!-- Staff Frontend Engineer dynamic favicon loader to force cache clearing in standard tabs -->
+    <script>
+      (function() {
+        try {
+          const t = Date.now();
+          const list = [
+            { rel: 'shortcut icon', href: '/favicon.ico?v=' + t },
+            { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/static/favicon-16x16.png?v=' + t },
+            { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/static/favicon-32x32.png?v=' + t },
+            { rel: 'icon', type: 'image/png', sizes: '48x48', href: '/static/favicon-48x48.png?v=' + t },
+            { rel: 'icon', type: 'image/png', sizes: '128x128', href: '/favicon.png?v=' + t },
+            { rel: 'apple-touch-icon', href: '/static/favicon-128x128.png?v=' + t }
+          ];
+          const old = document.querySelectorAll('link[rel*="icon"]');
+          old.forEach(function(el) { el.parentNode.removeChild(el); });
+          list.forEach(function(item) {
+            const l = document.createElement('link');
+            Object.keys(item).forEach(function(k) { l.setAttribute(k, item[k]); });
+            document.head.appendChild(l);
+          });
+        } catch(e) {
+          console.error('Favicon injection failed:', e);
+        }
+      })();
+    </script>
+
     <!-- PWA Manifest & iOS Standalone Optimization Tags -->
     <link rel="manifest" href="/manifest.json" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
