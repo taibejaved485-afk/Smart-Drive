@@ -2,13 +2,96 @@ import { motion } from 'motion/react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { CheckCircle2, ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Reviews from '../components/Reviews';
 import OurProcess from '../components/OurProcess';
 import SEO from '../components/SEO';
 
+interface PricingCourse {
+  id: string;
+  courseTitle: string;
+  courseDescription: string;
+  courseFee: string;
+  carImage: string;
+  lessonDuration: string;
+  dailyTime: string;
+  theoryDuration: string;
+  coursePeriod: string;
+  additionalTime: string;
+}
+
 export default function PricingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [courses, setCourses] = useState<PricingCourse[]>([]);
+
+  useEffect(() => {
+    const syncPricingCourses = () => {
+      const saved = localStorage.getItem('drivingCourses');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            setCourses(parsed);
+          } else {
+            setCourses(DEFAULT_PRICING_COURSES);
+          }
+        } catch (e) {
+          setCourses(DEFAULT_PRICING_COURSES);
+        }
+      } else {
+        setCourses(DEFAULT_PRICING_COURSES);
+        localStorage.setItem('drivingCourses', JSON.stringify(DEFAULT_PRICING_COURSES));
+      }
+    };
+
+    const DEFAULT_PRICING_COURSES = [
+      {
+        id: "course-1",
+        courseTitle: "Honda Civic (Manual)",
+        courseDescription: "Learn driving with automatic or manual Honda Civic.",
+        courseFee: "25000",
+        carImage: "https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600",
+        lessonDuration: "30 Mins Driving Lesson",
+        dailyTime: "40 min Per Day",
+        theoryDuration: "10 min Theory Session",
+        coursePeriod: "10 Days Course",
+        additionalTime: "Additional Time Available"
+      },
+      {
+        id: "course-2",
+        courseTitle: "Honda Civic (Auto)",
+        courseDescription: "Learn driving with automatic or manual Honda Civic.",
+        courseFee: "25000",
+        carImage: "https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600",
+        lessonDuration: "30 Mins Driving Lesson",
+        dailyTime: "40 min Per Day",
+        theoryDuration: "10 min Theory Session",
+        coursePeriod: "10 Days Course",
+        additionalTime: "Additional Time Available"
+      },
+      {
+        id: "course-3",
+        courseTitle: "Heavy Bike",
+        courseDescription: "Expert lessons for riding heavy motorcycles safely.",
+        courseFee: "50000",
+        carImage: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=600",
+        lessonDuration: "60 Mins Driving Lesson",
+        dailyTime: "40 min Per Day",
+        theoryDuration: "10 min Theory Session",
+        coursePeriod: "10 Days Course",
+        additionalTime: "Additional Time Available"
+      }
+    ];
+
+    syncPricingCourses();
+    window.addEventListener('storage', syncPricingCourses);
+    window.addEventListener('driving_courses_updated', syncPricingCourses);
+
+    return () => {
+      window.removeEventListener('storage', syncPricingCourses);
+      window.removeEventListener('driving_courses_updated', syncPricingCourses);
+    };
+  }, []);
 
   const pricingSchema = {
     "@context": "https://schema.org",
@@ -79,30 +162,52 @@ export default function PricingPage() {
 
             {/* Packages Grid */}
             <div className="grid md:grid-cols-3 gap-8 mb-24">
-                {[
-                    { name: "Honda Civic (Manual)", desc: "Learn driving with automatic or manual Honda Civic.", price: "25000/-", features: ["30 Mins Driving Lesson", "40 min Per Day", "10 min Theory Session", "10 Days Course", "Additional Time Available"] },
-                    { name: "Honda Civic (Auto)", desc: "Learn driving with automatic or manual Honda Civic.", price: "25000/-", features: ["30 Mins Driving Lesson", "40 min Per Day", "10 min Theory Session", "10 Days Course", "Additional Time Available"] },
-                    { name: "Heavy Bike", desc: "Expert lessons for riding heavy motorcycles safely.", price: "50000/-", features: ["60 Mins Driving Lesson", "40 min Per Day", "10 min Theory Session", "10 Days Course", "Additional Time Available"] }
-                ].map((pkg, i) => (
+                {courses.map((pkg, i) => (
                     <motion.div 
-                        key={i}
+                        key={pkg.id || i}
                         initial={{ opacity: 0, y: 50 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, amount: 0.3 }}
-                        className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 flex flex-col"
+                        viewport={{ once: true, amount: 0.1 }}
+                        className="bg-white p-6 sm:p-8 rounded-3xl shadow-xl border border-gray-100 flex flex-col justify-between hover:border-red-100 hover:shadow-2xl hover:shadow-red-50/20 transition-all duration-300"
                     >
-                        <div className="flex justify-center mb-8">
-                            <div className="p-4 rounded-full bg-gray-50"><svg viewBox="0 0 24 24" className="w-12 h-12 text-gray-800" fill="currentColor"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5S16.67 13 17.5 13s1.5.67 1.5 1.5S18.33 16 17.5 16zM5 11l1.5-4.5h11L19 11H5z"/></svg></div>
-                        </div>
-                        <h3 className="text-2xl font-bold mb-2 text-center">{pkg.name}</h3>
-                        <p className="text-gray-500 mb-8 font-mono text-center text-sm">{pkg.desc}</p>
-                        
-                        <div className="bg-red-800 text-white text-3xl font-bold py-4 text-center mb-8 rounded-sm">{pkg.price}</div>
-                        
-                        <div className="space-y-4 mb-8 flex-grow text-sm font-medium text-gray-700">
-                            {pkg.features.map(f => (
-                                <div key={f} className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-red-600"/> {f}</div>
-                            ))}
+                        <div>
+                            {/* Course Image frame with zoom hover effect */}
+                            <div className="relative aspect-video rounded-2xl overflow-hidden bg-gray-100 border border-gray-100 mb-6 group">
+                                <img 
+                                    src={pkg.carImage || "https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600"} 
+                                    alt={pkg.courseTitle} 
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                                    referrerPolicy="no-referrer"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                            </div>
+
+                            <h3 className="text-2xl font-black mb-1.5 text-gray-900 tracking-tight leading-snug">{pkg.courseTitle}</h3>
+                            <p className="text-gray-500 mb-6 font-medium text-sm leading-relaxed">{pkg.courseDescription}</p>
+                            
+                            {/* Professional Pricing Badge */}
+                            <div className="bg-red-800 text-white text-3xl font-black py-4 text-center mb-6 rounded-2xl shadow-sm tracking-tight font-sans">
+                                {pkg.courseFee}/- <span className="text-xs font-bold font-sans uppercase tracking-widest text-red-200">PKR Only</span>
+                            </div>
+                            
+                            {/* Check bullet parameters from custom admin schema */}
+                            <div className="space-y-3 mb-8 text-sm font-semibold text-gray-700">
+                                {pkg.lessonDuration && (
+                                    <div className="flex items-center gap-2.5"><CheckCircle2 className="w-5 h-5 text-red-650 shrink-0"/> {pkg.lessonDuration}</div>
+                                )}
+                                {pkg.dailyTime && (
+                                    <div className="flex items-center gap-2.5"><CheckCircle2 className="w-5 h-5 text-red-650 shrink-0"/> {pkg.dailyTime}</div>
+                                )}
+                                {pkg.theoryDuration && (
+                                    <div className="flex items-center gap-2.5"><CheckCircle2 className="w-5 h-5 text-red-650 shrink-0"/> {pkg.theoryDuration}</div>
+                                )}
+                                {pkg.coursePeriod && (
+                                    <div className="flex items-center gap-2.5"><CheckCircle2 className="w-5 h-5 text-red-650 shrink-0"/> {pkg.coursePeriod}</div>
+                                )}
+                                {pkg.additionalTime && (
+                                    <div className="flex items-center gap-2.5"><CheckCircle2 className="w-5 h-5 text-red-650 shrink-0"/> {pkg.additionalTime}</div>
+                                )}
+                            </div>
                         </div>
                         
                         <button 
@@ -113,7 +218,7 @@ export default function PricingPage() {
                                 window.scrollTo(0, 0);
                                 window.location.reload();
                             }}
-                            className="w-full text-red-600 border-2 border-red-600 py-3 rounded-xl font-bold hover:bg-red-600 hover:text-white transition uppercase tracking-widest flex justify-center items-center gap-2 cursor-pointer"
+                            className="w-full text-red-600 border-2 border-red-600 py-3 rounded-xl font-bold hover:bg-red-600 hover:text-white transition uppercase tracking-widest flex justify-center items-center gap-2 cursor-pointer font-sans"
                         >
                             GET STARTED <span className="text-lg">→</span>
                         </button>

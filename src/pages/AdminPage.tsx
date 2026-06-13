@@ -90,6 +90,58 @@ interface CustomerRequest {
   estimatedKM?: 'Under 500 KM' | '500 - 1500 KM' | '1500+ KM';
 }
 
+interface DrivingCourse {
+  id: string;
+  courseTitle: string;
+  courseDescription: string;
+  courseFee: string;
+  carImage: string;
+  lessonDuration: string;
+  dailyTime: string;
+  theoryDuration: string;
+  coursePeriod: string;
+  additionalTime: string;
+}
+
+const DEFAULT_DRIVING_COURSES: DrivingCourse[] = [
+  {
+    id: "course-1",
+    courseTitle: "Honda Civic (Manual)",
+    courseDescription: "Learn driving with automatic or manual Honda Civic.",
+    courseFee: "25000",
+    carImage: "https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600",
+    lessonDuration: "30 Mins Driving Lesson",
+    dailyTime: "40 min Per Day",
+    theoryDuration: "10 min Theory Session",
+    coursePeriod: "10 Days Course",
+    additionalTime: "Additional Time Available"
+  },
+  {
+    id: "course-2",
+    courseTitle: "Honda Civic (Auto)",
+    courseDescription: "Learn driving with automatic or manual Honda Civic.",
+    courseFee: "25000",
+    carImage: "https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600",
+    lessonDuration: "30 Mins Driving Lesson",
+    dailyTime: "40 min Per Day",
+    theoryDuration: "10 min Theory Session",
+    coursePeriod: "10 Days Course",
+    additionalTime: "Additional Time Available"
+  },
+  {
+    id: "course-3",
+    courseTitle: "Heavy Bike",
+    courseDescription: "Expert lessons for riding heavy motorcycles safely.",
+    courseFee: "50000",
+    carImage: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=600",
+    lessonDuration: "60 Mins Driving Lesson",
+    dailyTime: "40 min Per Day",
+    theoryDuration: "10 min Theory Session",
+    coursePeriod: "10 Days Course",
+    additionalTime: "Additional Time Available"
+  }
+];
+
 export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
@@ -97,11 +149,26 @@ export default function AdminPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [newPost, setNewPost] = useState({ title: '', author: '', imageUrl: '', content: '' });
-  const [activeTab, setActiveTab] = useState<'bookings' | 'blogs' | 'dns' | 'rentals' | 'requests'>('bookings');
+  const [activeTab, setActiveTab] = useState<'bookings' | 'blogs' | 'dns' | 'rentals' | 'requests' | 'courses'>('bookings');
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const carFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Driving school course states
+  const [drivingCourses, setDrivingCourses] = useState<DrivingCourse[]>([]);
+  const [editingCourseId, setEditingCourseId] = useState<string | null>(null);
+  const [newCourse, setNewCourse] = useState<Omit<DrivingCourse, 'id'>>({
+    courseTitle: '',
+    courseDescription: '',
+    courseFee: '',
+    carImage: '',
+    lessonDuration: '30 Mins Driving Lesson',
+    dailyTime: '40 min Per Day',
+    theoryDuration: '10 min Theory Session',
+    coursePeriod: '10 Days Course',
+    additionalTime: 'Additional Time Available'
+  });
 
   const showToast = (text: string, type: 'success' | 'info' | 'error' = 'success') => {
     setToastMessage({ text, type });
@@ -293,6 +360,24 @@ export default function AdminPage() {
     } else {
       setCustomerRequests([]);
     }
+
+    // 6. Load Driving Courses Registry
+    const savedCourses = localStorage.getItem('drivingCourses');
+    if (savedCourses) {
+      try {
+        const parsed = JSON.parse(savedCourses);
+        if (Array.isArray(parsed)) {
+          setDrivingCourses(parsed);
+        } else {
+          setDrivingCourses(DEFAULT_DRIVING_COURSES);
+        }
+      } catch (err) {
+        setDrivingCourses(DEFAULT_DRIVING_COURSES);
+      }
+    } else {
+      setDrivingCourses(DEFAULT_DRIVING_COURSES);
+      localStorage.setItem('drivingCourses', JSON.stringify(DEFAULT_DRIVING_COURSES));
+    }
   };
 
   useEffect(() => {
@@ -303,6 +388,7 @@ export default function AdminPage() {
     window.addEventListener('driving_bookings_updated', loadDataAndSync);
     window.addEventListener('pending_cars_updated', loadDataAndSync);
     window.addEventListener('customer_requests_updated', loadDataAndSync);
+    window.addEventListener('driving_courses_updated', loadDataAndSync);
     
     // Background polling interval for extra visual reactivity safety (every 3s)
     const syncInterval = setInterval(loadDataAndSync, 3000);
@@ -312,6 +398,7 @@ export default function AdminPage() {
       window.removeEventListener('driving_bookings_updated', loadDataAndSync);
       window.removeEventListener('pending_cars_updated', loadDataAndSync);
       window.removeEventListener('customer_requests_updated', loadDataAndSync);
+      window.removeEventListener('driving_courses_updated', loadDataAndSync);
       clearInterval(syncInterval);
     };
   }, []);
@@ -935,6 +1022,20 @@ export default function AdminPage() {
           >
             <Clock className="w-4 h-4 text-indigo-500" />
             Approve Car Requests (کسٹمرز)
+          </button>
+
+          {/* Tab 6: Manage Driving Courses */}
+          <button 
+            type="button"
+            onClick={() => setActiveTab('courses')}
+            className={`pb-4 px-6 font-bold text-sm tracking-wide transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'courses' 
+                ? 'border-red-650 text-red-650 font-black' 
+                : 'border-transparent text-gray-500 hover:text-gray-800'
+            }`}
+          >
+            <Sliders className="w-4 h-4 text-amber-500 animate-spin" style={{ animationDuration: '6s' }} />
+            Academy Courses (ڈرائیونگ کورسز)
           </button>
         </div>
 
@@ -2257,6 +2358,367 @@ export default function AdminPage() {
                 </table>
               </div>
             )}
+          </div>
+        )}
+
+        {activeTab === 'courses' && (
+          <div className="space-y-8 animate-fade-in" id="courses-admin-hub">
+            {/* Courses Tab Head */}
+            <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm p-6 sm:p-8 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+                    <Sliders className="w-6 h-6 text-red-650" />
+                    Manage Academy Driving Courses (ڈرائیونگ کورسز مینیجر)
+                  </h2>
+                  <p className="text-gray-500 text-xs sm:text-sm mt-1">
+                    Configure high-fidelity package courses. All updates are synchronized dynamically across the public pricing catalog view in real-time.
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <span className="bg-red-50 text-red-650 px-3.5 py-1.5 rounded-xl text-xs font-bold border border-red-100">
+                    Active Courses: {drivingCourses.length}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid lg:grid-cols-12 gap-8">
+              {/* Left Column: Form */}
+              <div className="lg:col-span-5 space-y-6">
+                <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                  <div className="flex items-center gap-2 mb-6 border-b border-gray-100 pb-4">
+                    <span className="p-2 bg-red-50 text-red-600 rounded-lg">
+                      <Plus className="w-5 h-5" />
+                    </span>
+                    <h3 className="text-xl font-extrabold text-gray-900">
+                      {editingCourseId ? 'Edit Academy Course' : 'Create New Course'}
+                    </h3>
+                  </div>
+
+                  <form onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!newCourse.courseTitle || !newCourse.courseFee) {
+                      showToast('Course Title and Course Fee are required.', 'error');
+                      return;
+                    }
+                    if (editingCourseId) {
+                      const updated = drivingCourses.map(c => c.id === editingCourseId ? { ...newCourse, id: editingCourseId } : c);
+                      setDrivingCourses(updated);
+                      localStorage.setItem('drivingCourses', JSON.stringify(updated));
+                      setEditingCourseId(null);
+                      setNewCourse({
+                        courseTitle: '',
+                        courseDescription: '',
+                        courseFee: '',
+                        carImage: '',
+                        lessonDuration: '30 Mins Driving Lesson',
+                        dailyTime: '40 min Per Day',
+                        theoryDuration: '10 min Theory Session',
+                        coursePeriod: '10 Days Course',
+                        additionalTime: 'Additional Time Available'
+                      });
+                      showToast('Course package updated successfully!', 'success');
+                    } else {
+                      const courseId = 'course-' + Date.now().toString();
+                      const finalCourse = { ...newCourse, id: courseId };
+                      const updated = [finalCourse, ...drivingCourses];
+                      setDrivingCourses(updated);
+                      localStorage.setItem('drivingCourses', JSON.stringify(updated));
+                      setNewCourse({
+                        courseTitle: '',
+                        courseDescription: '',
+                        courseFee: '',
+                        carImage: '',
+                        lessonDuration: '30 Mins Driving Lesson',
+                        dailyTime: '40 min Per Day',
+                        theoryDuration: '10 min Theory Session',
+                        coursePeriod: '10 Days Course',
+                        additionalTime: 'Additional Time Available'
+                      });
+                      showToast('New course package added successfully!', 'success');
+                    }
+                    window.dispatchEvent(new Event('driving_courses_updated'));
+                    window.dispatchEvent(new Event('storage'));
+                  }} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">Course Title *</label>
+                      <input 
+                        required
+                        type="text" 
+                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition text-sm font-medium" 
+                        placeholder="e.g. Honda Civic (Manual)" 
+                        value={newCourse.courseTitle} 
+                        onChange={e => setNewCourse({...newCourse, courseTitle: e.target.value})} 
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">Course Description *</label>
+                      <input 
+                        required
+                        type="text" 
+                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition text-sm font-medium" 
+                        placeholder="e.g. Learn driving with automatic or manual Honda Civic." 
+                        value={newCourse.courseDescription} 
+                        onChange={e => setNewCourse({...newCourse, courseDescription: e.target.value})} 
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">Course Fee (PKR) *</label>
+                      <input 
+                        required
+                        type="text" 
+                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition text-sm font-mono font-bold" 
+                        placeholder="e.g. 25000" 
+                        value={newCourse.courseFee} 
+                        onChange={e => setNewCourse({...newCourse, courseFee: e.target.value})} 
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">Car Cover Image URL</label>
+                      <input 
+                        type="text" 
+                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition text-xs font-mono" 
+                        placeholder="Or leave empty & choose a preset image below" 
+                        value={newCourse.carImage} 
+                        onChange={e => setNewCourse({...newCourse, carImage: e.target.value})} 
+                      />
+                    </div>
+
+                    {/* Presets and custom uploader */}
+                    <div className="bg-gray-50 p-4 rounded-xl border border-dashed border-gray-300 space-y-4">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <span className="font-bold text-xs text-gray-800 flex items-center gap-1.5 uppercase tracking-wide">
+                          <ImageIcon className="w-4 h-4 text-gray-500" /> Choose Car Preset
+                        </span>
+                        <label className="inline-flex items-center gap-1.5 bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-3 py-1.5 rounded-lg cursor-pointer text-xs font-bold transition">
+                          <Upload className="w-3.5 h-3.5 text-gray-500" /> Upload File
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            className="hidden" 
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  if (typeof reader.result === 'string') {
+                                    setNewCourse(prev => ({ ...prev, carImage: reader.result as string }));
+                                  }
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }} 
+                          />
+                        </label>
+                      </div>
+
+                      <div className="grid grid-cols-6 gap-2">
+                        {PRESET_CAR_IMAGES.map((img, i) => {
+                          const isSelected = newCourse.carImage === img.url;
+                          return (
+                            <button
+                              key={i}
+                              type="button"
+                              title={img.label}
+                              onClick={() => setNewCourse(prev => ({ ...prev, carImage: img.url }))}
+                              className={`relative aspect-video rounded-lg overflow-hidden border-2 transition-all ${
+                                isSelected ? 'border-red-650 scale-95 ring-2 ring-red-100' : 'border-transparent hover:border-gray-400'
+                              }`}
+                            >
+                              <img src={img.url} alt={img.label} className="w-full h-full object-cover" />
+                              {isSelected && (
+                                <div className="absolute inset-0 bg-red-600/20 flex items-center justify-center">
+                                  <span className="bg-red-600 text-white rounded-full p-0.5">
+                                    <Check className="w-2.5 h-2.5" />
+                                  </span>
+                                </div>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="border-t border-gray-150 pt-4 mt-2 space-y-4">
+                      <p className="text-xs font-black uppercase text-gray-500 tracking-wider">Course Bullet Parameters (سہولیات):</p>
+                      
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[11px] font-bold text-gray-500 mb-1">Lesson Duration</label>
+                          <input 
+                            type="text" 
+                            className="w-full border border-gray-300 p-2.5 rounded-lg text-xs" 
+                            placeholder="e.g. 30 Mins Driving Lesson" 
+                            value={newCourse.lessonDuration} 
+                            onChange={e => setNewCourse({...newCourse, lessonDuration: e.target.value})} 
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-gray-500 mb-1">Daily Timing</label>
+                          <input 
+                            type="text" 
+                            className="w-full border border-gray-300 p-2.5 rounded-lg text-xs" 
+                            placeholder="e.g. 40 min Per Day" 
+                            value={newCourse.dailyTime} 
+                            onChange={e => setNewCourse({...newCourse, dailyTime: e.target.value})} 
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[11px] font-bold text-gray-500 mb-1">Theory Session</label>
+                          <input 
+                            type="text" 
+                            className="w-full border border-gray-300 p-2.5 rounded-lg text-xs" 
+                            placeholder="e.g. 10 min Theory Session" 
+                            value={newCourse.theoryDuration} 
+                            onChange={e => setNewCourse({...newCourse, theoryDuration: e.target.value})} 
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-gray-500 mb-1">Course Period</label>
+                          <input 
+                            type="text" 
+                            className="w-full border border-gray-300 p-2.5 rounded-lg text-xs" 
+                            placeholder="e.g. 10 Days Course" 
+                            value={newCourse.coursePeriod} 
+                            onChange={e => setNewCourse({...newCourse, coursePeriod: e.target.value})} 
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold text-gray-500 mb-1">Additional Time Info</label>
+                        <input 
+                          type="text" 
+                          className="w-full border border-gray-300 p-2.5 rounded-lg text-xs" 
+                          placeholder="e.g. Additional Time Available" 
+                          value={newCourse.additionalTime} 
+                          onChange={e => setNewCourse({...newCourse, additionalTime: e.target.value})} 
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2 pt-2">
+                      <button 
+                        type="submit"
+                        className="flex-grow bg-red-650 hover:bg-red-700 text-white py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-md shadow-red-200 cursor-pointer text-sm font-sans"
+                      >
+                        <Save className="w-4 h-4" />
+                        {editingCourseId ? 'Save Core Package' : 'Publish Package'}
+                      </button>
+                      {editingCourseId && (
+                        <button 
+                          type="button"
+                          onClick={() => {
+                            setEditingCourseId(null);
+                            setNewCourse({
+                              courseTitle: '',
+                              courseDescription: '',
+                              courseFee: '',
+                              carImage: '',
+                              lessonDuration: '30 Mins Driving Lesson',
+                              dailyTime: '40 min Per Day',
+                              theoryDuration: '10 min Theory Session',
+                              coursePeriod: '10 Days Course',
+                              additionalTime: 'Additional Time Available'
+                            });
+                          }}
+                          className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-3.5 rounded-xl text-xs font-bold transition font-sans cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                      )}
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              {/* Right Column: Dynamic Course Index List */}
+              <div className="lg:col-span-7 space-y-6">
+                <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm min-h-[400px]">
+                  <div className="border-b border-gray-100 pb-4 mb-4">
+                    <h3 className="font-extrabold text-gray-900 text-lg">Active Course Templates ({drivingCourses.length})</h3>
+                    <p className="text-gray-500 text-xs text-sans">These templates are editable. Changes apply to the public facing catalog index instantly.</p>
+                  </div>
+
+                  {drivingCourses.length === 0 ? (
+                    <div className="text-center py-20 bg-gray-50 border border-dashed rounded-xl p-6">
+                      <Sliders className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                      <p className="text-gray-500 font-bold text-sm">Course template registry is empty.</p>
+                      <p className="text-xs text-gray-400 mt-1">Please insert parameters on the left to republish packages.</p>
+                    </div>
+                  ) : (
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      {drivingCourses.map((course) => (
+                        <div key={course.id} className="bg-gray-50/70 border border-gray-200 rounded-2xl p-4 flex flex-col justify-between hover:border-gray-350 hover:shadow-sm transition">
+                          <div>
+                            <div className="aspect-video w-full rounded-xl overflow-hidden bg-gray-200 border border-gray-200/50 mb-3 relative">
+                              <img 
+                                src={course.carImage || 'https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=300'} 
+                                alt={course.courseTitle} 
+                                className="w-full h-full object-cover" 
+                                referrerPolicy="no-referrer"
+                              />
+                              <div className="absolute top-2.5 right-2.5 bg-red-600 text-white font-mono font-black text-xs px-2.5 py-1 rounded-lg">
+                                PKR {course.courseFee}
+                              </div>
+                            </div>
+
+                            <h3 className="font-black text-gray-900 text-base leading-snug">{course.courseTitle}</h3>
+                            <p className="text-xs text-gray-500 leading-relaxed mt-1 font-sans">{course.courseDescription}</p>
+
+                            <ul className="text-[10px] space-y-1.5 mt-3 font-medium text-gray-600 bg-white p-2.5 rounded-xl border border-gray-150">
+                              <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-red-600 shrink-0" /> {course.lessonDuration}</li>
+                              <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-red-600 shrink-0" /> {course.dailyTime}</li>
+                              <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-red-650 shrink-0" /> {course.theoryDuration}</li>
+                              <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-red-650 shrink-0" /> {course.coursePeriod}</li>
+                              <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-red-650 shrink-0" /> {course.additionalTime}</li>
+                            </ul>
+                          </div>
+
+                          <div className="flex gap-2 mt-4 pt-3 border-t border-gray-200">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingCourseId(course.id);
+                                setNewCourse(course);
+                                window.scrollTo({ top: 300, behavior: 'smooth' });
+                              }}
+                              className="flex-1 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 font-bold text-xs py-2 rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer font-sans"
+                            >
+                              <Edit className="w-3.5 h-3.5 text-gray-500" /> Edit Details
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (window.confirm(`Delete "${course.courseTitle}" course template?`)) {
+                                  const updated = drivingCourses.filter(c => c.id !== course.id);
+                                  setDrivingCourses(updated);
+                                  localStorage.setItem('drivingCourses', JSON.stringify(updated));
+                                  showToast('Course package deleted.', 'info');
+                                  window.dispatchEvent(new Event('driving_courses_updated'));
+                                  window.dispatchEvent(new Event('storage'));
+                                }
+                              }}
+                              className="bg-white hover:bg-red-50 text-red-600 border border-red-200 hover:border-red-300 font-bold text-xs p-2 rounded-xl transition cursor-pointer"
+                              title="Delete template"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
