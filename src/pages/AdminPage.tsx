@@ -930,124 +930,260 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-slate-50/50 flex flex-col">
       <Navbar />
-      <div className="max-w-5xl mx-auto px-4 py-12 flex-grow w-full">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2">
-              Dashboard <span className="text-red-600 text-xl font-normal py-0.5 px-2.5 bg-red-50 rounded-full border border-red-100">Live Editor</span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow w-full">
+        
+        {/* Professional Header Panel */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-red-500/5 rounded-full blur-[120px] pointer-events-none" />
+          <div className="absolute -bottom-10 left-1/3 w-64 h-64 bg-slate-100 rounded-full blur-2xl pointer-events-none" />
+          
+          <div className="relative z-10">
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <span className="bg-red-50 text-red-700 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border border-red-100">
+                SYSTEM OPERATOR PAGE
+              </span>
+              <span className="bg-slate-100 text-slate-800 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border border-slate-200">
+                ADMIN ENVIRONMENT
+              </span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-none">
+              Administrative Control Board
             </h1>
-            <p className="text-gray-500">Create, edit, delete, and curate premium driving blogs.</p>
+            <p className="text-slate-500 text-xs sm:text-sm mt-2 font-medium max-w-2xl">
+              Create, edit, manage, and audit local Faisalabad driving school curriculums, student registrations, rental marketplace vehicles, and content listings instantly.
+            </p>
           </div>
-          <div className="flex items-center gap-3">
-            <Link to="/blog" className="self-start md:self-auto bg-gray-900 hover:bg-gray-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition shadow-sm">
-              <ArrowLeft className="w-4 h-4" /> Exit to Blogs Page
+          <div className="flex items-center gap-2 shrink-0 relative z-10 w-full md:w-auto">
+            <Link 
+              to="/blog" 
+              className="w-full md:w-auto bg-slate-900 hover:bg-slate-800 text-white px-5 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-center flex items-center justify-center gap-2 transition shadow-md shadow-slate-900/10"
+            >
+              <ArrowLeft className="w-4 h-4" /> Exit Board
             </Link>
             <button 
               onClick={purgeLocalStorage}
-              className="p-2.5 bg-white border border-gray-200 text-gray-300 hover:text-red-500 hover:border-red-100 hover:bg-red-50 rounded-xl transition-all opacity-20 hover:opacity-100 cursor-pointer"
-              title="Factory Reset Application State"
+              className="p-3 bg-white border border-slate-200 text-slate-400 hover:text-red-650 hover:border-red-200 hover:bg-red-50 rounded-xl transition cursor-pointer shadow-sm shrink-0"
+              title="Factory Reset LocalStorage State"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-4.5 h-4.5" />
             </button>
           </div>
         </div>
-        {/* DUAL-PURPOSE PLATFORM ADMIN STRIP TABS */}
-        <div className="flex flex-wrap border-b border-gray-200 mb-8 gap-2 pb-2">
-          {/* Tab 1: Manage Driving School Bookings */}
-          <button 
-            type="button"
-            onClick={() => setActiveTab('bookings')}
-            className={`pb-4 px-6 font-bold text-sm tracking-wide transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'bookings' 
-                ? 'border-red-650 text-red-650 font-black' 
-                : 'border-transparent text-gray-500 hover:text-gray-800'
-            }`}
-          >
-            <FileSpreadsheet className="w-4 h-4 text-red-650" />
-            Academy Bookings (ڈرائیونگ بکنگز)
-          </button>
 
-          {/* Tab 2: Manage Blogs */}
-          <button 
-            type="button"
-            onClick={() => setActiveTab('blogs')}
-            className={`pb-4 px-6 font-bold text-sm tracking-wide transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'blogs' 
-                ? 'border-red-650 text-red-650 font-black' 
-                : 'border-transparent text-gray-500 hover:text-gray-800'
-            }`}
-          >
-            <Plus className="w-4 h-4 text-gray-550" />
-            Blogs Manager (بلاگ مینیجر)
-          </button>
+        {/* Live System Diagnostics Rows */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-slate-400 text-[10px] font-black uppercase tracking-wider">Bookings Registered</span>
+              <div className="w-7 h-7 bg-red-50 rounded-lg flex items-center justify-center text-red-650">
+                <FileSpreadsheet className="w-4 h-4" />
+              </div>
+            </div>
+            <p className="text-2xl sm:text-3xl font-black text-slate-900 leading-none">
+              {bookings.length}
+            </p>
+            <div className="text-[10px] text-emerald-600 font-extrabold mt-2 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>Online submissions</span>
+            </div>
+          </div>
 
-          {/* Tab 3: Approve / Manage Listed Cars */}
-          <button 
-            type="button"
-            onClick={() => setActiveTab('rentals')}
-            className={`pb-4 px-6 font-bold text-sm tracking-wide transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'rentals' 
-                ? 'border-red-650 text-red-650 font-black' 
-                : 'border-transparent text-gray-500 hover:text-gray-800'
-            }`}
-          >
-            <Car className="w-4 h-4 text-red-650 animate-bounce" />
-            Car Listings Approval (رینٹل کار مینیجر)
-          </button>
+          <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-slate-400 text-[10px] font-black uppercase tracking-wider">Fleet Approved</span>
+              <div className="w-7 h-7 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600">
+                <Car className="w-4 h-4" />
+              </div>
+            </div>
+            <p className="text-2xl sm:text-3xl font-black text-slate-900 leading-none">
+              {rentalCars.length}
+            </p>
+            <div className="text-[10px] text-sky-600 font-extrabold mt-2 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
+              <span>Available rentals</span>
+            </div>
+          </div>
 
-          {/* Tab 4: SEO & DNS Settings */}
-          <button 
-            type="button"
-            onClick={() => setActiveTab('dns')}
-            className={`pb-4 px-6 font-bold text-sm tracking-wide transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'dns' 
-                ? 'border-red-650 text-red-650 font-black' 
-                : 'border-transparent text-gray-500 hover:text-gray-800'
-            }`}
-          >
-            <ShieldAlert className="w-4 h-4 text-yellow-500 animate-pulse" />
-            SEO & DNS Settings (DMARC)
-          </button>
+          <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-slate-400 text-[10px] font-black uppercase tracking-wider">Verification Work</span>
+              <div className="w-7 h-7 bg-amber-50 rounded-lg flex items-center justify-center text-amber-600">
+                <Clock className="w-4 h-4" />
+              </div>
+            </div>
+            <p className="text-2xl sm:text-3xl font-black text-slate-900 leading-none">
+              {pendingCars.length + customerRequests.length}
+            </p>
+            <div className="text-[10px] text-amber-600 font-extrabold mt-2 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+              <span>Awaiting review</span>
+            </div>
+          </div>
 
-          {/* Tab 5: Customer Requests */}
-          <button 
-            type="button"
-            onClick={() => setActiveTab('requests')}
-            className={`pb-4 px-6 font-bold text-sm tracking-wide transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'requests' 
-                ? 'border-red-650 text-red-650 font-black' 
-                : 'border-transparent text-gray-500 hover:text-gray-800'
-            }`}
-          >
-            <Clock className="w-4 h-4 text-indigo-500" />
-            Approve Car Requests (کسٹمرز)
-          </button>
-
-          {/* Tab 6: Manage Driving Courses */}
-          <button 
-            type="button"
-            onClick={() => setActiveTab('courses')}
-            className={`pb-4 px-6 font-bold text-sm tracking-wide transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'courses' 
-                ? 'border-red-650 text-red-650 font-black' 
-                : 'border-transparent text-gray-500 hover:text-gray-800'
-            }`}
-          >
-            <Sliders className="w-4 h-4 text-amber-500 animate-spin" style={{ animationDuration: '6s' }} />
-            Academy Courses (ڈرائیونگ کورسز)
-          </button>
+          <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-slate-400 text-[10px] font-black uppercase tracking-wider">Academy Curriculums</span>
+              <div className="w-7 h-7 bg-purple-50 rounded-lg flex items-center justify-center text-purple-650">
+                <Sliders className="w-4 h-4" />
+              </div>
+            </div>
+            <p className="text-2xl sm:text-3xl font-black text-slate-900 leading-none">
+              {drivingCourses.length}
+            </p>
+            <div className="text-[10px] text-purple-600 font-extrabold mt-2 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
+              <span>Active courses</span>
+            </div>
+          </div>
         </div>
 
-        {activeTab === 'bookings' && (
-          <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm p-6 sm:p-8 animate-fade-in space-y-6">
-            <div className="border-b border-gray-100 pb-5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h2 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
-                    <FileSpreadsheet className="w-6 h-6 text-red-600" />
-                    Manage Driving Academy Bookings (بکنگز مینیجر)
+        {/* Dynamic Multi-Column Master Workspace Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-12">
+          
+          {/* LEFT COMMAND SIDEBAR */}
+          <div className="lg:col-span-3 space-y-4">
+            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4">
+              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2 border-b border-slate-100 pb-2">
+                Operations Directory
+              </h3>
+              
+              {/* Responsive Tab Buttons Stack */}
+              <div className="flex flex-row lg:flex-col overflow-x-auto lg:overflow-x-visible gap-1.5 pb-2 lg:pb-0 scrollbar-none">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('bookings')}
+                  className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                    activeTab === 'bookings'
+                      ? 'bg-red-700 text-white font-extrabold shadow-md shadow-red-700/10'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
+                    <FileSpreadsheet className="w-4 h-4" />
+                    <span>Academy Bookings</span>
+                  </div>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-md font-black min-w-5 text-center ${
+                    activeTab === 'bookings' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                  }`}>
+                    {bookings.length}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('courses')}
+                  className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                    activeTab === 'courses'
+                      ? 'bg-red-700 text-white font-extrabold shadow-md shadow-red-700/10'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
+                    <Sliders className="w-4 h-4" />
+                    <span>Academy Courses</span>
+                  </div>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-md font-black min-w-5 text-center ${
+                    activeTab === 'courses' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                  }`}>
+                    {drivingCourses.length}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('rentals')}
+                  className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                    activeTab === 'rentals'
+                      ? 'bg-red-700 text-white font-extrabold shadow-md shadow-red-700/10'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
+                    <Car className="w-4 h-4" />
+                    <span>Rental Fleet</span>
+                  </div>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-md font-black min-w-5 text-center ${
+                    activeTab === 'rentals' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                  }`}>
+                    {rentalCars.length}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('requests')}
+                  className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                    activeTab === 'requests'
+                      ? 'bg-red-700 text-white font-extrabold shadow-md shadow-red-700/10'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
+                    <Clock className="w-4 h-4" />
+                    <span>Market Requests</span>
+                  </div>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-md font-black min-w-5 text-center ${
+                    activeTab === 'requests' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                  }`}>
+                    {customerRequests.length}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('blogs')}
+                  className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                    activeTab === 'blogs'
+                      ? 'bg-red-700 text-white font-extrabold shadow-md shadow-red-700/10'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
+                    <Plus className="w-4 h-4" />
+                    <span>Blogs Manager</span>
+                  </div>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-md font-black min-w-5 text-center ${
+                    activeTab === 'blogs' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                  }`}>
+                    {posts.length}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('dns')}
+                  className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                    activeTab === 'dns'
+                      ? 'bg-red-700 text-white font-extrabold shadow-md shadow-red-700/10'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
+                    <ShieldAlert className="w-4 h-4" />
+                    <span>SEO & DNS</span>
+                  </div>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ${
+                    activeTab === 'dns' ? 'bg-white/30 text-white' : 'bg-amber-100 text-amber-800'
+                  }`}>
+                    SSL
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT WORKSPACE DISPLAY VIEWPORT */}
+          <div className="lg:col-span-9 space-y-6">
+            {activeTab === 'bookings' && (
+              <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-8 animate-fade-in space-y-6">
+                <div className="border-b border-gray-100 pb-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h2 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+                        <FileSpreadsheet className="w-6 h-6 text-red-650" />
+                        Manage Driving Academy Bookings (بکنگز مینیجر)
                   </h2>
                   <p className="text-gray-500 text-xs sm:text-sm mt-1">
                     Process incoming course submissions. Select appropriate status modes like Confirm, Reschedule, or Cancel to coordinate with driver education pupils.
@@ -2722,7 +2858,9 @@ export default function AdminPage() {
             </div>
           </div>
         )}
-      </div>
+          </div> {/* Closes right workspace lg:col-span-9 */}
+        </div> {/* Closes master workspace grid */}
+      </div> {/* Closes main container max-w-7xl */}
 
       {/* Verification Vault Modal */}
       {vaultSelectedDocs && (
