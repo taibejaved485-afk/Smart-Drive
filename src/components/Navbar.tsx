@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 
 const PRESET_CAR_IMAGE_OPTIONS = [
   {
-    url: 'https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600',
+    url: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=600',
     label: 'White Luxury Sedan (Honda Civic Style)'
   },
   {

@@ -58,7 +58,7 @@ export default function ServicesPage() {
 
   useEffect(() => {
     const syncDrivingCourses = () => {
-      const saved = localStorage.getItem('driving_courses_v2');
+      const saved = localStorage.getItem('driving_courses_v3');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
@@ -82,7 +82,7 @@ export default function ServicesPage() {
         courseTitle: "10 Days Course Package",
         courseDescription: "Learn professional manual gear control from experienced trainers.",
         courseFee: "25000",
-        carImage: "https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600",
+        carImage: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=600",
         lessonDuration: "30 Mins Driving Lesson",
         dailyTime: "40 min Per Day",
         theoryDuration: "10 min Theory Session",
@@ -106,7 +106,7 @@ export default function ServicesPage() {
         courseTitle: "1 Month Complete Package",
         courseDescription: "Expert motorcycle sessions to ride heavy sport bike configurations.",
         courseFee: "50000",
-        carImage: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=600",
+        carImage: "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=600",
         lessonDuration: "60 Mins Driving Lesson",
         dailyTime: "40 min Per Day",
         theoryDuration: "10 min Theory Session",

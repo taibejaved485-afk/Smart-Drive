@@ -17,7 +17,7 @@ interface BlogPost {
 
 const PRESET_CAR_IMAGES = [
   {
-    url: 'https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600',
+    url: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=600',
     label: 'White Sedan (Honda Civic)'
   },
   {
@@ -134,7 +134,7 @@ const DEFAULT_DRIVING_COURSES: DrivingCourse[] = [
     courseTitle: "1 Month Complete Package",
     courseDescription: "Expert motorcycle sessions to ride heavy sport bike configurations.",
     courseFee: "50000",
-    carImage: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=600",
+    carImage: "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=600",
     lessonDuration: "60 Mins Driving Lesson",
     dailyTime: "40 min Per Day",
     theoryDuration: "10 min Theory Session",
@@ -363,7 +363,7 @@ export default function AdminPage() {
     }
 
     // 6. Load Driving Courses Registry
-    const savedCourses = localStorage.getItem('driving_courses_v2');
+    const savedCourses = localStorage.getItem('driving_courses_v3');
     if (savedCourses) {
       try {
         const parsed = JSON.parse(savedCourses);

@@ -22,9 +22,9 @@ const DEFAULT_FEATURED = [
     courseTitle: "10 Days Course Package",
     courseDescription: "Learn driving with automatic or manual Honda Civic.",
     courseFee: "25000",
-    carImage: "https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600",
+    carImage: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=600",
     instructorName: "Mr Shahzad",
-    instructorImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200&h=200"
+    instructorImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200&h=200"
   },
   {
     id: "course-2",
@@ -33,23 +33,23 @@ const DEFAULT_FEATURED = [
     courseFee: "25000",
     carImage: "https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600",
     instructorName: "Ms Alina",
-    instructorImage: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200"
+    instructorImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200&h=200"
   },
   {
     id: "course-3",
     courseTitle: "1 Month Complete Package",
     courseDescription: "Expert lessons for riding heavy motorcycles safely.",
     courseFee: "50000",
-    carImage: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=600",
+    carImage: "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=600",
     instructorName: "Mr Ahmed",
-    instructorImage: "https://images.unsplash.com/photo-1560250097-0b93528c31e3?auto=format&fit=crop&q=80&w=200&h=200"
+    instructorImage: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=200&h=200"
   }
 ];
 
 const INSTRUCTORS = [
-  { name: "Mr Shahzad", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200&h=200" },
-  { name: "Ms Alina", img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200" },
-  { name: "Mr Ahmed", img: "https://images.unsplash.com/photo-1560250097-0b93528c31e3?auto=format&fit=crop&q=80&w=200&h=200" }
+  { name: "Mr Shahzad", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200&h=200" },
+  { name: "Ms Alina", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200&h=200" },
+  { name: "Mr Ahmed", img: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=200&h=200" }
 ];
 
 export default function FeaturedCourses() {
@@ -59,7 +59,7 @@ export default function FeaturedCourses() {
 
   useEffect(() => {
     const loadCourses = () => {
-      const saved = localStorage.getItem('driving_courses_v2');
+      const saved = localStorage.getItem('driving_courses_v3');
       if (saved) {
         try {
           const parsed = JSON.parse(saved) as StoredCourse[];
@@ -71,7 +71,7 @@ export default function FeaturedCourses() {
                 title: c.courseTitle,
                 desc: c.courseDescription,
                 price: c.courseFee,
-                image: c.carImage || "https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600",
+                image: c.carImage || "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=600",
                 instructorName: inst.name,
                 instructorImage: inst.img
               };

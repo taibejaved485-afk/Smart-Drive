@@ -74,7 +74,7 @@ export default function Lessons() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         {/* Header Section */}
-        <div className="mb-20 text-center max-w-3xl mx-auto">
+        <div className="mb-20 text-center mx-auto w-full">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             whileInView={{ opacity: 1, y: 0 }}
