@@ -58,7 +58,7 @@ export default function ServicesPage() {
 
   useEffect(() => {
     const syncDrivingCourses = () => {
-      const saved = localStorage.getItem('drivingCourses');
+      const saved = localStorage.getItem('driving_courses_v2');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
@@ -72,45 +72,45 @@ export default function ServicesPage() {
         }
       } else {
         setCourses(DEFAULT_PRICING_COURSES);
-        localStorage.setItem('drivingCourses', JSON.stringify(DEFAULT_PRICING_COURSES));
+        localStorage.setItem('driving_courses_v2', JSON.stringify(DEFAULT_PRICING_COURSES));
       }
     };
 
     const DEFAULT_PRICING_COURSES = [
       {
         id: "course-1",
-        courseTitle: "Honda Civic (Manual)",
+        courseTitle: "10 Days Course Package",
         courseDescription: "Learn professional manual gear control from experienced trainers.",
         courseFee: "25000",
         carImage: "https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600",
         lessonDuration: "30 Mins Driving Lesson",
         dailyTime: "40 min Per Day",
         theoryDuration: "10 min Theory Session",
-        coursePeriod: "10 Days Course",
+        coursePeriod: "10 Days Training Duration",
         additionalTime: "Additional Time Available"
       },
       {
         id: "course-2",
-        courseTitle: "Honda Civic (Auto)",
+        courseTitle: "20 Days Course Package",
         courseDescription: "Master driving in our fully automatic modern Civic, ideal for beginners.",
         courseFee: "25000",
         carImage: "https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600",
         lessonDuration: "30 Mins Driving Lesson",
         dailyTime: "40 min Per Day",
         theoryDuration: "10 min Theory Session",
-        coursePeriod: "10 Days Course",
+        coursePeriod: "20 Days Intensive Plan",
         additionalTime: "Additional Time Available"
       },
       {
         id: "course-3",
-        courseTitle: "Heavy Bike",
+        courseTitle: "1 Month Complete Package",
         courseDescription: "Expert motorcycle sessions to ride heavy sport bike configurations.",
         courseFee: "50000",
         carImage: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=600",
         lessonDuration: "60 Mins Driving Lesson",
         dailyTime: "40 min Per Day",
         theoryDuration: "10 min Theory Session",
-        coursePeriod: "10 Days Course",
+        coursePeriod: "1 Month Comprehensive Track",
         additionalTime: "Additional Time Available"
       }
     ];
@@ -214,27 +214,35 @@ export default function ServicesPage() {
       <Navbar />
 
       {/* Hero Banner Section */}
-      <section className="relative overflow-hidden bg-slate-50 border-b border-gray-100 py-20 lg:py-28">
+      <section className="relative overflow-hidden bg-white border-b border-gray-100 py-20 lg:py-28">
         <div className="absolute top-0 right-0 w-96 h-96 bg-red-100/30 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-slate-100 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-slate-100/50 rounded-full blur-2xl pointer-events-none" />
         
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-          <span className="inline-flex items-center gap-1 bg-red-50 border border-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4">
-            <Sparkles className="w-3.5 h-3.5" /> All-in-One Automobile Hub
-          </span>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-none mb-6">
-            Get Behind the Wheel. <br />
-            <span className="text-red-700">Explore Our Services.</span>
-          </h1>
-          <p className="max-w-3xl mx-auto text-slate-500 text-base sm:text-lg leading-relaxed font-medium">
-            Whether you are here to learn defensive driving, build steady passive income by renting your vehicle, or list your car for a high-value hassle-free sale, GoDriveify is your premium partner.
-          </p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="text-left">
+              <span className="inline-flex items-center gap-1 bg-red-50 border border-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4">
+                <Sparkles className="w-3.5 h-3.5" /> All-in-One Automobile Hub
+              </span>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-none mb-6">
+                Get Behind the Wheel. <br />
+                <span className="text-red-700">Explore Our Services.</span>
+              </h1>
+              <p className="max-w-xl text-slate-500 text-base sm:text-lg leading-relaxed font-medium">
+                Whether you are here to learn defensive driving, build steady passive income by renting your vehicle, or list your car for a high-value hassle-free sale, GoDriveify is your premium partner.
+              </p>
+            </div>
+          
+            <div className="hidden lg:flex justify-center items-center relative">
+                 <img src="https://i.pinimg.com/1200x/ee/dc/79/eedc79c7a80fec3048983cef468e7191.jpg" alt="3D Car" className="w-full max-w-lg object-contain z-10 relative mix-blend-multiply" />
+            </div>
+          </div>
 
-          <div className="mt-8 flex flex-wrap gap-4 justify-center">
+          <div className="mt-16 flex flex-col md:flex-row flex-nowrap justify-center items-center gap-4 overflow-x-auto pb-4">
             <button 
               id="tab-btn-driving"
               onClick={() => setActiveTab('driving')}
-              className={`px-6 sm:px-8 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer border ${
+              className={`whitespace-nowrap px-6 sm:px-8 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer border ${
                 activeTab === 'driving' 
                   ? 'bg-red-700 hover:bg-red-800 text-white shadow-lg border-transparent shadow-red-700/20' 
                   : 'bg-white border-slate-200 text-slate-700 hover:text-red-750 hover:border-red-500/30 hover:bg-red-50/30'
@@ -245,7 +253,7 @@ export default function ServicesPage() {
             <button 
               id="tab-btn-rent"
               onClick={() => setActiveTab('rent')}
-              className={`px-6 sm:px-8 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer border ${
+              className={`whitespace-nowrap px-6 sm:px-8 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer border ${
                 activeTab === 'rent' 
                   ? 'bg-slate-900 hover:bg-slate-800 text-white shadow-lg border-transparent shadow-slate-900/20' 
                   : 'bg-white border-slate-200 text-slate-700 hover:text-slate-900 hover:border-slate-300 hover:bg-slate-50'
@@ -256,7 +264,7 @@ export default function ServicesPage() {
             <button 
               id="tab-btn-sale"
               onClick={() => setActiveTab('sale')}
-              className={`px-6 sm:px-8 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer border ${
+              className={`whitespace-nowrap px-6 sm:px-8 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer border ${
                 activeTab === 'sale' 
                   ? 'bg-red-950 hover:bg-red-900 text-white shadow-lg border-transparent shadow-red-950/20' 
                   : 'bg-white border-slate-200 text-slate-700 hover:text-slate-905 hover:border-slate-300 hover:bg-slate-50'

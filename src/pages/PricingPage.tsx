@@ -107,7 +107,7 @@ export default function PricingPage() {
 
   useEffect(() => {
     const syncPricingCourses = () => {
-      const saved = localStorage.getItem('drivingCourses');
+      const saved = localStorage.getItem('driving_courses_v2');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
@@ -121,45 +121,45 @@ export default function PricingPage() {
         }
       } else {
         setCourses(DEFAULT_PRICING_COURSES);
-        localStorage.setItem('drivingCourses', JSON.stringify(DEFAULT_PRICING_COURSES));
+        localStorage.setItem('driving_courses_v2', JSON.stringify(DEFAULT_PRICING_COURSES));
       }
     };
 
     const DEFAULT_PRICING_COURSES = [
       {
         id: "course-1",
-        courseTitle: "Honda Civic (Manual)",
-        courseDescription: "Learn driving with automatic or manual Honda Civic.",
+        courseTitle: "10 Days Course Package",
+        courseDescription: "Learn professional manual gear control from experienced trainers.",
         courseFee: "25000",
         carImage: "https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600",
         lessonDuration: "30 Mins Driving Lesson",
         dailyTime: "40 min Per Day",
         theoryDuration: "10 min Theory Session",
-        coursePeriod: "10 Days Course",
+        coursePeriod: "10 Days Training Duration",
         additionalTime: "Additional Time Available"
       },
       {
         id: "course-2",
-        courseTitle: "Honda Civic (Auto)",
-        courseDescription: "Learn driving with automatic or manual Honda Civic.",
+        courseTitle: "20 Days Course Package",
+        courseDescription: "Master driving in our fully automatic modern Civic, ideal for beginners.",
         courseFee: "25000",
         carImage: "https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600",
         lessonDuration: "30 Mins Driving Lesson",
         dailyTime: "40 min Per Day",
         theoryDuration: "10 min Theory Session",
-        coursePeriod: "10 Days Course",
+        coursePeriod: "20 Days Intensive Plan",
         additionalTime: "Additional Time Available"
       },
       {
         id: "course-3",
-        courseTitle: "Heavy Bike",
-        courseDescription: "Expert lessons for riding heavy motorcycles safely.",
+        courseTitle: "1 Month Complete Package",
+        courseDescription: "Expert motorcycle sessions to ride heavy sport bike configurations.",
         courseFee: "50000",
         carImage: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=600",
         lessonDuration: "60 Mins Driving Lesson",
         dailyTime: "40 min Per Day",
         theoryDuration: "10 min Theory Session",
-        coursePeriod: "10 Days Course",
+        coursePeriod: "1 Month Comprehensive Track",
         additionalTime: "Additional Time Available"
       }
     ];
@@ -183,8 +183,8 @@ export default function PricingPage() {
         "@type": "Offer",
         "itemOffered": {
           "@type": "Service",
-          "name": "Honda Civic (Manual) Driving Course",
-          "description": "10 Days Course manual gear shifter lessons on Honda Civic."
+          "name": "10 Days Course Package",
+          "description": "Learn professional manual gear control from experienced trainers."
         },
         "price": "25000",
         "priceCurrency": "PKR"
@@ -193,8 +193,8 @@ export default function PricingPage() {
         "@type": "Offer",
         "itemOffered": {
           "@type": "Service",
-          "name": "Honda Civic (Automatic) Driving Course",
-          "description": "10 Days Course automatic transmission lessons on Honda Civic."
+          "name": "20 Days Course Package",
+          "description": "Master driving in our fully automatic modern Civic, ideal for beginners."
         },
         "price": "25000",
         "priceCurrency": "PKR"
@@ -203,8 +203,8 @@ export default function PricingPage() {
         "@type": "Offer",
         "itemOffered": {
           "@type": "Service",
-          "name": "Heavy Bike Riding Course",
-          "description": "Complete heavy motorcycle training under certified coaches."
+          "name": "1 Month Complete Package",
+          "description": "Expert motorcycle sessions to ride heavy sport bike configurations."
         },
         "price": "50000",
         "priceCurrency": "PKR"

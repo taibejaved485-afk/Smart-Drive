@@ -107,38 +107,38 @@ interface DrivingCourse {
 const DEFAULT_DRIVING_COURSES: DrivingCourse[] = [
   {
     id: "course-1",
-    courseTitle: "Honda Civic (Manual)",
-    courseDescription: "Learn driving with automatic or manual Honda Civic.",
+    courseTitle: "10 Days Course Package",
+    courseDescription: "Learn professional manual gear control from experienced trainers.",
     courseFee: "25000",
     carImage: "https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600",
     lessonDuration: "30 Mins Driving Lesson",
     dailyTime: "40 min Per Day",
     theoryDuration: "10 min Theory Session",
-    coursePeriod: "10 Days Course",
+    coursePeriod: "10 Days Training Duration",
     additionalTime: "Additional Time Available"
   },
   {
     id: "course-2",
-    courseTitle: "Honda Civic (Auto)",
-    courseDescription: "Learn driving with automatic or manual Honda Civic.",
+    courseTitle: "20 Days Course Package",
+    courseDescription: "Master driving in our fully automatic modern Civic, ideal for beginners.",
     courseFee: "25000",
     carImage: "https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600",
     lessonDuration: "30 Mins Driving Lesson",
     dailyTime: "40 min Per Day",
     theoryDuration: "10 min Theory Session",
-    coursePeriod: "10 Days Course",
+    coursePeriod: "20 Days Intensive Plan",
     additionalTime: "Additional Time Available"
   },
   {
     id: "course-3",
-    courseTitle: "Heavy Bike",
-    courseDescription: "Expert lessons for riding heavy motorcycles safely.",
+    courseTitle: "1 Month Complete Package",
+    courseDescription: "Expert motorcycle sessions to ride heavy sport bike configurations.",
     courseFee: "50000",
     carImage: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=600",
     lessonDuration: "60 Mins Driving Lesson",
     dailyTime: "40 min Per Day",
     theoryDuration: "10 min Theory Session",
-    coursePeriod: "10 Days Course",
+    coursePeriod: "1 Month Comprehensive Track",
     additionalTime: "Additional Time Available"
   }
 ];
@@ -363,7 +363,7 @@ export default function AdminPage() {
     }
 
     // 6. Load Driving Courses Registry
-    const savedCourses = localStorage.getItem('drivingCourses');
+    const savedCourses = localStorage.getItem('driving_courses_v2');
     if (savedCourses) {
       try {
         const parsed = JSON.parse(savedCourses);
@@ -377,7 +377,7 @@ export default function AdminPage() {
       }
     } else {
       setDrivingCourses(DEFAULT_DRIVING_COURSES);
-      localStorage.setItem('drivingCourses', JSON.stringify(DEFAULT_DRIVING_COURSES));
+      localStorage.setItem('driving_courses_v2', JSON.stringify(DEFAULT_DRIVING_COURSES));
     }
   };
 
@@ -2542,7 +2542,7 @@ export default function AdminPage() {
                     if (editingCourseId) {
                       const updated = drivingCourses.map(c => c.id === editingCourseId ? { ...newCourse, id: editingCourseId } : c);
                       setDrivingCourses(updated);
-                      localStorage.setItem('drivingCourses', JSON.stringify(updated));
+                      localStorage.setItem('driving_courses_v2', JSON.stringify(updated));
                       setEditingCourseId(null);
                       setNewCourse({
                         courseTitle: '',
@@ -2561,7 +2561,7 @@ export default function AdminPage() {
                       const finalCourse = { ...newCourse, id: courseId };
                       const updated = [finalCourse, ...drivingCourses];
                       setDrivingCourses(updated);
-                      localStorage.setItem('drivingCourses', JSON.stringify(updated));
+                      localStorage.setItem('driving_courses_v2', JSON.stringify(updated));
                       setNewCourse({
                         courseTitle: '',
                         courseDescription: '',
@@ -2837,7 +2837,7 @@ export default function AdminPage() {
                                 if (window.confirm(`Delete "${course.courseTitle}" course template?`)) {
                                   const updated = drivingCourses.filter(c => c.id !== course.id);
                                   setDrivingCourses(updated);
-                                  localStorage.setItem('drivingCourses', JSON.stringify(updated));
+                                  localStorage.setItem('driving_courses_v2', JSON.stringify(updated));
                                   showToast('Course package deleted.', 'info');
                                   window.dispatchEvent(new Event('driving_courses_updated'));
                                   window.dispatchEvent(new Event('storage'));
