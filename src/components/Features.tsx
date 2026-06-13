@@ -56,27 +56,24 @@ const FeatureCard: React.FC<{ feature: any }> = ({ feature }) => {
     <div 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="relative flex flex-col items-start gap-4 p-6 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 group"
+      className="relative p-[1px] rounded-2xl overflow-hidden group hover:shadow-xl transition-all duration-300"
     >
-      <style>{`
-        @keyframes travel-rectangle {
-          0%, 100% { top: -10px; left: -10px; }
-          25% { top: -10px; left: calc(100% - 6px); }
-          50% { top: calc(100% - 6px); left: calc(100% - 6px); }
-          75% { top: calc(100% - 6px); left: -10px; }
-        }
-        .animate-travel-rectangle { animation: travel-rectangle 4s linear infinite; }
-      `}</style>
+      {isHovered ? (
+        <div className="absolute inset-0 bg-red-100/50">
+          <span className="absolute w-[300%] h-[300%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#dc2626_0%,transparent_15%)]" />
+        </div>
+      ) : (
+        <div className="absolute inset-0 bg-gray-100" />
+      )}
       
-      {/* Rectangular Red Dot */}
-      <div className={`absolute w-4 h-4 bg-red-600 rounded-full shadow-[0_0_15px_#dc2626] animate-travel-rectangle z-0 ${isHovered ? 'block' : 'hidden'}`} />
-      
-      <div className="relative z-10 p-4 rounded-full bg-red-600 shadow-md">
-        <feature.icon className="w-8 h-8 text-white" />
+      <div className="relative flex flex-col items-start gap-4 p-6 bg-white rounded-[15px] h-full z-10 w-full">
+        <div className="relative z-10 p-4 rounded-full bg-red-600 shadow-md">
+          <feature.icon className="w-8 h-8 text-white" />
+        </div>
+        <h3 className="relative z-10 font-display font-bold text-xl text-gray-900">{feature.label}</h3>
+        <div className="relative z-10 w-16 h-1 bg-red-500 rounded-full" />
+        <p className="relative z-10 text-gray-600 leading-relaxed text-sm min-h-[4rem] flex-grow">{displayedText}</p>
       </div>
-      <h3 className="relative z-10 font-display font-bold text-xl text-gray-900">{feature.label}</h3>
-      <div className="relative z-10 w-16 h-1 bg-red-500 rounded-full" />
-      <p className="relative z-10 text-gray-600 leading-relaxed text-sm min-h-[4rem]">{displayedText}</p>
     </div>
   );
 };
