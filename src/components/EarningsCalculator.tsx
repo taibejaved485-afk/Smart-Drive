@@ -45,6 +45,7 @@ export default function EarningsCalculator() {
 
   // Update total estimation output to include retention bonus
   const targetEarnings = (currentRate * days) + retentionBonus;
+  const sliderPercentage = ((days - 1) / (30 - 1)) * 100;
 
   // Smooth dynamic count transition
   useEffect(() => {
@@ -139,14 +140,17 @@ export default function EarningsCalculator() {
                   </span>
                 </div>
               </div>
-              <div className="relative">
+              <div className="relative pt-1">
                 <input
                   type="range"
                   min="1"
                   max="30"
                   value={days}
                   onChange={(e) => setDays(Number(e.target.value))}
-                  className="w-full h-2 bg-slate-205 rounded-lg appearance-none cursor-pointer accent-red-650 my-4"
+                  className="custom-slider"
+                  style={{
+                    background: `linear-gradient(to right, #dc2626 0%, #dc2626 ${sliderPercentage}%, #e2e8f0 ${sliderPercentage}%, #e2e8f0 100%)`
+                  }}
                 />
                 <div className="flex justify-between text-[10px] text-slate-450 font-mono">
                   <span>1 day</span>
