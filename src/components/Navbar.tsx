@@ -2,6 +2,7 @@ import React, { useState, useEffect, FormEvent } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Phone, Car, Plus, Check, ChevronRight, User, ShieldCheck, Mail, Info, UploadCloud, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useToast } from './Toast';
 
 const PRESET_CAR_IMAGE_OPTIONS = [
   {
@@ -31,6 +32,7 @@ const PRESET_CAR_IMAGE_OPTIONS = [
 ];
 
 export default function Navbar() {
+  const toast = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [modalType, setModalType] = useState<'Learning' | 'Rent' | 'Sale' | null>(null);
   const [step, setStep] = useState(1);
@@ -78,7 +80,7 @@ export default function Navbar() {
   const handleNextStep = () => {
     if (step === 1) {
       if (!formData.ownerName.trim() || !formData.ownerPhone.trim()) {
-        alert('Please fill out your owner name and WhatsApp number.');
+        toast.warning('Please fill out your owner name and active phone number.', 'Missing Fields');
         return;
       }
       if (!formData.cnicDoc) {
@@ -87,7 +89,7 @@ export default function Navbar() {
       }
     } else if (step === 2) {
       if (!formData.name.trim() || !formData.registrationNumber.trim()) {
-        alert('Please fill out car details and registration number.');
+        toast.warning('Please fill out car brand/model details and registration number.', 'Incomplete Specifications');
         return;
       }
       if (!formData.registrationDoc) {
@@ -116,14 +118,14 @@ export default function Navbar() {
   const handleSubmitOwnerCar = (e: FormEvent) => {
     e.preventDefault();
     if (!formData.rentPrice.trim()) {
-      alert('Please specify the rent rate.');
+      toast.warning('Please specify the rental price rate.', 'Missing Pricing');
       return;
     }
 
     const sanitizedPrice = formData.rentPrice.replace(/,/g, '').trim();
     const parsedPrice = parseFloat(sanitizedPrice);
     if (isNaN(parsedPrice)) {
-      alert('Please enter a valid price number.');
+      toast.error('Please enter a valid price/rent amount number.', 'Invalid Format');
       return;
     }
 
@@ -167,6 +169,10 @@ export default function Navbar() {
     }
 
     setSubmissionComplete(true);
+    toast.success(
+      `Your car "${formData.name}" was successfully registered for review!`,
+      modalType === 'Rent' ? 'Rent Booking Initiated' : 'Sale Registration Received'
+    );
   };
 
   const resetListingForm = () => {
@@ -196,7 +202,7 @@ export default function Navbar() {
 
     const remainingSlots = 4 - formData.imageUrls.length;
     if (remainingSlots <= 0) {
-      alert('You can only upload a maximum of 4 images.');
+      toast.error('You can only upload a maximum of 4 images.', 'Upload Limit Reached');
       return;
     }
 
@@ -204,7 +210,7 @@ export default function Navbar() {
 
     filesToProcess.forEach(file => {
       if (file.size > 5 * 1024 * 1024) {
-        alert(`${file.name} exceeds the 5MB limit.`);
+        toast.error(`${file.name} exceeds the 5MB size limit.`, 'File Too Large');
         return;
       }
       const reader = new FileReader();

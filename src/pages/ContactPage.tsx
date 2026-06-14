@@ -9,10 +9,12 @@ import {
   Mail, Phone, MapPin, Clock, Send, CheckCircle2, ChevronRight, 
   Car, Shield, Award, HelpCircle, ArrowRight, MessageSquare, ExternalLink
 } from 'lucide-react';
+import { useToast } from '../components/Toast';
 
 export default function ContactPage() {
   const [searchParams] = useSearchParams();
   const programParam = searchParams.get('program');
+  const toast = useToast();
 
   const contactSchema = {
     "@context": "https://schema.org",
@@ -94,10 +96,25 @@ export default function ContactPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Quick validation with graceful error toast
+    const cleanPhone = formData.phone.replace(/[^0-9]/g, '');
+    if (cleanPhone.length < 10 || cleanPhone.length > 12) {
+      toast.error(
+        'Please enter a valid active phone number (10 to 11 digits format, e.g. 0300-1234567).',
+        'Invalid Contact Phone'
+      );
+      return;
+    }
+
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
       setIsSubmitted(true);
+      toast.success(
+        `Session reservation registered for ${formData.course}. Our support team will connect with you shortly!`,
+        'Inquiry Submitted'
+      );
     }, 1200);
   };
 
