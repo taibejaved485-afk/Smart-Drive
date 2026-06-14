@@ -24,10 +24,10 @@ export default function About() {
           {/* Images Section */}
           <div className="grid grid-cols-2 gap-4">
             <div className="rounded-3xl shadow-xl overflow-hidden h-80 sm:h-96 group transition-shadow duration-500 hover:shadow-2xl">
-              <img src="https://i.pinimg.com/736x/a1/63/96/a1639624eb25cd6c5e373b87f7245cd5.jpg" alt="Driving Lesson 1" className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110" />
+              <img src="https://i.pinimg.com/736x/9f/0d/66/9f0d66fd74686f49039604ab9e5bbcea.jpg" alt="Driving Lesson 1" className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110" referrerPolicy="no-referrer" />
             </div>
             <div className="rounded-3xl shadow-xl overflow-hidden h-80 sm:h-96 sm:mt-16 group transition-shadow duration-500 hover:shadow-2xl">
-              <img src="https://i.pinimg.com/736x/a1/1a/e5/a11ae5071f90d92c3531cb1db6894d54.jpg" alt="Driving Lesson 2" className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110" />
+              <img src="https://i.pinimg.com/736x/9e/21/05/9e2105f1018bb352350702651895ad14.jpg" alt="Driving Lesson 2" className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110" referrerPolicy="no-referrer" />
             </div>
           </div>
 
