@@ -107,39 +107,39 @@ interface DrivingCourse {
 const DEFAULT_DRIVING_COURSES: DrivingCourse[] = [
   {
     id: "course-1",
-    courseTitle: "10 Days Course Package",
-    courseDescription: "Learn professional manual gear control from experienced trainers.",
-    courseFee: "25000",
-    carImage: "https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600",
-    lessonDuration: "30 Mins Driving Lesson",
-    dailyTime: "40 min Per Day",
-    theoryDuration: "10 min Theory Session",
+    courseTitle: "Basic Driving Course",
+    courseDescription: "Excellent foundational course covering vital steering control, brake safety, and real-world road signals.",
+    courseFee: "15000",
+    carImage: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=600",
+    lessonDuration: "10 Driving Classes Included",
+    dailyTime: "1,500 PKR Per Class Rate",
+    theoryDuration: "35 Mins Practice Lesson",
     coursePeriod: "10 Days Training Duration",
-    additionalTime: "Additional Time Available"
+    additionalTime: "Essential Signboard Theory"
   },
   {
     id: "course-2",
-    courseTitle: "20 Days Course Package",
-    courseDescription: "Master driving in our fully automatic modern Civic, ideal for beginners.",
-    courseFee: "25000",
+    courseTitle: "Standard Driving Course",
+    courseDescription: "Our most popular training track covering parallel parking, reverse controls, and highway driving confidence.",
+    courseFee: "20000",
     carImage: "https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600",
-    lessonDuration: "30 Mins Driving Lesson",
-    dailyTime: "40 min Per Day",
-    theoryDuration: "10 min Theory Session",
-    coursePeriod: "20 Days Intensive Plan",
-    additionalTime: "Additional Time Available"
+    lessonDuration: "15 Driving Classes Included",
+    dailyTime: "1,333 PKR Per Class Rate",
+    theoryDuration: "35 Mins Practice Lesson",
+    coursePeriod: "15 Days Training Duration",
+    additionalTime: "Highway Session & Parking Guide"
   },
   {
     id: "course-3",
-    courseTitle: "1 Month Complete Package",
-    courseDescription: "Expert motorcycle sessions to ride heavy sport bike configurations.",
-    courseFee: "50000",
-    carImage: "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=600",
-    lessonDuration: "60 Mins Driving Lesson",
-    dailyTime: "40 min Per Day",
-    theoryDuration: "10 min Theory Session",
-    coursePeriod: "1 Month Comprehensive Track",
-    additionalTime: "Additional Time Available"
+    courseTitle: "Premium Driving Course",
+    courseDescription: "Complete masterclass including city grid navigation, night driving safety, and expert-level license exam preparation.",
+    courseFee: "25000",
+    carImage: "https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600",
+    lessonDuration: "20 Driving Classes Included",
+    dailyTime: "1,250 PKR Per Class Rate",
+    theoryDuration: "35 Mins Practice Lesson",
+    coursePeriod: "20 Days Complete Mastery Plan",
+    additionalTime: "Full License Test Preparation"
   }
 ];
 
@@ -363,11 +363,11 @@ export default function AdminPage() {
     }
 
     // 6. Load Driving Courses Registry
-    const savedCourses = localStorage.getItem('driving_courses_v3');
+    const savedCourses = localStorage.getItem('driving_courses_v4');
     if (savedCourses) {
       try {
         const parsed = JSON.parse(savedCourses);
-        if (Array.isArray(parsed)) {
+        if (Array.isArray(parsed) && parsed.length > 0) {
           setDrivingCourses(parsed);
         } else {
           setDrivingCourses(DEFAULT_DRIVING_COURSES);
@@ -377,7 +377,7 @@ export default function AdminPage() {
       }
     } else {
       setDrivingCourses(DEFAULT_DRIVING_COURSES);
-      localStorage.setItem('driving_courses_v2', JSON.stringify(DEFAULT_DRIVING_COURSES));
+      localStorage.setItem('driving_courses_v4', JSON.stringify(DEFAULT_DRIVING_COURSES));
     }
   };
 
@@ -2542,7 +2542,7 @@ export default function AdminPage() {
                     if (editingCourseId) {
                       const updated = drivingCourses.map(c => c.id === editingCourseId ? { ...newCourse, id: editingCourseId } : c);
                       setDrivingCourses(updated);
-                      localStorage.setItem('driving_courses_v2', JSON.stringify(updated));
+                      localStorage.setItem('driving_courses_v4', JSON.stringify(updated));
                       setEditingCourseId(null);
                       setNewCourse({
                         courseTitle: '',
@@ -2561,7 +2561,7 @@ export default function AdminPage() {
                       const finalCourse = { ...newCourse, id: courseId };
                       const updated = [finalCourse, ...drivingCourses];
                       setDrivingCourses(updated);
-                      localStorage.setItem('driving_courses_v2', JSON.stringify(updated));
+                      localStorage.setItem('driving_courses_v4', JSON.stringify(updated));
                       setNewCourse({
                         courseTitle: '',
                         courseDescription: '',
@@ -2837,7 +2837,7 @@ export default function AdminPage() {
                                 if (window.confirm(`Delete "${course.courseTitle}" course template?`)) {
                                   const updated = drivingCourses.filter(c => c.id !== course.id);
                                   setDrivingCourses(updated);
-                                  localStorage.setItem('driving_courses_v2', JSON.stringify(updated));
+                                  localStorage.setItem('driving_courses_v4', JSON.stringify(updated));
                                   showToast('Course package deleted.', 'info');
                                   window.dispatchEvent(new Event('driving_courses_updated'));
                                   window.dispatchEvent(new Event('storage'));

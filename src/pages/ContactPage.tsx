@@ -165,122 +165,83 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Main Content Layout */}
+      {/* Main Content Layout - Inspired by Pagedone.io premium split architecture */}
       <section className="py-20 bg-slate-50 relative z-10 w-full overflow-hidden">
         {/* Subtle decorative futuristic grid markings in background */}
         <div className="absolute inset-0 bg-[radial-gradient(#00000002_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none" />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative">
-          <div className="grid lg:grid-cols-12 gap-12 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-14 items-stretch">
             
-            {/* Left Column: Human Centric Details Card */}
-            <div className="lg:col-span-5 flex flex-col justify-between gap-8">
-              
-              {/* Quick Contact & Working Hours */}
-              <div className="space-y-6">
-                <div className="bg-white border border-gray-200/80 rounded-3xl p-8 shadow-[0_4px_30px_rgba(0,0,0,0.02)] relative overflow-hidden transition-all duration-300 hover:shadow-[0_10px_40px_rgba(239,68,68,0.05)] group">
-                  <div className="absolute top-0 left-0 w-1.5 h-0 bg-red-600 group-hover:h-full transition-all duration-300" />
-                  <h3 className="text-2xl font-black text-slate-900 mb-6 font-display tracking-tight flex items-center gap-2">
-                    <span className="w-1.5 h-6 bg-red-650 rounded-full inline-block"></span>
-                    Contact Coordinates
-                  </h3>
-                  
-                  <div className="space-y-4">
-                    {/* Address */}
-                    <div className="flex gap-4 items-start p-4 rounded-2xl transition-all duration-300 hover:bg-slate-50 border border-transparent hover:border-slate-100">
-                      <div className="p-3 bg-red-50 text-red-650 rounded-2xl border border-red-100 shrink-0 shadow-[0_2px_10px_rgba(239,68,68,0.05)]">
-                        <MapPin className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <span className="text-[10px] uppercase tracking-widest font-black text-slate-400 block mb-1">Academy Campus</span>
-                        <p className="text-slate-700 text-sm sm:text-base leading-relaxed font-bold">
-                          Main Jaranwala Road, Near Peoples Colony, Faisalabad, Punjab, Pakistan.
-                        </p>
-                      </div>
-                    </div>
+            {/* Left Column: Visual Brand Element Card (Pagedone Inspired) */}
+            <div className="relative rounded-3xl overflow-hidden min-h-[500px] lg:min-h-[620px] flex flex-col justify-between p-8 sm:p-12 shadow-2xl group transition-all duration-500 hover:shadow-red-500/10">
+              {/* Background image & gradient overlay */}
+              <div className="absolute inset-0 z-0">
+                <img 
+                  src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=80&w=1200" 
+                  alt="Premium driving journey" 
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-slate-950/40" />
+              </div>
 
-                    {/* Phone */}
-                    <div className="flex gap-4 items-start p-4 rounded-2xl transition-all duration-300 hover:bg-slate-50 border border-transparent hover:border-slate-100">
-                      <div className="p-3 bg-blue-50 text-blue-605 rounded-2xl border border-blue-100 shrink-0 shadow-[0_2px_10px_rgba(59,130,246,0.05)]">
-                        <Phone className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <span className="text-[10px] uppercase tracking-widest font-black text-slate-400 block mb-1">Direct Helpline</span>
-                        <p className="text-slate-950 text-base sm:text-lg font-mono font-black tracking-tight scale-y-105">
-                          03097666928
-                        </p>
-                        <p className="text-xs text-slate-400 mt-0.5 font-semibold">Instant human dispatch • Mon - Sat</p>
-                      </div>
-                    </div>
+              {/* Elegant Typography stating Contact Us */}
+              <div className="relative z-10">
+                <span className="text-red-500 text-xs font-black uppercase tracking-widest bg-red-500/10 border border-red-500/20 px-3.5 py-1.5 rounded-full inline-block backdrop-blur-md mb-4">
+                  Reach Out
+                </span>
+                <h2 className="text-4xl sm:text-5xl font-black text-white font-display tracking-tight leading-none mb-2">
+                  Contact Us
+                </h2>
+                <p className="text-slate-300 text-sm font-medium max-w-xs">
+                  Have questions? We are here to help you navigate your journey.
+                </p>
+              </div>
 
-                    {/* Email */}
-                    <div className="flex gap-4 items-start p-4 rounded-2xl transition-all duration-300 hover:bg-slate-50 border border-transparent hover:border-slate-100">
-                      <div className="p-3 bg-green-50 text-green-600 rounded-2xl border border-green-100 shrink-0 shadow-[0_2px_10px_rgba(34,197,94,0.05)]">
-                        <Mail className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <span className="text-[10px] uppercase tracking-widest font-black text-slate-400 block mb-1">Encrypted Mailbox</span>
-                        <p className="text-slate-700 text-sm sm:text-base font-mono font-bold">
-                          info@godriveify.com
-                        </p>
-                      </div>
-                    </div>
+              {/* White Info Card nested inside wrapper */}
+              <div className="relative z-10 bg-white/95 backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-2xl border border-white/20 space-y-5 transition-transform duration-500 group-hover:translate-y-[-4px]">
+                <div className="flex gap-4 items-center border-b border-gray-100 pb-4">
+                  <div className="p-3 bg-red-50 text-red-650 rounded-full shrink-0">
+                    <Phone className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 block mb-0.5">Direct Hotline</span>
+                    <a href="tel:03097666928" className="text-slate-950 font-mono text-base font-black hover:text-red-600 transition-colors">
+                      03097666928
+                    </a>
                   </div>
                 </div>
 
-                {/* Training Hours Card */}
-                <div className="bg-white border border-gray-200/80 rounded-3xl p-8 shadow-[0_4px_30px_rgba(0,0,0,0.02)] relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 rounded-full blur-xl pointer-events-none" />
-                  <div className="flex items-center justify-between mb-6">
-                    <h4 className="text-lg font-black text-slate-900 font-display tracking-tight">Active Operation Hours</h4>
-                    <span className="flex h-2 w-2 relative">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                    </span>
+                <div className="flex gap-4 items-center border-b border-gray-100 pb-4">
+                  <div className="p-3 bg-red-50 text-red-650 rounded-full shrink-0">
+                    <Mail className="w-5 h-5" />
                   </div>
-                  
-                  <div className="space-y-3.5 text-xs text-slate-600 font-bold">
-                    <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
-                      <span className="text-slate-400 uppercase tracking-wider text-[10px]">Monday - Wednesday</span>
-                      <span className="text-slate-800 font-black">08:00 AM - 06:00 PM</span>
-                    </div>
-                    <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
-                      <span className="text-slate-400 uppercase tracking-wider text-[10px]">Thursday - Saturday</span>
-                      <span className="text-slate-800 font-black">08:00 AM - 06:00 PM</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-slate-400 uppercase tracking-wider text-[10px]">Sunday</span>
-                      <span className="text-red-650 font-black uppercase tracking-widest">System Closed</span>
-                    </div>
+                  <div>
+                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 block mb-0.5">Corporate Email</span>
+                    <a href="mailto:info@godriveify.com" className="text-slate-900 font-medium text-sm hover:text-red-600 transition-colors">
+                      info@godriveify.com
+                    </a>
+                  </div>
+                </div>
+
+                <div className="flex gap-4 items-center">
+                  <div className="p-3 bg-red-50 text-red-650 rounded-full shrink-0">
+                    <MapPin className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 block mb-0.5">Academy Campus</span>
+                    <p className="text-slate-800 text-xs sm:text-sm font-bold leading-relaxed">
+                      Main Jaranwala Road, Near Peoples Colony, Faisalabad, PK.
+                    </p>
                   </div>
                 </div>
               </div>
-
-              {/* Live WhatsApp Assist Callout with custom animated radar ring */}
-              <div className="bg-gradient-to-br from-[#25D366]/5 to-[#25D366]/10 border border-[#25D366]/20 rounded-3xl p-8 flex items-center justify-between gap-6 relative overflow-hidden group">
-                <div className="absolute -bottom-12 -left-12 w-28 h-28 bg-[#25D366]/5 rounded-full blur-lg pointer-events-none" />
-                <div className="space-y-1 relative z-10">
-                  <h5 className="font-extrabold text-slate-900 text-base">Instant WhatsApp Assist</h5>
-                  <p className="text-xs text-slate-500 font-semibold leading-relaxed">Direct connection to active instructors on campus.</p>
-                </div>
-                <a 
-                  href="https://wa.me/923097666928" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="bg-[#25D366] hover:bg-[#128C7E] text-white p-4 rounded-2xl flex items-center justify-center transition-all shadow-lg shadow-green-200/50 ring-4 ring-green-600/10 hover:scale-110 active:scale-95 shrink-0 relative z-10 cursor-pointer"
-                  aria-label="Direct WhatsApp Support Link"
-                >
-                  <svg className="w-6 h-6 fill-white text-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.455 5.703 1.455h.008c6.56 0 11.895-5.335 11.898-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                  </svg>
-                </a>
-              </div>
-
             </div>
 
-            {/* Right Column: Premium Contact Form Card */}
-            <div className="lg:col-span-7">
-              <div className="bg-white border border-gray-200 rounded-3xl p-8 sm:p-10 shadow-[0_8px_40px_rgba(0,0,0,0.02)] flex flex-col justify-between h-full relative overflow-hidden group">
+            {/* Right Column: Premium Interactive Inquiry Form Card */}
+            <div>
+              <div className="bg-white border border-gray-100 rounded-3xl p-8 sm:p-12 shadow-[0_15px_50px_rgba(0,0,0,0.03)] flex flex-col justify-between h-full relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/5 rounded-full blur-3xl pointer-events-none" />
                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl pointer-events-none" />
 
@@ -290,113 +251,100 @@ export default function ContactPage() {
                       key="contact-form"
                       initial={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
+                      className="space-y-8"
                     >
-                      <div className="mb-8 border-b border-gray-150 pb-5">
-                        <h3 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-                          <span className="w-2.5 h-2.5 bg-red-650 rounded-full animate-pulse inline-block" />
-                          Send Us An Inquiry
+                      <div>
+                        <span className="text-xs font-black text-red-650 uppercase tracking-widest block mb-2">Connect Instantly</span>
+                        <h3 className="text-3xl font-black text-slate-900 tracking-tight font-display">
+                          Send Us A Message
                         </h3>
-                        <p className="text-slate-400 text-[10px] mt-2 font-black uppercase tracking-widest">LOCK YOUR PREFERRED TIMING SYSTEM slot</p>
+                        <p className="text-slate-500 text-xs mt-1.5 font-medium leading-relaxed">Fill out the quick session form below and start your premium driving experience today.</p>
                       </div>
 
                       <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                           <div>
-                            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5">
+                            <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-4">
                               Your Full Name
                             </label>
-                            <div className="relative rounded-2xl overflow-hidden p-[2px] bg-red-400/40 focus-within:bg-red-500/60 transition-colors">
-                              <span className="absolute w-[300%] h-[300%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#dc2626_0%,transparent_15%)]" />
-                              <input 
-                                type="text" 
-                                required
-                                value={formData.name}
-                                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                                placeholder="Muhammad Ali" 
-                                className="w-full relative z-10 bg-white rounded-[14px] px-5 py-4 focus:outline-none text-slate-900 text-sm transition-all font-semibold"
-                              />
-                            </div>
+                            <input 
+                              type="text" 
+                              required
+                              value={formData.name}
+                              onChange={(e) => setFormData({...formData, name: e.target.value})}
+                              placeholder="Muhammad Ali" 
+                              className="rounded-full bg-transparent border border-gray-200 pl-5 pr-5 py-4 text-sm text-slate-900 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 placeholder:text-gray-400 font-semibold transition-all duration-300 w-full"
+                            />
                           </div>
+                          
                           <div>
-                            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5">
+                            <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-4">
                               Active Phone Number
                             </label>
-                            <div className="relative rounded-2xl overflow-hidden p-[2px] bg-red-400/40 focus-within:bg-red-500/60 transition-colors">
-                              <span className="absolute w-[300%] h-[300%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-[spin_3.5s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#dc2626_0%,transparent_15%)]" />
-                              <input 
-                                type="tel" 
-                                required
-                                value={formData.phone}
-                                onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                                placeholder="0300-1234567" 
-                                className="w-full relative z-10 bg-white rounded-[14px] px-5 py-4 focus:outline-none text-slate-900 text-sm transition-all font-semibold"
-                              />
-                            </div>
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5">
-                            Email Address
-                          </label>
-                          <div className="relative rounded-2xl overflow-hidden p-[2px] bg-red-400/40 focus-within:bg-red-500/60 transition-colors">
-                            <span className="absolute w-[300%] h-[300%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#dc2626_0%,transparent_15%)]" />
                             <input 
-                              type="email" 
+                              type="tel" 
                               required
-                              value={formData.email}
-                              onChange={(e) => setFormData({...formData, email: e.target.value})}
-                              placeholder="student@gmail.com" 
-                              className="w-full relative z-10 bg-white rounded-[14px] px-5 py-4 focus:outline-none text-slate-900 text-sm transition-all font-semibold"
+                              value={formData.phone}
+                              onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                              placeholder="0300-1234567" 
+                              className="rounded-full bg-transparent border border-gray-200 pl-5 pr-5 py-4 text-sm text-slate-900 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 placeholder:text-gray-400 font-semibold transition-all duration-300 w-full"
                             />
                           </div>
                         </div>
 
                         <div>
-                          <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5">
-                            Select Preferred Course Program
+                          <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-4">
+                            Email Address
                           </label>
-                          <div className="relative rounded-2xl overflow-hidden p-[2px] bg-red-400/40 focus-within:bg-red-500/60 transition-colors">
-                            <span className="absolute w-[300%] h-[300%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-[spin_4.5s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#dc2626_0%,transparent_15%)]" />
-                            <div className="relative w-full z-10 bg-white rounded-[14px]">
-                              <select 
-                                value={formData.course}
-                                onChange={(e) => setFormData({...formData, course: e.target.value})}
-                                className="w-full bg-transparent px-5 py-4 appearance-none focus:outline-none text-slate-950 text-sm transition-all font-bold cursor-pointer"
-                              >
-                                {courses.map((course, idx) => (
-                                  <option key={idx} value={course}>
-                                    {course}
-                                  </option>
-                                ))}
-                              </select>
-                              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
-                                <ChevronRight className="w-4 h-4 rotate-90" />
-                              </div>
+                          <input 
+                            type="email" 
+                            required
+                            value={formData.email}
+                            onChange={(e) => setFormData({...formData, email: e.target.value})}
+                            placeholder="student@gmail.com" 
+                            className="rounded-full bg-transparent border border-gray-200 pl-5 pr-5 py-4 text-sm text-slate-900 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 placeholder:text-gray-400 font-semibold transition-all duration-300 w-full"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-4">
+                            Select Course Program
+                          </label>
+                          <div className="relative w-full">
+                            <select 
+                              value={formData.course}
+                              onChange={(e) => setFormData({...formData, course: e.target.value})}
+                              className="rounded-full bg-transparent border border-gray-200 pl-5 pr-10 py-4 text-sm text-slate-900 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 font-semibold transition-all duration-300 w-full appearance-none cursor-pointer"
+                            >
+                              {courses.map((course, idx) => (
+                                <option key={idx} value={course}>
+                                  {course}
+                                </option>
+                              ))}
+                            </select>
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                              <ChevronRight className="w-4 h-4 rotate-90" />
                             </div>
                           </div>
                         </div>
 
                         <div>
-                          <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5">
-                            How can we help you? (Optional Message)
+                          <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-4">
+                            Your Message
                           </label>
-                          <div className="relative rounded-2xl overflow-hidden p-[2px] bg-red-400/40 focus-within:bg-red-500/60 transition-colors">
-                            <span className="absolute w-[300%] h-[300%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-[spin_5s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#dc2626_0%,transparent_15%)]" />
-                            <textarea 
-                              rows={4}
-                              value={formData.message}
-                              onChange={(e) => setFormData({...formData, message: e.target.value})}
-                              placeholder="Write down any requests such as pick/drop timings, manual or automatic transmissions, or specific training parameters..." 
-                              className="w-full relative z-10 bg-white rounded-[14px] px-5 py-4 focus:outline-none text-slate-900 text-sm transition-all resize-none font-medium"
-                            ></textarea>
-                          </div>
+                          <textarea 
+                            rows={4}
+                            value={formData.message}
+                            onChange={(e) => setFormData({...formData, message: e.target.value})}
+                            placeholder="Write down any requests such as pick/drop timings, manual or automatic transmissions..." 
+                            className="rounded-2xl bg-transparent border border-gray-200 pl-5 pr-5 py-4 text-sm text-slate-900 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 placeholder:text-gray-400 font-semibold transition-all duration-300 w-full resize-none"
+                          ></textarea>
                         </div>
 
                         <button 
                           type="submit" 
                           disabled={loading}
-                          className="w-full bg-red-600 hover:bg-red-700 text-white font-black py-4.5 px-6 rounded-2xl shadow-lg shadow-red-200/50 active:scale-[0.98] hover:scale-[1.01] transition-all flex items-center justify-center gap-2.5 text-xs uppercase tracking-widest disabled:opacity-75 cursor-pointer"
+                          className="w-full bg-red-600 hover:bg-slate-900 text-white font-black py-4 px-8 rounded-full shadow-lg shadow-red-200/50 hover:shadow-xl hover:scale-[1.01] active:scale-[0.98] transition-all duration-500 flex items-center justify-center gap-2.5 text-xs uppercase tracking-widest disabled:opacity-75 cursor-pointer"
                         >
                           {loading ? (
                             <span className="flex items-center gap-2">
@@ -405,7 +353,7 @@ export default function ContactPage() {
                             </span>
                           ) : (
                             <>
-                              <Send className="w-4 h-4" />
+                              <Send className="w-4.5 h-4.5" />
                               Book Free Call Reservation
                             </>
                           )}
@@ -432,7 +380,7 @@ export default function ContactPage() {
                           setIsSubmitted(false);
                           setFormData({ name: '', phone: '', email: '', course: 'Complete Driving Course', message: '' });
                         }}
-                        className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold py-4 px-8 rounded-2xl text-xs uppercase tracking-widest transition-colors cursor-pointer"
+                        className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold py-4 px-8 rounded-full text-xs uppercase tracking-widest transition-colors cursor-pointer"
                       >
                         Process Another Booking
                       </button>

@@ -19,28 +19,28 @@ interface StoredCourse {
 const DEFAULT_FEATURED = [
   {
     id: "course-1",
-    courseTitle: "10 Days Course Package",
-    courseDescription: "Learn driving with automatic or manual Honda Civic.",
-    courseFee: "25000",
+    courseTitle: "Basic Driving Course",
+    courseDescription: "Excellent foundational course covering vital steering control, brake safety, and real-world road signals.",
+    courseFee: "15000",
     carImage: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=600",
     instructorName: "Mr Shahzad",
     instructorImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200&h=200"
   },
   {
     id: "course-2",
-    courseTitle: "20 Days Course Package",
-    courseDescription: "Learn driving with automatic or manual Honda Civic.",
-    courseFee: "25000",
+    courseTitle: "Standard Driving Course",
+    courseDescription: "Our most popular training track covering parallel parking, reverse controls, and highway driving confidence.",
+    courseFee: "20000",
     carImage: "https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600",
     instructorName: "Ms Alina",
     instructorImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200&h=200"
   },
   {
     id: "course-3",
-    courseTitle: "1 Month Complete Package",
-    courseDescription: "Expert lessons for riding heavy motorcycles safely.",
-    courseFee: "50000",
-    carImage: "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=600",
+    courseTitle: "Premium Driving Course",
+    courseDescription: "Complete masterclass including city grid navigation, night driving safety, and expert-level license exam preparation.",
+    courseFee: "25000",
+    carImage: "https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600",
     instructorName: "Mr Ahmed",
     instructorImage: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=200&h=200"
   }
@@ -59,7 +59,7 @@ export default function FeaturedCourses() {
 
   useEffect(() => {
     const loadCourses = () => {
-      const saved = localStorage.getItem('driving_courses_v3');
+      const saved = localStorage.getItem('driving_courses_v4');
       if (saved) {
         try {
           const parsed = JSON.parse(saved) as StoredCourse[];

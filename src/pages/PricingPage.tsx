@@ -107,11 +107,11 @@ export default function PricingPage() {
 
   useEffect(() => {
     const syncPricingCourses = () => {
-      const saved = localStorage.getItem('driving_courses_v3');
+      const saved = localStorage.getItem('driving_courses_v4');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed)) {
+          if (Array.isArray(parsed) && parsed.length > 0) {
             setCourses(parsed);
           } else {
             setCourses(DEFAULT_PRICING_COURSES);
@@ -121,46 +121,46 @@ export default function PricingPage() {
         }
       } else {
         setCourses(DEFAULT_PRICING_COURSES);
-        localStorage.setItem('driving_courses_v2', JSON.stringify(DEFAULT_PRICING_COURSES));
+        localStorage.setItem('driving_courses_v4', JSON.stringify(DEFAULT_PRICING_COURSES));
       }
     };
 
     const DEFAULT_PRICING_COURSES = [
       {
         id: "course-1",
-        courseTitle: "10 Days Course Package",
-        courseDescription: "Learn professional manual gear control from experienced trainers.",
-        courseFee: "25000",
+        courseTitle: "Basic Driving Course",
+        courseDescription: "Excellent foundational course covering vital steering control, brake safety, and real-world road signals.",
+        courseFee: "15000",
         carImage: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=600",
-        lessonDuration: "30 Mins Driving Lesson",
-        dailyTime: "40 min Per Day",
-        theoryDuration: "10 min Theory Session",
+        lessonDuration: "10 Driving Classes Included",
+        dailyTime: "1,500 PKR Per Class Rate",
+        theoryDuration: "35 Mins Practice Lesson",
         coursePeriod: "10 Days Training Duration",
-        additionalTime: "Additional Time Available"
+        additionalTime: "Essential Signboard Theory"
       },
       {
         id: "course-2",
-        courseTitle: "20 Days Course Package",
-        courseDescription: "Master driving in our fully automatic modern Civic, ideal for beginners.",
-        courseFee: "25000",
+        courseTitle: "Standard Driving Course",
+        courseDescription: "Our most popular training track covering parallel parking, reverse controls, and highway driving confidence.",
+        courseFee: "20000",
         carImage: "https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600",
-        lessonDuration: "30 Mins Driving Lesson",
-        dailyTime: "40 min Per Day",
-        theoryDuration: "10 min Theory Session",
-        coursePeriod: "20 Days Intensive Plan",
-        additionalTime: "Additional Time Available"
+        lessonDuration: "15 Driving Classes Included",
+        dailyTime: "1,333 PKR Per Class Rate",
+        theoryDuration: "35 Mins Practice Lesson",
+        coursePeriod: "15 Days Training Duration",
+        additionalTime: "Highway Session & Parking Guide"
       },
       {
         id: "course-3",
-        courseTitle: "1 Month Complete Package",
-        courseDescription: "Expert motorcycle sessions to ride heavy sport bike configurations.",
-        courseFee: "50000",
-        carImage: "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=600",
-        lessonDuration: "60 Mins Driving Lesson",
-        dailyTime: "40 min Per Day",
-        theoryDuration: "10 min Theory Session",
-        coursePeriod: "1 Month Comprehensive Track",
-        additionalTime: "Additional Time Available"
+        courseTitle: "Premium Driving Course",
+        courseDescription: "Complete masterclass including city grid navigation, night driving safety, and expert-level license exam preparation.",
+        courseFee: "25000",
+        carImage: "https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600",
+        lessonDuration: "20 Driving Classes Included",
+        dailyTime: "1,250 PKR Per Class Rate",
+        theoryDuration: "35 Mins Practice Lesson",
+        coursePeriod: "20 Days Complete Mastery Plan",
+        additionalTime: "Full License Test Preparation"
       }
     ];
 
@@ -183,30 +183,30 @@ export default function PricingPage() {
         "@type": "Offer",
         "itemOffered": {
           "@type": "Service",
-          "name": "10 Days Course Package",
-          "description": "Learn professional manual gear control from experienced trainers."
+          "name": "Basic Driving Course",
+          "description": "Excellent foundational course covering vital steering control, brake safety, and real-world road signals."
         },
-        "price": "25000",
+        "price": "15000",
         "priceCurrency": "PKR"
       },
       {
         "@type": "Offer",
         "itemOffered": {
           "@type": "Service",
-          "name": "20 Days Course Package",
-          "description": "Master driving in our fully automatic modern Civic, ideal for beginners."
+          "name": "Standard Driving Course",
+          "description": "Our most popular training track covering parallel parking, reverse controls, and highway driving confidence."
         },
-        "price": "25000",
+        "price": "20000",
         "priceCurrency": "PKR"
       },
       {
         "@type": "Offer",
         "itemOffered": {
           "@type": "Service",
-          "name": "1 Month Complete Package",
-          "description": "Expert motorcycle sessions to ride heavy sport bike configurations."
+          "name": "Premium Driving Course",
+          "description": "Complete masterclass including city grid navigation, night driving safety, and expert-level license exam preparation."
         },
-        "price": "50000",
+        "price": "25000",
         "priceCurrency": "PKR"
       }
     ]
@@ -216,7 +216,7 @@ export default function PricingPage() {
     <div className="bg-gray-50 min-h-screen">
       <SEO 
         title="Driving School Fees & Lesson Packages | GoDriveify"
-        description="Check out our low-cost manual & automatic driving school pricing plans in Faisalabad. Learn in a high-end Honda Civic starting from 25,000 PKR only."
+        description="Check out our low-cost manual & automatic driving school pricing plans in Faisalabad. Learn in a high-end Honda Civic starting from 15,000 PKR only."
         keywords="driving school fee Faisalabad, car driving class packages, heavy bike license course rates, cheap driving instructor cost, automatic car lesson prices Punjab"
         schema={pricingSchema}
       />
