@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 
 const StatCard = (props: any) => {
   const Icon = props.icon;
-  const { label, count } = props;
+  const { label, count, suffix } = props;
   const nodeRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(nodeRef, { once: true, margin: "-100px" });
   const countValue = useMotionValue(0);
@@ -35,9 +35,9 @@ const StatCard = (props: any) => {
       <div className="relative z-10 flex flex-col items-center">
         <Icon className="w-12 h-12 text-red-500 mb-4 drop-shadow-[0_0_10px_rgba(220,38,38,0.5)] group-hover:scale-110 transition-transform" />
         <h3 className="text-4xl md:text-5xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400">
-          <motion.span>{rounded}</motion.span>
+          <motion.span>{rounded}</motion.span>{suffix ?? ''}
         </h3>
-        <p className="text-gray-400 font-medium text-sm tracking-wide uppercase">{label}</p>
+        <p className="text-gray-400 font-medium text-xs sm:text-sm tracking-wide uppercase text-center">{label}</p>
       </div>
     </div>
   );
@@ -47,15 +47,15 @@ export default function Stats() {
   const stats = [
     { icon: Award, label: 'Years Experience', count: 16 },
     { icon: Car, label: 'Professional Instructor', count: 25 },
-    { icon: Users, label: 'People Reviews', count: 150 },
-    { icon: Gauge, label: 'Driver Training', count: 125 },
+    { icon: Users, label: 'Happy Reviews', count: 150, suffix: '+' },
+    { icon: Gauge, label: 'Students Trained', count: 125, suffix: '+' },
   ];
 
   return (
     <section className="relative py-20 bg-gray-900 overflow-hidden">
       <div 
         className="absolute inset-0 z-0 bg-cover bg-center opacity-30"
-        style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=2000")' }}
+        style={{ backgroundImage: 'url("https://i.pinimg.com/736x/82/14/57/821457006ba1f2acea6e7234cb3b74ce.jpg")' }}
       ></div>
       <div className="absolute inset-0 bg-gray-900/70 z-10"></div>
 
