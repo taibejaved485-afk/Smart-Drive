@@ -272,33 +272,40 @@ export default function Navbar() {
                 >
                   <Plus className="w-4 h-4" /> APPLY NOW
                 </button>
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden hidden group-hover:block z-50">
-                  <Link 
-                    to="/contact"
-                    className="block w-full text-left px-4 py-3 text-xs font-bold hover:bg-gray-50 uppercase tracking-wider text-gray-800 hover:text-red-600 transition-colors"
-                  >
-                    Apply For Learning
-                  </Link>
-                  <button 
-                    onClick={() => {
-                      setStep(1);
-                      setSubmissionComplete(false);
-                      setModalType('Rent');
-                    }}
-                    className="block w-full text-left px-4 py-3 text-xs font-bold hover:bg-gray-50 uppercase tracking-wider"
-                  >
-                    Rent Your Car
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setStep(1);
-                      setSubmissionComplete(false);
-                      setModalType('Sale');
-                    }}
-                    className="block w-full text-left px-4 py-3 text-xs font-bold hover:bg-gray-50 uppercase tracking-wider"
-                  >
-                    Sale Your Car
-                  </button>
+                {/* 
+                  To prevent premium dropdown from flickering or disappearing when the cursor departs the button:
+                  We have introduced an absolute bridge wrapper that starts precisely at top-full with safe padding-top (pt-2).
+                  There is now a zero-gap invisible runway that ensures smooth pointer transitions.
+                */}
+                <div className="absolute right-0 top-full pt-2 w-48 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-305 origin-top-right transform scale-95 group-hover:scale-100 z-50">
+                  <div className="bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden">
+                    <Link 
+                      to="/contact"
+                      className="block w-full text-left px-4 py-3 text-xs font-bold hover:bg-gray-50 uppercase tracking-wider text-gray-800 hover:text-red-600 transition-colors"
+                    >
+                      Apply For Learning
+                    </Link>
+                    <button 
+                      onClick={() => {
+                        setStep(1);
+                        setSubmissionComplete(false);
+                        setModalType('Rent');
+                      }}
+                      className="block w-full text-left px-4 py-3 text-xs font-bold hover:bg-gray-50 hover:text-red-600 transition-colors uppercase tracking-wider cursor-pointer"
+                    >
+                      Rent Your Car
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setStep(1);
+                        setSubmissionComplete(false);
+                        setModalType('Sale');
+                      }}
+                      className="block w-full text-left px-4 py-3 text-xs font-bold hover:bg-gray-50 hover:text-red-600 transition-colors uppercase tracking-wider cursor-pointer"
+                    >
+                      Sale Your Car
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
