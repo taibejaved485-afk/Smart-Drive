@@ -273,16 +273,12 @@ export default function Navbar() {
                   <Plus className="w-4 h-4" /> APPLY NOW
                 </button>
                 <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden hidden group-hover:block z-50">
-                  <button 
-                    onClick={() => {
-                      setStep(1);
-                      setSubmissionComplete(false);
-                      setModalType('Learning');
-                    }}
-                    className="block w-full text-left px-4 py-3 text-xs font-bold hover:bg-gray-50 uppercase tracking-wider"
+                  <Link 
+                    to="/contact"
+                    className="block w-full text-left px-4 py-3 text-xs font-bold hover:bg-gray-50 uppercase tracking-wider text-gray-800 hover:text-red-600 transition-colors"
                   >
                     Apply For Learning
-                  </button>
+                  </Link>
                   <button 
                     onClick={() => {
                       setStep(1);
@@ -329,18 +325,15 @@ export default function Navbar() {
             })}
             <div className="flex flex-col gap-2 pt-2">
               <div className="space-y-2">
-                <button 
+                <Link 
+                  to="/contact"
                   onClick={() => {
                     setIsOpen(false);
-                    setStep(1);
-                    setSubmissionComplete(false);
-                    setModalType('Learning');
                   }}
                   className="w-full flex items-center justify-center gap-2 bg-red-650 hover:bg-red-700 text-white py-3 rounded-xl font-bold transition text-xs uppercase tracking-wider cursor-pointer"
-                  type="button"
                 >
                   Apply For Learning
-                </button>
+                </Link>
                 <button 
                   onClick={() => {
                     setIsOpen(false);
