@@ -35,8 +35,8 @@ interface ReviewCardProps {
 
 function ReviewCard({ name, text, rating, avatar }: ReviewCardProps) {
   return (
-    <div className="bg-white p-5 rounded-2xl shadow-[0_4px_16px_rgba(0,0,0,0.02)] border border-gray-100 flex flex-col w-[275px] sm:w-[315px] shrink-0 transition-all duration-300 hover:shadow-md hover:border-red-500/10 group">
-      <div className="flex justify-between items-start mb-3">
+    <div className="bg-white p-4 sm:p-4.5 rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.02)] border border-gray-100 flex flex-col w-[275px] sm:w-[315px] shrink-0 transition-all duration-300 hover:shadow-md hover:border-red-500/10 group">
+      <div className="flex justify-between items-start mb-2.5">
         <div className="flex gap-0.5">
           {[...Array(rating)].map((_, j) => (
             <Star key={j} className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
@@ -53,15 +53,15 @@ function ReviewCard({ name, text, rating, avatar }: ReviewCardProps) {
           </svg>
         </div>
       </div>
-      <p className="text-gray-650 text-xs leading-relaxed mb-4 font-medium flex-grow italic">
+      <p className="text-gray-650 text-xs leading-relaxed mb-3 font-medium flex-grow italic">
         "{text}"
       </p>
-      <div className="flex items-center gap-2.5 pt-3 border-t border-gray-100">
+      <div className="flex items-center gap-2.5 pt-2.5 border-t border-gray-100">
         <img 
           src={avatar} 
           alt={name} 
           referrerPolicy="no-referrer" 
-          className="w-8.5 h-8.5 rounded-full object-cover border border-red-500/10" 
+          className="w-8 h-8 rounded-full object-cover border border-red-500/10" 
         />
         <div>
           <p className="font-bold text-gray-950 text-xs tracking-tight">{name}</p>
@@ -74,7 +74,7 @@ function ReviewCard({ name, text, rating, avatar }: ReviewCardProps) {
 
 export default function Reviews() {
   return (
-    <section className="py-16 bg-gray-50/70 overflow-hidden relative">
+    <section className="py-12 bg-gray-50/70 overflow-hidden relative">
       {/* Dynamic Keyframes Styling injected directly */}
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes marquee-ltr {
@@ -97,29 +97,29 @@ export default function Reviews() {
           width: max-content;
           animation: marquee-rtl 55s linear infinite;
         }
-        .marquee-group:hover .animate-marquee-ltr,
-        .marquee-group:hover .animate-marquee-rtl {
+        .marquee-row:hover .animate-marquee-ltr,
+        .marquee-row:hover .animate-marquee-rtl {
           animation-play-state: paused;
         }
       `}} />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full text-center mb-10">
-        <span className="inline-flex items-center gap-1.5 bg-red-500/10 text-red-650 font-black text-[10px] tracking-widest uppercase py-1 px-3.5 rounded-full mb-2.5">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full text-center mb-7">
+        <span className="inline-flex items-center gap-1.5 bg-red-500/10 text-red-650 font-black text-[10px] tracking-widest uppercase py-1 px-3.5 rounded-full mb-2">
           ⭐ Google Certified Reviews
         </span>
         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-950 font-display tracking-tight">
           What Our Students Say
         </h2>
-        <p className="max-w-lg mx-auto text-xs text-gray-500 font-medium mt-1.5">
+        <p className="max-w-lg mx-auto text-xs text-gray-500 font-medium mt-1">
           Discover why thousands of residents across Faisalabad trust GoDriveify for safe, competent, and fully defensive driving education.
         </p>
       </div>
 
       {/* Cinematic Marquee Containers with Glass Borders */}
-      <div className="space-y-4 sm:space-y-5 relative marquee-group select-none">
+      <div className="space-y-3 sm:space-y-3.5 relative select-none">
         
         {/* Row 1: Left to Right Scroll */}
-        <div className="overflow-hidden relative w-full py-1">
+        <div className="overflow-hidden relative w-full py-1 marquee-row">
           <div className="animate-marquee-ltr">
             {/* Duplicated for flawless circular infinite loops */}
             {[...row1Reviews, ...row1Reviews, ...row1Reviews].map((review, i) => (
@@ -135,7 +135,7 @@ export default function Reviews() {
         </div>
 
         {/* Row 2: Right to Left Scroll */}
-        <div className="overflow-hidden relative w-full py-1">
+        <div className="overflow-hidden relative w-full py-1 marquee-row">
           <div className="animate-marquee-rtl">
             {/* Duplicated for flawless circular infinite loops */}
             {[...row2Reviews, ...row2Reviews, ...row2Reviews].map((review, i) => (
@@ -151,7 +151,7 @@ export default function Reviews() {
         </div>
 
         {/* Row 3: Left to Right Scroll */}
-        <div className="overflow-hidden relative w-full py-1">
+        <div className="overflow-hidden relative w-full py-1 marquee-row">
           <div className="animate-marquee-ltr">
             {/* Duplicated for flawless circular infinite loops */}
             {[...row3Reviews, ...row3Reviews, ...row3Reviews].map((review, i) => (
