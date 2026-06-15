@@ -135,13 +135,13 @@ export default function ContactPage() {
         {/* Futuristic Background Image with Glow Overlay */}
         <div className="absolute inset-0 z-0 bg-slate-950">
           <img 
-            src="https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&q=80&w=2000" 
+            src="https://i.pinimg.com/1200x/6c/ae/89/6cae89f016eecba155c205d3ac6832da.jpg" 
             alt="Futuristic Neon Driving Dashboard Cockpit" 
-            className="w-full h-full object-cover opacity-65 scale-105"
+            className="w-full h-full object-cover scale-105"
             referrerPolicy="no-referrer"
           />
           {/* Neon grid effect and high-tech gradient overlays */}
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/95 via-slate-950/80 to-slate-900" />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/50 via-slate-950/40 to-slate-900/60" />
           <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/10 rounded-full blur-[120px] pointer-events-none" />
           <div className="absolute -bottom-10 left-0 w-80 h-80 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
           {/* Cybernetic grid visual accent */}
