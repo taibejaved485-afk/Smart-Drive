@@ -72,6 +72,7 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Services', path: '/services' },
     { name: 'Rent Car', path: '/rentals' },
+    { name: 'Sale Car', path: '/car-sale' },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' }
   ];
@@ -132,6 +133,7 @@ export default function Navbar() {
 
     const newOwnerCar = {
       id: 'owner-' + Date.now().toString(),
+      purpose: modalType || 'Rent',
       name: formData.name,
       ownerName: formData.ownerName,
       ownerPhone: cleanedPhone,
@@ -153,25 +155,40 @@ export default function Navbar() {
       approved: false
     };
 
-    // Store in LocalStorage pending_cars
+    // Store in LocalStorage
     try {
-      const existingPending = localStorage.getItem('pending_cars');
-      const pendingList = existingPending ? JSON.parse(existingPending) : [];
-      pendingList.unshift(newOwnerCar);
-      localStorage.setItem('pending_cars', JSON.stringify(pendingList));
+      if (modalType === 'Sale') {
+        const existingPendingSale = localStorage.getItem('pending_sale_cars');
+        const pendingSaleList = existingPendingSale ? JSON.parse(existingPendingSale) : [];
+        pendingSaleList.unshift(newOwnerCar);
+        localStorage.setItem('pending_sale_cars', JSON.stringify(pendingSaleList));
+        window.dispatchEvent(new Event('pending_sale_cars_updated'));
+      } else {
+        const existingPending = localStorage.getItem('pending_cars');
+        const pendingList = existingPending ? JSON.parse(existingPending) : [];
+        pendingList.unshift(newOwnerCar);
+        localStorage.setItem('pending_cars', JSON.stringify(pendingList));
+        window.dispatchEvent(new Event('pending_cars_updated'));
+      }
 
       // Dispatch global storage state updates
-      window.dispatchEvent(new Event('pending_cars_updated'));
       window.dispatchEvent(new Event('storage'));
     } catch (err) {
       console.error('Failed to write car to pending list', err);
     }
 
     setSubmissionComplete(true);
-    toast.success(
-      `Your car "${formData.name}" was successfully registered for review!`,
-      modalType === 'Rent' ? 'Rent Booking Initiated' : 'Sale Registration Received'
-    );
+    if (modalType === 'Sale') {
+      toast.success(
+        `Your car "${formData.name}" was successfully listed for sale!`,
+        'Sale Listing Published'
+      );
+    } else {
+      toast.success(
+        `Your car "${formData.name}" was successfully registered for review!`,
+        'Rent Booking Initiated'
+      );
+    }
   };
 
   const resetListingForm = () => {
@@ -438,14 +455,22 @@ export default function Navbar() {
                     <div className="w-16 h-16 bg-green-50 border border-green-200 text-green-500 rounded-full flex items-center justify-center mb-6">
                       <Check className="w-8 h-8 stroke-[3]" />
                     </div>
-                    <h3 className="text-2xl font-black text-gray-900 leading-snug">Registration Submitted!</h3>
+                    <h3 className="text-2xl font-black text-gray-900 leading-snug">{modalType === 'Sale' ? 'Listing Published!' : 'Registration Submitted!'}</h3>
                     <p className="text-sm text-gray-600 max-w-md mx-auto mt-3 leading-relaxed">
-                      Zabardast! Your car listing has been sent to the portal administrator for verification. Once approved, local customers in <strong className="text-red-650">{formData.city}</strong> will be able to contact you directly on your WhatsApp number.
+                      Zabardast! {modalType === 'Sale' ? 
+                        `Your car has been listed for sale on our website. Customers in ` : 
+                        `Your car listing has been sent to the administrator for verification. Once approved, local customers in `
+                      } 
+                      <strong className="text-red-650">{formData.city}</strong> will be able to contact you directly on your WhatsApp number.
                     </p>
                     <div className="bg-gray-50 border rounded-2xl p-4 w-full max-w-sm mt-6 text-left text-xs space-y-2 font-medium">
                       <div className="flex justify-between"><span className="text-gray-400">Owner Name:</span> <span className="font-bold text-gray-800">{formData.ownerName}</span></div>
                       <div className="flex justify-between"><span className="text-gray-400">Car Model:</span> <span className="font-bold text-gray-800">{formData.name}</span></div>
-                      <div className="flex justify-between"><span className="text-gray-400">Monthly Est. Earnings:</span> <span className="font-extrabold text-green-600 font-mono">PKR {(parseInt(formData.rentPrice.replace(/,/g, '')) * 26 || 150000).toLocaleString()}/mo</span></div>
+                      {modalType === 'Sale' ? (
+                        <div className="flex justify-between"><span className="text-gray-400">Asking Price:</span> <span className="font-extrabold text-blue-600 font-mono">PKR {formData.rentPrice}</span></div>
+                      ) : (
+                        <div className="flex justify-between"><span className="text-gray-400">Monthly Est. Earnings:</span> <span className="font-extrabold text-green-600 font-mono">PKR {(parseInt(formData.rentPrice.replace(/,/g, '')) * 26 || 150000).toLocaleString()}/mo</span></div>
+                      )}
                     </div>
                     <button 
                       onClick={resetListingForm}
@@ -670,7 +695,7 @@ export default function Navbar() {
                       <div className="space-y-4 animate-fade-in">
                         <div className="grid sm:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-1.5">Rental price (PKR) *</label>
+                            <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-1.5">{modalType === 'Sale' ? 'Sale price (PKR) *' : 'Rental price (PKR) *'}</label>
                             <div className="relative">
                               <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold font-mono text-gray-500">PKR</span>
                               <input 
@@ -684,17 +709,19 @@ export default function Navbar() {
                             </div>
                           </div>
 
-                          <div>
-                            <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-1.5">Billing Interval *</label>
-                            <select 
-                              className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none bg-white transition text-xs sm:text-sm font-medium"
-                              value={formData.rentUnit}
-                              onChange={e => setFormData({...formData, rentUnit: e.target.value as 'Day' | 'Hour'})}
-                            >
-                              <option value="Day">Per Day (روزانہ)</option>
-                              <option value="Hour">Per Hour (گھنٹہ)</option>
-                            </select>
-                          </div>
+                          {modalType !== 'Sale' && (
+                            <div>
+                              <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-1.5">Billing Interval *</label>
+                              <select 
+                                className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none bg-white transition text-xs sm:text-sm font-medium"
+                                value={formData.rentUnit}
+                                onChange={e => setFormData({...formData, rentUnit: e.target.value as 'Day' | 'Hour'})}
+                              >
+                                <option value="Day">Per Day (روزانہ)</option>
+                                <option value="Hour">Per Hour (گھنٹہ)</option>
+                              </select>
+                            </div>
+                          )}
                         </div>
 
                         <div>

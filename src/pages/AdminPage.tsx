@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import CTABanner from '../components/CTABanner';
-import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown } from 'lucide-react';
+import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { INITIAL_RENTAL_FLEET, RentalCar } from '../data/inventory';
 
@@ -150,7 +150,7 @@ export default function AdminPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [newPost, setNewPost] = useState({ title: '', author: '', imageUrl: '', content: '' });
-  const [activeTab, setActiveTab] = useState<'bookings' | 'blogs' | 'dns' | 'rentals' | 'requests' | 'courses'>('bookings');
+  const [activeTab, setActiveTab] = useState<'bookings' | 'blogs' | 'dns' | 'rentals' | 'requests' | 'courses' | 'car-sales'>('bookings');
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -180,6 +180,7 @@ export default function AdminPage() {
 
   // Car Fleet State
   const [rentalCars, setRentalCars] = useState<RentalCar[]>([]);
+  const [editingCarId, setEditingCarId] = useState<string | null>(null);
   const [newCar, setNewCar] = useState({
     name: '',
     transmission: 'Automatic' as 'Automatic' | 'Manual',
@@ -197,6 +198,8 @@ export default function AdminPage() {
   const [bookingSearch, setBookingSearch] = useState('');
   const [bookingStatusFilter, setBookingStatusFilter] = useState('All');
   const [pendingCars, setPendingCars] = useState<any[]>([]);
+  const [pendingSaleCars, setPendingSaleCars] = useState<any[]>([]);
+  const [saleCars, setSaleCars] = useState<any[]>([]);
   const [verifiedToggles, setVerifiedToggles] = useState<Record<string, boolean>>({});
   
   // Customer Requests State
@@ -301,6 +304,40 @@ export default function AdminPage() {
       setPendingCars([]);
     }
 
+    // Load Pending submitted sale cars
+    const savedPendingSale = localStorage.getItem('pending_sale_cars');
+    if (savedPendingSale) {
+      try {
+        const parsed = JSON.parse(savedPendingSale);
+        if (Array.isArray(parsed)) {
+          setPendingSaleCars(parsed);
+        } else {
+          setPendingSaleCars([]);
+        }
+      } catch (err) {
+        setPendingSaleCars([]);
+      }
+    } else {
+      setPendingSaleCars([]);
+    }
+
+    // Load Approved active sale cars
+    const savedSaleCars = localStorage.getItem('sale_cars');
+    if (savedSaleCars) {
+      try {
+        const parsed = JSON.parse(savedSaleCars);
+        if (Array.isArray(parsed)) {
+          setSaleCars(parsed);
+        } else {
+          setSaleCars([]);
+        }
+      } catch (err) {
+        setSaleCars([]);
+      }
+    } else {
+      setSaleCars([]);
+    }
+
     // 4. Load approved active car fleet
     const savedCars = localStorage.getItem('rental_cars');
     let baseList: RentalCar[] = [];
@@ -388,6 +425,8 @@ export default function AdminPage() {
     window.addEventListener('storage', loadDataAndSync);
     window.addEventListener('driving_bookings_updated', loadDataAndSync);
     window.addEventListener('pending_cars_updated', loadDataAndSync);
+    window.addEventListener('pending_sale_cars_updated', loadDataAndSync);
+    window.addEventListener('sale_cars_updated', loadDataAndSync);
     window.addEventListener('customer_requests_updated', loadDataAndSync);
     window.addEventListener('driving_courses_updated', loadDataAndSync);
     
@@ -398,6 +437,8 @@ export default function AdminPage() {
       window.removeEventListener('storage', loadDataAndSync);
       window.removeEventListener('driving_bookings_updated', loadDataAndSync);
       window.removeEventListener('pending_cars_updated', loadDataAndSync);
+      window.removeEventListener('pending_sale_cars_updated', loadDataAndSync);
+      window.removeEventListener('sale_cars_updated', loadDataAndSync);
       window.removeEventListener('customer_requests_updated', loadDataAndSync);
       window.removeEventListener('driving_courses_updated', loadDataAndSync);
       clearInterval(syncInterval);
@@ -575,6 +616,101 @@ export default function AdminPage() {
     }
   };
 
+  const approveSaleCarOnboarding = (car: any) => {
+    const cardId = `pending-sale-card-${car.id}`;
+    const cardEl = document.getElementById(cardId);
+    const btnEl = document.getElementById(`btn-approve-sale-${car.id}`);
+
+    if (cardEl) {
+      cardEl.classList.remove('border-gray-200', 'hover:border-gray-300');
+      cardEl.classList.add('border-emerald-500', 'ring-4', 'ring-emerald-500/20', 'bg-emerald-50/30');
+      cardEl.style.transition = 'all 0.6s ease-in-out';
+      cardEl.style.opacity = '0';
+      cardEl.style.transform = 'scale(0.95)';
+    }
+
+    if (btnEl) {
+      btnEl.innerHTML = '✓ Approved';
+      btnEl.classList.remove('bg-green-600', 'hover:bg-green-700');
+      btnEl.classList.add('bg-emerald-600', 'hover:bg-emerald-600');
+    }
+
+    showToast(`Car sale submission approved! "${car.name}" is now live on the public Car Sale page.`, 'success');
+
+    setTimeout(() => {
+      // 1. Save to approved sale cars
+      const savedSaleCars = localStorage.getItem('sale_cars');
+      let customSaleList: any[] = [];
+      if (savedSaleCars) {
+        try {
+          const parsed = JSON.parse(savedSaleCars);
+          if (Array.isArray(parsed)) {
+            customSaleList = parsed;
+          }
+        } catch (e) {}
+      }
+      
+      const vettedCar = {
+        ...car,
+        id: car.id || 'sale-' + Date.now().toString(),
+        approved: true
+      };
+      
+      customSaleList = [vettedCar, ...customSaleList.filter(c => c.id !== vettedCar.id)];
+      localStorage.setItem('sale_cars', JSON.stringify(customSaleList));
+
+      // 2. Delete from pending sale cars
+      setPendingSaleCars(prev => {
+        const remainingPending = prev.filter(c => c.id !== car.id);
+        localStorage.setItem('pending_sale_cars', JSON.stringify(remainingPending));
+        return remainingPending;
+      });
+
+      if (cardEl) {
+        cardEl.remove();
+      }
+
+      window.dispatchEvent(new Event('sale_cars_updated'));
+      window.dispatchEvent(new Event('pending_sale_cars_updated'));
+      window.dispatchEvent(new Event('storage'));
+      loadDataAndSync();
+    }, 750);
+  };
+
+  const rejectSaleCarOnboarding = (id: string) => {
+    if (window.confirm('Reject and permanently discard this sale owner submission?')) {
+      setPendingSaleCars(prev => {
+        const remainingPending = prev.filter(c => c.id !== id);
+        localStorage.setItem('pending_sale_cars', JSON.stringify(remainingPending));
+        return remainingPending;
+      });
+      
+      window.dispatchEvent(new Event('pending_sale_cars_updated'));
+      window.dispatchEvent(new Event('storage'));
+      loadDataAndSync();
+    }
+  };
+
+  const deleteApprovedSaleCar = (id: string) => {
+    if (window.confirm('Are you sure you want to permanently delete this sale car listing?')) {
+      const savedSaleCars = localStorage.getItem('sale_cars');
+      if (savedSaleCars) {
+        try {
+          const parsed = JSON.parse(savedSaleCars);
+          if (Array.isArray(parsed)) {
+            const updated = parsed.filter((c: any) => c.id !== id);
+            localStorage.setItem('sale_cars', JSON.stringify(updated));
+            setSaleCars(updated);
+          }
+        } catch (e) {}
+      }
+      showToast('Sale car deleted successfully.', 'info');
+      window.dispatchEvent(new Event('sale_cars_updated'));
+      window.dispatchEvent(new Event('storage'));
+      loadDataAndSync();
+    }
+  };
+
   // Handler methods for Customer Rental Requests
   const handleApproveRequest = (id: string) => {
     const updated = customerRequests.map(r => r.id === id ? { ...r, status: 'live' as const } : r);
@@ -617,6 +753,39 @@ export default function AdminPage() {
     }
   };
 
+  const startEditingCar = (car: RentalCar) => {
+    setEditingCarId(car.id);
+    setNewCar({
+      name: car.name,
+      transmission: car.transmission as 'Automatic' | 'Manual',
+      rentPrice: car.rentPrice.replace(/,/g, ''),
+      rentUnit: (car.rentUnit || 'Day') as 'Day' | 'Hour',
+      imageUrl: car.imageUrl || '',
+      city: car.city || 'Faisalabad',
+      status: car.status as 'Available' | 'Booked',
+      type: car.type || 'Sedan',
+      availabilityStatus: car.availabilityStatus || 'Available'
+    });
+    // Scroll to the top where the form is
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const cancelEditingCar = () => {
+    setEditingCarId(null);
+    setNewCar({
+      name: '',
+      transmission: 'Automatic',
+      rentPrice: '',
+      rentUnit: 'Day',
+      imageUrl: '',
+      city: 'Faisalabad',
+      status: 'Available',
+      type: 'Sedan',
+      availabilityStatus: 'Available'
+    });
+    if (carFileInputRef.current) carFileInputRef.current.value = '';
+  };
+
   const addRentalCar = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCar.name || !newCar.rentPrice || !newCar.city) {
@@ -633,40 +802,52 @@ export default function AdminPage() {
 
     const finalPrice = priceNum.toLocaleString();
 
-    const carId = 'rc-' + Date.now().toString();
-    const finalCar: RentalCar = {
-      id: carId,
-      name: newCar.name,
-      transmission: newCar.transmission,
-      rentPrice: finalPrice,
-      rentUnit: newCar.rentUnit,
-      imageUrl: newCar.imageUrl || PRESET_CAR_IMAGES[0].url,
-      city: newCar.city,
-      status: newCar.status,
-      type: newCar.type,
-      availabilityStatus: newCar.availabilityStatus,
-      isVerified: false
-    };
+    let updated: RentalCar[];
+    
+    if (editingCarId) {
+      updated = rentalCars.map(car => 
+        car.id === editingCarId 
+          ? {
+              ...car,
+              name: newCar.name,
+              transmission: newCar.transmission,
+              rentPrice: finalPrice,
+              rentUnit: newCar.rentUnit,
+              imageUrl: newCar.imageUrl || car.imageUrl || PRESET_CAR_IMAGES[0].url,
+              city: newCar.city,
+              status: newCar.status,
+              type: newCar.type,
+              availabilityStatus: newCar.availabilityStatus,
+            }
+          : car
+      );
+      showToast('Rental vehicle updated successfully!', 'success');
+    } else {
+      const carId = 'rc-' + Date.now().toString();
+      const finalCar: RentalCar = {
+        id: carId,
+        name: newCar.name,
+        transmission: newCar.transmission,
+        rentPrice: finalPrice,
+        rentUnit: newCar.rentUnit,
+        imageUrl: newCar.imageUrl || PRESET_CAR_IMAGES[0].url,
+        city: newCar.city,
+        status: newCar.status,
+        type: newCar.type,
+        availabilityStatus: newCar.availabilityStatus,
+        isVerified: false
+      };
+      updated = [finalCar, ...rentalCars];
+      showToast('Rental vehicle added to fleet!', 'success');
+    }
 
-    const updated = [finalCar, ...rentalCars];
     setRentalCars(updated);
     localStorage.setItem('rental_cars', JSON.stringify(updated));
     
     // Trigger a window sync event for other routes
     window.dispatchEvent(new Event('storage'));
 
-    showToast('Rental vehicle added to fleet!', 'success');
-
-    setNewCar({
-      name: '',
-      transmission: 'Automatic',
-      rentPrice: '',
-      rentUnit: 'Day',
-      imageUrl: '',
-      city: 'Faisalabad',
-      status: 'Available'
-    });
-    if (carFileInputRef.current) carFileInputRef.current.value = '';
+    cancelEditingCar();
   };
 
   const deleteRentalCar = (id: string) => {
@@ -1128,6 +1309,26 @@ export default function AdminPage() {
                     activeTab === 'requests' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
                   }`}>
                     {customerRequests.length}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('car-sales')}
+                  className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                    activeTab === 'car-sales'
+                      ? 'bg-red-700 text-white font-extrabold shadow-md shadow-red-700/10'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
+                    <Tag className="w-4 h-4" />
+                    <span>Car Sales</span>
+                  </div>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-md font-black min-w-5 text-center ${
+                    activeTab === 'car-sales' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                  }`}>
+                    {pendingSaleCars.length}
                   </span>
                 </button>
 
@@ -2125,14 +2326,23 @@ export default function AdminPage() {
 
             {/* Direct Fleet and Inventory Administration Sub-grid */}
             <div className="grid lg:grid-cols-12 gap-8">
-            {/* Add New Rental Car Form */}
+            {/* Add New/Edit Rental Car Form */}
             <div className="lg:col-span-6 space-y-6">
               <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm transition">
                 <div className="flex items-center gap-2 mb-6 border-b border-gray-100 pb-4">
                   <span className="p-2 bg-red-50 text-red-600 rounded-lg">
                     <Car className="w-5 h-5" />
                   </span>
-                  <h2 className="text-xl font-bold text-gray-900">Add New Rental Car</h2>
+                  <h2 className="text-xl font-bold text-gray-900">{editingCarId ? 'Edit Rental Car' : 'Add New Rental Car'}</h2>
+                  {editingCarId && (
+                    <button 
+                      type="button" 
+                      onClick={cancelEditingCar}
+                      className="ml-auto text-xs font-bold text-gray-500 hover:text-red-600 underline"
+                    >
+                      Cancel Edit
+                    </button>
+                  )}
                 </div>
 
                 <form onSubmit={addRentalCar} className="space-y-4">
@@ -2306,7 +2516,15 @@ export default function AdminPage() {
                     type="submit" 
                     className="w-full bg-red-600 hover:bg-red-700 text-white py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-md shadow-red-200 cursor-pointer text-sm"
                   >
-                    <Plus className="w-4 h-4" /> Add Car to Active Fleet
+                    {editingCarId ? (
+                      <>
+                        <Check className="w-4 h-4" /> Save Changes
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-4 h-4" /> Add Car to Active Fleet
+                      </>
+                    )}
                   </button>
                 </form>
               </div>
@@ -2376,15 +2594,27 @@ export default function AdminPage() {
                               <ChevronDown className="w-3 h-3 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none opacity-50" />
                             </div>
 
-                            {/* Delete Button */}
-                            <button 
-                              onClick={() => deleteRentalCar(car.id)} 
-                              title="Remove vehicle from inventory"
-                              type="button"
-                              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition cursor-pointer"
-                            >
-                              <Trash2 className="w-5 h-5" />
-                            </button>
+                            <div className="flex items-center gap-1.5">
+                              {/* Edit Button */}
+                              <button 
+                                onClick={() => startEditingCar(car)} 
+                                title="Edit vehicle"
+                                type="button"
+                                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition cursor-pointer"
+                              >
+                                <Edit className="w-5 h-5" />
+                              </button>
+
+                              {/* Delete Button */}
+                              <button 
+                                onClick={() => deleteRentalCar(car.id)} 
+                                title="Remove vehicle from inventory"
+                                type="button"
+                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition cursor-pointer"
+                              >
+                                <Trash2 className="w-5 h-5" />
+                              </button>
+                            </div>
                           </div>
                         </div>
                       );
@@ -2495,6 +2725,202 @@ export default function AdminPage() {
                 </table>
               </div>
             )}
+          </div>
+        )}
+
+        {activeTab === 'car-sales' && (
+          <div className="space-y-8 animate-fade-in" id="sales-admin-hub">
+            {/* Header stats bar */}
+            <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm p-6 sm:p-8 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+                    <Tag className="w-6 h-6 text-red-650" />
+                    Car Sales Onboarding & Verification
+                  </h2>
+                  <p className="text-gray-500 text-xs sm:text-sm mt-1">
+                    Verify owner submissions for selling their cars. Approved vehicles are instantly published to the public Car Sale catalog feed.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <span className="bg-amber-50 text-amber-800 px-3.5 py-1.5 rounded-xl text-xs font-bold border border-amber-150 border-solid">
+                    Awaiting Review: {pendingSaleCars.length}
+                  </span>
+                  <span className="bg-green-50 text-green-800 px-3.5 py-1.5 rounded-xl text-xs font-bold border border-green-150 border-solid">
+                    Live Listings: {saleCars.length}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Pending Approvals Sub-section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-black text-slate-800 tracking-tight flex items-center gap-2 border-b border-gray-150 pb-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                Pending Review Submissions ({pendingSaleCars.length})
+              </h3>
+
+              {pendingSaleCars.length === 0 ? (
+                <div className="bg-white rounded-2xl border border-gray-150 p-12 text-center shadow-sm">
+                  <Car className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-sm font-bold text-gray-500">Zabardast! No pending submissions to review.</p>
+                  <p className="text-xs text-gray-400 mt-1">Any new submissions from the "Sale Your Car" form will appear here.</p>
+                </div>
+              ) : (
+                <div className="grid md:grid-cols-2 gap-6">
+                  {pendingSaleCars.map((car) => (
+                    <div 
+                      key={car.id} 
+                      id={`pending-sale-card-${car.id}`}
+                      className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col transition hover:border-gray-300"
+                    >
+                      {/* Car Thumbnail Image */}
+                      <div className="relative h-48 bg-slate-900">
+                        <img 
+                          src={car.imageUrl} 
+                          alt={car.name} 
+                          referrerPolicy="no-referrer"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute top-3 right-3 bg-black/70 text-white px-2.5 py-1 rounded-lg font-bold font-mono text-[10px] uppercase">
+                          {car.city}
+                        </div>
+                        <div className="absolute bottom-3 left-3 bg-red-650 text-white px-3 py-1 rounded-lg font-black text-xs font-mono">
+                          PKR {car.rentPrice}
+                        </div>
+                      </div>
+
+                      {/* Content details */}
+                      <div className="p-5 flex-grow space-y-4">
+                        <div>
+                          <div className="flex justify-between items-start gap-2">
+                            <h4 className="text-base font-black text-gray-900 leading-snug">{car.name}</h4>
+                            <span className="text-[10px] font-black uppercase text-gray-400 bg-gray-50 border border-gray-100 border-solid rounded px-1.5 py-0.5 whitespace-nowrap">
+                              {car.transmission}
+                            </span>
+                          </div>
+                          {car.registrationNumber && (
+                            <p className="text-xs font-mono font-bold text-gray-500 mt-0.5">Reg #: {car.registrationNumber}</p>
+                          )}
+                        </div>
+
+                        {/* Owner details */}
+                        <div className="bg-slate-50 rounded-xl p-3 border border-slate-100 border-solid text-xs space-y-2.5">
+                          <div className="flex justify-between font-medium">
+                            <span className="text-gray-400 font-bold uppercase tracking-wider text-[9px]">Seller:</span>
+                            <span className="font-extrabold text-gray-800">{car.ownerName}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-400 font-bold uppercase tracking-wider text-[9px]">Contact:</span>
+                            <span className="font-bold text-gray-800 font-mono flex items-center gap-1.5">
+                              {car.displayPhone || car.ownerPhone}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-400 font-bold uppercase tracking-wider text-[9px]">Sub City:</span>
+                            <span className="font-bold text-gray-800">{car.ownerCity}</span>
+                          </div>
+                          {car.fuelType && (
+                            <div className="flex justify-between">
+                              <span className="text-gray-400 font-bold uppercase tracking-wider text-[9px]">Fuel Type:</span>
+                              <span className="font-bold text-gray-800 uppercase text-[10px]">{car.fuelType}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="text-xs text-gray-600 font-medium leading-relaxed bg-amber-50/40 p-3 rounded-lg border border-amber-100 border-solid">
+                          <span className="font-bold text-amber-800">Description: </span>
+                          {car.description}
+                        </div>
+                      </div>
+
+                      {/* Approve / Reject buttons */}
+                      <div className="bg-gray-50 border-t border-gray-100 p-4 shrink-0 flex gap-3">
+                        <button
+                          id={`btn-approve-sale-${car.id}`}
+                          onClick={() => approveSaleCarOnboarding(car)}
+                          className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-xl transition text-xs shrink-0 cursor-pointer"
+                        >
+                          Approve Listing
+                        </button>
+                        <button
+                          onClick={() => rejectSaleCarOnboarding(car.id)}
+                          className="bg-gray-100 hover:bg-red-50 text-gray-700 hover:text-red-600 font-extrabold px-4 py-2.5 rounded-xl transition text-xs cursor-pointer border border-gray-200 border-solid hover:border-red-100 shrink-0"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Published Active Listings View */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-black text-slate-800 tracking-tight flex items-center gap-2 border-b border-gray-150 pb-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                Active Published Sale Cars ({saleCars.length})
+              </h3>
+
+              {saleCars.length === 0 ? (
+                <div className="bg-white rounded-2xl border border-gray-150 p-8 text-center shadow-sm">
+                  <p className="text-sm font-bold text-gray-500">No active vehicles on checkout feed yet.</p>
+                  <p className="text-xs text-gray-400 mt-1">Once you approve any pending car sale request, it will be displayed here.</p>
+                </div>
+              ) : (
+                <div className="bg-white rounded-2xl border border-gray-200 border-solid shadow-sm overflow-hidden animate-fade-in">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="bg-gray-50 border-b border-gray-100 border-solid font-bold text-gray-400 uppercase tracking-wider text-[9px]">
+                          <th className="p-4">Car Model</th>
+                          <th className="p-4">City</th>
+                          <th className="p-4">Asking Price</th>
+                          <th className="p-4">Transmission</th>
+                          <th className="p-4 font-bold">Owner Name</th>
+                          <th className="p-4">Owner WhatsApp</th>
+                          <th className="p-4 text-center">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100 font-medium">
+                        {saleCars.map((car) => (
+                          <tr key={car.id} className="hover:bg-slate-50/50 transition duration-150">
+                            <td className="p-4">
+                              <div className="flex items-center gap-3">
+                                <img src={car.imageUrl} alt={car.name} className="w-10 h-7 rounded object-cover shadow-sm " />
+                                <div>
+                                  <span className="font-extrabold text-slate-800 text-sm">{car.name}</span>
+                                  {car.registrationNumber && <p className="text-[10px] text-gray-400 font-mono">Reg: {car.registrationNumber}</p>}
+                                </div>
+                              </div>
+                            </td>
+                            <td className="p-4 text-slate-650 font-bold">{car.city}</td>
+                            <td className="p-4 font-black font-mono text-slate-800 text-sm">PKR {car.rentPrice}</td>
+                            <td className="p-4">
+                              <span className="bg-slate-100 text-slate-700 font-black uppercase text-[10px] px-2 py-0.5 rounded border border-slate-150 border-solid">
+                                {car.transmission}
+                              </span>
+                            </td>
+                            <td className="p-4 font-bold text-slate-700">{car.ownerName}</td>
+                            <td className="p-4 font-mono text-slate-500">{car.displayPhone || car.ownerPhone}</td>
+                            <td className="p-4 text-center">
+                              <button
+                                onClick={() => deleteApprovedSaleCar(car.id)}
+                                className="p-2 text-slate-400 hover:text-red-650 hover:bg-red-50 rounded-xl transition cursor-pointer"
+                                title="Remove listing permanently"
+                              >
+                                <Trash2 className="w-5 h-5" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
