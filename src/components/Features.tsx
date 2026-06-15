@@ -1,6 +1,7 @@
 import { FileText, Settings, FileCheck } from 'lucide-react';
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useInView } from 'motion/react';
+import { ScrollReveal } from './ScrollReveal';
 
 export default function Features() {
   const features = [
@@ -22,11 +23,13 @@ export default function Features() {
   ];
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20 bg-white z-20 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-3 gap-12">
           {features.map((feature, i) => (
-            <FeatureCard key={i} feature={feature} index={i} />
+            <ScrollReveal key={i} delay={i * 0.1}>
+              <FeatureCard feature={feature} index={i} />
+            </ScrollReveal>
           ))}
         </div>
       </div>
