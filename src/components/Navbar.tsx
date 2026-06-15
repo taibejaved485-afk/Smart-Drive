@@ -70,7 +70,6 @@ export default function Navbar() {
   const location = useLocation();
 
   const navLinks = [
-    { name: 'Home', path: '/' },
     { name: 'Services', path: '/services' },
     { name: 'Rent Car', path: '/rentals' },
     { name: 'About', path: '/about' },
