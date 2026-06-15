@@ -15,6 +15,7 @@ import ContactPage from './pages/ContactPage';
 import PricingPage from './pages/PricingPage';
 import ServicesPage from './pages/ServicesPage';
 import RentalsPage from './pages/RentalsPage';
+import BackToTopButton from './components/BackToTopButton';
 import { ToastProvider } from './components/Toast';
 
 export default function App() {
@@ -35,6 +36,7 @@ export default function App() {
             <Route path="/rentals" element={<RentalsPage />} />
           </Routes>
         <WhatsAppButton />
+        <BackToTopButton />
       </BrowserRouter>
     </ToastProvider>
   );
