@@ -4,7 +4,7 @@ import Footer from '../components/Footer';
 import CTABanner from '../components/CTABanner';
 import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { INITIAL_RENTAL_FLEET, RentalCar } from '../data/inventory';
+import { RentalCar } from '../data/inventory';
 import { 
   fetchSaleCars, 
   fetchPendingSaleCars, 
@@ -267,29 +267,7 @@ export default function AdminPage() {
         setBookings([]);
       }
     } else {
-      // Seed starter bookings
-      const starterBookings = [
-        {
-          id: 'bk-starter-1',
-          fullName: 'Zainab Bibi',
-          email: 'zainab.bibi@gmail.com',
-          subject: 'Female-Only Safe Road Course',
-          comments: 'Required female instructor for late evening timings near Jaranwala Road.',
-          status: 'Confirmed',
-          createdAt: new Date(Date.now() - 3600000 * 3).toISOString()
-        },
-        {
-          id: 'bk-starter-2',
-          fullName: 'Asim Siddique',
-          email: 'asim.sid@yahoo.com',
-          subject: 'Beginner Class Driving Session',
-          comments: 'Weekend slot preparation for LTV commercial test.',
-          status: 'Pending',
-          createdAt: new Date(Date.now() - 3600000 * 24).toISOString()
-        }
-      ];
-      setBookings(starterBookings);
-      localStorage.setItem('driving_bookings', JSON.stringify(starterBookings));
+      setBookings([]);
     }
     // Fetch background from Supabase
     fetchDrivingBookings().then(data => {
@@ -384,13 +362,13 @@ export default function AdminPage() {
         if (Array.isArray(parsed)) {
           baseList = parsed;
         } else {
-          baseList = INITIAL_RENTAL_FLEET;
+          baseList = [];
         }
       } catch (e) {
-        baseList = INITIAL_RENTAL_FLEET;
+        baseList = [];
       }
     } else {
-      baseList = INITIAL_RENTAL_FLEET;
+      baseList = [];
     }
 
     let approvedList: RentalCar[] = [];
@@ -421,10 +399,9 @@ export default function AdminPage() {
     // Try fetching rental cars from backend
     fetchRentalCars().then(data => {
       if (data && data.length > 0) {
-        const mergedBackend = [...data, ...INITIAL_RENTAL_FLEET];
         const uniqueBackend: RentalCar[] = [];
         const seenBackendIds = new Set<string>();
-        for (const car of mergedBackend) {
+        for (const car of data) {
           if (!seenBackendIds.has(car.id)) {
             seenBackendIds.add(car.id);
             uniqueBackend.push(car);
@@ -892,7 +869,7 @@ export default function AdminPage() {
     if (window.confirm('Are you sure you want to remove this car from the fleet?')) {
       // 1. Get current base fleet (ensuring we use defaults if key is missing/null)
       const savedCars = localStorage.getItem('rental_cars');
-      let currentBase: RentalCar[] = INITIAL_RENTAL_FLEET;
+      let currentBase: RentalCar[] = [];
       if (savedCars) {
         try {
           const parsed = JSON.parse(savedCars);
