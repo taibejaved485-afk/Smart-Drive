@@ -1,9 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 
 // @ts-ignore
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || import.meta.env.NEXT_PUBLIC_SUPABASE_URL || 'https://gzepvqpygnfgyahjfann.supabase.co';
 // @ts-ignore
-const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '';
+const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_VN4CNJYtHYvx0VHFcEJV7Q_95mUpgnX';
 
 // Let's create the client. If variables are missing, we don't crash, instead we handle it gracefully.
 export const supabase = supabaseUrl && supabaseKey 
