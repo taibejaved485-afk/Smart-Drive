@@ -1,8 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 
-const meta = import.meta as any;
-const supabaseUrl = (meta && meta.env && meta.env.VITE_SUPABASE_URL) || '';
-const supabaseKey = (meta && meta.env && meta.env.VITE_SUPABASE_PUBLISHABLE_KEY) || '';
+// @ts-ignore
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+// @ts-ignore
+const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '';
 
 // Let's create the client. If variables are missing, we don't crash, instead we handle it gracefully.
 export const supabase = supabaseUrl && supabaseKey 
@@ -97,15 +98,20 @@ async function tableExists(tableName: string): Promise<boolean> {
   if (!supabase) return false;
   try {
     const { error } = await supabase.from(tableName).select('id').limit(1);
-    if (error && error.code === 'P0001') {
-      // Table doesn't exist or SQL error
-      return false;
-    }
-    if (error && (error.message?.includes('does not exist') || error.code === '42P01')) {
-      return false;
+    if (error) {
+      if (error.code === 'P0001') {
+        console.warn(`[Supabase] Table "${tableName}" does not exist or has SQL error (P0001).`);
+        return false;
+      }
+      if (error.message?.includes('does not exist') || error.code === '42P01') {
+        console.warn(`[Supabase] Table "${tableName}" does not exist (42P01). Make sure to run your SQL schema script in the Supabase SQL Editor.`);
+        return false;
+      }
+      console.error(`[Supabase] Unexpected error checking table "${tableName}":`, error);
     }
     return true;
-  } catch {
+  } catch (err) {
+    console.error(`[Supabase] Exception checking table "${tableName}":`, err);
     return false;
   }
 }
