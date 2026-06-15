@@ -196,7 +196,7 @@ export default function ContactPage() {
               {/* Background image & gradient overlay */}
               <div className="absolute inset-0 z-0">
                 <img 
-                  src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=80&w=1200" 
+                  src="https://i.pinimg.com/736x/6c/f2/fc/6cf2fc8535ed2c053fbf47e58025813c.jpg" 
                   alt="Premium driving journey" 
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   referrerPolicy="no-referrer"
