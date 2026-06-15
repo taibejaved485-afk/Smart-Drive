@@ -422,8 +422,11 @@ export default function RentalsPage() {
       <Navbar />
 
       {/* Hero Header */}
-      <section className="relative py-24 bg-gray-950 text-white overflow-hidden bg-[url('https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=1600')] bg-cover bg-center">
-        <div className="absolute inset-0 bg-gray-950/85"></div>
+      <section 
+        className="relative py-24 text-white overflow-hidden bg-cover bg-center"
+        style={{ backgroundImage: "url('https://i.pinimg.com/1200x/aa/8c/59/aa8c59af08030bf767a16f053cb78d1c.jpg')" }}
+      >
+        <div className="absolute inset-0 bg-gray-900/40"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <motion.p 
             initial={{ opacity: 0, y: -10 }}

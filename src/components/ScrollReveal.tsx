@@ -32,12 +32,13 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
   };
 
   return (
-    <div ref={ref} style={{ width }} className={`${className} ${overflowHidden ? 'overflow-hidden' : ''}`}>
+    <div ref={ref} style={{ width }} className={`${className} h-full ${overflowHidden ? 'overflow-hidden' : ''}`}>
       <motion.div
         variants={getVariants()}
         initial="hidden"
         animate={isInView ? 'visible' : 'hidden'}
         transition={{ duration: 0.8, delay: delay, ease: [0.17, 0.55, 0.55, 1] }}
+        className="w-full h-full"
       >
         {children}
       </motion.div>
