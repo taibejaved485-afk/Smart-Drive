@@ -623,16 +623,9 @@ export default function AdminPage() {
         return remainingPending;
       });
 
-      if (cardEl) {
-        cardEl.remove();
-      }
-
       window.dispatchEvent(new Event('pending_cars_updated'));
       window.dispatchEvent(new Event('storage'));
       loadDataAndSync();
-      
-      const remnants = document.querySelectorAll(`[id="${cardId}"]`);
-      remnants.forEach(el => el.remove());
     }, 750);
   };
 
@@ -703,10 +696,6 @@ export default function AdminPage() {
         localStorage.setItem('pending_sale_cars', JSON.stringify(remainingPending));
         return remainingPending;
       });
-
-      if (cardEl) {
-        cardEl.remove();
-      }
 
       window.dispatchEvent(new Event('sale_cars_updated'));
       window.dispatchEvent(new Event('pending_sale_cars_updated'));
