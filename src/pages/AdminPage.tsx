@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import CTABanner from '../components/CTABanner';
-import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag } from 'lucide-react';
+import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag, Bold, Italic, List, ListOrdered } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RentalCar } from '../data/inventory';
 import { 
@@ -171,6 +171,7 @@ export default function AdminPage() {
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const carFileInputRef = useRef<HTMLInputElement>(null);
+  const blogTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Driving school course states
   const [drivingCourses, setDrivingCourses] = useState<DrivingCourse[]>([]);
@@ -976,6 +977,61 @@ export default function AdminPage() {
     });
     // Scroll smoothly to form
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const insertFormatting = (before: string, after: string = '') => {
+    const textarea = blogTextareaRef.current;
+    if (!textarea) {
+      setNewPost(prev => ({
+        ...prev,
+        content: prev.content + before + after
+      }));
+      return;
+    }
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const originalText = textarea.value;
+    const selectedText = originalText.substring(start, end);
+
+    const replacement = before + (selectedText || '') + after;
+    const newContent = originalText.substring(0, start) + replacement + originalText.substring(end);
+
+    setNewPost(prev => ({ ...prev, content: newContent }));
+
+    // Focus back and set cursor position
+    setTimeout(() => {
+      textarea.focus();
+      const newCursorPos = start + before.length + (selectedText || '').length + after.length;
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 50);
+  };
+
+  const insertTemplate = (text: string) => {
+    const textarea = blogTextareaRef.current;
+    if (!textarea) {
+      setNewPost(prev => ({
+        ...prev,
+        content: prev.content ? prev.content + '\n\n' + text : text
+      }));
+      return;
+    }
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const originalText = textarea.value;
+
+    const prefix = originalText && !originalText.endsWith('\n') ? '\n\n' : '';
+    const replacement = prefix + text + '\n\n';
+    const newContent = originalText.substring(0, start) + replacement + originalText.substring(end);
+
+    setNewPost(prev => ({ ...prev, content: newContent }));
+
+    setTimeout(() => {
+      textarea.focus();
+      const newCursorPos = start + replacement.length;
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 50);
   };
 
   const cancelEdit = () => {
@@ -1787,13 +1843,156 @@ export default function AdminPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">Blog Content *</label>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                      <label className="block text-sm font-bold text-gray-700">
+                        Blog Content / بلاگ کا مواد *
+                      </label>
+                      <span className="text-xs text-gray-500 font-medium bg-gray-100 px-2.5 py-1 rounded-full flex items-center gap-1">
+                        <Sparkles className="w-3.5 h-3.5 text-red-600" />
+                        Tip: Use the helper buttons below to easily build paragraphs
+                      </span>
+                    </div>
+
+                    {/* Rich Paragraph Formatting Toolbar */}
+                    <div className="bg-gray-50 border border-gray-300 border-b-0 rounded-t-xl p-2 sm:p-3 flex flex-wrap gap-2 items-center">
+                      <div className="flex flex-wrap gap-1.5 border-r border-gray-200 pr-2">
+                        <button
+                          type="button"
+                          onClick={() => insertFormatting('**', '**')}
+                          title="Make selected text bold / الفاظ موٹا کریں"
+                          className="p-2 text-gray-700 bg-white hover:bg-red-50 hover:text-red-600 rounded-md border border-gray-200 transition focus:outline-none flex items-center justify-center gap-1"
+                        >
+                          <Bold className="w-4 h-4" />
+                          <span className="text-[10px] sm:text-xs font-bold font-sans">Bold</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => insertFormatting('*', '*')}
+                          title="Make selected text italic / الفاظ ترچھا کریں"
+                          className="p-2 text-gray-700 bg-white hover:bg-red-50 hover:text-red-600 rounded-md border border-gray-200 transition focus:outline-none flex items-center justify-center gap-1"
+                        >
+                          <Italic className="w-4 h-4" />
+                          <span className="text-[10px] sm:text-xs font-bold font-sans">Italic</span>
+                        </button>
+                      </div>
+
+                      <div className="flex flex-wrap gap-1.5 border-r border-gray-200 pr-2">
+                        <button
+                          type="button"
+                          onClick={() => insertFormatting('\n## ', '\n')}
+                          title="Insert big title / بڑی سرخی"
+                          className="px-2.5 py-2 text-gray-700 bg-white hover:bg-red-50 hover:text-red-600 rounded-md border border-gray-200 transition focus:outline-none text-[10px] sm:text-xs font-black font-sans"
+                        >
+                          H1 (Heading)
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => insertFormatting('\n### ', '\n')}
+                          title="Insert sub-title / چھوٹی سرخی"
+                          className="px-2.5 py-2 text-gray-700 bg-white hover:bg-red-50 hover:text-red-600 rounded-md border border-gray-200 transition focus:outline-none text-[10px] sm:text-xs font-bold font-sans"
+                        >
+                          H2 (Sub)
+                        </button>
+                      </div>
+
+                      <div className="flex flex-wrap gap-1.5 border-r border-gray-200 pr-2">
+                        <button
+                          type="button"
+                          onClick={() => insertFormatting('\n\n')}
+                          title="Insert clean paragraph space / نیا پیراگراف"
+                          className="px-2.5 py-2 text-gray-700 bg-white hover:bg-red-50 hover:text-red-600 rounded-md border border-gray-200 transition focus:outline-none text-[10px] sm:text-xs font-bold font-sans flex items-center gap-1"
+                        >
+                          <span className="text-red-600">&para;</span> New Paragraph / نیا پیراگراف
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => insertFormatting('\n- ')}
+                          title="Insert bullet item / فہرست"
+                          className="p-2 text-gray-700 bg-white hover:bg-red-50 hover:text-red-600 rounded-md border border-gray-200 transition focus:outline-none flex items-center justify-center"
+                        >
+                          <List className="w-4 h-4" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => insertFormatting('\n1. ')}
+                          title="Insert numbered item / فہرست"
+                          className="p-2 text-gray-700 bg-white hover:bg-red-50 hover:text-red-600 rounded-md border border-gray-200 transition focus:outline-none flex items-center justify-center"
+                        >
+                          <ListOrdered className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      {/* Instant templates generator */}
+                      <div className="flex flex-wrap gap-1.5 items-center">
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider pl-1">Insert Premium Templates:</span>
+                        
+                        <button
+                          type="button"
+                          onClick={() => insertTemplate(`## 🚗 اہم حفاظتی تدابیر (Important Safety Guidelines)\nڈرائیونگ شروع کرنے سے پہلے درج ذیل اصولوں پر عمل کریں تاکہ آپ کا سفر ہمیشہ محفوظ رہے:\n- سیٹ بیلٹ کا استعمال لازمی بنائیں۔\n- شیشوں (Mirrors) کو اپنی سیٹ کے مطابق ایڈجسٹ کریں۔\n- گاڑی کے انجن آئل، پانی اور ٹائر پریشر کو باقاعدگی سے چیک کریں۔`)}
+                          className="px-2 py-1 text-[11px] font-semibold text-red-700 bg-red-50 hover:bg-red-100 rounded-full transition focus:outline-none"
+                        >
+                          + 🚗 Safety Tips
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => insertTemplate(`## 🚦 ٹریفک اشارے اور قانون کی پاسداری (Traffic Signals Guide)\nروڈ پر ڈرائیونگ محفوظ بنانے کے لیے اشاروں کی پاسداری ضروری ہے:\n- *سرخ لائٹ (Red light)*: گاڑی کو مکمل طور پر روکیں۔\n- *پیلی لائٹ (Yellow light)*: رکنے کے لیے تیار ہو جائیں۔\n- *سبز لائٹ (Green light)*: احتیاط کے ساتھ آگے بڑھیں۔\n- اوور ٹیکنگ (Overtaking) صرف دائیں طرف سے کریں۔`)}
+                          className="px-2 py-1 text-[11px] font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-full transition focus:outline-none"
+                        >
+                          + 🚦 Signs Guide
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => insertTemplate(`## 💡 فیصل آباد میں ڈرائیونگ کے دوران احتیاط (Faisalabad Route Safety)\nفیصل آباد کی مصروف ترین سڑکوں جیسے کینال روڈ اور جڑانوالہ روڈ پر ان باتوں کا خاص خیال رکھیں:\n1. موٹر سائیکل سواروں اور رکشوں سے ہمیشہ مناسب فاصلہ رکھیں۔\n2. ٹرننگ اشارہ (Indicator) موڑ کاٹنے سے کم از کم 50 میٹر پہلے آن کریں۔\n3. ہمیشہ بائیں لین (Left lane) میں دھیمی اور محفوظ رفتار سے گاڑی چلائیں۔`)}
+                          className="px-2 py-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-full transition focus:outline-none"
+                        >
+                          + 💡 Fsd Driving Tip
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => insertTemplate(`## 🎓 نتیجہ اور اگلا قدم (Conclusion & Invitation)\nاگر آپ بھی ایک پراعتماد اور محفوظ ڈرائیور بننا چاہتے ہیں، تو آج ہی ہمارے ایڈوانسڈ کورسز میں داخلہ لیں اور ماہر انسٹرکٹرز کی خدمات حاصل کریں!`)}
+                          className="px-2 py-1 text-[11px] font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-full transition focus:outline-none"
+                        >
+                          + 🎓 Intro/Outro
+                        </button>
+                      </div>
+                    </div>
+
                     <textarea 
-                      className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition h-56 font-sans text-sm leading-relaxed" 
-                      placeholder="Write the driving tips, guidelines, or instruction articles here..." 
+                      ref={blogTextareaRef}
+                      className="w-full border border-gray-300 p-4 rounded-b-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition h-72 font-sans text-sm leading-relaxed" 
+                      placeholder="Write the driving tips, guidelines, or instruction articles here... (Use double spacing/paragraphs to format nice clean readable text)" 
                       value={newPost.content} 
                       onChange={e => setNewPost({...newPost, content: e.target.value})} 
                     />
+
+                    {/* Real-time Content Statistics & Formatting Checker */}
+                    <div className="bg-gray-50 border border-gray-200 border-t-0 -mt-1.5 rounded-b-lg p-2.5 flex items-center justify-between text-xs text-gray-500">
+                      <div className="flex gap-4">
+                        <span>Characters: <strong>{newPost.content.length}</strong></span>
+                        <span>Words: <strong>{newPost.content.trim() ? newPost.content.trim().split(/\s+/).length : 0}</strong></span>
+                        <span>Paragraphs: <strong>{newPost.content.split(/\n\n+/).filter(Boolean).length}</strong></span>
+                      </div>
+                      
+                      {/* Interactive Advice feedback */}
+                      <div>
+                        {newPost.content.length > 50 && !newPost.content.includes('\n\n') ? (
+                          <span className="text-yellow-600 font-semibold animate-pulse flex items-center gap-1">
+                            ⚠️ Tip: Break text into paragraphs using "New Paragraph" button or Double Enter!
+                          </span>
+                        ) : newPost.content.length > 100 ? (
+                          <span className="text-emerald-600 font-semibold flex items-center gap-1">
+                            ✓ Nicely formatted with paragraphs!
+                          </span>
+                        ) : null}
+                      </div>
+                    </div>
                   </div>
 
                   <div className="pt-2">
