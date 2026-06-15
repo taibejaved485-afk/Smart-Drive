@@ -1,6 +1,7 @@
 import { useState, FormEvent } from 'react';
 import { motion } from 'motion/react';
 import { Mail, Phone, CheckCircle2, Send, Check } from 'lucide-react';
+import { insertDrivingBooking } from '../lib/supabase';
 
 export default function AppointmentForm() {
   const [firstName, setFirstName] = useState('');
@@ -30,16 +31,20 @@ export default function AppointmentForm() {
     };
 
     try {
-      const existing = localStorage.getItem('driving_bookings');
-      const list = existing ? JSON.parse(existing) : [];
-      list.unshift(newBooking);
-      localStorage.setItem('driving_bookings', JSON.stringify(list));
-      
-      // Dispatch events for real-time reactivity
-      window.dispatchEvent(new Event('driving_bookings_updated'));
-      window.dispatchEvent(new Event('storage'));
+      insertDrivingBooking({
+        id: newBooking.id,
+        courseId: 'driving-school-form',
+        courseName: newBooking.subject,
+        price: '15,000', // Default price or free custom estimate
+        customerName: newBooking.fullName,
+        phone: newBooking.phone,
+        email: newBooking.email,
+        startingDate: new Date().toLocaleDateString(),
+        preferredSlot: newBooking.comments,
+        status: 'Pending'
+      });
     } catch (err) {
-      console.error('Failed to submit driving school booking', err);
+      console.error('Failed to submit driving school booking via Supabase', err);
     }
 
     setIsSuccess(true);

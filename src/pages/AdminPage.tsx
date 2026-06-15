@@ -5,6 +5,22 @@ import CTABanner from '../components/CTABanner';
 import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { INITIAL_RENTAL_FLEET, RentalCar } from '../data/inventory';
+import { 
+  fetchSaleCars, 
+  fetchPendingSaleCars, 
+  fetchRentalCars, 
+  fetchPendingRentalCars,
+  fetchDrivingBookings, 
+  fetchCustomerRequests,
+  approveSaleCarBackend,
+  deleteSaleCarBackend,
+  approveRentalCarBackend,
+  deleteRentalCarBackend,
+  updateDrivingBookingStatus,
+  deleteDrivingBooking,
+  updateCustomerRequestStatus,
+  deleteCustomerRequest
+} from '../lib/supabase';
 
 interface BlogPost {
   id: string;
@@ -275,6 +291,12 @@ export default function AdminPage() {
       setBookings(starterBookings);
       localStorage.setItem('driving_bookings', JSON.stringify(starterBookings));
     }
+    // Fetch background from Supabase
+    fetchDrivingBookings().then(data => {
+      if (data && data.length > 0) {
+        setBookings(data);
+      }
+    }).catch(() => {});
 
     // 3. Load Pending submitted owner cars
     const savedPending = localStorage.getItem('pending_cars');
@@ -303,6 +325,11 @@ export default function AdminPage() {
     } else {
       setPendingCars([]);
     }
+    fetchPendingRentalCars().then(data => {
+      if (data) {
+        setPendingCars(data);
+      }
+    }).catch(() => {});
 
     // Load Pending submitted sale cars
     const savedPendingSale = localStorage.getItem('pending_sale_cars');
@@ -320,6 +347,11 @@ export default function AdminPage() {
     } else {
       setPendingSaleCars([]);
     }
+    fetchPendingSaleCars().then(data => {
+      if (data) {
+        setPendingSaleCars(data);
+      }
+    }).catch(() => {});
 
     // Load Approved active sale cars
     const savedSaleCars = localStorage.getItem('sale_cars');
@@ -337,6 +369,11 @@ export default function AdminPage() {
     } else {
       setSaleCars([]);
     }
+    fetchSaleCars().then(data => {
+      if (data) {
+        setSaleCars(data);
+      }
+    }).catch(() => {});
 
     // 4. Load approved active car fleet
     const savedCars = localStorage.getItem('rental_cars');
@@ -369,7 +406,6 @@ export default function AdminPage() {
       }
     }
 
-    // Combine safely to filter duplicate IDs (prioritizing custom approved)
     const merged = [...approvedList, ...baseList];
     const uniqueCars: RentalCar[] = [];
     const seenIds = new Set<string>();
@@ -381,7 +417,23 @@ export default function AdminPage() {
       }
     }
     setRentalCars(uniqueCars);
-    
+
+    // Try fetching rental cars from backend
+    fetchRentalCars().then(data => {
+      if (data && data.length > 0) {
+        const mergedBackend = [...data, ...INITIAL_RENTAL_FLEET];
+        const uniqueBackend: RentalCar[] = [];
+        const seenBackendIds = new Set<string>();
+        for (const car of mergedBackend) {
+          if (!seenBackendIds.has(car.id)) {
+            seenBackendIds.add(car.id);
+            uniqueBackend.push(car);
+          }
+        }
+        setRentalCars(uniqueBackend);
+      }
+    }).catch(() => {});
+
     // 5. Load Customer Requests
     const savedCustomerRequests = localStorage.getItem('customer_requests');
     if (savedCustomerRequests) {
@@ -398,6 +450,11 @@ export default function AdminPage() {
     } else {
       setCustomerRequests([]);
     }
+    fetchCustomerRequests().then(data => {
+      if (data) {
+        setCustomerRequests(data);
+      }
+    }).catch(() => {});
 
     // 6. Load Driving Courses Registry
     const savedCourses = localStorage.getItem('driving_courses_v4');
@@ -446,30 +503,28 @@ export default function AdminPage() {
   }, []);
 
   // Handler methods for Driving Academy Bookings
-  const changeBookingStatus = (id: string, newStatus: string) => {
+  const changeBookingStatus = async (id: string, newStatus: string) => {
     const updated = bookings.map(b => b.id === id ? { ...b, status: newStatus } : b);
     setBookings(updated);
     localStorage.setItem('driving_bookings', JSON.stringify(updated));
     window.dispatchEvent(new Event('driving_bookings_updated'));
     window.dispatchEvent(new Event('storage'));
+
+    await updateDrivingBookingStatus(id, newStatus);
+    loadDataAndSync();
   };
 
-  const removeBookingRecord = (id: string) => {
+  const removeBookingRecord = async (id: string) => {
     if (window.confirm('Are you sure you want to permanently delete this scheduling request?')) {
-      const saved = localStorage.getItem('driving_bookings');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed)) {
-            const updated = parsed.filter(b => String(b.id) !== String(id));
-            setBookings(updated);
-            localStorage.setItem('driving_bookings', JSON.stringify(updated));
-            showToast('Booking record removed.', 'info');
-            window.dispatchEvent(new Event('driving_bookings_updated'));
-            window.dispatchEvent(new Event('storage'));
-          }
-        } catch (e) {}
-      }
+      const updated = bookings.filter(b => String(b.id) !== String(id));
+      setBookings(updated);
+      localStorage.setItem('driving_bookings', JSON.stringify(updated));
+      window.dispatchEvent(new Event('driving_bookings_updated'));
+      window.dispatchEvent(new Event('storage'));
+
+      await deleteDrivingBooking(id);
+      showToast('Booking record removed.', 'info');
+      loadDataAndSync();
     }
   };
 
@@ -497,25 +552,20 @@ export default function AdminPage() {
   };
 
   // Handler methods for Car Owner Registration Onboarding
-  const approveCarOnboarding = (car: any, isVerified: boolean = false) => {
+  const approveCarOnboarding = async (car: any, isVerified: boolean = false) => {
     const cardId = `pending-card-${car.id}`;
     const cardEl = document.getElementById(cardId);
     const btnEl = document.getElementById(`btn-approve-${car.id}`);
 
     // Create a micro-state change feedback right before the card disappears.
-    // Force the card's border to flash green and smoothly transition out
     if (cardEl) {
       cardEl.classList.remove('border-gray-200', 'hover:border-gray-300');
       cardEl.classList.add('border-emerald-500', 'ring-4', 'ring-emerald-500/20', 'bg-emerald-50/30');
       cardEl.style.transition = 'all 0.6s ease-in-out';
-      
-      // User strictly requested a physically .remove() cleanup sequence
-      // We'll apply a fade out animation then remove it from DOM as a safety fallback
       cardEl.style.opacity = '0';
       cardEl.style.transform = 'scale(0.95)';
     }
 
-    // Replace the "Approve" button text with temporary check text "✓ Approved" or icon
     if (btnEl) {
       btnEl.innerHTML = '✓ Approved';
       btnEl.classList.remove('bg-green-600', 'hover:bg-green-700');
@@ -523,10 +573,10 @@ export default function AdminPage() {
       btnEl.style.transition = 'all 0.3s ease-in-out';
     }
 
-    // Trigger professional UI browser notification or toast alert
     showToast(`Vehicle approved successfully! "${car.name}" is now live on the public fleet directory.`, 'success');
 
-    // Smooth delays to satisfy visual persistence before elements are removed/synchronized
+    await approveRentalCarBackend(car.id);
+
     setTimeout(() => {
       // 1. Save to approved cars
       const savedCustomApproved = localStorage.getItem('approved_cars');
@@ -540,7 +590,6 @@ export default function AdminPage() {
         } catch (e) {}
       }
       
-      // Add new vetted id active
       const vettedCar: RentalCar = {
         ...car,
         id: car.id || 'owner-' + Date.now().toString(),
@@ -550,7 +599,6 @@ export default function AdminPage() {
         availabilityStatus: car.availabilityStatus || 'Available'
       };
       
-      // Save to approved_cars avoiding duplicate id
       customApprovedList = [vettedCar, ...customApprovedList.filter(c => c.id !== vettedCar.id)];
       localStorage.setItem('approved_cars', JSON.stringify(customApprovedList));
 
@@ -568,39 +616,27 @@ export default function AdminPage() {
       activeFleet = [vettedCar, ...activeFleet.filter(c => c.id !== vettedCar.id)];
       localStorage.setItem('rental_cars', JSON.stringify(activeFleet));
 
-      // 3. Delete from pending (using robust comparison in a functional update to prevent React state closure/refresh issues)
+      // 3. Delete from pending
       setPendingCars(prev => {
-        const remainingPending = prev.filter(c => {
-          const matchesId = c.id && car.id && c.id === car.id;
-          const matchesDetails = c.name === car.name && 
-                                 c.registrationNumber === car.registrationNumber && 
-                                 c.ownerPhone === car.ownerPhone;
-          return !(matchesId || matchesDetails);
-        });
+        const remainingPending = prev.filter(c => c.id !== car.id);
         localStorage.setItem('pending_cars', JSON.stringify(remainingPending));
         return remainingPending;
       });
 
-      // 4. Final physical DOM cleanup as requested
       if (cardEl) {
         cardEl.remove();
       }
 
-      // Dispatch storage updates
       window.dispatchEvent(new Event('pending_cars_updated'));
       window.dispatchEvent(new Event('storage'));
-      
-      // Trigger local state re-load immediately
       loadDataAndSync();
       
-      // Secondary safety check: if multiple cards exist with same ID (not expected but good for robust UI)
       const remnants = document.querySelectorAll(`[id="${cardId}"]`);
       remnants.forEach(el => el.remove());
-      
     }, 750);
   };
 
-  const rejectCarOnboarding = (id: string) => {
+  const rejectCarOnboarding = async (id: string) => {
     if (window.confirm('Reject and permanently discard this owner submission?')) {
       setPendingCars(prev => {
         const remainingPending = prev.filter(c => c.id !== id);
@@ -608,15 +644,15 @@ export default function AdminPage() {
         return remainingPending;
       });
       
+      await deleteRentalCarBackend(id);
+
       window.dispatchEvent(new Event('pending_cars_updated'));
       window.dispatchEvent(new Event('storage'));
-      
-      // Trigger local state re-load immediately
       loadDataAndSync();
     }
   };
 
-  const approveSaleCarOnboarding = (car: any) => {
+  const approveSaleCarOnboarding = async (car: any) => {
     const cardId = `pending-sale-card-${car.id}`;
     const cardEl = document.getElementById(cardId);
     const btnEl = document.getElementById(`btn-approve-sale-${car.id}`);
@@ -636,6 +672,8 @@ export default function AdminPage() {
     }
 
     showToast(`Car sale submission approved! "${car.name}" is now live on the public Car Sale page.`, 'success');
+
+    await approveSaleCarBackend(car.id);
 
     setTimeout(() => {
       // 1. Save to approved sale cars
@@ -677,7 +715,7 @@ export default function AdminPage() {
     }, 750);
   };
 
-  const rejectSaleCarOnboarding = (id: string) => {
+  const rejectSaleCarOnboarding = async (id: string) => {
     if (window.confirm('Reject and permanently discard this sale owner submission?')) {
       setPendingSaleCars(prev => {
         const remainingPending = prev.filter(c => c.id !== id);
@@ -685,13 +723,15 @@ export default function AdminPage() {
         return remainingPending;
       });
       
+      await deleteSaleCarBackend(id);
+
       window.dispatchEvent(new Event('pending_sale_cars_updated'));
       window.dispatchEvent(new Event('storage'));
       loadDataAndSync();
     }
   };
 
-  const deleteApprovedSaleCar = (id: string) => {
+  const deleteApprovedSaleCar = async (id: string) => {
     if (window.confirm('Are you sure you want to permanently delete this sale car listing?')) {
       const savedSaleCars = localStorage.getItem('sale_cars');
       if (savedSaleCars) {
@@ -704,6 +744,9 @@ export default function AdminPage() {
           }
         } catch (e) {}
       }
+
+      await deleteSaleCarBackend(id);
+
       showToast('Sale car deleted successfully.', 'info');
       window.dispatchEvent(new Event('sale_cars_updated'));
       window.dispatchEvent(new Event('storage'));
@@ -712,15 +755,18 @@ export default function AdminPage() {
   };
 
   // Handler methods for Customer Rental Requests
-  const handleApproveRequest = (id: string) => {
+  const handleApproveRequest = async (id: string) => {
     const updated = customerRequests.map(r => r.id === id ? { ...r, status: 'live' as const } : r);
     setCustomerRequests(updated);
     localStorage.setItem('customer_requests', JSON.stringify(updated));
     window.dispatchEvent(new Event('customer_requests_updated'));
     window.dispatchEvent(new Event('storage'));
+
+    await updateCustomerRequestStatus(id, 'live');
+    loadDataAndSync();
   };
 
-  const handleRejectRequest = (id: string) => {
+  const handleRejectRequest = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this customer request?')) {
       const saved = localStorage.getItem('customer_requests');
       if (saved) {
@@ -736,6 +782,9 @@ export default function AdminPage() {
           }
         } catch (e) {}
       }
+
+      await deleteCustomerRequest(id);
+      loadDataAndSync();
     }
   };
 

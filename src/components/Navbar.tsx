@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Phone, Car, Plus, Check, ChevronRight, User, ShieldCheck, Mail, Info, UploadCloud, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useToast } from './Toast';
+import { insertSaleCar, insertRentalCar } from '../lib/supabase';
+
 
 const PRESET_CAR_IMAGE_OPTIONS = [
   {
@@ -155,26 +157,15 @@ export default function Navbar() {
       approved: false
     };
 
-    // Store in LocalStorage
+    // Store in Supabase / LocalStorage
     try {
       if (modalType === 'Sale') {
-        const existingPendingSale = localStorage.getItem('pending_sale_cars');
-        const pendingSaleList = existingPendingSale ? JSON.parse(existingPendingSale) : [];
-        pendingSaleList.unshift(newOwnerCar);
-        localStorage.setItem('pending_sale_cars', JSON.stringify(pendingSaleList));
-        window.dispatchEvent(new Event('pending_sale_cars_updated'));
+        insertSaleCar(newOwnerCar);
       } else {
-        const existingPending = localStorage.getItem('pending_cars');
-        const pendingList = existingPending ? JSON.parse(existingPending) : [];
-        pendingList.unshift(newOwnerCar);
-        localStorage.setItem('pending_cars', JSON.stringify(pendingList));
-        window.dispatchEvent(new Event('pending_cars_updated'));
+        insertRentalCar(newOwnerCar);
       }
-
-      // Dispatch global storage state updates
-      window.dispatchEvent(new Event('storage'));
     } catch (err) {
-      console.error('Failed to write car to pending list', err);
+      console.error('Failed to register car listing via Supabase service:', err);
     }
 
     setSubmissionComplete(true);

@@ -4,6 +4,7 @@ import Footer from '../components/Footer';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { ShieldCheck, Tag, Car, MapPin, Gauge, Search, Fuel, Calendar, Phone, CheckCircle, HelpCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { fetchSaleCars } from '../lib/supabase';
 
 export default function CarSalePage() {
   const [saleCars, setSaleCars] = useState<any[]>([]);
@@ -12,11 +13,11 @@ export default function CarSalePage() {
   const [selectedTransmission, setSelectedTransmission] = useState('All');
 
   useEffect(() => {
-    // Initial fetch
-    const loadSaleCars = () => {
-      const stored = localStorage.getItem('sale_cars');
-      if (stored) {
-        setSaleCars(JSON.parse(stored));
+    // Initial fetch using Supabase synced fetching
+    const loadSaleCars = async () => {
+      const data = await fetchSaleCars();
+      if (data) {
+        setSaleCars(data);
       }
     };
     
@@ -163,88 +164,122 @@ export default function CarSalePage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredCars.map((car, idx) => (
               <ScrollReveal direction="up" delay={idx * 0.08} key={car.id}>
-                <div className="bg-white rounded-[24px] overflow-hidden border border-slate-200/80 shadow-xl shadow-slate-200/30 group flex flex-col h-full transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-red-500/5 hover:border-red-500/20">
+                <div className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-lg shadow-slate-200/40 hover:shadow-2xl hover:shadow-red-500/10 hover:border-red-500/20 group flex flex-col h-full transform transition-all duration-300 hover:-translate-y-2.5 relative">
                   
-                  {/* Photo area with status badge overlay */}
-                  <div className="relative h-60 sm:h-64 overflow-hidden bg-slate-950 shrink-0">
+                  {/* Glowing gradient back-accent on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-red-500/[0.02] via-transparent to-emerald-500/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-3xl"></div>
+
+                  {/* Photo Area with modern overlays */}
+                  <div className="relative h-64 sm:h-72 overflow-hidden bg-slate-950 shrink-0">
                     <img 
                       src={car.images && car.images.length > 0 ? car.images[0] : car.imageUrl} 
                       alt={car.name || 'Car Image'} 
                       referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
                     />
                     
-                    {/* Top action flags */}
-                    <div className="absolute top-4 left-4 flex flex-col gap-2">
-                      <div className="bg-emerald-600 text-white px-3 py-1.5 rounded-full font-black text-[10px] shadow-lg tracking-wider uppercase flex items-center gap-1">
+                    {/* Corner badge actions */}
+                    <div className="absolute top-4 left-4 flex flex-col gap-1.5 z-10">
+                      <span className="bg-emerald-600/95 backdrop-blur-md text-white px-3 py-1.5 rounded-full font-black text-[10px] tracking-wider uppercase flex items-center gap-1.5 shadow-md">
                         <ShieldCheck className="w-3.5 h-3.5 text-white" />
-                        Verified Active
-                      </div>
+                        Admin Verified
+                      </span>
                     </div>
 
-                    <div className="absolute top-4 right-4 bg-black/75 backdrop-blur-md text-white px-2.5 py-1.5 rounded-full font-bold text-[10px] shadow-lg tracking-widest uppercase flex items-center gap-1.5">
-                      <MapPin className="w-3 h-3 text-red-500" />
+                    <div className="absolute top-4 right-4 bg-slate-950/85 backdrop-blur-md text-white px-3 py-1.5 rounded-full font-extrabold text-[10px] shadow-md tracking-wider uppercase flex items-center gap-1.5 z-10 border border-white/10">
+                      <MapPin className="w-3 h-3 text-red-500 animate-pulse" />
                       {car.city}
                     </div>
 
-                    {/* Elegant footer fade gradient */}
-                    <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/85 via-black/40 to-transparent flex items-end p-4">
-                      <div className="flex justify-between items-center w-full">
-                        <span className="font-sans text-[11px] font-black uppercase text-red-400 tracking-widest bg-red-500/15 px-2 py-0.5 rounded border border-red-500/20">
+                    {/* Dark gradient fade for crisp text details */}
+                    <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent flex items-end p-5">
+                      <div className="flex justify-between items-center w-full z-10">
+                        <span className="font-sans text-[10px] font-black uppercase text-red-400 tracking-widest bg-red-500/15 backdrop-blur-md px-2.5 py-1 rounded-md border border-red-500/25">
                           {car.fuelType || 'Petrol'}
                         </span>
-                        <span className="font-mono text-white text-[10px] font-bold opacity-80">
-                          {car.registrationNumber ? `Reg: ${car.registrationNumber}` : 'Reg Portal Verified'}
+                        <span className="text-white/90 text-xs font-semibold bg-white/10 backdrop-blur-sm px-2.5 py-1 rounded-md border border-white/5 font-mono">
+                          {car.registrationNumber ? `Reg: ${car.registrationNumber}` : 'Verified Docs'}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Info Panel */}
-                  <div className="p-6 sm:p-8 flex flex-col flex-grow bg-white">
+                  {/* Info Card Area */}
+                  <div className="p-6 sm:p-8 flex flex-col flex-grow bg-white relative z-10">
+                    
+                    {/* Header Title section */}
                     <div className="mb-4">
-                      <h3 className="text-xl sm:text-2xl font-black text-slate-950 leading-tight tracking-tight group-hover:text-red-650 transition">
+                      <h3 className="text-xl sm:text-2xl font-black text-slate-950 leading-tight tracking-tight group-hover:text-red-650 transition duration-200">
                         {car.name}
                       </h3>
-                      <p className="text-[10px] font-black uppercase tracking-wider text-slate-400 mt-1">Listed by Direct Owner: {car.ownerName}</p>
-                    </div>
-
-                    <div className="border-t border-b border-slate-100 py-3 mb-5 flex items-center justify-between">
-                      <div className="text-xs uppercase font-extrabold text-slate-400">Asking Price</div>
-                      <div className="text-2xl font-black font-mono text-red-650 flex items-center gap-1.5 tracking-tight">
-                        <span className="text-xs font-black text-red-500">PKR</span> {car.rentPrice}
+                      <div className="flex items-center gap-1.5 mt-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                        <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Direct Owner: {car.ownerName}</p>
                       </div>
                     </div>
 
+                    {/* Styled Price bar */}
+                    <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4.5 mb-5 flex items-center justify-between">
+                      <span className="text-[11px] uppercase font-black text-slate-400 tracking-wider">Demand (PKR)</span>
+                      <div className="text-2xl font-black font-mono text-red-650 flex items-center gap-1.5 tracking-tight">
+                        <span className="text-xs font-black text-red-500 px-1.5 py-0.5 bg-red-100 rounded">PKR</span>
+                        {car.rentPrice}
+                      </div>
+                    </div>
+
+                    {/* Specs Grid with 4 beautiful components */}
                     <div className="grid grid-cols-2 gap-3 mb-6">
-                      <div className="bg-slate-50/80 border border-slate-100 rounded-xl p-3 flex items-center gap-2.5">
-                        <Gauge className="w-4 h-4 text-slate-450 shrink-0" />
+                      <div className="bg-slate-50/70 border border-slate-100/80 rounded-xl p-3 flex items-center gap-3">
+                        <div className="p-2 bg-white rounded-lg border border-slate-100 shadow-sm shrink-0">
+                          <Gauge className="w-4 h-4 text-red-600" />
+                        </div>
                         <div className="truncate">
-                          <p className="text-[9px] font-black uppercase text-slate-400 tracking-wider">Gearbox</p>
+                          <p className="text-[9px] font-black uppercase text-slate-400 tracking-wider">Transmission</p>
                           <p className="text-xs font-extrabold text-slate-800 uppercase tracking-wide truncate">{car.transmission}</p>
                         </div>
                       </div>
-                      <div className="bg-slate-50/80 border border-slate-100 rounded-xl p-3 flex items-center gap-2.5">
-                        <MapPin className="w-4 h-4 text-slate-450 shrink-0" />
+                      
+                      <div className="bg-slate-50/70 border border-slate-100/80 rounded-xl p-3 flex items-center gap-3">
+                        <div className="p-2 bg-white rounded-lg border border-slate-100 shadow-sm shrink-0">
+                          <MapPin className="w-4 h-4 text-indigo-600" />
+                        </div>
                         <div className="truncate">
-                          <p className="text-[9px] font-black uppercase text-slate-400 tracking-wider">Owner's City</p>
+                          <p className="text-[9px] font-black uppercase text-slate-400 tracking-wider">Listed From</p>
                           <p className="text-xs font-extrabold text-slate-800 uppercase tracking-wide truncate">{car.ownerCity || car.city}</p>
+                        </div>
+                      </div>
+
+                      <div className="bg-slate-50/70 border border-slate-100/80 rounded-xl p-3 flex items-center gap-3 col-span-2">
+                        <div className="p-2 bg-white rounded-lg border border-slate-100 shadow-sm shrink-0">
+                          <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                        </div>
+                        <div className="truncate">
+                          <p className="text-[9px] font-black uppercase text-slate-400 tracking-wider">Registration Status</p>
+                          <p className="text-xs font-extrabold text-emerald-700 tracking-wide truncate">Verified Biometric Available</p>
                         </div>
                       </div>
                     </div>
 
-                    <p className="text-xs sm:text-sm text-slate-600 mb-8 line-clamp-3 leading-relaxed flex-grow italic">
-                      " {car.description || 'No description provided by the owner. Please contact them directly for full service or mechanical history.'} "
-                    </p>
+                    {/* Dynamic owner comments */}
+                    <div className="relative bg-slate-50/40 p-4 rounded-2xl border border-slate-100 mb-6 flex-grow flex items-center">
+                      <span className="absolute -top-2.5 left-4 bg-white px-2 text-[9px] font-black uppercase tracking-widest text-slate-400">Seller's Note</span>
+                      <p className="text-xs text-slate-600 italic leading-relaxed line-clamp-3">
+                        " {car.description || 'Stunning family car listed by registered local owner. Perfect mechanical running order, fully functional AC, comfortable layout.'} "
+                      </p>
+                    </div>
 
-                    <div className="mt-auto pt-4 border-t border-slate-100/80 flex flex-col gap-2.5">
+                    {/* CTA Button section */}
+                    <div className="mt-auto pt-4 border-t border-slate-100/60">
                       <a 
                         href={getWhatsAppLink(car)} 
                         target="_blank" 
                         rel="noreferrer"
-                        className="w-full inline-flex items-center justify-center gap-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-3.5 font-bold transition-all text-xs sm:text-sm uppercase tracking-widest shadow-md shadow-emerald-100 hover:shadow-lg hover:shadow-emerald-200/50 cursor-pointer transform active:scale-98"
+                        className="w-full inline-flex items-center justify-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-3.5 font-bold transition-all duration-200 text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-emerald-100 hover:shadow-xl hover:shadow-emerald-200/50 cursor-pointer transform active:scale-98 relative overflow-hidden group/btn"
                       >
-                        <Phone className="w-4 h-4 fill-white" /> Contact Seller via WhatsApp
+                        {/* Shimmer effect inside button */}
+                        <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000 ease-in-out pointer-events-none"></div>
+                        <Phone className="w-4 h-4 fill-white animate-bounce" />
+                        Contact Seller via WhatsApp
                       </a>
                     </div>
                   </div>

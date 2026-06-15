@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MapPin, Car, DollarSign, Send, ShieldCheck, HelpCircle, CheckCircle2, ChevronDown, Check, Clock } from 'lucide-react';
+import { insertCustomerRequest } from '../lib/supabase';
+
 
 export interface CustomerRequest {
   id: string;
@@ -63,13 +65,20 @@ export function CarRequestsForm() {
       createdAt: new Date().toISOString()
     };
 
-    const existing = localStorage.getItem('customer_requests');
-    const requestsList = existing ? JSON.parse(existing) : [];
-    requestsList.unshift(newRequest);
-    localStorage.setItem('customer_requests', JSON.stringify(requestsList));
-    
-    // Dispatch event if needed
-    window.dispatchEvent(new Event('customer_requests_updated'));
+    try {
+      insertCustomerRequest({
+        id: newRequest.id,
+        carId: '',
+        carName: newRequest.carModel,
+        customerName: newRequest.name,
+        phone: newRequest.whatsapp,
+        days: '3', // Default estimate of days
+        totalPrice: newRequest.maxBudget,
+        status: 'pending'
+      });
+    } catch (e) {
+      console.error('Failed to post customer custom request via Supabase', e);
+    }
 
     setSubmitted(true);
   };
