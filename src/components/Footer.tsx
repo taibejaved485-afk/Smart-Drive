@@ -5,6 +5,22 @@ import { Link } from 'react-router-dom';
 export default function Footer() {
   return (
     <footer className="bg-slate-950 text-slate-400 pt-20 pb-12 relative overflow-hidden border-t border-white/5">
+      {/* Background looping video with mask */}
+      <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover opacity-75"
+        >
+          <source src="/footer-section.mp4" type="video/mp4" />
+        </video>
+        {/* Ambient Dark Gradients to keep edge boundaries soft while leaving the main visual area highly clear */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 via-transparent to-slate-950/95" />
+        <div className="absolute inset-0 bg-radial-gradient from-transparent via-slate-950/50 to-slate-950/90" />
+      </div>
+
       {/* Premium Ambient Lights & Glassy Grid Overlays */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-500/50 to-transparent" />
       <div className="absolute inset-0 bg-[radial-gradient(#ffffff03_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none" />
