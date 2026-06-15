@@ -39,7 +39,7 @@ export default function Hero() {
           muted 
           playsInline 
           preload="auto"
-          src="Hero section.mp4"
+          src="/hero-video.mp4"
           className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none will-change-transform"
         />
         {/* Dark Vignette Color Overlay (Readability Lock) */}
