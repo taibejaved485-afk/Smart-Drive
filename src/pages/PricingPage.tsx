@@ -8,6 +8,7 @@ import Reviews from '../components/Reviews';
 import OurProcess from '../components/OurProcess';
 import SEO from '../components/SEO';
 import { ScrollReveal } from '../components/ScrollReveal';
+import { insertDrivingBooking } from '../lib/supabase';
 
 interface PricingCourse {
   id: string;
@@ -67,13 +68,28 @@ export default function PricingPage() {
     try {
       const stored = localStorage.getItem('contact_inquiries');
       const inquiriesList = stored ? JSON.parse(stored) : [];
-      inquiriesList.unshift({
+      const newInquiry = {
         ticketId,
         ...formData,
         timestamp: new Date().toISOString()
-      });
+      };
+      inquiriesList.unshift(newInquiry);
       localStorage.setItem('contact_inquiries', JSON.stringify(inquiriesList));
       window.dispatchEvent(new Event('inquiry_submitted'));
+
+      // Also persist training driving course request/enquiry directly in Supabase driving_bookings
+      insertDrivingBooking({
+        id: 'bk-' + ticketId,
+        courseId: 'pricing-page-form',
+        courseName: formData.inquiryType || 'Learn Driving / Course Inquiry',
+        price: '15000',
+        customerName: formData.fullName,
+        phone: formData.whatsappNumber,
+        email: formData.email || '',
+        startingDate: new Date().toLocaleDateString(),
+        preferredSlot: `Father's Name: ${formData.fatherName}. Message: ${formData.message || 'No additional remarks.'}. Service Ticket ID: ${ticketId}`,
+        status: 'Pending'
+      });
     } catch (err) {
       console.error(err);
     }
