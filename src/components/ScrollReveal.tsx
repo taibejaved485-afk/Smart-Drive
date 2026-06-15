@@ -7,15 +7,17 @@ interface ScrollRevealProps {
   direction?: 'up' | 'down' | 'left' | 'right';
   className?: string;
   width?: 'auto' | '100%';
+  overflowHidden?: boolean;
 }
 
-export function ScrollReveal({ 
+export const ScrollReveal: React.FC<ScrollRevealProps> = ({ 
   children, 
   delay = 0, 
   direction = 'up',
   className = '',
-  width = 'auto'
-}: ScrollRevealProps) {
+  width = 'auto',
+  overflowHidden = false
+}) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-50px' });
 
@@ -30,7 +32,7 @@ export function ScrollReveal({
   };
 
   return (
-    <div ref={ref} style={{ width }} className={`${className} overflow-hidden`}>
+    <div ref={ref} style={{ width }} className={`${className} ${overflowHidden ? 'overflow-hidden' : ''}`}>
       <motion.div
         variants={getVariants()}
         initial="hidden"

@@ -580,8 +580,8 @@ export default function ServicesPage() {
             </div>
 
             {/* Side Static Interactive Widget for Sales Stats */}
-            <ScrollReveal direction="up" delay={0.2}>
-            <div className="lg:col-span-5 bg-slate-50 border border-slate-200/50 p-6 sm:p-8 rounded-3xl relative h-full">
+            <ScrollReveal direction="up" delay={0.2} className="lg:col-span-5 h-full relative">
+            <div className="bg-slate-50 border border-slate-200/50 p-6 sm:p-8 rounded-3xl relative h-full">
               <div className="absolute -top-3 -right-3 bg-red-700 text-white font-bold text-[10px] tracking-widest px-3 py-1 rounded-full shadow-md uppercase">
                 DIRECT SELLING
               </div>
