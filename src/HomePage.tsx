@@ -21,6 +21,8 @@ import { Award, Car, Sparkles, ShieldCheck, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Newsletter from './components/Newsletter';
 
+import { ScrollReveal } from './components/ScrollReveal';
+
 export default function HomePage() {
   const [activeService, setActiveService] = useState<'learn' | 'rent' | 'requests'>('learn');
 
@@ -159,16 +161,16 @@ export default function HomePage() {
             exit={{ opacity: 0, y: -15 }}
             transition={{ duration: 0.4 }}
           >
-            <Features />
-            <About />
-            <Stats />
-            <Lessons />
-            <FeaturedCourses />
-            <EnrollCTA />
-            <WhyChooseUs />
-            <AppointmentForm />
-            <OurProcess />
-            <Reviews />
+            <ScrollReveal direction="up"><Features /></ScrollReveal>
+            <ScrollReveal direction="up" delay={0.1}><About /></ScrollReveal>
+            <ScrollReveal direction="up" delay={0.1}><Stats /></ScrollReveal>
+            <ScrollReveal direction="up" delay={0.1}><Lessons /></ScrollReveal>
+            <ScrollReveal direction="up" delay={0.1}><FeaturedCourses /></ScrollReveal>
+            <ScrollReveal direction="up" delay={0.1}><EnrollCTA /></ScrollReveal>
+            <ScrollReveal direction="up" delay={0.1}><WhyChooseUs /></ScrollReveal>
+            <ScrollReveal direction="up" delay={0.1}><AppointmentForm /></ScrollReveal>
+            <ScrollReveal direction="up" delay={0.1}><OurProcess /></ScrollReveal>
+            <ScrollReveal direction="up" delay={0.1}><Reviews /></ScrollReveal>
           </motion.div>
         )}
         {activeService === 'rent' && (
@@ -179,7 +181,7 @@ export default function HomePage() {
             exit={{ opacity: 0, y: -15 }}
             transition={{ duration: 0.4 }}
           >
-            <RentalMarketplace />
+            <ScrollReveal direction="up" delay={0.1}><RentalMarketplace /></ScrollReveal>
           </motion.div>
         )}
         {activeService === 'requests' && (
@@ -191,15 +193,15 @@ export default function HomePage() {
             transition={{ duration: 0.4 }}
             className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16"
           >
-            <CarRequestsForm />
-            <CarRequestsGrid />
+            <ScrollReveal direction="up" delay={0.1}><CarRequestsForm /></ScrollReveal>
+            <ScrollReveal direction="up" delay={0.2}><CarRequestsGrid /></ScrollReveal>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <Newsletter />
-      <CTABanner />
-      <Footer />
+      <ScrollReveal direction="up" delay={0.1}><Newsletter /></ScrollReveal>
+      <ScrollReveal direction="up" delay={0.1}><CTABanner /></ScrollReveal>
+      <ScrollReveal direction="up" delay={0.2}><Footer /></ScrollReveal>
     </div>
   );
 }

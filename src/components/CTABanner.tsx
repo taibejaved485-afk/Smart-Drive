@@ -30,12 +30,18 @@ export default function CTABanner() {
             50% { top: calc(100% - 6px); left: calc(100% - 6px); }
             75% { top: calc(100% - 6px); left: -10px; }
           }
-          .animate-travel-rectangle-banner { animation: travel-rectangle-banner 6s linear infinite; }
+          .animate-travel-rectangle-banner { 
+            animation: travel-rectangle-banner 25s linear infinite; 
+            animation-play-state: paused;
+          }
+          .group:hover .animate-travel-rectangle-banner {
+            animation-play-state: running;
+          }
         `}</style>
 
-        <div className="bg-gradient-to-r from-red-950/40 via-gray-905/90 to-slate-900/40 border-2 border-white/20 rounded-3xl p-8 sm:p-12 flex flex-col lg:flex-row items-center justify-between gap-8 shadow-2xl relative overflow-hidden group">
+        <div className="bg-gradient-to-r from-red-950/40 via-gray-905/90 to-slate-900/40 border-2 border-white/20 hover:border-white/30 rounded-3xl p-8 sm:p-12 flex flex-col lg:flex-row items-center justify-between gap-8 shadow-2xl relative overflow-hidden group transition-colors duration-500">
           {/* White Rectangular Dot */}
-          <div className="absolute w-4 h-4 bg-white rounded-full shadow-[0_0_15px_#ffffff] animate-travel-rectangle-banner z-0" />
+          <div className="absolute w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 animate-travel-rectangle-banner shadow-[0_0_15px_5px_#ffffff] z-0 transition-opacity duration-500 pointer-events-none" />
 
           <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/10 rounded-full blur-3xl pointer-events-none" />
           

@@ -66,12 +66,18 @@ export default function Newsletter() {
           50% { top: calc(100% - 6px); left: calc(100% - 6px); }
           75% { top: calc(100% - 6px); left: -10px; }
         }
-        .animate-travel-rectangle-newsletter { animation: travel-rectangle-newsletter 6s linear infinite; }
+        .animate-travel-rectangle-newsletter { 
+          animation: travel-rectangle-newsletter 25s linear infinite; 
+          animation-play-state: paused;
+        }
+        .group:hover .animate-travel-rectangle-newsletter {
+          animation-play-state: running;
+        }
       `}</style>
-      <div className="bg-white border-2 border-red-500 rounded-3xl p-8 sm:p-12 shadow-xl shadow-slate-100/40 relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8 group">
+      <div className="bg-white border-2 border-red-500 hover:border-red-600 rounded-3xl p-8 sm:p-12 shadow-xl shadow-slate-100/40 relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8 group transition-colors duration-500">
         
         {/* Rectangular Red Dot */}
-        <div className="absolute w-4 h-4 bg-red-600 rounded-full shadow-[0_0_15px_#dc2626] animate-travel-rectangle-newsletter z-0" />
+        <div className="absolute w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 animate-travel-rectangle-newsletter shadow-[0_0_15px_5px_#dc2626] z-0 transition-opacity duration-500 pointer-events-none" />
 
         {/* Subtle Decorative Ambient Background Effects */}
         <div className="absolute top-0 right-0 w-80 h-80 bg-red-50/40 rounded-full blur-3xl pointer-events-none" />

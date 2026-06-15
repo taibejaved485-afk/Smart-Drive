@@ -6,6 +6,7 @@ import WhyChooseUs from '../components/WhyChooseUs';
 import Reviews from '../components/Reviews';
 import { CheckCircle2 } from 'lucide-react';
 import SEO from '../components/SEO';
+import { ScrollReveal } from '../components/ScrollReveal';
 
 export default function AboutPage() {
   const aboutSchema = {
@@ -195,9 +196,9 @@ export default function AboutPage() {
       </section>
 
       {/* Additional Stats, Why Choose Us, and Reviews sections to make the Page outstanding */}
-      <Stats />
-      <WhyChooseUs />
-      <Reviews />
+      <ScrollReveal direction="up" delay={0.1}><Stats /></ScrollReveal>
+      <ScrollReveal direction="up" delay={0.2}><WhyChooseUs /></ScrollReveal>
+      <ScrollReveal direction="up" delay={0.1}><Reviews /></ScrollReveal>
 
       {/* Our History Section */}
       <section className="py-16 sm:py-24 bg-white border-t border-gray-100">
@@ -228,7 +229,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <CTABanner />
+      <ScrollReveal direction="up" delay={0.1}><CTABanner /></ScrollReveal>
       <Footer />
     </div>
   );

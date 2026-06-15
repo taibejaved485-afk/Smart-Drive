@@ -13,40 +13,6 @@ export default function Footer() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         
-        {/* Upper Footer: Premium Contact & Support Action Grid */}
-        <div className="bg-slate-900/65 backdrop-blur-md rounded-3xl p-8 sm:p-10 border border-white/5 mb-16 shadow-[0_15px_40px_rgba(0,0,0,0.2)] flex flex-col lg:flex-row items-center justify-between gap-8">
-          <div className="space-y-3 max-w-2xl text-center lg:text-left">
-            <span className="inline-flex items-center gap-1.5 bg-red-500/10 border border-red-500/20 text-red-500 font-black text-[10px] tracking-widest uppercase py-1 px-3 rounded-full">
-              <Award className="w-3 h-3" /> Pakistan's Premier Driving Academy
-            </span>
-            <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight font-display">
-              Ready to claim your professional driving license?
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-400 font-medium font-sans">
-              Connect instantly with our executive support desk to secure your preferred morning, afternoon, or evening training slot today.
-            </p>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto shrink-0">
-            <a 
-              href="https://wa.me/923097666928"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs uppercase tracking-widest py-4 px-6 rounded-full inline-flex items-center justify-center gap-2 transition-all duration-300 w-full sm:w-auto shadow-lg shadow-emerald-900/30 active:scale-95 hover:-translate-y-0.5 cursor-pointer"
-            >
-              <MessageSquare className="w-4 h-4 fill-white" />
-              WhatsApp Support
-            </a>
-            <a 
-              href="tel:03097666928"
-              className="bg-red-650 hover:bg-white hover:text-slate-950 text-white font-extrabold text-xs uppercase tracking-widest py-4 px-6 rounded-full inline-flex items-center justify-center gap-2 transition-all duration-300 w-full sm:w-auto border border-transparent hover:border-slate-100 shadow-lg shadow-red-950/30 active:scale-95 hover:-translate-y-0.5 cursor-pointer"
-            >
-              <Phone className="w-4 h-4" />
-              Call 03097666928
-            </a>
-          </div>
-        </div>
-
         {/* Middle Footer: 4-Column Professional Resource Layout */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           

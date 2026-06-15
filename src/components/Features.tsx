@@ -57,17 +57,12 @@ const FeatureCard: React.FC<{ feature: any, index: number }> = ({ feature }) => 
   return (
     <div 
       ref={ref}
-      className="relative p-[1px] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
+      className="group relative p-[1.5px] bg-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
     >
-      {isInView ? (
-        <div className="absolute inset-0 bg-red-100/50">
-          <span className="absolute w-[300%] h-[300%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#dc2626_0%,transparent_15%)]" />
-        </div>
-      ) : (
-        <div className="absolute inset-0 bg-gray-100" />
-      )}
+      <div className="absolute inset-0 bg-gray-100 transition-colors duration-500 group-hover:bg-red-100/30" />
+      <span className="absolute w-[300%] h-[300%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 group-hover:animate-[spin_10s_linear_infinite] transition-opacity duration-500 bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#ef4444_2%,#dc2626_4%,transparent_8%)]" />
       
-      <div className="relative flex flex-col items-start gap-4 p-6 bg-white rounded-[15px] h-full z-10 w-full">
+      <div className="relative flex flex-col items-start gap-4 p-6 bg-white rounded-[14.5px] h-full z-10 w-full">
         <div className="relative z-10 p-4 rounded-full bg-red-600 shadow-md">
           <feature.icon className="w-8 h-8 text-white" />
         </div>

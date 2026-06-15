@@ -10,6 +10,7 @@ import {
   TrendingUp, FileText, Check, HelpCircle, Star, MessageSquare 
 } from 'lucide-react';
 import Newsletter from '../components/Newsletter';
+import { ScrollReveal } from '../components/ScrollReveal';
 
 interface DrivingCourse {
   id: string;
@@ -300,10 +301,14 @@ export default function ServicesPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {courses.length > 0 ? (
-              courses.map((pkg) => (
-                <div 
-                  key={pkg.id} 
-                  className="bg-white rounded-3xl border border-slate-100 shadow-lg hover:shadow-2xl hover:border-red-100 transition-all duration-300 overflow-hidden flex flex-col justify-between"
+              courses.map((pkg, idx) => (
+                <motion.div 
+                  initial={{ opacity: 0, y: 60 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.5, delay: idx * 0.15, ease: "easeOut" }}
+                  key={pkg.id}
+                  className="h-full bg-white rounded-3xl border border-slate-100 shadow-lg hover:shadow-2xl hover:border-red-100 hover:-translate-y-3 transition-all duration-300 ease-out overflow-hidden flex flex-col justify-between"
                 >
                   <div>
                     {/* Course Image */}
@@ -379,7 +384,7 @@ export default function ServicesPage() {
                       Book This Course
                     </button>
                   </div>
-                </div>
+                </motion.div>
               ))
             ) : (
               <div className="col-span-full text-center py-10 text-slate-400 font-medium">
@@ -414,7 +419,8 @@ export default function ServicesPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between">
+            <ScrollReveal direction="up" delay={0.1}>
+            <div className="h-full bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between">
               <div>
                 <div className="w-10 h-10 bg-red-50 text-red-700 rounded-xl flex items-center justify-center font-extrabold text-sm mb-4">
                   01
@@ -425,8 +431,10 @@ export default function ServicesPage() {
                 </p>
               </div>
             </div>
+            </ScrollReveal>
 
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between">
+            <ScrollReveal direction="up" delay={0.2}>
+            <div className="h-full bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between">
               <div>
                 <div className="w-10 h-10 bg-red-50 text-red-700 rounded-xl flex items-center justify-center font-extrabold text-sm mb-4">
                   02
@@ -437,8 +445,10 @@ export default function ServicesPage() {
                 </p>
               </div>
             </div>
+            </ScrollReveal>
 
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between">
+            <ScrollReveal direction="up" delay={0.3}>
+            <div className="h-full bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between">
               <div>
                 <div className="w-10 h-10 bg-red-50 text-red-700 rounded-xl flex items-center justify-center font-extrabold text-sm mb-4">
                   03
@@ -449,8 +459,10 @@ export default function ServicesPage() {
                 </p>
               </div>
             </div>
+            </ScrollReveal>
 
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between">
+            <ScrollReveal direction="up" delay={0.4}>
+            <div className="h-full bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between">
               <div>
                 <div className="w-10 h-10 bg-red-50 text-red-700 rounded-xl flex items-center justify-center font-extrabold text-sm mb-4">
                   04
@@ -461,8 +473,10 @@ export default function ServicesPage() {
                 </p>
               </div>
             </div>
+            </ScrollReveal>
           </div>
 
+          <ScrollReveal direction="up" delay={0.1}>
           <div className="mt-12 bg-white rounded-3xl p-8 border border-slate-100 shadow-md text-center max-w-3xl mx-auto">
             <h3 className="text-2xl font-black text-slate-900 mb-2 leading-tight">Got an Inactive Sedan or Hatchback in Faisalabad?</h3>
             <p className="text-slate-500 text-xs sm:text-sm font-medium leading-relaxed mb-6 max-w-xl mx-auto">
@@ -486,6 +500,7 @@ export default function ServicesPage() {
               </button>
             </div>
           </div>
+          </ScrollReveal>
         </div>
       </section>
           </motion.div>
@@ -565,7 +580,8 @@ export default function ServicesPage() {
             </div>
 
             {/* Side Static Interactive Widget for Sales Stats */}
-            <div className="lg:col-span-5 bg-slate-50 border border-slate-200/50 p-6 sm:p-8 rounded-3xl relative">
+            <ScrollReveal direction="up" delay={0.2}>
+            <div className="lg:col-span-5 bg-slate-50 border border-slate-200/50 p-6 sm:p-8 rounded-3xl relative h-full">
               <div className="absolute -top-3 -right-3 bg-red-700 text-white font-bold text-[10px] tracking-widest px-3 py-1 rounded-full shadow-md uppercase">
                 DIRECT SELLING
               </div>
@@ -609,6 +625,7 @@ export default function ServicesPage() {
                 List Your Ride For Sale
               </button>
             </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
@@ -616,7 +633,7 @@ export default function ServicesPage() {
         )}
       </AnimatePresence>
 
-      <Newsletter />
+      <ScrollReveal direction="up" delay={0.1}><Newsletter /></ScrollReveal>
 
       {/* BOTTOM INQUIRY FORM */}
       <section ref={contactFormRef} className="py-24 bg-slate-50">
@@ -802,7 +819,7 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <CTABanner />
+      <ScrollReveal direction="up" delay={0.1}><CTABanner /></ScrollReveal>
       <Footer />
     </div>
   );

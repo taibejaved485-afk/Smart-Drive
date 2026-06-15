@@ -5,6 +5,7 @@ import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import Reviews from '../components/Reviews';
 import SEO from '../components/SEO';
+import { ScrollReveal } from '../components/ScrollReveal';
 
 const faqs = [
   {q: "What Is The Minimum Age Requirement For The Heavy Bike Driving Course?", a: "The minimum age requirement is 18 years, and you must hold a valid learner's permit for motorbikes to start the training."},
@@ -68,18 +69,21 @@ export default function FAQPage() {
 
         <div className="grid md:grid-cols-2 gap-8">
             {faqs.map((faq, i) => (
-                <div key={i} className="bg-gray-50 p-6 rounded-xl hover:shadow-md transition">
-                    <button onClick={() => setOpenFaq(openFaq === i ? null : i)} className="w-full flex justify-between items-center font-bold text-lg text-left">
-                        {faq.q}
-                        <ChevronDown className={`w-5 h-5 transition ${openFaq === i ? 'rotate-180' : ''}`}/>
-                    </button>
-                    {openFaq === i && <p className="mt-4 text-gray-600">{faq.a}</p>}
-                </div>
+                <ScrollReveal direction="up" delay={i * 0.1} key={i}>
+                  <div className="bg-gray-50 p-6 rounded-xl hover:shadow-md transition">
+                      <button onClick={() => setOpenFaq(openFaq === i ? null : i)} className="w-full flex justify-between items-center font-bold text-lg text-left">
+                          {faq.q}
+                          <ChevronDown className={`w-5 h-5 transition ${openFaq === i ? 'rotate-180' : ''}`}/>
+                      </button>
+                      {openFaq === i && <p className="mt-4 text-gray-600">{faq.a}</p>}
+                  </div>
+                </ScrollReveal>
             ))}
         </div>
       </section>
 
       {/* Enroll Today */}
+      <ScrollReveal direction="up" delay={0.2}>
       <section 
         className="py-24 text-gray-900 text-center bg-cover bg-center"
         style={{ backgroundImage: "url('https://i.pinimg.com/1200x/5e/33/26/5e332692e6b46b4662892f58557e8871.jpg')" }}
@@ -101,10 +105,11 @@ export default function FAQPage() {
           </button>
         </div>
       </section>
+      </ScrollReveal>
 
-      <Reviews />
+      <ScrollReveal direction="up" delay={0.1}><Reviews /></ScrollReveal>
 
-      <CTABanner />
+      <ScrollReveal direction="up" delay={0.1}><CTABanner /></ScrollReveal>
       <Footer />
     </div>
   );

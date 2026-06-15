@@ -7,6 +7,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Reviews from '../components/Reviews';
 import OurProcess from '../components/OurProcess';
 import SEO from '../components/SEO';
+import { ScrollReveal } from '../components/ScrollReveal';
 
 interface PricingCourse {
   id: string;
@@ -246,10 +247,11 @@ export default function PricingPage() {
                 {courses.map((pkg, i) => (
                     <motion.div 
                         key={pkg.id || i}
-                        initial={{ opacity: 0, y: 50 }}
+                        initial={{ opacity: 0, y: 60 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, amount: 0.1 }}
-                        className="bg-white p-6 sm:p-8 rounded-3xl shadow-xl border border-gray-100 flex flex-col justify-between hover:border-red-100 hover:shadow-2xl hover:shadow-red-50/20 transition-all duration-300"
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ duration: 0.5, delay: i * 0.15, ease: "easeOut" }}
+                        className="bg-white p-6 sm:p-8 rounded-3xl shadow-xl border border-gray-100 flex flex-col justify-between hover:border-red-100 hover:shadow-2xl hover:shadow-red-50/20 hover:-translate-y-3 transition-all duration-300 ease-out"
                     >
                         <div>
                             {/* Course Image frame with zoom hover effect */}
@@ -320,8 +322,8 @@ export default function PricingPage() {
                     ))}
                 </div>
             </div>
-            <Reviews />
-            <OurProcess />
+            <ScrollReveal direction="up" delay={0.1}><Reviews /></ScrollReveal>
+            <ScrollReveal direction="up" delay={0.2}><OurProcess /></ScrollReveal>
         </div>
       </section>
 
@@ -502,7 +504,7 @@ export default function PricingPage() {
         </div>
       </section>
 
-      <CTABanner />
+      <ScrollReveal direction="up" delay={0.1}><CTABanner /></ScrollReveal>
       <Footer />
     </div>
   );

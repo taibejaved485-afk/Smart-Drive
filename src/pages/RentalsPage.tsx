@@ -7,6 +7,7 @@ import CTABanner from '../components/CTABanner';
 import SEO from '../components/SEO';
 import EarningsCalculator from '../components/EarningsCalculator';
 import { CarRequestsForm, CarRequestsGrid } from '../components/CarRequestsDirectory';
+import { ScrollReveal } from '../components/ScrollReveal';
 import { INITIAL_RENTAL_FLEET, RentalCar } from '../data/inventory';
 import { Car, MapPin, Calendar, Sliders, CheckCircle2, ShieldCheck, X, Phone, DollarSign, Clock, HelpCircle, Filter, Sparkles, ChevronLeft, ChevronRight, Search, ChevronDown, Check, Users, Maximize2 } from 'lucide-react';
 
@@ -451,7 +452,7 @@ export default function RentalsPage() {
 
       {/* INTERACTIVE INCOME CALCULATOR COMPONENT */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 mb-16 relative z-20 animate-fade-in">
-        <EarningsCalculator />
+        <ScrollReveal direction="up" delay={0.1}><EarningsCalculator /></ScrollReveal>
       </div>
 
       {/* Main Content & Fleet Section */}
@@ -672,14 +673,14 @@ export default function RentalsPage() {
               </div>
             ) : (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {filteredCars.map((car) => {
+                {filteredCars.map((car, idx) => {
                   const currentStatus = car.availabilityStatus || (car.status === 'Booked' ? 'Rented Out' : 'Available');
                   const isAvailable = currentStatus === 'Available';
                   
                   return (
+                    <ScrollReveal direction="up" delay={idx * 0.1} key={car.id}>
                     <div
-                      key={car.id}
-                      className={`bg-white rounded-3xl overflow-hidden border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col justify-between ${!isAvailable ? 'opacity-75 grayscale-[20%]' : 'opacity-100'}`}
+                      className={`h-full bg-white rounded-3xl overflow-hidden border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col justify-between ${!isAvailable ? 'opacity-75 grayscale-[20%]' : 'opacity-100'}`}
                     >
                       {/* Card Image and City Badge */}
                       <div className="relative aspect-[16/10] bg-gray-100 overflow-hidden group">
@@ -804,6 +805,7 @@ export default function RentalsPage() {
                         </div>
                       </div>
                     </div>
+                    </ScrollReveal>
                   );
                 })}
               </div>
@@ -1032,7 +1034,7 @@ export default function RentalsPage() {
         )}
       </AnimatePresence>
 
-      <CTABanner />
+      <ScrollReveal direction="up" delay={0.1}><CTABanner /></ScrollReveal>
       <Footer />
     </div>
   );

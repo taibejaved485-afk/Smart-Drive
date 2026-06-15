@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import CTABanner from '../components/CTABanner';
 import { motion, AnimatePresence } from 'motion/react';
 import SEO from '../components/SEO';
+import { ScrollReveal } from '../components/ScrollReveal';
 import { 
   Mail, Phone, MapPin, Clock, Send, CheckCircle2, ChevronRight, 
   Car, Shield, Award, HelpCircle, ArrowRight, MessageSquare, ExternalLink
@@ -502,7 +503,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <CTABanner />
+      <ScrollReveal direction="up" delay={0.1}><CTABanner /></ScrollReveal>
       <Footer />
     </div>
   );
