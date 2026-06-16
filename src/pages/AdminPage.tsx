@@ -177,12 +177,6 @@ const DEFAULT_DRIVING_COURSES: DrivingCourse[] = [
   }
 ];
 
-const DEFAULT_EDITORS: BlogEditor[] = [
-  { id: 'editor-1', name: 'Taibe Javed', role: 'Head of Content', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=120', email: 'taibejaved485@gmail.com', status: 'Active' },
-  { id: 'editor-2', name: 'Arham Sohail', role: 'Chief Driving Coach', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120', email: 'arham@godriveify.com', status: 'Active' },
-  { id: 'editor-3', name: 'Ayesha Khan', role: 'Road Safety Officer', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=120', email: 'ayesha@godriveify.com', status: 'Active' }
-];
-
 export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
@@ -206,11 +200,6 @@ export default function AdminPage() {
   });
   const [isDragging, setIsDragging] = useState(false);
   
-  // Blog registered editors state
-  const [blogEditors, setBlogEditors] = useState<BlogEditor[]>([]);
-  const [isAddingEditor, setIsAddingEditor] = useState(false);
-  const [newEditor, setNewEditor] = useState({ name: '', role: '', avatar: '', email: '', status: 'Active' as 'Active' | 'Inactive' });
-  const [editorSearch, setEditorSearch] = useState('');
   const [blogSearchQuery, setBlogSearchQuery] = useState('');
   const [editorWorkspaceTab, setEditorWorkspaceTab] = useState<'write' | 'preview'>('write');
   const [editorAuthorSelectMode, setEditorAuthorSelectMode] = useState<'dropdown' | 'custom'>('dropdown');
@@ -499,25 +488,6 @@ export default function AdminPage() {
     } else {
       setDrivingCourses(DEFAULT_DRIVING_COURSES);
       localStorage.setItem('driving_courses_v4', JSON.stringify(DEFAULT_DRIVING_COURSES));
-    }
-
-    // 7. Load Blog Editors Directory
-    const savedEditors = localStorage.getItem('blog_editors');
-    if (savedEditors) {
-      try {
-        const parsed = JSON.parse(savedEditors);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setBlogEditors(parsed);
-        } else {
-          setBlogEditors(DEFAULT_EDITORS);
-          localStorage.setItem('blog_editors', JSON.stringify(DEFAULT_EDITORS));
-        }
-      } catch (err) {
-        setBlogEditors(DEFAULT_EDITORS);
-      }
-    } else {
-      setBlogEditors(DEFAULT_EDITORS);
-      localStorage.setItem('blog_editors', JSON.stringify(DEFAULT_EDITORS));
     }
   };
 
@@ -1398,29 +1368,31 @@ export default function AdminPage() {
     const finalImageUrl = newPost.imageUrl || PRESET_IMAGES[0].url;
 
     if (editingPostId) {
-      const updatedPosts = posts.map(p => {
-        if (p.id === editingPostId) {
-          return {
-            ...p,
-            title: newPost.title,
-            author: newPost.author || 'GoDriveify Team',
-            imageUrl: finalImageUrl,
-            content: newPost.content,
-            authorAvatar: newPost.authorAvatar,
-            authorRole: newPost.authorRole,
-            imageAlt: newPost.imageAlt,
-            metaTitle: newPost.metaTitle,
-            metaDescription: newPost.metaDescription,
-            focusKeywords: newPost.focusKeywords,
-            excerpt: newPost.excerpt,
-            status: finalStatus,
-            scheduledAt: finalStatus === 'Scheduled' ? newPost.scheduledAt : ''
-          };
-        }
-        return p;
+      setPosts(prevPosts => {
+        const updatedPosts = prevPosts.map(p => {
+          if (String(p.id) === String(editingPostId)) {
+            return {
+              ...p,
+              title: newPost.title,
+              author: newPost.author || 'GoDriveify Team',
+              imageUrl: finalImageUrl,
+              content: newPost.content,
+              authorAvatar: newPost.authorAvatar,
+              authorRole: newPost.authorRole,
+              imageAlt: newPost.imageAlt,
+              metaTitle: newPost.metaTitle,
+              metaDescription: newPost.metaDescription,
+              focusKeywords: newPost.focusKeywords,
+              excerpt: newPost.excerpt,
+              status: finalStatus,
+              scheduledAt: finalStatus === 'Scheduled' ? newPost.scheduledAt : ''
+            };
+          }
+          return p;
+        });
+        localStorage.setItem('blogPosts', JSON.stringify(updatedPosts));
+        return updatedPosts;
       });
-      setPosts(updatedPosts);
-      localStorage.setItem('blogPosts', JSON.stringify(updatedPosts));
       setEditingPostId(null);
       showToast(`Post updated successfully as ${finalStatus === 'Draft' ? 'Draft' : finalStatus}!`, 'success');
     } else {
@@ -1441,9 +1413,11 @@ export default function AdminPage() {
         status: finalStatus,
         scheduledAt: finalStatus === 'Scheduled' ? newPost.scheduledAt : ''
       };
-      const updatedPosts = [post, ...posts]; // Add new posts at the top
-      setPosts(updatedPosts);
-      localStorage.setItem('blogPosts', JSON.stringify(updatedPosts));
+      setPosts(prevPosts => {
+        const updatedPosts = [post, ...prevPosts];
+        localStorage.setItem('blogPosts', JSON.stringify(updatedPosts));
+        return updatedPosts;
+      });
       showToast(`Post saved successfully as ${finalStatus === 'Draft' ? 'Draft' : finalStatus}!`, 'success');
     }
 
@@ -1538,64 +1512,13 @@ export default function AdminPage() {
   };
 
   // Blog Editor Operations
-  const handleAddNewEditor = () => {
-    if (!newEditor.name.trim() || !newEditor.role.trim()) {
-      showToast('Please type both Editor Name and Role Designation!', 'error');
-      return;
-    }
-
-    const finalEmail = newEditor.email.trim() || `${newEditor.name.toLowerCase().replace(/\s+/g, '')}@godriveify.com`;
-    const finalAvatar = newEditor.avatar.trim() || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=120';
-
-    const createdEditor: BlogEditor = {
-      id: `editor-${Date.now()}`,
-      name: newEditor.name,
-      role: newEditor.role,
-      avatar: finalAvatar,
-      email: finalEmail,
-      status: newEditor.status || 'Active'
-    };
-
-    const updated = [...blogEditors, createdEditor];
-    setBlogEditors(updated);
-    localStorage.setItem('blog_editors', JSON.stringify(updated));
-    window.dispatchEvent(new CustomEvent('blog_editors_updated', { detail: updated }));
-    
-    // reset state
-    setNewEditor({ name: '', role: '', avatar: '', email: '', status: 'Active' });
-    setIsAddingEditor(false);
-    showToast(`Verification credential saved! Active roster: ${createdEditor.name}`, 'success');
-  };
-
-  const handleToggleEditorStatus = (id: string) => {
-    const updated = blogEditors.map(editor => {
-      if (editor.id === id) {
-        const nextStatus = editor.status === 'Active' ? 'Inactive' : 'Active';
-        showToast(`${editor.name} is now ${nextStatus}`, 'info');
-        return { ...editor, status: nextStatus };
-      }
-      return editor;
-    });
-    setBlogEditors(updated);
-    localStorage.setItem('blog_editors', JSON.stringify(updated));
-    window.dispatchEvent(new CustomEvent('blog_editors_updated', { detail: updated }));
-  };
-
-  const handleDeleteEditor = (id: string, name: string) => {
-    if (window.confirm(`Are you sure you want to permanently remove registered editor ${name}?`)) {
-      const updated = blogEditors.filter(e => e.id !== id);
-      setBlogEditors(updated);
-      localStorage.setItem('blog_editors', JSON.stringify(updated));
-      window.dispatchEvent(new CustomEvent('blog_editors_updated', { detail: updated }));
-      showToast(`Removed editor: ${name}`, 'info');
-    }
-  };
-
   const deletePost = (id: string) => {
     if (window.confirm('Are you sure you want to delete this blog post?')) {
-      const updatedPosts = posts.filter(p => String(p.id) !== String(id));
-      setPosts(updatedPosts);
-      localStorage.setItem('blogPosts', JSON.stringify(updatedPosts));
+      setPosts(prevPosts => {
+        const updatedPosts = prevPosts.filter(p => String(p.id) !== String(id));
+        localStorage.setItem('blogPosts', JSON.stringify(updatedPosts));
+        return updatedPosts;
+      });
       showToast('Blog post deleted successfully.', 'info');
       if (editingPostId === id) {
         cancelEdit();
@@ -2223,13 +2146,13 @@ export default function AdminPage() {
               </div>
               <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between">
                 <div>
-                  <p className="text-gray-500 text-xs font-bold uppercase tracking-wider">Active Blog Editors</p>
+                  <p className="text-gray-500 text-xs font-bold uppercase tracking-wider">Unpublished Drafts</p>
                   <p className="text-3xl font-black text-[#002060] mt-1">
-                    {blogEditors?.filter(e => e.status === 'Active').length || 0}
+                    {posts.filter(p => p.status === 'Draft').length}
                   </p>
                 </div>
                 <div className="p-3 bg-emerald-50 rounded-xl text-emerald-600 font-sans">
-                  <Sliders className="w-6 h-6" />
+                  <FileSpreadsheet className="w-6 h-6" />
                 </div>
               </div>
               <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between">
