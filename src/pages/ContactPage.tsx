@@ -28,10 +28,10 @@ export default function ContactPage() {
       "name": "GoDriveify Driving School",
       "telephone": "03097666928",
       "email": "info@godriveify.com",
-      "hasMap": "https://maps.google.com/?q=GoDriveify+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan",
+      "hasMap": "https://maps.google.com/?q=GoDriveify+Driving+School+Millat+Road+Millat+Town+Faisalabad+Punjab+Pakistan",
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "Main Jaranwala Road",
+        "streetAddress": "Millat Road, Millat Town",
         "addressLocality": "Faisalabad",
         "addressRegion": "Punjab",
         "postalCode": "38000",
@@ -48,7 +48,7 @@ export default function ContactPage() {
         "https://www.instagram.com/godriveify/",
         "https://www.youtube.com/@godriveify",
         "https://x.com/godriveify?s=11",
-        "https://maps.google.com/?q=GoDriveify+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan"
+        "https://maps.google.com/?q=GoDriveify+Driving+School+Millat+Road+Millat+Town+Faisalabad+Punjab+Pakistan"
       ]
     }
   };
@@ -123,7 +123,7 @@ export default function ContactPage() {
     <div className="font-sans text-gray-800 bg-slate-50 min-h-screen flex flex-col justify-between selection:bg-red-650 selection:text-white">
       <SEO 
         title="Contact Us & Driving Course Registration | GoDriveify"
-        description="Connect with Faisalabad's top driving school. Book lessons, find our location on Jaranwala Road, call 03097666928, or submit our online registration form."
+        description="Connect with Faisalabad's top driving school. Book lessons, find our location on Millat Road, call 03097666928, or submit our online registration form."
         keywords="contact driving school Faisalabad, register driving classes, female driving instructor booking, learn driving school address Pakistan"
         schema={contactSchema}
       />
@@ -250,7 +250,7 @@ export default function ContactPage() {
                   <div>
                     <span className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 block mb-0.5">Academy Campus</span>
                     <p className="text-slate-800 text-xs sm:text-sm font-bold leading-relaxed">
-                      Main Jaranwala Road, Near Peoples Colony, Faisalabad, PK.
+                      Millat Road, Millat Town, Faisalabad, PK.
                     </p>
                   </div>
                 </div>
@@ -426,7 +426,7 @@ export default function ContactPage() {
                 Easy to Locate Campus Center
               </h2>
               <p className="text-gray-650 text-sm sm:text-base leading-relaxed mb-6">
-                Our main office and safety parking arena are situated near Peoples Colony on Jaranwala Road, Faisalabad. We feature spacious driving ground templates and theoretical class facilities designed for professional training.
+                Our main office and safety parking arena are situated at Millat Town on Millat Road, Faisalabad. We feature spacious driving ground templates and theoretical class facilities designed for professional training.
               </p>
 
               <div className="space-y-4 mb-8">
@@ -447,7 +447,7 @@ export default function ContactPage() {
               </div>
 
               <a 
-                href="https://maps.google.com/?q=GoDriveify+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan" 
+                href="https://maps.google.com/?q=GoDriveify+Driving+School+Millat+Road+Millat+Town+Faisalabad+Punjab+Pakistan" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs uppercase tracking-wider px-6 py-3.5 rounded-xl border border-gray-300 inline-flex items-center gap-2 transition-all cursor-pointer"
@@ -461,7 +461,7 @@ export default function ContactPage() {
               <div className="flex justify-between items-center bg-white p-3.5 rounded-2xl border border-gray-200 shadow-sm z-10">
                 <div>
                   <h4 className="font-bold text-gray-950 text-xs">Faisalabad Campus Yard</h4>
-                  <p className="text-[10px] text-gray-400 font-medium">Jaranwala Road Sector</p>
+                  <p className="text-[10px] text-gray-400 font-medium">Millat Road Sector</p>
                 </div>
                 <span className="bg-red-50 border border-red-100 text-red-600 text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-lg">
                   Registered Academy
@@ -494,7 +494,7 @@ export default function ContactPage() {
 
               {/* Bottom bar */}
               <div className="flex justify-between items-center text-[10.5px] text-gray-500 bg-white p-3 rounded-xl border border-gray-200 shadow-sm z-10">
-                <span>Near Peoples Colony Jaranwala Rd, FSD</span>
+                <span>Millat Road, Millat Town, FSD</span>
                 <span className="font-mono text-[9px] text-gray-400">GEO_PLOT_OK</span>
               </div>
             </div>

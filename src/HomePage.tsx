@@ -36,10 +36,10 @@ export default function HomePage() {
         "image": "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=600&auto=format&fit=crop",
         "telephone": "03097666928",
         "email": "info@godriveify.com",
-        "hasMap": "https://maps.google.com/?q=GoDriveify+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan",
+        "hasMap": "https://maps.google.com/?q=GoDriveify+Driving+School+Millat+Road+Millat+Town+Faisalabad+Punjab+Pakistan",
         "address": {
           "@type": "PostalAddress",
-          "streetAddress": "Main Jaranwala Road",
+          "streetAddress": "Millat Road, Millat Town",
           "addressLocality": "Faisalabad",
           "addressRegion": "Punjab",
           "postalCode": "38000",
@@ -71,7 +71,7 @@ export default function HomePage() {
           "https://www.instagram.com/godriveify/",
           "https://www.youtube.com/@godriveify",
           "https://x.com/godriveify?s=11",
-          "https://maps.google.com/?q=GoDriveify+Driving+School+Main+Jaranwala+Road+Near+Peoples+Colony+Faisalabad+Punjab+Pakistan"
+          "https://maps.google.com/?q=GoDriveify+Driving+School+Millat+Road+Millat+Town+Faisalabad+Punjab+Pakistan"
         ]
       },
       {

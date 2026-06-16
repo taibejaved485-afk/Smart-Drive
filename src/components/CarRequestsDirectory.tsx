@@ -214,7 +214,7 @@ export function CarRequestsForm() {
             <input 
               type="text"
               className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition text-sm font-medium" 
-              placeholder="e.g. DHA Phase 2, Peoples Colony" 
+              placeholder="e.g. DHA Phase 2, Millat Town" 
               value={formData.area} onChange={e => setFormData({...formData, area: e.target.value})} 
             />
           </div>

@@ -277,7 +277,7 @@ export default function RentalsPage() {
   const cities = ['All Cities', 'Faisalabad', 'Lahore', 'Islamabad', 'Karachi'];
   
   const CITY_AREAS: Record<string, string[]> = {
-    'Faisalabad': ['Peoples Colony', 'D-Ground', 'Canal Road', 'Samanabad', 'Sargodha Road'],
+    'Faisalabad': ['Millat Town', 'D-Ground', 'Canal Road', 'Peoples Colony', 'Sargodha Road'],
     'Lahore': ['DHA', 'Gulberg', 'Johar Town', 'Bahria Town', 'Model Town'],
     'Islamabad': ['Blue Area', 'F-7', 'G-11', 'DHA Phase 2', 'E-7'],
     'Karachi': ['Clifton', 'DHA', 'Gulshan-e-Iqbal', 'North Nazimabad']

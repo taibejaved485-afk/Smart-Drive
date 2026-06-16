@@ -36,8 +36,11 @@ export default function Footer() {
           {/* Column 1: Legacy Brand & Premium Status Statement */}
           <div className="space-y-6">
             <div>
-              <Link to="/">
-                <BrandLogo isDark={true} />
+              <Link to="/" className="flex items-center group select-none">
+                <div className="font-display tracking-tighter text-2xl font-black flex items-center">
+                  <span className="text-[#FF5500]">Go</span>
+                  <span className="text-white">Driveify</span>
+                </div>
               </Link>
             </div>
             
@@ -161,7 +164,7 @@ export default function Footer() {
                 <div>
                   <span className="text-[9px] uppercase tracking-wider font-extrabold text-slate-500 block mb-0.5">Primary Campus</span>
                   <address className="text-slate-400 not-italic font-bold text-xs leading-relaxed">
-                    Main Jaranwala Road, Near Peoples Colony, Faisalabad, PK
+                    Millat Road, Millat Town, Faisalabad
                   </address>
                 </div>
               </div>
