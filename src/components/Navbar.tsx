@@ -1,8 +1,9 @@
 import React, { useState, useEffect, FormEvent } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Phone, Car, Plus, Check, ChevronRight, User, ShieldCheck, Mail, Info, UploadCloud, Trash2 } from 'lucide-react';
+import { Menu, X, Phone, Car, Plus, Check, ChevronRight, User, ShieldCheck, Mail, Info, UploadCloud, Trash2, BookOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useToast } from './Toast';
+import BrandLogo from './BrandLogo';
 import { insertSaleCar, insertRentalCar } from '../lib/supabase';
 
 
@@ -257,9 +258,8 @@ export default function Navbar() {
       <nav className="sticky top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-gray-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-20 items-center">
-            <Link to="/" className="font-display font-black text-2xl text-red-600 flex items-center gap-0.5 leading-none tracking-tighter">
-              <span>GO</span>
-              <span className="text-gray-950 font-extrabold text-xl">DRIVEIFY</span>
+            <Link to="/" className="cursor-pointer select-none">
+              <BrandLogo />
             </Link>
             
             <div className="hidden lg:flex space-x-6 font-sans font-medium text-sm text-gray-700">
@@ -278,9 +278,15 @@ export default function Navbar() {
             </div>
 
             <div className="hidden lg:flex items-center gap-3">
+              <Link
+                to="/blog"
+                className="flex items-center gap-2 bg-[#002060] hover:bg-[#FF5500] text-white px-5 py-2.5 rounded-xl font-bold transition-colors duration-300 shadow-md text-xs uppercase tracking-wider cursor-pointer transform hover:scale-102 active:scale-98"
+              >
+                <BookOpen className="w-4 h-4" /> BLOG UPDATES
+              </Link>
               <div className="relative group">
                 <button 
-                  className="flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-750 hover:to-red-800 text-white px-5 py-2.5 rounded-xl font-bold transition shadow-md text-xs uppercase tracking-wider cursor-pointer transform hover:scale-102 active:scale-98"
+                  className="flex items-center gap-2 bg-[#FF5500] hover:bg-[#002060] text-white px-5 py-2.5 rounded-xl font-bold transition-colors duration-300 shadow-md text-xs uppercase tracking-wider cursor-pointer transform hover:scale-102 active:scale-98"
                   type="button"
                 >
                   <Plus className="w-4 h-4" /> APPLY NOW
@@ -345,6 +351,13 @@ export default function Navbar() {
             })}
             <div className="flex flex-col gap-2 pt-2">
               <div className="space-y-2">
+                <Link 
+                  to="/blog"
+                  onClick={() => setIsOpen(false)}
+                  className="w-full flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-850 text-white py-3 rounded-xl font-bold transition text-xs uppercase tracking-wider cursor-pointer decoration-none"
+                >
+                  <BookOpen className="w-4 h-4 text-slate-300" /> Blog Updates
+                </Link>
                 <Link 
                   to="/contact"
                   onClick={() => {

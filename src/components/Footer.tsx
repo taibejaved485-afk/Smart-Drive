@@ -1,6 +1,7 @@
 import React from 'react';
 import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin, Clock, ArrowRight, ShieldCheck, Sparkles, MessageSquare, Award, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import BrandLogo from './BrandLogo';
 
 export default function Footer() {
   return (
@@ -35,11 +36,9 @@ export default function Footer() {
           {/* Column 1: Legacy Brand & Premium Status Statement */}
           <div className="space-y-6">
             <div>
-              <Link to="/" className="font-display font-black text-2.5xl text-red-600 flex items-center gap-1.5 leading-none tracking-tight">
-                <span>GO</span>
-                <span className="text-white font-black text-2xl">DRIVEIFY</span>
+              <Link to="/">
+                <BrandLogo isDark={true} />
               </Link>
-              <p className="text-xs text-red-500 font-bold uppercase tracking-widest mt-1">Driving Intelligence</p>
             </div>
             
             <p className="text-xs sm:text-sm leading-relaxed text-slate-400 font-medium">
@@ -79,24 +78,21 @@ export default function Footer() {
           {/* Column 2: Comprehensive Training Programs */}
           <div className="space-y-5">
             <h4 className="text-white font-extrabold tracking-wider uppercase text-xs flex items-center gap-2">
-              <span className="w-1.5 h-1.5 bg-red-500 rounded-full" /> Academy Courses
+              <span className="w-1.5 h-1.5 bg-[#FF5500] rounded-full" /> Academy Courses
             </h4>
             <ul className="space-y-3 text-xs sm:text-sm">
               {[
-                { title: "Basic Driving Course", period: "10 Days Plan" },
-                { title: "Standard Driving Course", period: "15 Days Plan" },
-                { title: "Premium Driving Course", period: "20 Days Plan" },
-                { title: "Manual Transmission Mastery", period: "Faisalabad Tracks" },
-                { title: "Automatic Sedan Training", period: "Civic Special" }
+                { title: "Basic Driving Course" },
+                { title: "Standard Driving Course" },
+                { title: "Premium Driving Course" },
+                { title: "Manual Transmission Mastery" },
+                { title: "Automatic Sedan Training" }
               ].map((item, idx) => (
                 <li key={idx} className="group">
-                  <Link to="/pricing" className="text-slate-400 hover:text-red-500 transition-colors duration-300 flex items-center justify-between pointer-events-auto">
-                    <span className="font-semibold flex items-center gap-1.5">
-                      <ArrowRight className="w-3 h-3 text-slate-600 group-hover:text-red-500 group-hover:translate-x-0.5 transition-all duration-300" />
+                  <Link to="/pricing" className="text-slate-400 hover:text-[#FF5500] transition-colors duration-300 flex items-center gap-2 pointer-events-auto">
+                    <ArrowRight className="w-3 h-3 text-slate-605 group-hover:text-[#FF5500] group-hover:translate-x-0.5 transition-all duration-300 shrink-0" />
+                    <span className="font-semibold">
                       {item.title}
-                    </span>
-                    <span className="text-[9px] bg-slate-900 text-slate-500 font-mono font-bold uppercase py-0.5 px-2 rounded-md border border-white/5 transition-colors group-hover:border-red-500/20 group-hover:text-red-500">
-                      {item.period}
                     </span>
                   </Link>
                 </li>
