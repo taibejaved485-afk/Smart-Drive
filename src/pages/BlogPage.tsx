@@ -15,6 +15,8 @@ interface BlogPost {
   imageUrl: string;
   content: string;
   date: string;
+  authorAvatar?: string;
+  authorRole?: string;
 }
 
 const parseBoldAndItalic = (text: string) => {
@@ -150,7 +152,19 @@ export default function BlogPage() {
                     />
                   </div>
                   <h2 className="text-2xl font-bold mb-2 group-hover:text-red-600 transition-colors duration-350">{post.title}</h2>
-                  <p className="text-gray-500 text-sm mb-4">By {post.author} on {post.date}</p>
+                  <div className="flex items-center gap-2 mb-3.5 text-xs text-gray-500 font-medium">
+                    {post.authorAvatar ? (
+                      <img src={post.authorAvatar} alt="" className="w-5.5 h-5.5 rounded-full object-cover shrink-0 border border-gray-200" />
+                    ) : (
+                      <span className="p-1 bg-[#002060]/5 text-[#002060] rounded-full shrink-0">
+                        <User className="w-3.5 h-3.5" />
+                      </span>
+                    )}
+                    <span className="truncate">
+                      By <strong className="text-gray-800 font-bold">{post.author}</strong>
+                      {post.authorRole ? ` (${post.authorRole})` : ''} • {post.date}
+                    </span>
+                  </div>
                   <p className="text-gray-600 mb-6 flex-grow">{post.content.substring(0, 100)}...</p>
                   <button 
                     onClick={(e) => {
@@ -216,13 +230,20 @@ export default function BlogPage() {
                   <h2 className="text-2xl md:text-3xl font-extrabold leading-tight mb-2">
                     {selectedPost.title}
                   </h2>
-                  <div className="flex flex-wrap items-center gap-3 text-xs text-gray-200">
-                    <span className="flex items-center gap-1">
-                      <User className="w-3.5 h-3.5 text-red-500" />
-                      By <strong className="text-white font-semibold">{selectedPost.author}</strong>
+                  <div className="flex flex-wrap items-center gap-3.5 text-xs text-gray-200">
+                    <span className="flex items-center gap-2">
+                      {selectedPost.authorAvatar ? (
+                        <img src={selectedPost.authorAvatar} alt="" className="w-6 h-6 rounded-full object-cover shrink-0 border border-white/25 bg-white/10" />
+                      ) : (
+                        <User className="w-3.5 h-3.5 text-red-500" />
+                      )}
+                      <span>
+                        By <strong className="text-white font-semibold">{selectedPost.author}</strong>
+                        {selectedPost.authorRole ? ` (${selectedPost.authorRole})` : ''}
+                      </span>
                     </span>
-                    <span className="w-1 h-1 rounded-full bg-red-500" />
-                    <span className="flex items-center gap-1">
+                    <span className="w-1 h-1 rounded-full bg-red-550" />
+                    <span className="flex items-center gap-1.5">
                       <Calendar className="w-3.5 h-3.5 text-red-500" />
                       {selectedPost.date}
                     </span>

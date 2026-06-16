@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import CTABanner from '../components/CTABanner';
-import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag, Bold, Italic, List, ListOrdered } from 'lucide-react';
+import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag, Bold, Italic, List, ListOrdered, BookOpen, User, Calendar, Zap, UserCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RentalCar } from '../data/inventory';
 import { 
@@ -29,6 +29,24 @@ interface BlogPost {
   imageUrl: string;
   content: string;
   date: string;
+  authorAvatar?: string;
+  authorRole?: string;
+  imageAlt?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  focusKeywords?: string;
+  excerpt?: string;
+  status?: 'Draft' | 'Published' | 'Scheduled';
+  scheduledAt?: string;
+}
+
+interface BlogEditor {
+  id: string;
+  name: string;
+  role: string;
+  avatar: string;
+  email: string;
+  status: 'Active' | 'Inactive';
 }
 
 const PRESET_CAR_IMAGES = [
@@ -159,19 +177,50 @@ const DEFAULT_DRIVING_COURSES: DrivingCourse[] = [
   }
 ];
 
+const DEFAULT_EDITORS: BlogEditor[] = [
+  { id: 'editor-1', name: 'Taibe Javed', role: 'Head of Content', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=120', email: 'taibejaved485@gmail.com', status: 'Active' },
+  { id: 'editor-2', name: 'Arham Sohail', role: 'Chief Driving Coach', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120', email: 'arham@godriveify.com', status: 'Active' },
+  { id: 'editor-3', name: 'Ayesha Khan', role: 'Road Safety Officer', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=120', email: 'ayesha@godriveify.com', status: 'Active' }
+];
+
 export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
-  const [newPost, setNewPost] = useState({ title: '', author: '', imageUrl: '', content: '' });
+  const [newPost, setNewPost] = useState({ 
+    title: '', 
+    author: '', 
+    imageUrl: '', 
+    content: '', 
+    authorAvatar: '', 
+    authorRole: '',
+    imageAlt: '',
+    metaTitle: '',
+    metaDescription: '',
+    focusKeywords: '',
+    excerpt: '',
+    status: 'Draft' as 'Draft' | 'Published' | 'Scheduled',
+    scheduledAt: ''
+  });
+  const [isDragging, setIsDragging] = useState(false);
+  
+  // Blog registered editors state
+  const [blogEditors, setBlogEditors] = useState<BlogEditor[]>([]);
+  const [isAddingEditor, setIsAddingEditor] = useState(false);
+  const [newEditor, setNewEditor] = useState({ name: '', role: '', avatar: '', email: '', status: 'Active' as 'Active' | 'Inactive' });
+  const [editorSearch, setEditorSearch] = useState('');
+  const [blogSearchQuery, setBlogSearchQuery] = useState('');
+  const [editorWorkspaceTab, setEditorWorkspaceTab] = useState<'write' | 'preview'>('write');
+  const [editorAuthorSelectMode, setEditorAuthorSelectMode] = useState<'dropdown' | 'custom'>('dropdown');
   const [activeTab, setActiveTab] = useState<'bookings' | 'blogs' | 'dns' | 'rentals' | 'requests' | 'courses' | 'car-sales'>('bookings');
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const carFileInputRef = useRef<HTMLInputElement>(null);
   const blogTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const wysiwygEditorRef = useRef<HTMLDivElement>(null);
 
   // Driving school course states
   const [drivingCourses, setDrivingCourses] = useState<DrivingCourse[]>([]);
@@ -451,6 +500,25 @@ export default function AdminPage() {
       setDrivingCourses(DEFAULT_DRIVING_COURSES);
       localStorage.setItem('driving_courses_v4', JSON.stringify(DEFAULT_DRIVING_COURSES));
     }
+
+    // 7. Load Blog Editors Directory
+    const savedEditors = localStorage.getItem('blog_editors');
+    if (savedEditors) {
+      try {
+        const parsed = JSON.parse(savedEditors);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setBlogEditors(parsed);
+        } else {
+          setBlogEditors(DEFAULT_EDITORS);
+          localStorage.setItem('blog_editors', JSON.stringify(DEFAULT_EDITORS));
+        }
+      } catch (err) {
+        setBlogEditors(DEFAULT_EDITORS);
+      }
+    } else {
+      setBlogEditors(DEFAULT_EDITORS);
+      localStorage.setItem('blog_editors', JSON.stringify(DEFAULT_EDITORS));
+    }
   };
 
   useEffect(() => {
@@ -464,6 +532,7 @@ export default function AdminPage() {
     window.addEventListener('sale_cars_updated', loadDataAndSync);
     window.addEventListener('customer_requests_updated', loadDataAndSync);
     window.addEventListener('driving_courses_updated', loadDataAndSync);
+    window.addEventListener('blog_editors_updated', loadDataAndSync);
     
     // Background polling interval for extra visual reactivity safety (every 3s)
     const syncInterval = setInterval(loadDataAndSync, 3000);
@@ -476,6 +545,7 @@ export default function AdminPage() {
       window.removeEventListener('sale_cars_updated', loadDataAndSync);
       window.removeEventListener('customer_requests_updated', loadDataAndSync);
       window.removeEventListener('driving_courses_updated', loadDataAndSync);
+      window.removeEventListener('blog_editors_updated', loadDataAndSync);
       clearInterval(syncInterval);
     };
   }, []);
@@ -960,10 +1030,192 @@ export default function AdminPage() {
       const reader = new FileReader();
       reader.onloadend = () => {
         if (typeof reader.result === 'string') {
-          setNewPost(prev => ({ ...prev, imageUrl: reader.result as string }));
+          setNewPost(prev => ({ 
+            ...prev, 
+            imageUrl: reader.result as string,
+            imageAlt: file.name.split('.')[0].replace(/[-_]/g, ' ')
+          }));
         }
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          setNewPost(prev => ({ 
+            ...prev, 
+            imageUrl: reader.result as string,
+            imageAlt: file.name.split('.')[0].replace(/[-_]/g, ' ')
+          }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const markdownToHtml = (markdown: string): string => {
+    if (!markdown) return '';
+    return markdown
+      .split('\n')
+      .map(line => {
+        const trimmed = line.trim();
+        if (!trimmed) return '<p><br></p>';
+        
+        // Unordered list item
+        if (trimmed.startsWith('- ')) {
+          const content = trimmed.substring(2);
+          const parsed = content
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+          return `<ul><li>${parsed}</li></ul>`;
+        }
+        
+        // Ordered list item
+        if (/^\d+\.\s/.test(trimmed)) {
+          const content = trimmed.replace(/^\d+\.\s/, '');
+          const parsed = content
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+          return `<ol><li>${parsed}</li></ol>`;
+        }
+        
+        // Blockquote
+        if (trimmed.startsWith('> ')) {
+          const content = trimmed.substring(2);
+          const parsed = content
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+          return `<blockquote>${parsed}</blockquote>`;
+        }
+        
+        // Heading 1 (##)
+        if (trimmed.startsWith('## ')) {
+          const content = trimmed.substring(3);
+          const parsed = content
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+          return `<h2>${parsed}</h2>`;
+        }
+        
+        // Heading 2 (###)
+        if (trimmed.startsWith('### ')) {
+          const content = trimmed.substring(4);
+          const parsed = content
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+          return `<h3>${parsed}</h3>`;
+        }
+        
+        // Regular paragraph or plain line
+        const parsed = line
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.*?)\*/g, '<em>$1</em>');
+        return `<p>${parsed}</p>`;
+      })
+      .join('');
+  };
+
+  const htmlToMarkdown = (html: string): string => {
+    if (!html) return '';
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    const lines: string[] = [];
+
+    const traverse = (node: Node) => {
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const el = node as HTMLElement;
+        const tagName = el.tagName.toUpperCase();
+
+        if (tagName === 'H1' || tagName === 'H2') {
+          lines.push(`## ${cleanInlineStyles(el.innerHTML)}`);
+        } else if (tagName === 'H3' || tagName === 'H4') {
+          lines.push(`### ${cleanInlineStyles(el.innerHTML)}`);
+        } else if (tagName === 'BLOCKQUOTE') {
+          lines.push(`> ${cleanInlineStyles(el.innerHTML)}`);
+        } else if (tagName === 'LI') {
+          const parentTag = el.parentElement?.tagName.toUpperCase();
+          if (parentTag === 'OL') {
+            lines.push(`1. ${cleanInlineStyles(el.innerHTML)}`);
+          } else {
+            lines.push(`- ${cleanInlineStyles(el.innerHTML)}`);
+          }
+        } else if (tagName === 'P' || tagName === 'DIV') {
+          const innerHTML = el.innerHTML;
+          if (innerHTML === '<br>' || innerHTML === '') {
+            lines.push('');
+          } else {
+            const hasBlockChildren = Array.from(el.children).some(child => 
+              ['P', 'DIV', 'H1', 'H2', 'H3', 'H4', 'UL', 'OL', 'LI'].includes(child.tagName.toUpperCase())
+            );
+            if (hasBlockChildren) {
+              Array.from(el.childNodes).forEach(traverse);
+            } else {
+              lines.push(cleanInlineStyles(innerHTML));
+            }
+          }
+        } else if (tagName === 'UL' || tagName === 'OL') {
+          Array.from(el.childNodes).forEach(traverse);
+        } else if (['STRONG', 'B', 'EM', 'I', 'SPAN'].includes(tagName)) {
+          const textVal = cleanInlineStyles(el.outerHTML);
+          if (textVal) lines.push(textVal);
+        } else {
+          const hasBlockChildren = Array.from(el.children).some(child => 
+            ['P', 'DIV', 'H1', 'H2', 'H3', 'H4', 'UL', 'OL', 'LI'].includes(child.tagName.toUpperCase())
+          );
+          if (hasBlockChildren) {
+            Array.from(el.childNodes).forEach(traverse);
+          } else {
+            const textVal = cleanInlineStyles(el.innerHTML);
+            if (textVal) lines.push(textVal);
+          }
+        }
+      } else if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.nodeValue;
+        if (text && text.trim()) {
+          lines.push(text.trim());
+        }
+      }
+    };
+
+    const cleanInlineStyles = (contents: string): string => {
+      let text = contents;
+      text = text.replace(/<strong[^>]*>(.*?)<\/strong>/gi, '**$1**');
+      text = text.replace(/<b[^>]*>(.*?)<\/b>/gi, '**$1**');
+      text = text.replace(/<em[^>]*>(.*?)<\/em>/gi, '*$1*');
+      text = text.replace(/<i[^>]*>(.*?)<\/i>/gi, '*$1*');
+      text = text.replace(/<[^>]*>/g, '');
+      text = text
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>');
+      return text.trim();
+    };
+
+    Array.from(tempDiv.childNodes).forEach(traverse);
+    return lines.join('\n');
+  };
+
+  const updateWysiwygContent = (markdown: string) => {
+    if (wysiwygEditorRef.current) {
+      wysiwygEditorRef.current.innerHTML = markdownToHtml(markdown);
     }
   };
 
@@ -973,75 +1225,173 @@ export default function AdminPage() {
       title: post.title,
       author: post.author,
       imageUrl: post.imageUrl || '',
-      content: post.content
+      content: post.content,
+      authorAvatar: post.authorAvatar || '',
+      authorRole: post.authorRole || '',
+      imageAlt: post.imageAlt || '',
+      metaTitle: post.metaTitle || '',
+      metaDescription: post.metaDescription || '',
+      focusKeywords: post.focusKeywords || '',
+      excerpt: post.excerpt || '',
+      status: post.status || 'Draft',
+      scheduledAt: post.scheduledAt || ''
     });
-    // Scroll smoothly to form
+    
+    setTimeout(() => {
+      updateWysiwygContent(post.content);
+    }, 100);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const insertFormatting = (before: string, after: string = '') => {
-    const textarea = blogTextareaRef.current;
-    if (!textarea) {
-      setNewPost(prev => ({
-        ...prev,
-        content: prev.content + before + after
-      }));
-      return;
+  const executeCommand = (command: string, arg: string = '') => {
+    document.execCommand(command, false, arg);
+    if (wysiwygEditorRef.current) {
+      const mdValue = htmlToMarkdown(wysiwygEditorRef.current.innerHTML);
+      setNewPost(prev => ({ ...prev, content: mdValue }));
+    }
+  };
+
+  const formatBlock = (tag: string) => {
+    let success = false;
+    try {
+      // 1. Try standard upper case tag (e.g., 'H2')
+      success = document.execCommand('formatBlock', false, tag.toUpperCase());
+    } catch (e) {
+      console.warn('formatBlock tag uppercase failed, trying with angle brackets:', e);
     }
 
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const originalText = textarea.value;
-    const selectedText = originalText.substring(start, end);
+    if (!success) {
+      try {
+        // 2. Try angle brackets wrapping (e.g., '<h2>' or '<H2>')
+        success = document.execCommand('formatBlock', false, `<${tag.toUpperCase()}>`);
+      } catch (e) {
+        try {
+          // 3. Try fallback standard lowercase
+          success = document.execCommand('formatBlock', false, tag.toLowerCase());
+        } catch (err) {
+          console.error('All formatBlock techniques failed:', err);
+        }
+      }
+    }
 
-    const replacement = before + (selectedText || '') + after;
-    const newContent = originalText.substring(0, start) + replacement + originalText.substring(end);
-
-    setNewPost(prev => ({ ...prev, content: newContent }));
-
-    // Focus back and set cursor position
-    setTimeout(() => {
-      textarea.focus();
-      const newCursorPos = start + before.length + (selectedText || '').length + after.length;
-      textarea.setSelectionRange(newCursorPos, newCursorPos);
-    }, 50);
+    if (wysiwygEditorRef.current) {
+      const mdValue = htmlToMarkdown(wysiwygEditorRef.current.innerHTML);
+      setNewPost(prev => ({ ...prev, content: mdValue }));
+    }
   };
 
   const insertTemplate = (text: string) => {
-    const textarea = blogTextareaRef.current;
-    if (!textarea) {
-      setNewPost(prev => ({
-        ...prev,
-        content: prev.content ? prev.content + '\n\n' + text : text
-      }));
-      return;
+    const htmlToInsert = markdownToHtml(text);
+    if (wysiwygEditorRef.current) {
+      if (!wysiwygEditorRef.current.innerHTML || wysiwygEditorRef.current.innerHTML === '<p><br></p>') {
+        wysiwygEditorRef.current.innerHTML = htmlToInsert;
+      } else {
+        wysiwygEditorRef.current.innerHTML += '<p><br></p>' + htmlToInsert;
+      }
+      const mdValue = htmlToMarkdown(wysiwygEditorRef.current.innerHTML);
+      setNewPost(prev => ({ ...prev, content: mdValue }));
     }
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const originalText = textarea.value;
-
-    const prefix = originalText && !originalText.endsWith('\n') ? '\n\n' : '';
-    const replacement = prefix + text + '\n\n';
-    const newContent = originalText.substring(0, start) + replacement + originalText.substring(end);
-
-    setNewPost(prev => ({ ...prev, content: newContent }));
-
-    setTimeout(() => {
-      textarea.focus();
-      const newCursorPos = start + replacement.length;
-      textarea.setSelectionRange(newCursorPos, newCursorPos);
-    }, 50);
   };
 
   const cancelEdit = () => {
     setEditingPostId(null);
-    setNewPost({ title: '', author: '', imageUrl: '', content: '' });
+    setNewPost({ 
+      title: '', 
+      author: '', 
+      imageUrl: '', 
+      content: '', 
+      authorAvatar: '', 
+      authorRole: '',
+      imageAlt: '',
+      metaTitle: '',
+      metaDescription: '',
+      focusKeywords: '',
+      excerpt: '',
+      status: 'Draft',
+      scheduledAt: ''
+    });
+    if (wysiwygEditorRef.current) {
+      wysiwygEditorRef.current.innerHTML = '';
+    }
   };
 
-  const publishPost = () => {
+  const parseBoldAndItalic = (text: string) => {
+    const parts = text.split(/(\*\*.*?\*\*|\*.*?\*)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={i} className="font-extrabold text-slate-950">{part.slice(2, -2)}</strong>;
+      }
+      if (part.startsWith('*') && part.endsWith('*')) {
+        return <em key={i} className="text-red-650 font-semibold italic">{part.slice(1, -1)}</em>;
+      }
+      return part;
+    });
+  };
+
+  const renderPreviewBlogContent = (content: string) => {
+    if (!content) return null;
+    return content.split('\n').map((line, index) => {
+      const trimmed = line.trim();
+      if (!trimmed) return <div key={index} className="h-3" />;
+
+      if (trimmed.startsWith('## ')) {
+        return (
+          <h3 key={index} className="text-xl md:text-2xl font-black text-slate-900 mt-6 mb-3 border-b border-gray-100 pb-1.5 font-sans">
+            {trimmed.replace('## ', '')}
+          </h3>
+        );
+      }
+
+      if (trimmed.startsWith('### ')) {
+        return (
+          <h4 key={index} className="text-lg md:text-xl font-extrabold text-slate-800 mt-4 mb-2 font-sans">
+            {trimmed.replace('### ', '')}
+          </h4>
+        );
+      }
+
+      if (trimmed.startsWith('> ')) {
+        return (
+          <blockquote key={index} className="border-l-4 border-[#FF5500] pl-4 italic text-[#002060] my-4 bg-slate-50/80 p-3.5 rounded-r-xl text-left font-sans text-sm md:text-base">
+            {parseBoldAndItalic(trimmed.replace('> ', ''))}
+          </blockquote>
+        );
+      }
+
+      if (trimmed.startsWith('- ')) {
+        return (
+          <li key={index} className="ml-5 list-disc text-slate-705 my-1 pl-1 text-[13px] sm:text-sm leading-relaxed">
+            {parseBoldAndItalic(trimmed.replace('- ', ''))}
+          </li>
+        );
+      }
+
+      if (/^\d+\.\s/.test(trimmed)) {
+        const parts = trimmed.split(/^\d+\.\s/);
+        return (
+          <li key={index} className="ml-5 list-decimal text-slate-705 my-1 pl-1 text-[13px] sm:text-sm leading-relaxed">
+            {parseBoldAndItalic(parts[1] || '')}
+          </li>
+        );
+      }
+
+      return (
+        <p key={index} className="text-slate-600 text-[13px] sm:text-sm leading-relaxed mb-3 text-left font-normal font-sans">
+          {parseBoldAndItalic(line)}
+        </p>
+      );
+    });
+  };
+
+  const publishPost = (statusOverride?: 'Draft' | 'Published' | 'Scheduled') => {
     if (!newPost.title || !newPost.content) {
       showToast('Please fill out the Title and Content fields.', 'error');
+      return;
+    }
+
+    const finalStatus = statusOverride || newPost.status || 'Draft';
+    if (finalStatus === 'Scheduled' && !newPost.scheduledAt) {
+      showToast('Please set an exact future Date & Time for scheduling!', 'error');
       return;
     }
 
@@ -1056,6 +1406,15 @@ export default function AdminPage() {
             author: newPost.author || 'GoDriveify Team',
             imageUrl: finalImageUrl,
             content: newPost.content,
+            authorAvatar: newPost.authorAvatar,
+            authorRole: newPost.authorRole,
+            imageAlt: newPost.imageAlt,
+            metaTitle: newPost.metaTitle,
+            metaDescription: newPost.metaDescription,
+            focusKeywords: newPost.focusKeywords,
+            excerpt: newPost.excerpt,
+            status: finalStatus,
+            scheduledAt: finalStatus === 'Scheduled' ? newPost.scheduledAt : ''
           };
         }
         return p;
@@ -1063,7 +1422,7 @@ export default function AdminPage() {
       setPosts(updatedPosts);
       localStorage.setItem('blogPosts', JSON.stringify(updatedPosts));
       setEditingPostId(null);
-      showToast('Post updated successfully!', 'success');
+      showToast(`Post updated successfully as ${finalStatus === 'Draft' ? 'Draft' : finalStatus}!`, 'success');
     } else {
       const post: BlogPost = {
         title: newPost.title,
@@ -1071,34 +1430,175 @@ export default function AdminPage() {
         imageUrl: finalImageUrl,
         content: newPost.content,
         id: Date.now().toString(),
-        date: new Date().toLocaleDateString()
+        date: new Date().toLocaleDateString(),
+        authorAvatar: newPost.authorAvatar,
+        authorRole: newPost.authorRole,
+        imageAlt: newPost.imageAlt,
+        metaTitle: newPost.metaTitle,
+        metaDescription: newPost.metaDescription,
+        focusKeywords: newPost.focusKeywords,
+        excerpt: newPost.excerpt,
+        status: finalStatus,
+        scheduledAt: finalStatus === 'Scheduled' ? newPost.scheduledAt : ''
       };
       const updatedPosts = [post, ...posts]; // Add new posts at the top
       setPosts(updatedPosts);
       localStorage.setItem('blogPosts', JSON.stringify(updatedPosts));
-      showToast('Post published successfully!', 'success');
+      showToast(`Post saved successfully as ${finalStatus === 'Draft' ? 'Draft' : finalStatus}!`, 'success');
     }
 
-    setNewPost({ title: '', author: '', imageUrl: '', content: '' });
+    // Reset post form
+    setNewPost({ 
+      title: '', 
+      author: '', 
+      imageUrl: '', 
+      content: '', 
+      authorAvatar: '', 
+      authorRole: '',
+      imageAlt: '',
+      metaTitle: '',
+      metaDescription: '',
+      focusKeywords: '',
+      excerpt: '',
+      status: 'Draft',
+      scheduledAt: ''
+    });
+    
+    if (wysiwygEditorRef.current) {
+      wysiwygEditorRef.current.innerHTML = '';
+    }
     if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleAutoGenerateSEO = () => {
+    if (!newPost.content && !newPost.title) {
+      showToast('Please write some content or title first to run AI SEO generation!', 'error');
+      return;
+    }
+
+    // 1. Strip HTML tags from markdown representation
+    const temp = document.createElement('div');
+    temp.innerHTML = markdownToHtml(newPost.content);
+    let plainText = temp.textContent || temp.innerText || '';
+    plainText = plainText.replace(/\n+/g, ' ').replace(/\s+/g, ' ').trim();
+
+    // 2. Generate Excerpt & Meta Description (150-char summary)
+    let excerptText = '';
+    if (plainText) {
+      excerptText = plainText.substring(0, 150).trim();
+      if (plainText.length > 150) {
+        excerptText += '...';
+      }
+    } else {
+      excerptText = (newPost.title ? `Read our ultimate guide about ${newPost.title} for Pakistani drivers.` : '');
+    }
+
+    // 3. Generate Focus Keywords
+    // Grab words, filter out stop words, count frequencies
+    const words = plainText
+      .toLowerCase()
+      .replace(/[^\w\s\u0600-\u06FF]/g, '') // Keep English & Arabic/Urdu unicode chars
+      .split(/\s+/);
+
+    const stopWords = new Set([
+      'the', 'is', 'at', 'which', 'on', 'and', 'a', 'an', 'to', 'in', 'of', 'for', 'with', 'this', 'our', 'your', 'we', 'you', 'are', 'be', 'that', 'from', 'by', 'as', 'it', 'or', 'has', 'have',
+      'کا', 'کی', 'کے', 'سے', 'کو', 'میں', 'پر', 'اور', 'ہے', 'ہیں', 'تھا', 'تھی', 'تھے', 'گا', 'گی', 'گے', 'نہ', 'سب', 'یہ', 'وہ'
+    ]);
+
+    const keywordCounts: Record<string, number> = {};
+    words.forEach(w => {
+      if (w.length > 3 && !stopWords.has(w)) {
+        keywordCounts[w] = (keywordCounts[w] || 0) + 1;
+      }
+    });
+
+    const sortedKeywords = Object.keys(keywordCounts).sort((a, b) => keywordCounts[b] - keywordCounts[a]);
+    const focusKeywords = sortedKeywords.slice(0, 5).join(', ');
+
+    // 4. Generate Meta Title
+    let metaTitleText = '';
+    if (newPost.title) {
+      const suffix = ' | GoDriveify';
+      if (newPost.title.length + suffix.length <= 60) {
+        metaTitleText = newPost.title + suffix;
+      } else {
+        metaTitleText = newPost.title.substring(0, 60 - suffix.length) + suffix;
+      }
+    }
+
+    setNewPost(prev => ({
+      ...prev,
+      excerpt: excerptText,
+      metaTitle: metaTitleText,
+      metaDescription: excerptText.substring(0, 150),
+      focusKeywords: focusKeywords
+    }));
+
+    showToast('AI Metadata & SEO tags generated instantly!', 'success');
+  };
+
+  // Blog Editor Operations
+  const handleAddNewEditor = () => {
+    if (!newEditor.name.trim() || !newEditor.role.trim()) {
+      showToast('Please type both Editor Name and Role Designation!', 'error');
+      return;
+    }
+
+    const finalEmail = newEditor.email.trim() || `${newEditor.name.toLowerCase().replace(/\s+/g, '')}@godriveify.com`;
+    const finalAvatar = newEditor.avatar.trim() || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=120';
+
+    const createdEditor: BlogEditor = {
+      id: `editor-${Date.now()}`,
+      name: newEditor.name,
+      role: newEditor.role,
+      avatar: finalAvatar,
+      email: finalEmail,
+      status: newEditor.status || 'Active'
+    };
+
+    const updated = [...blogEditors, createdEditor];
+    setBlogEditors(updated);
+    localStorage.setItem('blog_editors', JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent('blog_editors_updated', { detail: updated }));
+    
+    // reset state
+    setNewEditor({ name: '', role: '', avatar: '', email: '', status: 'Active' });
+    setIsAddingEditor(false);
+    showToast(`Verification credential saved! Active roster: ${createdEditor.name}`, 'success');
+  };
+
+  const handleToggleEditorStatus = (id: string) => {
+    const updated = blogEditors.map(editor => {
+      if (editor.id === id) {
+        const nextStatus = editor.status === 'Active' ? 'Inactive' : 'Active';
+        showToast(`${editor.name} is now ${nextStatus}`, 'info');
+        return { ...editor, status: nextStatus };
+      }
+      return editor;
+    });
+    setBlogEditors(updated);
+    localStorage.setItem('blog_editors', JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent('blog_editors_updated', { detail: updated }));
+  };
+
+  const handleDeleteEditor = (id: string, name: string) => {
+    if (window.confirm(`Are you sure you want to permanently remove registered editor ${name}?`)) {
+      const updated = blogEditors.filter(e => e.id !== id);
+      setBlogEditors(updated);
+      localStorage.setItem('blog_editors', JSON.stringify(updated));
+      window.dispatchEvent(new CustomEvent('blog_editors_updated', { detail: updated }));
+      showToast(`Removed editor: ${name}`, 'info');
+    }
   };
 
   const deletePost = (id: string) => {
     if (window.confirm('Are you sure you want to delete this blog post?')) {
-      const savedPosts = localStorage.getItem('blogPosts');
-      if (savedPosts) {
-        try {
-          const parsed = JSON.parse(savedPosts);
-          if (Array.isArray(parsed)) {
-            const updatedPosts = parsed.filter(p => String(p.id) !== String(id));
-            setPosts(updatedPosts);
-            localStorage.setItem('blogPosts', JSON.stringify(updatedPosts));
-            showToast('Blog post deleted successfully.', 'info');
-            if (editingPostId === id) {
-              cancelEdit();
-            }
-          }
-        } catch (e) {}
+      const updatedPosts = posts.filter(p => String(p.id) !== String(id));
+      setPosts(updatedPosts);
+      localStorage.setItem('blogPosts', JSON.stringify(updatedPosts));
+      showToast('Blog post deleted successfully.', 'info');
+      if (editingPostId === id) {
+        cancelEdit();
       }
     }
   };
@@ -1709,312 +2209,393 @@ export default function AdminPage() {
         )}
 
         {activeTab === 'blogs' && (
-          <div className="grid lg:grid-cols-12 gap-8">
-            {/* Post Form (Create or Edit) */}
-            <div className="lg:col-span-7 space-y-6">
-              <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm transition">
-                <div className="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
-                  <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                    {editingPostId ? (
-                      <>
-                        <Edit className="w-6 h-6 text-yellow-500" />
-                        Edit Blog Post
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="w-6 h-6 text-red-600" />
-                        Create New Post
-                      </>
-                    )}
-                  </h2>
-                  {editingPostId && (
+          <div className="space-y-8 animate-fade-in">
+            {/* Upper Stats bar */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-[#002060] p-5 rounded-2xl text-white shadow-md border border-[#002060]/20 flex items-center justify-between">
+                <div>
+                  <p className="text-white/70 text-xs font-bold uppercase tracking-wider">Total Articles Published</p>
+                  <p className="text-3xl font-black mt-1">{posts.length}</p>
+                </div>
+                <div className="p-3 bg-white/10 rounded-xl">
+                  <BookOpen className="w-6 h-6 text-[#FF5500]" />
+                </div>
+              </div>
+              <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between">
+                <div>
+                  <p className="text-gray-500 text-xs font-bold uppercase tracking-wider">Active Blog Editors</p>
+                  <p className="text-3xl font-black text-[#002060] mt-1">
+                    {blogEditors?.filter(e => e.status === 'Active').length || 0}
+                  </p>
+                </div>
+                <div className="p-3 bg-emerald-50 rounded-xl text-emerald-600 font-sans">
+                  <Sliders className="w-6 h-6" />
+                </div>
+              </div>
+              <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between">
+                <div>
+                  <p className="text-gray-500 text-xs font-bold uppercase tracking-wider">Estimated Monthly Reach</p>
+                  <p className="text-3xl font-black text-gray-900 mt-1">
+                    {posts.length * 142 + 24} <span className="text-xs text-emerald-600 font-bold font-sans">+12%</span>
+                  </p>
+                </div>
+                <div className="p-3 bg-red-50 rounded-xl text-red-600">
+                  <Sparkles className="w-6 h-6" />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid lg:grid-cols-12 gap-8 items-start">
+              {/* Left Column: Advanced Workspace (Post Form) with Nested Sidebar Configs */}
+              <div className="lg:col-span-8 space-y-6">
+                
+                {/* Editing Notification Banner */}
+                {editingPostId && (
+                  <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4 flex items-center justify-between shadow-sm animate-fade-in text-left">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 bg-amber-500/15 text-amber-600 rounded-xl shrink-0">
+                        <Edit className="w-5 h-5 animate-pulse" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-extrabold uppercase tracking-widest text-amber-800 font-sans">Active Editing Session</p>
+                        <p className="text-xs font-bold text-slate-800 truncate font-sans">Modifying: "{newPost.title || 'Untitled Post'}"</p>
+                      </div>
+                    </div>
                     <button 
                       onClick={cancelEdit} 
-                      className="text-sm font-bold text-red-500 hover:text-red-700 bg-red-50 px-3 py-1.5 rounded-lg flex items-center gap-1 transition"
+                      className="text-[11px] font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-200 px-3 py-1.5 rounded-xl transition cursor-pointer flex items-center gap-1 shrink-0 font-sans ml-3"
                     >
-                      <X className="w-4 h-4" /> Cancel Edit
+                      <X className="w-3.5 h-3.5" /> Discard
                     </button>
-                  )}
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">Blog Title *</label>
-                    <input 
-                      className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition" 
-                      placeholder="Enter an catchy title..." 
-                      value={newPost.title} 
-                      onChange={e => setNewPost({...newPost, title: e.target.value})} 
-                    />
                   </div>
+                )}
 
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-1">Author Name</label>
-                      <input 
-                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition" 
-                        placeholder="e.g. GoDriveify Instructor" 
-                        value={newPost.author} 
-                        onChange={e => setNewPost({...newPost, author: e.target.value})} 
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-1">Cover Image Source</label>
-                      <input 
-                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition text-xs" 
-                        placeholder="Or enter custom URL instead of upload" 
-                        value={newPost.imageUrl} 
-                        onChange={e => setNewPost({...newPost, imageUrl: e.target.value})} 
-                      />
-                    </div>
-                  </div>
-
-                  {/* Cover Image uploader & Preset Gallery */}
-                  <div className="bg-gray-50 p-4 rounded-xl border border-dashed border-gray-300 space-y-4">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                      <div>
-                        <h4 className="font-bold text-sm text-gray-800 flex items-center gap-1.5">
-                          <ImageIcon className="w-4 h-4 text-gray-500" /> Choose Cover Image
-                        </h4>
-                        <p className="text-xs text-gray-500">Select a high-quality driving image or upload yours</p>
-                      </div>
-                      <div>
-                        <label className="inline-flex items-center gap-1.5 bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-3.5 py-2 rounded-lg cursor-pointer text-xs font-bold transition">
-                          <Upload className="w-3.5 h-3.5 text-gray-500" />
-                          Upload Device Image
-                          <input 
-                            type="file" 
-                            ref={fileInputRef} 
-                            accept="image/*" 
-                            className="hidden" 
-                            onChange={handleImageUpload} 
-                          />
-                        </label>
-                      </div>
+                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                  {/* Editor Top Bar Header */}
+                  <div className="bg-slate-50 px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="text-left">
+                      <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                        {editingPostId ? (
+                          <>
+                            <span className="p-1.5 bg-yellow-500/10 text-yellow-600 rounded-lg">
+                              <Edit className="w-5 h-5" />
+                            </span>
+                            Edit Academy Post
+                          </>
+                        ) : (
+                          <>
+                            <span className="p-1.5 bg-[#FF5500]/10 text-[#FF5500] rounded-lg">
+                              <Plus className="w-5 h-5" />
+                            </span>
+                            Create New Article
+                          </>
+                        )}
+                      </h2>
+                      <p className="text-xs text-gray-500 mt-1 font-medium font-sans">Draft guidelines, driver safety tutorials, and license instructions</p>
                     </div>
 
-                    {/* Preset Grid */}
-                    <div>
-                      <p className="text-xs text-gray-500 font-bold mb-2">Preset High-Quality Library:</p>
-                      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                        {PRESET_IMAGES.map((img, i) => {
-                          const isSelected = newPost.imageUrl === img.url;
-                          return (
-                            <button
-                              key={i}
-                              type="button"
-                              title={img.label}
-                              onClick={() => setNewPost(prev => ({ ...prev, imageUrl: img.url }))}
-                              className={`relative aspect-video rounded-lg overflow-hidden border-2 transition-all ${
-                                isSelected ? 'border-red-600 scale-95 ring-2 ring-red-100' : 'border-transparent hover:border-gray-400'
-                              }`}
-                            >
-                              <img src={img.url} alt={img.label} className="w-full h-full object-cover" />
-                              {isSelected && (
-                                <div className="absolute inset-0 bg-red-600/20 flex items-center justify-center">
-                                  <span className="bg-red-600 text-white rounded-full p-0.5">
-                                    <Check className="w-3 h-3" />
-                                  </span>
-                                </div>
-                              )}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* Small Live Preview */}
-                    {newPost.imageUrl && (
-                      <div className="flex items-center gap-3 bg-white p-2.5 rounded-lg border border-gray-200">
-                        <img src={newPost.imageUrl} alt="Preview" className="w-16 h-10 object-cover rounded-md" />
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs font-bold text-gray-800 truncate">Selected Image Preview</p>
-                          <p className="text-[10px] text-gray-500 truncate">{newPost.imageUrl}</p>
-                        </div>
-                        <button 
-                          type="button" 
-                          onClick={() => setNewPost(prev => ({ ...prev, imageUrl: '' }))} 
-                          className="text-gray-400 hover:text-red-500 p-1 rounded-full hover:bg-gray-100 transition"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
+                    {editingPostId && (
+                      <button 
+                        onClick={cancelEdit} 
+                        className="text-xs font-bold text-red-650 hover:text-white hover:bg-red-655 bg-red-50 border border-red-200 px-3 py-1.5 rounded-lg flex items-center gap-1 transition cursor-pointer"
+                      >
+                        <X className="w-3.5 h-3.5" /> Stop Editing
+                      </button>
                     )}
                   </div>
 
-                  <div>
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
-                      <label className="block text-sm font-bold text-gray-700">
-                        Blog Content / بلاگ کا مواد *
-                      </label>
-                      <span className="text-xs text-gray-500 font-medium bg-gray-100 px-2.5 py-1 rounded-full flex items-center gap-1">
-                        <Sparkles className="w-3.5 h-3.5 text-red-600" />
-                        Tip: Use the helper buttons below to easily build paragraphs
-                      </span>
-                    </div>
-
-                    {/* Rich Paragraph Formatting Toolbar */}
-                    <div className="bg-gray-50 border border-gray-300 border-b-0 rounded-t-xl p-2 sm:p-3 flex flex-wrap gap-2 items-center">
-                      <div className="flex flex-wrap gap-1.5 border-r border-gray-200 pr-2">
-                        <button
-                          type="button"
-                          onClick={() => insertFormatting('**', '**')}
-                          title="Make selected text bold / الفاظ موٹا کریں"
-                          className="p-2 text-gray-700 bg-white hover:bg-red-50 hover:text-red-600 rounded-md border border-gray-200 transition focus:outline-none flex items-center justify-center gap-1"
-                        >
-                          <Bold className="w-4 h-4" />
-                          <span className="text-[10px] sm:text-xs font-bold font-sans">Bold</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => insertFormatting('*', '*')}
-                          title="Make selected text italic / الفاظ ترچھا کریں"
-                          className="p-2 text-gray-700 bg-white hover:bg-red-50 hover:text-red-600 rounded-md border border-gray-200 transition focus:outline-none flex items-center justify-center gap-1"
-                        >
-                          <Italic className="w-4 h-4" />
-                          <span className="text-[10px] sm:text-xs font-bold font-sans">Italic</span>
-                        </button>
+                  <div className="p-6 space-y-6">
+                    {/* Header: Title and Cover Zone */}
+                    <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+                      {/* Title Input */}
+                      <div className="text-left">
+                        <label className="block text-xs font-bold uppercase tracking-wider text-gray-650 mb-1.5 font-sans">Article Title *</label>
+                        <input 
+                          type="text"
+                          className="w-full border border-gray-300 px-4 py-3 rounded-xl focus:ring-2 focus:ring-[#FF5500] focus:border-[#FF5500] outline-none transition font-sans text-base text-gray-900 placeholder:text-gray-400 font-semibold shadow-sm" 
+                          placeholder="e.g. 5 Critical Road Signals Every Pakistani Driver Must Understand ..." 
+                          value={newPost.title} 
+                          onChange={e => setNewPost({...newPost, title: e.target.value})} 
+                        />
                       </div>
 
-                      <div className="flex flex-wrap gap-1.5 border-r border-gray-200 pr-2">
-                        <button
-                          type="button"
-                          onClick={() => insertFormatting('\n## ', '\n')}
-                          title="Insert big title / بڑی سرخی"
-                          className="px-2.5 py-2 text-gray-700 bg-white hover:bg-red-50 hover:text-red-600 rounded-md border border-gray-200 transition focus:outline-none text-[10px] sm:text-xs font-black font-sans"
-                        >
-                          H1 (Heading)
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => insertFormatting('\n### ', '\n')}
-                          title="Insert sub-title / چھوٹی سرخی"
-                          className="px-2.5 py-2 text-gray-700 bg-white hover:bg-red-50 hover:text-red-600 rounded-md border border-gray-200 transition focus:outline-none text-[10px] sm:text-xs font-bold font-sans"
-                        >
-                          H2 (Sub)
-                        </button>
-                      </div>
-
-                      <div className="flex flex-wrap gap-1.5 border-r border-gray-200 pr-2">
-                        <button
-                          type="button"
-                          onClick={() => insertFormatting('\n\n')}
-                          title="Insert clean paragraph space / نیا پیراگراف"
-                          className="px-2.5 py-2 text-gray-700 bg-white hover:bg-red-50 hover:text-red-600 rounded-md border border-gray-200 transition focus:outline-none text-[10px] sm:text-xs font-bold font-sans flex items-center gap-1"
-                        >
-                          <span className="text-red-600">&para;</span> New Paragraph / نیا پیراگراف
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => insertFormatting('\n- ')}
-                          title="Insert bullet item / فہرست"
-                          className="p-2 text-gray-700 bg-white hover:bg-red-50 hover:text-red-600 rounded-md border border-gray-200 transition focus:outline-none flex items-center justify-center"
-                        >
-                          <List className="w-4 h-4" />
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => insertFormatting('\n1. ')}
-                          title="Insert numbered item / فہرست"
-                          className="p-2 text-gray-700 bg-white hover:bg-red-50 hover:text-red-600 rounded-md border border-gray-200 transition focus:outline-none flex items-center justify-center"
-                        >
-                          <ListOrdered className="w-4 h-4" />
-                        </button>
-                      </div>
-
-                      {/* Instant templates generator */}
-                      <div className="flex flex-wrap gap-1.5 items-center">
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider pl-1">Insert Premium Templates:</span>
+                      {/* Drag & Drop Main Cover Zone */}
+                      <div className="text-left">
+                        <label className="block text-xs font-bold uppercase tracking-wider text-gray-650 mb-1.5 font-sans">Feature Cover Image *</label>
                         
-                        <button
-                          type="button"
-                          onClick={() => insertTemplate(`## 🚗 اہم حفاظتی تدابیر (Important Safety Guidelines)\nڈرائیونگ شروع کرنے سے پہلے درج ذیل اصولوں پر عمل کریں تاکہ آپ کا سفر ہمیشہ محفوظ رہے:\n- سیٹ بیلٹ کا استعمال لازمی بنائیں۔\n- شیشوں (Mirrors) کو اپنی سیٹ کے مطابق ایڈجسٹ کریں۔\n- گاڑی کے انجن آئل، پانی اور ٹائر پریشر کو باقاعدگی سے چیک کریں۔`)}
-                          className="px-2 py-1 text-[11px] font-semibold text-red-700 bg-red-50 hover:bg-red-100 rounded-full transition focus:outline-none"
-                        >
-                          + 🚗 Safety Tips
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => insertTemplate(`## 🚦 ٹریفک اشارے اور قانون کی پاسداری (Traffic Signals Guide)\nروڈ پر ڈرائیونگ محفوظ بنانے کے لیے اشاروں کی پاسداری ضروری ہے:\n- *سرخ لائٹ (Red light)*: گاڑی کو مکمل طور پر روکیں۔\n- *پیلی لائٹ (Yellow light)*: رکنے کے لیے تیار ہو جائیں۔\n- *سبز لائٹ (Green light)*: احتیاط کے ساتھ آگے بڑھیں۔\n- اوور ٹیکنگ (Overtaking) صرف دائیں طرف سے کریں۔`)}
-                          className="px-2 py-1 text-[11px] font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-full transition focus:outline-none"
-                        >
-                          + 🚦 Signs Guide
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => insertTemplate(`## 💡 فیصل آباد میں ڈرائیونگ کے دوران احتیاط (Faisalabad Route Safety)\nفیصل آباد کی مصروف ترین سڑکوں جیسے کینال روڈ اور جڑانوالہ روڈ پر ان باتوں کا خاص خیال رکھیں:\n1. موٹر سائیکل سواروں اور رکشوں سے ہمیشہ مناسب فاصلہ رکھیں۔\n2. ٹرننگ اشارہ (Indicator) موڑ کاٹنے سے کم از کم 50 میٹر پہلے آن کریں۔\n3. ہمیشہ بائیں لین (Left lane) میں دھیمی اور محفوظ رفتار سے گاڑی چلائیں۔`)}
-                          className="px-2 py-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-full transition focus:outline-none"
-                        >
-                          + 💡 Fsd Driving Tip
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => insertTemplate(`## 🎓 نتیجہ اور اگلا قدم (Conclusion & Invitation)\nاگر آپ بھی ایک پراعتماد اور محفوظ ڈرائیور بننا چاہتے ہیں، تو آج ہی ہمارے ایڈوانسڈ کورسز میں داخلہ لیں اور ماہر انسٹرکٹرز کی خدمات حاصل کریں!`)}
-                          className="px-2 py-1 text-[11px] font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-full transition focus:outline-none"
-                        >
-                          + 🎓 Intro/Outro
-                        </button>
+                        {newPost.imageUrl ? (
+                          <div className="relative rounded-xl overflow-hidden border border-gray-200 group bg-slate-50 transition shadow-inner">
+                            <img src={newPost.imageUrl} alt={newPost.imageAlt || "Cover image preview"} className="w-full h-44 md:h-56 object-cover" />
+                            <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center gap-3">
+                              <button
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                className="px-4 py-2 bg-white hover:bg-slate-100 text-[#002060] text-xs font-black rounded-lg transition-all flex items-center gap-1 cursor-pointer"
+                              >
+                                <Upload className="w-3.5 h-3.5" />
+                                Replace
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setNewPost(prev => ({ ...prev, imageUrl: '', imageAlt: '' }))}
+                                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-black rounded-lg transition-all flex items-center gap-1 cursor-pointer"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                Remove
+                              </button>
+                            </div>
+                            <div className="absolute top-3 left-3 bg-[#002060]/95 backdrop-blur text-white text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-md">
+                              Main Feature Cover
+                            </div>
+                          </div>
+                        ) : (
+                          <div 
+                            onDragOver={handleDragOver}
+                            onDragLeave={handleDragLeave}
+                            onDrop={handleDrop}
+                            onClick={() => fileInputRef.current?.click()}
+                            className={`relative h-44 border-2 border-dashed rounded-xl flex flex-col items-center justify-center text-center p-6 cursor-pointer transition-all duration-200 ${
+                              isDragging 
+                                ? 'border-[#FF5500] bg-orange-50/20 shadow-lg scale-[0.99] ring-4 ring-orange-100' 
+                                : 'border-slate-300 hover:border-[#FF5500] bg-slate-50/50 hover:bg-white hover:shadow-sm'
+                            }`}
+                          >
+                            <input 
+                              type="file" 
+                              ref={fileInputRef} 
+                              accept="image/*" 
+                              className="hidden" 
+                              onChange={handleImageUpload} 
+                            />
+                            <div className="p-3 bg-white hover:bg-slate-50 border border-slate-200 shadow-sm text-slate-500 rounded-xl mb-3 transition-transform">
+                              <Upload className="w-6 h-6 text-slate-400" />
+                            </div>
+                            <p className="text-xs font-bold text-slate-700 font-sans">
+                              Drag &amp; drop post cover imagery here, or <span className="text-[#FF5500]">browse device</span>
+                            </p>
+                          </div>
+                        )}
+                        
+                        <div className="mt-3 text-left">
+                          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wide font-sans mb-1 block">Image Alt Text (SEO)</label>
+                          <input 
+                            type="text"
+                            className="w-full bg-slate-50 border border-gray-200 px-3.5 py-2 rounded-xl focus:ring-1 focus:ring-[#FF5500] focus:border-[#FF5500] outline-none text-xs text-slate-800 placeholder:text-gray-400 font-sans shadow-inner" 
+                            placeholder="Describe this image for screen readers ..." 
+                            value={newPost.imageAlt || ''} 
+                            onChange={e => setNewPost({...newPost, imageAlt: e.target.value})} 
+                          />
+                        </div>
                       </div>
                     </div>
 
-                    <textarea 
-                      ref={blogTextareaRef}
-                      className="w-full border border-gray-300 p-4 rounded-b-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition h-72 font-sans text-sm leading-relaxed" 
-                      placeholder="Write the driving tips, guidelines, or instruction articles here... (Use double spacing/paragraphs to format nice clean readable text)" 
-                      value={newPost.content} 
-                      onChange={e => setNewPost({...newPost, content: e.target.value})} 
-                    />
+                    {/* WYSIWYG Workspace Container */}
+                    <div>
+                      <div className="flex items-center justify-between border-b border-gray-200 pb-2 mb-4">
+                        <div className="flex gap-1.5 font-sans">
+                          <button
+                            type="button"
+                            onClick={() => setEditorWorkspaceTab('write')}
+                            className={`px-4 py-2 rounded-lg font-bold text-xs tracking-wide uppercase transition-all flex items-center gap-1.5 cursor-pointer ${
+                              editorWorkspaceTab === 'write'
+                                ? 'bg-[#002060] text-white shadow-sm font-black'
+                                : 'bg-slate-100 text-gray-600 hover:bg-slate-200'
+                            }`}
+                          >
+                            <Edit className="w-3.5 h-3.5" />
+                            Write Content
+                          </button>
 
-                    {/* Real-time Content Statistics & Formatting Checker */}
-                    <div className="bg-gray-50 border border-gray-200 border-t-0 -mt-1.5 rounded-b-lg p-2.5 flex items-center justify-between text-xs text-gray-500">
-                      <div className="flex gap-4">
-                        <span>Characters: <strong>{newPost.content.length}</strong></span>
-                        <span>Words: <strong>{newPost.content.trim() ? newPost.content.trim().split(/\s+/).length : 0}</strong></span>
-                        <span>Paragraphs: <strong>{newPost.content.split(/\n\n+/).filter(Boolean).length}</strong></span>
+                          <button
+                            type="button"
+                            onClick={() => setEditorWorkspaceTab('preview')}
+                            className={`px-4 py-2 rounded-lg font-bold text-xs tracking-wide uppercase transition-all flex items-center gap-1.5 cursor-pointer ${
+                              editorWorkspaceTab === 'preview'
+                                ? 'bg-[#FF5500] text-white shadow-sm font-black'
+                                : 'bg-slate-100 text-gray-600 hover:bg-slate-200'
+                            }`}
+                          >
+                            <Globe className="w-3.5 h-3.5" />
+                            Live Preview
+                          </button>
+                        </div>
+                        <span className="hidden sm:inline-flex text-[11px] text-slate-400 font-extrabold uppercase tracking-widest font-sans">
+                          WYSIWYG Workspace
+                        </span>
                       </div>
-                      
-                      {/* Interactive Advice feedback */}
-                      <div>
-                        {newPost.content.length > 50 && !newPost.content.includes('\n\n') ? (
-                          <span className="text-yellow-600 font-semibold animate-pulse flex items-center gap-1">
-                            ⚠️ Tip: Break text into paragraphs using "New Paragraph" button or Double Enter!
-                          </span>
-                        ) : newPost.content.length > 100 ? (
-                          <span className="text-emerald-600 font-semibold flex items-center gap-1">
-                            ✓ Nicely formatted with paragraphs!
-                          </span>
-                        ) : null}
-                      </div>
+
+                      {editorWorkspaceTab === 'write' ? (
+                        <div className="space-y-2 font-sans">
+                          {/* Formatting Toolbar */}
+                          <div className="bg-slate-50 border border-b-0 border-gray-300 rounded-t-2xl p-2.5 flex flex-wrap gap-2 items-center">
+                            <div className="flex gap-1 pr-2 border-r border-gray-200">
+                              <button
+                                type="button"
+                                onMouseDown={(e) => { e.preventDefault(); executeCommand('bold'); }}
+                                className="p-2 bg-white hover:bg-slate-100 border border-gray-200 rounded-lg transition-all cursor-pointer"
+                              >
+                                <Bold className="w-4 h-4 text-slate-700" />
+                              </button>
+                              <button
+                                type="button"
+                                onMouseDown={(e) => { e.preventDefault(); executeCommand('italic'); }}
+                                className="p-2 bg-white hover:bg-slate-100 border border-gray-200 rounded-lg transition-all cursor-pointer"
+                              >
+                                <Italic className="w-4 h-4 text-slate-700" />
+                              </button>
+                            </div>
+
+                            <button
+                              type="button"
+                              onMouseDown={(e) => { e.preventDefault(); formatBlock('h2'); }}
+                              className="px-3 py-2 bg-white hover:bg-[#002060] hover:text-white border border-gray-200 text-[11px] font-black rounded-lg transition-all cursor-pointer"
+                            >
+                              H2
+                            </button>
+
+                            <button
+                              type="button"
+                              onMouseDown={(e) => { e.preventDefault(); insertTemplate('> “ٹائپ کیجئے اپنی اہم بات...”'); }}
+                              className="px-3 py-2 bg-white hover:bg-slate-100 border border-gray-200 text-[10px] font-extrabold rounded-lg flex items-center gap-1 transition-all cursor-pointer"
+                            >
+                              <span className="text-[#FF5500] font-black text-xs">“</span> Blockquote
+                            </button>
+
+                            <div className="flex flex-wrap gap-1.5 items-center pl-1 border-l border-gray-200 ml-1">
+                              <button
+                                type="button"
+                                onClick={() => insertTemplate(`## 🚗 اہم حفاظتی تدابیر\n- سیٹ بیلٹ کا استعمال لازمی بنائیں۔\n- شیشوں کو اپنی سیٹ کے مطابق ایڈجسٹ کریں۔`)}
+                                className="px-2 py-1 text-[9px] font-black text-red-700 bg-red-50 hover:bg-red-100 rounded-lg uppercase tracking-wide cursor-pointer"
+                              >
+                                + Safety Template
+                              </button>
+                            </div>
+                          </div>
+
+                          <div
+                            ref={wysiwygEditorRef}
+                            contentEditable
+                            className="w-full border border-gray-300 p-4 rounded-b-2xl focus:ring-2 focus:ring-[#FF5500] focus:border-[#FF5500] outline-none transition min-h-[380px] max-h-[600px] overflow-y-auto font-sans text-sm leading-relaxed bg-white text-gray-900 prose prose-slate max-w-none wysiwyg-editor text-left"
+                            onInput={(e) => {
+                              const htmlValue = e.currentTarget.innerHTML;
+                              const mdValue = htmlToMarkdown(htmlValue);
+                              setNewPost(prev => ({ ...prev, content: mdValue }));
+                            }}
+                            style={{ outline: 'none' }}
+                          />
+                        </div>
+                      ) : (
+                        <div className="border border-gray-200 rounded-2xl p-6 bg-white min-h-[400px] max-h-[600px] overflow-y-auto font-sans text-left">
+                          <h1 className="text-2xl font-black text-slate-900 mb-4">{newPost.title || 'Untitled Post'}</h1>
+                          {newPost.imageUrl && (
+                            <img src={newPost.imageUrl} alt="" className="w-full h-48 object-cover rounded-xl mb-6 shadow-sm" />
+                          )}
+                          <div className="prose prose-slate max-w-none">
+                            {renderPreviewBlogContent(newPost.content)}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
+                </div>
+              </div>
 
-                  <div className="pt-2">
+              {/* Right Column: SEO Assistant & Scheduling */}
+              <div className="lg:col-span-4 space-y-6">
+                {/* AI SEO Assistant */}
+                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden text-left">
+                  <div className="bg-slate-900 px-5 py-4 border-b border-slate-800 flex items-center justify-between">
+                    <h3 className="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-[#FF5500]" /> AI SEO ASSISTANT
+                    </h3>
                     <button 
-                      onClick={publishPost} 
-                      className={`w-full text-white py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow ${
-                        editingPostId 
-                          ? 'bg-yellow-500 hover:bg-yellow-600' 
-                          : 'bg-red-600 hover:bg-red-700'
+                      onClick={handleAutoGenerateSEO}
+                      className="p-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all cursor-pointer"
+                      title="Run AI Autogen"
+                    >
+                      <Zap className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <div className="p-5 space-y-4">
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">Meta Title</label>
+                      <input 
+                        type="text" 
+                        className="w-full bg-slate-50 border border-slate-200 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 focus:ring-1 focus:ring-[#FF5500] outline-none"
+                        placeholder="Optimized title tag..."
+                        value={newPost.metaTitle || ''}
+                        onChange={e => setNewPost({...newPost, metaTitle: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">Focus Keywords</label>
+                      <input 
+                        type="text" 
+                        className="w-full bg-slate-50 border border-slate-200 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 focus:ring-1 focus:ring-[#FF5500] outline-none"
+                        placeholder="driving-school, faisalabad, safety..."
+                        value={newPost.focusKeywords || ''}
+                        onChange={e => setNewPost({...newPost, focusKeywords: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">Meta Description / Excerpt</label>
+                      <textarea 
+                        className="w-full bg-slate-50 border border-slate-200 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 focus:ring-1 focus:ring-[#FF5500] outline-none min-h-[80px] resize-none"
+                        placeholder="Brief summary for Google results..."
+                        value={newPost.metaDescription || ''}
+                        onChange={e => setNewPost({...newPost, metaDescription: e.target.value})}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Scheduling & Publish Flow */}
+                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden text-left">
+                  <div className="bg-slate-50 px-5 py-4 border-b border-gray-200">
+                    <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-[#FF5500]" /> Scheduling
+                    </h3>
+                  </div>
+                  <div className="p-5 space-y-4">
+                    <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                      <input 
+                        type="datetime-local" 
+                        className="w-full bg-transparent text-xs font-bold text-slate-800 outline-none"
+                        value={newPost.scheduledAt || ''}
+                        onChange={e => {
+                          setNewPost(prev => ({ ...prev, scheduledAt: e.target.value, status: e.target.value ? 'Scheduled' : 'Draft' }));
+                        }}
+                      />
+                    </div>
+                    <button 
+                      onClick={() => publishPost(newPost.scheduledAt ? 'Scheduled' : 'Published')}
+                      className={`w-full py-4 rounded-2xl font-black text-sm transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
+                        editingPostId ? 'bg-yellow-500 hover:bg-yellow-600 text-white' : 'bg-[#002060] hover:bg-slate-900 text-white'
                       }`}
                     >
                       {editingPostId ? (
-                        <>
-                          <Save className="w-5 h-5" />
-                          Update Post Changes
-                        </>
+                        <><Save className="w-4 h-4" /> Save Changes</>
                       ) : (
-                        <>
-                          <Plus className="w-5 h-5" />
-                          Publish Blog Post
-                        </>
+                        newPost.scheduledAt ? (
+                          <><Clock className="w-4 h-4" /> Schedule Post</>
+                        ) : (
+                          <><Globe className="w-4 h-4" /> Publish Now</>
+                        )
                       )}
+                    </button>
+                    {editingPostId && (
+                      <button 
+                        onClick={cancelEdit}
+                        className="w-full py-3.5 rounded-2xl bg-gray-100 border border-gray-200 text-gray-600 font-bold text-xs hover:bg-gray-200 transition-all cursor-pointer"
+                      >
+                        Cancel Editing
+                      </button>
+                    )}
+                    <button 
+                      onClick={() => publishPost('Draft')}
+                      className="w-full py-3.5 rounded-2xl bg-white border border-slate-300 text-slate-500 font-bold text-xs hover:bg-slate-50 transition-all cursor-pointer"
+                    >
+                      Save as Draft
                     </button>
                   </div>
                 </div>
@@ -2022,56 +2603,70 @@ export default function AdminPage() {
             </div>
 
             {/* Manage / List Existing Posts */}
-            <div className="lg:col-span-5">
-              <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm h-full flex flex-col">
-                <div className="mb-6 border-b border-gray-100 pb-4">
-                  <h2 className="text-2xl font-bold text-gray-900">Manage Posts ({posts.length})</h2>
-                  <p className="text-xs text-gray-500 mt-1">Select any post below to edit or permanently delete.</p>
+            <div className="lg:col-span-12 space-y-8 mt-12 pt-12 border-t border-gray-200">
+              {/* Manage Posts List */}
+              <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col min-h-[400px]">
+                <div className="mb-4 border-b border-gray-100 pb-3 flex items-center justify-between">
+                  <div>
+                    <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                      <BookOpen className="w-5 h-5 text-[#002060]" />
+                      Manage Posts ({posts.length})
+                    </h2>
+                    <p className="text-xs text-gray-400 font-sans mt-0.5">Select posts to live edit or permanently delete.</p>
+                  </div>
                 </div>
 
                 {posts.length === 0 ? (
-                  <div className="text-center py-16 flex-grow flex flex-col justify-center items-center bg-gray-50 border border-dashed rounded-xl p-6">
-                    <ImageIcon className="w-12 h-12 text-gray-300 mb-3" />
-                    <p className="text-gray-500 font-bold text-sm">No blogs posted yet.</p>
-                    <p className="text-xs text-gray-400 mt-1 max-w-[200px]">Create your first post using the left panel.</p>
+                  <div className="text-center py-10 flex-grow flex flex-col justify-center items-center bg-gray-50 border border-dashed rounded-xl p-6 font-sans">
+                    <ImageIcon className="w-10 h-10 text-gray-300 mb-2" />
+                    <p className="text-gray-500 font-bold text-xs">No blogs posted yet.</p>
+                    <p className="text-[10px] text-gray-400 mt-1 max-w-[180px]">Create your first post using the left panel.</p>
                   </div>
                 ) : (
-                  <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1 flex-grow">
+                  <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1 flex-grow font-sans text-left">
                     {posts.map(post => {
                       const isCurrentlyEditing = editingPostId === post.id;
                       return (
                         <div 
                           key={post.id} 
-                          className={`p-3.5 rounded-xl border transition flex items-start gap-3.5 ${
+                          className={`p-3 rounded-xl border transition flex items-start gap-3 ${
                             isCurrentlyEditing 
-                              ? 'border-yellow-400 bg-yellow-50/50 ring-2 ring-yellow-100' 
-                              : 'border-gray-200 hover:border-gray-300 bg-white'
+                              ? 'border-yellow-400 bg-yellow-50/40 ring-1 ring-yellow-100' 
+                              : 'border-gray-150 hover:border-gray-250 bg-white'
                           }`}
                         >
                           <img 
                             src={post.imageUrl || PRESET_IMAGES[0].url} 
                             alt="" 
-                            className="w-16 h-12 object-cover rounded-lg border border-gray-100 shrink-0 bg-gray-100" 
+                            className="w-14 h-10 object-cover rounded-lg border border-gray-100 shrink-0 bg-gray-100" 
                           />
                           <div className="min-w-0 flex-1">
-                            <h3 className="font-bold text-gray-900 text-sm truncate leading-snug">{post.title}</h3>
-                            <p className="text-xs text-gray-500 mt-0.5 truncate">By {post.author || 'GoDriveify'}</p>
-                            <p className="text-[10px] text-gray-400 mt-1">{post.date}</p>
+                            <h3 className="font-bold text-gray-800 text-xs truncate leading-snug">{post.title}</h3>
+                            <p className="text-[10px] text-gray-500 mt-0.5 truncate uppercase font-black tracking-wider shadow-sm inline-block px-1.5 py-0.5 bg-slate-50 border border-slate-100 rounded">By {post.author || 'GoDriveify'}</p>
+                            <div className="flex items-center gap-2 mt-1.5">
+                              <span className="text-[9px] text-gray-400">{post.date}</span>
+                              <span className={`text-[8px] font-black px-1.5 py-0.5 rounded uppercase ${
+                                post.status === 'Published' ? 'bg-emerald-50 text-emerald-600' : 
+                                post.status === 'Scheduled' ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-500'
+                              }`}>
+                                {post.status || 'Draft'}
+                              </span>
+                            </div>
                           </div>
-                          <div className="flex flex-col sm:flex-row items-center gap-1.5 shrink-0 self-center">
+                          <div className="flex items-center gap-1 shrink-0 self-center">
                             <button 
                               onClick={() => startEdit(post)} 
                               title="Edit this post"
-                              className="p-2 text-gray-500 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition"
+                              className="p-1.5 text-gray-400 hover:text-yellow-600 hover:bg-yellow-50 rounded-md transition cursor-pointer"
                             >
-                              <Edit className="w-4 h-4" />
+                              <Edit className="w-3.5 h-3.5" />
                             </button>
                             <button 
                               onClick={() => deletePost(post.id)} 
                               title="Delete this post"
-                              className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                              className="p-1.5 text-gray-400 hover:text-red-650 hover:bg-red-50 rounded-md transition cursor-pointer"
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           </div>
                         </div>
