@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import SEO from '../components/SEO';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Calendar, User, BookOpen } from 'lucide-react';
+import { X, Calendar, User, BookOpen, Sparkles } from 'lucide-react';
 
 interface BlogPost {
   id: string;
@@ -17,6 +17,7 @@ interface BlogPost {
   date: string;
   authorAvatar?: string;
   authorRole?: string;
+  category?: string;
 }
 
 const parseBoldAndItalic = (text: string) => {
@@ -121,7 +122,7 @@ export default function BlogPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50 pb-24">
       <SEO 
         title="Driving Tips, Guides & Road Safety Blog | GoDriveify"
         description="Learn safe driving with expert tips and tutorials. We post practical guides on road tests, parallel parking, and traffic rules in Faisalabad, Pakistan."
@@ -130,51 +131,62 @@ export default function BlogPage() {
       />
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 py-16">
-        <Link to="/" className="text-red-600 font-bold hover:underline mb-8 block">&larr; Back to Home</Link>
-        <h1 className="text-5xl font-bold mb-12 text-center text-gray-950">Our Latest Blogs</h1>
-        
+      <div className="max-w-7xl mx-auto px-4 pt-8">
+        <div className="mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3 tracking-tight">Latest Articles</h2>
+          <div className="h-1 w-16 bg-indigo-600 rounded"></div>
+        </div>
+
         {posts.length === 0 ? (
-          <p className="text-center text-gray-600 text-xl italic py-20 bg-white rounded-xl border">No blogs posted yet.</p>
+          <div className="bg-white rounded-3xl border border-gray-100 shadow-xl p-20 text-center relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-10 opacity-5">
+              <BookOpen className="w-64 h-64 text-slate-900" />
+            </div>
+            <p className="text-slate-400 text-xl font-medium italic relative z-10">Our editors are currently drafting safety guides. Check back soon.</p>
+          </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {posts.map((post, i) => (
               <ScrollReveal direction="up" delay={i * 0.1} key={post.id}>
                 <div 
-                  className="bg-white rounded-2xl shadow-sm border p-6 flex flex-col h-full hover:shadow-md cursor-pointer group transition-all duration-300"
+                  className="flex flex-col h-full bg-white rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_15px_40px_rgb(0,0,0,0.1)] overflow-hidden group cursor-pointer transition-all duration-300 hover:-translate-y-1 border border-gray-50"
                   onClick={() => setSelectedPost(post)}
                 >
-                  <div className="overflow-hidden rounded-xl mb-4 h-48">
+                  {/* Flushed Image Container */}
+                  <div className="w-full h-[280px] overflow-hidden bg-gray-100 flex-shrink-0">
                     <img 
                       src={post.imageUrl} 
                       alt={post.title} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                     />
                   </div>
-                  <h2 className="text-2xl font-bold mb-2 group-hover:text-red-600 transition-colors duration-350">{post.title}</h2>
-                  <div className="flex items-center gap-2 mb-3.5 text-xs text-gray-500 font-medium">
-                    {post.authorAvatar ? (
-                      <img src={post.authorAvatar} alt="" className="w-5.5 h-5.5 rounded-full object-cover shrink-0 border border-gray-200" />
-                    ) : (
-                      <span className="p-1 bg-[#002060]/5 text-[#002060] rounded-full shrink-0">
-                        <User className="w-3.5 h-3.5" />
-                      </span>
-                    )}
-                    <span className="truncate">
-                      By <strong className="text-gray-800 font-bold">{post.author}</strong>
-                      {post.authorRole ? ` (${post.authorRole})` : ''} • {post.date}
-                    </span>
+                  
+                  {/* Details Container */}
+                  <div className="p-7 flex flex-col flex-grow">
+                    <h3 className="text-[22px] font-semibold text-slate-800 mb-3 line-clamp-2 leading-snug group-hover:text-indigo-600 transition-colors">
+                      {post.title}
+                    </h3>
+                    
+                    <p className="text-slate-500 text-[15px] leading-relaxed mb-8 line-clamp-3">
+                      {post.content}
+                    </p>
+                    
+                    <div className="mt-auto pt-5 border-t border-gray-100 flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0">
+                        {post.authorAvatar ? (
+                          <img src={post.authorAvatar} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full bg-indigo-50 border border-indigo-100 flex items-center justify-center p-2">
+                             <img src="/static/godriveify-logo.jpg" alt="Logo" className="w-full h-full object-contain" />
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-slate-800 tracking-tight">{post.author}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">{post.date}</p>
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-gray-600 mb-6 flex-grow">{post.content.substring(0, 100)}...</p>
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedPost(post);
-                    }}
-                    className="text-red-600 font-bold hover:text-red-800 self-start inline-flex items-center gap-1 group/btn"
-                  >
-                    Read More <span className="group-hover/btn:translate-x-1 transition-transform duration-200">&rarr;</span>
-                  </button>
                 </div>
               </ScrollReveal>
             ))}

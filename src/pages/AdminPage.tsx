@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import CTABanner from '../components/CTABanner';
-import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag, Bold, Italic, List, ListOrdered, BookOpen, User, Calendar, Zap, UserCheck } from 'lucide-react';
+import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag, Bold, Italic, List, ListOrdered, BookOpen, User, Calendar, Zap, UserCheck, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RentalCar } from '../data/inventory';
 import { 
@@ -203,7 +203,7 @@ export default function AdminPage() {
   const [blogSearchQuery, setBlogSearchQuery] = useState('');
   const [editorWorkspaceTab, setEditorWorkspaceTab] = useState<'write' | 'preview'>('write');
   const [editorAuthorSelectMode, setEditorAuthorSelectMode] = useState<'dropdown' | 'custom'>('dropdown');
-  const [activeTab, setActiveTab] = useState<'bookings' | 'blogs' | 'dns' | 'rentals' | 'requests' | 'courses' | 'car-sales'>('bookings');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'bookings' | 'blogs' | 'dns' | 'rentals' | 'requests' | 'courses' | 'car-sales'>('dashboard');
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -1727,6 +1727,23 @@ export default function AdminPage() {
               {/* Responsive Tab Buttons Stack */}
               <div className="flex flex-row lg:flex-col overflow-x-auto lg:overflow-x-visible gap-1.5 pb-2 lg:pb-0 scrollbar-none">
                 <button
+                   type="button"
+                   onClick={() => setActiveTab('dashboard')}
+                   className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                     activeTab === 'dashboard'
+                       ? 'bg-slate-950 text-white font-extrabold shadow-lg shadow-slate-950/20'
+                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                   }`}
+                >
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
+                    <Sparkles className="w-4 h-4" />
+                    <span>Control Panel</span>
+                  </div>
+                </button>
+
+                <div className="h-px bg-slate-100 my-2 hidden lg:block" />
+
+                <button
                   type="button"
                   onClick={() => setActiveTab('bookings')}
                   className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
@@ -1871,6 +1888,124 @@ export default function AdminPage() {
 
           {/* RIGHT WORKSPACE DISPLAY VIEWPORT */}
           <div className="lg:col-span-9 space-y-6">
+            {activeTab === 'dashboard' && (
+              <div className="animate-fade-in space-y-8">
+                <div className="bg-slate-950 rounded-[2.5rem] p-8 md:p-12 text-white relative overflow-hidden shadow-2xl shadow-slate-900/40">
+                  <div className="absolute top-0 right-0 p-20 opacity-10 blur-3xl bg-red-600 rounded-full -mr-20 -mt-20" />
+                  <div className="relative z-10 max-w-2xl">
+                    <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tighter leading-tight">Welcome back, Academy Admin</h2>
+                    <p className="text-slate-400 text-lg font-medium leading-relaxed">
+                      Your academy operations are running smoothly. You have <span className="text-white font-bold">{bookings.filter(b => b.status === 'Pending').length} pending applications</span> that require coordination today.
+                    </p>
+                    <div className="mt-8 flex flex-wrap gap-4">
+                      <button onClick={() => setActiveTab('bookings')} className="bg-white text-slate-950 px-6 py-3 rounded-2xl font-black text-sm transition hover:scale-105 cursor-pointer">
+                        Process Bookings
+                      </button>
+                      <button onClick={() => setActiveTab('blogs')} className="bg-slate-800 text-white px-6 py-3 rounded-2xl font-black text-sm transition hover:bg-slate-700 cursor-pointer">
+                        Write New Blog
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {/* Status Card 1: Bookings */}
+                  <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 group hover:border-red-600/30 transition-all duration-500 hover:-translate-y-1">
+                    <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 mb-6 group-hover:scale-110 group-hover:bg-red-600 group-hover:text-white transition-all duration-500">
+                      <Calendar className="w-7 h-7" />
+                    </div>
+                    <h3 className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Pending Applications</h3>
+                    <div className="flex items-baseline gap-2">
+                       <p className="text-4xl font-black text-slate-950 tracking-tighter">
+                         {bookings.filter(b => b.status === 'Pending').length}
+                       </p>
+                       <span className="text-xs font-bold text-slate-400">Scheduled / {bookings.length} Total</span>
+                    </div>
+                    <div className="mt-6 pt-6 border-t border-slate-50 flex items-center justify-between text-[11px] font-black uppercase tracking-wider">
+                      <div className="flex items-center gap-1.5 text-emerald-500 bg-emerald-50 px-2.5 py-1 rounded-xl">
+                        <Zap className="w-3 h-3 fill-emerald-500" />
+                        <span>Active System</span>
+                      </div>
+                      <button onClick={() => setActiveTab('bookings')} className="text-slate-400 hover:text-red-600 transition-colors">Manage Enrolls &rarr;</button>
+                    </div>
+                  </div>
+
+                  {/* Status Card 2: Fleet */}
+                  <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 group hover:border-indigo-600/30 transition-all duration-500 hover:-translate-y-1">
+                    <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-6 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-500">
+                      <Car className="w-7 h-7" />
+                    </div>
+                    <h3 className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Fleet Availability</h3>
+                    <div className="flex items-baseline gap-2">
+                       <p className="text-4xl font-black text-slate-950 tracking-tighter">
+                         {rentalCars.filter(c => c.availabilityStatus === 'Available').length}/{rentalCars.length}
+                       </p>
+                       <span className="text-xs font-bold text-slate-400">Cars Ready</span>
+                    </div>
+                    <div className="mt-6 pt-6 border-t border-slate-50 flex items-center justify-between text-[11px] font-black uppercase tracking-wider">
+                      <div className="flex items-center gap-1.5 text-indigo-500 bg-indigo-50 px-2.5 py-1 rounded-xl">
+                        <Users className="w-3 h-3 fill-indigo-500" />
+                        <span>{customerRequests.filter(r => r.status === 'live').length} Active Leads</span>
+                      </div>
+                      <button onClick={() => setActiveTab('rentals')} className="text-slate-400 hover:text-indigo-600 transition-colors">Fleet Log &rarr;</button>
+                    </div>
+                  </div>
+
+                  {/* Status Card 3: Journal */}
+                  <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 group hover:border-amber-600/30 transition-all duration-500 hover:-translate-y-1">
+                    <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-6 group-hover:scale-110 group-hover:bg-amber-600 group-hover:text-white transition-all duration-500">
+                      <BookOpen className="w-7 h-7" />
+                    </div>
+                    <h3 className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Education Journal</h3>
+                    <div className="flex items-baseline gap-2">
+                       <p className="text-4xl font-black text-slate-950 tracking-tighter">
+                         {posts.length}
+                       </p>
+                       <span className="text-xs font-bold text-slate-400">Published Guides</span>
+                    </div>
+                    <div className="mt-6 pt-6 border-t border-slate-50 flex items-center justify-between text-[11px] font-black uppercase tracking-wider">
+                      <div className="flex items-center gap-1.5 text-amber-500 bg-amber-50 px-2.5 py-1 rounded-xl">
+                        <Sparkles className="w-3 h-3 fill-amber-500" />
+                        <span>SEO Optimized</span>
+                      </div>
+                      <button onClick={() => setActiveTab('blogs')} className="text-slate-400 hover:text-amber-600 transition-colors">Write &rarr;</button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Actions List */}
+                <div className="bg-white rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50 p-8">
+                  <h3 className="text-lg font-black text-slate-950 mb-6 tracking-tight">System Quick-Actions</h3>
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <button onClick={purgeLocalStorage} className="flex items-center gap-3 p-4 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-red-50 hover:border-red-100 transition-all group text-left cursor-pointer">
+                      <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-red-600 transition-transform group-hover:scale-95">
+                        <Trash2 className="w-5 h-5" />
+                      </div>
+                      <span className="text-xs font-bold text-slate-600 group-hover:text-red-700">Clear System Log</span>
+                    </button>
+                    <button onClick={() => { setActiveTab('courses'); setEditingCourseId(null); }} className="flex items-center gap-3 p-4 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-100 transition-all group text-left cursor-pointer">
+                      <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-emerald-600 transition-transform group-hover:scale-95">
+                        <Plus className="w-5 h-5" />
+                      </div>
+                      <span className="text-xs font-bold text-slate-600 group-hover:text-emerald-700">Add New Course</span>
+                    </button>
+                    <button onClick={() => setActiveTab('dns')} className="flex items-center gap-3 p-4 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-blue-50 hover:border-blue-100 transition-all group text-left cursor-pointer">
+                      <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-blue-600 transition-transform group-hover:scale-95">
+                        <Globe className="w-5 h-5" />
+                      </div>
+                      <span className="text-xs font-bold text-slate-600 group-hover:text-blue-700">Check Security</span>
+                    </button>
+                    <button onClick={() => setActiveTab('blogs')} className="flex items-center gap-3 p-4 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-amber-50 hover:border-amber-100 transition-all group text-left cursor-pointer">
+                      <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-amber-600 transition-transform group-hover:scale-95">
+                        <Edit className="w-5 h-5" />
+                      </div>
+                      <span className="text-xs font-bold text-slate-600 group-hover:text-amber-700">Draft Tutorial</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             {activeTab === 'bookings' && (
               <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-8 animate-fade-in space-y-6">
                 <div className="border-b border-gray-100 pb-5">
@@ -4102,8 +4237,13 @@ export default function AdminPage() {
         </div>
       )}
 
-      <CTABanner />
-      <Footer />
+      <footer className="py-12 border-t border-gray-100 bg-white">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">
+            GoDriveify Academy Management System &copy; {new Date().getFullYear()}
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
