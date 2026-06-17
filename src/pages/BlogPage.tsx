@@ -145,15 +145,21 @@ export default function BlogPage() {
     author: selectedPost?.author || "Admin",
     date: selectedPost?.date || "June 17, 2026",
     time: "12:30 PM",
-    title_en: "How to Drive a Car Safely on Highways",
-    title_ur: "ہائی ویز پر محفوظ طریقے سے گاڑی کیسے چلائیں",
+    title_en: "5 Essential Safety Rules for Every New Driver",
+    title_ur: "نئے ڈرائیورز کے لیے 5 ضروری حفاظتی اصول",
     content_en: [
-      {heading: "1. Keep Your Distance", body: "Always maintain a safe distance from the vehicle ahead. It gives you more time to react in case of sudden braking."},
-      {heading: "2. Check Your Mirrors", body: "Consistently monitor your rearview and side mirrors before changing lanes to make sure the road is clear."}
+      {heading: "1. Adjust Your Mirrors", body: "Before starting the car, ensure all your mirrors are adjusted correctly to minimize blind spots."},
+      {heading: "2. Maintain a Safe Distance", body: "Keep a safe following distance from the car in front of you. Use the \"three-second rule\"."},
+      {heading: "3. Use Turn Signals", body: "Always signal your intentions before turning or changing lanes to communicate with other drivers on the road."},
+      {heading: "4. Eliminate Distractions", body: "Put your phone away and keep your focus entirely on driving."},
+      {heading: "5. Watch Your Speed", body: "Follow posted speed limits and adjust your speed based on traffic, weather, and road conditions."}
     ],
     content_ur: [
-      {heading: "1. فاصلہ برقرار رکھیں", body: "ہمیشہ اپنے سے آگے جانے والی گاڑی سے محفوظ فاصلہ رکھیں۔ یہ آپ کو اچانک بریک لگانے کی صورت میں ردعمل کا زیادہ وقت دیتا ہے۔"},
-      {heading: "2. اپنے شیشے چیک کریں", body: "لین تبدیل کرنے سے پہلے باقاعدگی سے اپنے پیچھے اور سائیڈ والے شیشوں کی نگرانی کریں تاکہ یقین ہو سکے کہ سڑک صاف ہے۔"}
+      {heading: "1. اپنے شیشے ایڈجسٹ کریں", body: "گاڑی چلانے سے پہلے، یقینی بنائیں کہ اندھے دھبوں کو کم کرنے کے لیے آپ کے تمام شیشے درست طریقے سے ایڈجسٹ کیے گئے ہیں۔"},
+      {heading: "2. محفوظ فاصلہ برقرار رکھیں", body: "اپنے سامنے والی گاڑی سے محفوظ فاصلہ رکھیں۔ \"تین سیکنڈ کا اصول\" استعمال کریں۔"},
+      {heading: "3. ٹرن سگنلز کا استعمال کریں", body: "سڑک پر دوسرے ڈرائیوروں کے ساتھ بات چیت کرنے کے لیے لین موڑنے یا تبدیل کرنے سے پہلے ہمیشہ اپنے ارادوں کا اشارہ دیں۔"},
+      {heading: "4. خلفشار کو ختم کریں", body: "اپنا فون دور رکھیں اور اپنی توجہ پوری طرح ڈرائیونگ پر رکھیں۔"},
+      {heading: "5. اپنی رفتار پر نظر رکھیں", body: "پوسٹ کردہ رفتار کی حدود پر عمل کریں اور ٹریفک، موسم اور سڑک کے حالات کی بنیاد پر اپنی رفتار کو ایڈجسٹ کریں۔"}
     ]
   };
 
