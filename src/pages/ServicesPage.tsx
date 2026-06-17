@@ -29,7 +29,17 @@ interface DrivingCourse {
 export default function ServicesPage() {
   const [courses, setCourses] = useState<DrivingCourse[]>([]);
   const contactFormRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [activeTab, setActiveTab] = useState<'driving' | 'rent' | 'sale'>('driving');
+
+  // Ensure high performance instant playback of services video
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(err => {
+        console.log("Autoplay was prevented by browser, retrying...", err);
+      });
+    }
+  }, []);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -231,7 +241,7 @@ export default function ServicesPage() {
       <Navbar />
 
       {/* Hero Banner Section */}
-      <section className="relative overflow-hidden bg-[#ededed] border-b border-gray-100 pt-12 sm:pt-16 lg:pt-24 pb-16 lg:pb-28">
+      <section className="relative overflow-hidden bg-white border-b border-gray-100 pt-12 sm:pt-16 lg:pt-24 pb-16 lg:pb-28">
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -249,14 +259,19 @@ export default function ServicesPage() {
             </div>
           
             <div className="hidden lg:flex justify-center items-center relative">
-              <div className="w-full max-w-lg aspect-video z-10 relative bg-[#ededed] overflow-hidden">
+              <div className="w-full max-w-lg aspect-video z-10 relative bg-white overflow-hidden">
                 <video 
+                  ref={videoRef}
                   autoPlay={true} 
                   loop={true} 
                   muted={true} 
                   playsInline={true} 
                   preload="auto"
-                  className="w-full h-full object-cover scale-[1.04] select-none pointer-events-none rounded-none"
+                  className="w-full h-full object-cover select-none pointer-events-none rounded-none mix-blend-multiply"
+                  style={{
+                    maskImage: 'radial-gradient(ellipse at center, black 30%, transparent 70%)',
+                    WebkitMaskImage: 'radial-gradient(ellipse at center, black 30%, transparent 70%)'
+                  }}
                 >
                   <source src="/service page-1.mp4" type="video/mp4" />
                 </video>
