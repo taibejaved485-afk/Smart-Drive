@@ -432,7 +432,7 @@ export default function BlogPage() {
               return (
                 <ScrollReveal direction="up" delay={i * 0.1} key={post.id}>
                   <div 
-                    className="flex flex-col h-full bg-white rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(255,113,18,0.12)] overflow-hidden group cursor-pointer transition-all duration-300 hover:-translate-y-1.5 border border-slate-100"
+                    className="flex flex-col h-full bg-white rounded-xl shadow-sm hover:shadow-xl overflow-hidden group cursor-pointer transition-transform duration-300 hover:-translate-y-2 border border-slate-100"
                     onClick={(e) => {
                       e.preventDefault();
                       setSelectedPost(post);

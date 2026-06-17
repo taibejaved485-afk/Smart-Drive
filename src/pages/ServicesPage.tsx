@@ -231,9 +231,7 @@ export default function ServicesPage() {
       <Navbar />
 
       {/* Hero Banner Section */}
-      <section className="relative overflow-hidden bg-white border-b border-gray-100 pt-0 pb-16 lg:pt-0 lg:pb-28">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#FF7112]/20/30 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-slate-100/50 rounded-full blur-2xl pointer-events-none" />
+      <section className="relative overflow-hidden bg-[#ededed] border-b border-gray-100 pt-0 pb-16 lg:pt-0 lg:pb-28">
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -251,7 +249,18 @@ export default function ServicesPage() {
             </div>
           
             <div className="hidden lg:flex justify-center items-center relative">
-                 <img src="https://i.pinimg.com/1200x/ee/dc/79/eedc79c7a80fec3048983cef468e7191.jpg" alt="3D Car" className="w-full max-w-lg object-contain z-10 relative mix-blend-multiply" />
+              <div className="w-full max-w-lg aspect-video z-10 relative bg-[#ededed] overflow-hidden">
+                <video 
+                  autoPlay={true} 
+                  loop={true} 
+                  muted={true} 
+                  playsInline={true} 
+                  preload="auto"
+                  className="w-full h-full object-cover scale-[1.04] select-none pointer-events-none rounded-none"
+                >
+                  <source src="/service page-1.mp4" type="video/mp4" />
+                </video>
+              </div>
             </div>
           </div>
 
