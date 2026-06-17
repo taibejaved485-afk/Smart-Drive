@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import CTABanner from '../components/CTABanner';
-import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag, Bold, Italic, Underline, Link as LinkIcon, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, BookOpen, User, Calendar, Zap, UserCheck, Users } from 'lucide-react';
+import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag, Bold, Italic, Underline, Link as LinkIcon, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, BookOpen, User, Calendar, Zap, UserCheck, Users, Pilcrow } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RentalCar } from '../data/inventory';
 import { 
@@ -2573,6 +2573,14 @@ export default function AdminPage() {
                             </div>
 
                             <div className="flex gap-1 pr-2 border-r border-gray-200">
+                              <button
+                                type="button"
+                                onMouseDown={(e) => { e.preventDefault(); formatBlock('p'); }}
+                                title="Paragraph"
+                                className="p-2 bg-white hover:bg-slate-100 border border-gray-200 rounded-lg transition-all cursor-pointer flex items-center justify-center text-slate-700"
+                              >
+                                <Pilcrow className="w-4 h-4" />
+                              </button>
                               <button
                                 type="button"
                                 onMouseDown={(e) => { e.preventDefault(); formatBlock('h2'); }}
