@@ -31,7 +31,14 @@ const parseInlineMarkdown = (text: string) => {
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 };
 
-const generateId = (text: string) => text.replace(/[\*\_]/g, '').toLowerCase().replace(/[^\w]+/g, '-');
+const generateId = (text: string) => {
+  return text
+    .replace(/[\*\_]/g, '')     // Remove bold/italic markdown characters
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-')       // Replace spaces with hyphens
+    .replace(/[^\w\u0600-\u06FF\-]/g, ''); // Keep alphanumeric, Urdu/Arabic range, and hyphens
+};
 
 const renderBlogContent = (content: string) => {
   if (!content) return null;
@@ -43,9 +50,10 @@ const renderBlogContent = (content: string) => {
       const title = trimmed.replace('## ', '');
       const id = generateId(title);
       return (
-        <h3 key={index} id={id} className="text-xl md:text-2xl font-black text-slate-900 mt-6 mb-3 border-b border-gray-100 pb-1.5 font-sans scroll-mt-24">
+        <h2 key={index} id={id} className="text-2xl md:text-3xl font-black text-[#002060] mt-10 mb-4 scroll-mt-32 relative group hover:text-[#FF7112] transition-colors cursor-pointer w-fit inline-block">
+          <div className="absolute -left-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-[#FF7112] hidden md:block">#</div>
           {parseInlineMarkdown(title)}
-        </h3>
+        </h2>
       );
     }
 
@@ -53,15 +61,15 @@ const renderBlogContent = (content: string) => {
       const title = trimmed.replace('### ', '');
       const id = generateId(title);
       return (
-        <h4 key={index} id={id} className="text-lg md:text-xl font-extrabold text-slate-800 mt-4 mb-2 font-sans scroll-mt-24">
+        <h3 key={index} id={id} className="text-xl md:text-2xl font-extrabold text-[#002060] mt-8 mb-3 scroll-mt-32 hover:text-[#FF7112] transition-colors cursor-pointer">
           {parseInlineMarkdown(title)}
-        </h4>
+        </h3>
       );
     }
 
     if (trimmed.startsWith('> ')) {
       return (
-        <blockquote key={index} className="border-l-4 border-[#FF7112] pl-4 italic text-[#002060] my-4 bg-slate-50/80 p-4 rounded-r-xl text-left font-sans text-base">
+        <blockquote key={index} className="border-l-4 border-[#FF7112] pl-5 italic text-[#002060] my-8 bg-[#FF7112]/5 p-6 rounded-r-xl text-left font-sans text-xl font-medium leading-relaxed">
           {parseInlineMarkdown(trimmed.replace('> ', ''))}
         </blockquote>
       );
@@ -69,7 +77,7 @@ const renderBlogContent = (content: string) => {
 
     if (trimmed.startsWith('- ')) {
       return (
-        <li key={index} className="ml-5 list-disc text-slate-700 my-1 pl-1 text-base leading-relaxed">
+        <li key={index} className="ml-5 list-disc text-slate-700 my-2 pl-2 text-lg leading-relaxed marker:text-[#FF7112]">
           {parseInlineMarkdown(trimmed.replace('- ', ''))}
         </li>
       );
@@ -78,7 +86,7 @@ const renderBlogContent = (content: string) => {
     if (/^\d+\.\s/.test(trimmed)) {
       const parts = trimmed.split(/^\d+\.\s/);
       return (
-        <li key={index} className="ml-5 list-decimal text-slate-700 my-1 pl-1 text-base leading-relaxed">
+        <li key={index} className="ml-6 list-decimal text-slate-700 my-2 pl-2 text-lg md:text-xl leading-relaxed marker:text-[#FF7112] marker:font-bold">
           {parseInlineMarkdown(parts[1] || '')}
         </li>
       );
@@ -99,7 +107,7 @@ const renderBlogContent = (content: string) => {
     }
 
     return (
-      <p key={index} className={`text-slate-700 text-base md:text-[17px] leading-relaxed mb-3.5 font-normal font-sans ${alignClass}`}>
+      <p key={index} className={`text-slate-600 text-lg md:text-xl leading-loose mb-6 font-normal font-sans whitespace-pre-wrap ${alignClass}`}>
         {parseInlineMarkdown(contentLine)}
       </p>
     );
@@ -163,12 +171,11 @@ export default function BlogPage() {
     ]
   };
 
-  const activeTitle = language === 'ur' ? dummyBilingualData.title_ur : (selectedPost?.title || dummyBilingualData.title_en);
-  const activeContentBlocks = language === 'ur' ? dummyBilingualData.content_ur : dummyBilingualData.content_en;
-  const activeCategory = language === 'ur' ? "اکیڈمی بلاگ" : (selectedPost?.category || 'ACADEMY BLOG');
+  const activeTitle = selectedPost?.title || (language === 'ur' ? dummyBilingualData.title_ur : dummyBilingualData.title_en);
+  const activeCategory = selectedPost?.category || (language === 'ur' ? "اکیڈمی بلاگ" : "ACADEMY BLOG");
 
   const toc = useMemo(() => {
-    if (language === 'en' && selectedPost?.content) {
+    if (selectedPost?.content) {
       const lines = selectedPost.content.split('\n');
       const headings: { id: string; title: React.ReactNode; level: number }[] = [];
       lines.forEach(line => {
@@ -181,12 +188,14 @@ export default function BlogPage() {
       });
       return headings;
     }
+    
+    const activeContentBlocks = language === 'ur' ? dummyBilingualData.content_ur : dummyBilingualData.content_en;
     return activeContentBlocks.map(block => ({
       id: generateId(block.heading),
       title: block.heading,
       level: 2
     }));
-  }, [language, selectedPost, activeContentBlocks]);
+  }, [language, selectedPost]);
 
   if (selectedPost) {
 
@@ -306,18 +315,19 @@ export default function BlogPage() {
                       className={`prose prose-lg max-w-none prose-slate bg-transparent text-left font-sans ${language === 'ur' ? 'font-urdu' : ''}`}
                       dir={language === 'ur' ? 'rtl' : 'ltr'}
                     >
-                      {language === 'en' && selectedPost?.content ? (
+                      {selectedPost?.content ? (
                         renderBlogContent(selectedPost.content)
                       ) : (
-                        activeContentBlocks.map((block, index) => (
-                          <div key={index} className="mb-8">
+                        (language === 'ur' ? dummyBilingualData.content_ur : dummyBilingualData.content_en).map((block, index) => (
+                          <div key={index} className="mb-10 group">
                             <h2 
                               id={generateId(block.heading)} 
-                              className="text-2xl md:text-3xl font-black text-[#002060] mb-4 scroll-mt-24"
+                              className="text-2xl md:text-3xl font-black text-[#002060] mb-5 scroll-mt-32 relative inline-block group-hover:text-[#FF7112] transition-colors"
                             >
+                              <div className="absolute -left-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-[#FF7112] hidden md:block">#</div>
                               {block.heading}
                             </h2>
-                            <p className="text-slate-600 leading-relaxed text-lg">
+                            <p className="text-slate-600 leading-relaxed text-lg whitespace-pre-line">
                               {block.body}
                             </p>
                           </div>
