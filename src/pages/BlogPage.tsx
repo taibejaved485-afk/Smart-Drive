@@ -72,6 +72,78 @@ const renderBlogContent = (content: string) => {
     const trimmed = line.trim();
     if (!trimmed) return <div key={index} className="h-3" />;
 
+    if (trimmed.startsWith('|=layout-img-left=|')) {
+      const innerContent = trimmed.substring('|=layout-img-left=|'.length);
+      const match = innerContent.match(/^!\[(.*?)\]\((.*?)\)\|(.*)$/);
+      if (match) {
+        const [, alt, src, text] = match;
+        return (
+          <div key={index} className="blog-layout-grid-left flex flex-col md:flex-row gap-6 sm:gap-8 items-center my-10 bg-slate-50/65 p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-sm">
+            <div className="w-full md:w-[35%] shrink-0">
+              <img src={src} alt={alt} referrerPolicy="no-referrer" className="rounded-2xl w-full object-cover aspect-[4/3] shadow-md m-0" />
+            </div>
+            <div className="w-full md:w-[65%] text-slate-700 text-base md:text-lg leading-relaxed whitespace-normal text-right" style={{ direction: 'rtl' }}>
+              {parseInlineMarkdown(text)}
+            </div>
+          </div>
+        );
+      }
+    }
+
+    if (trimmed.startsWith('|=layout-img-right=|')) {
+      const innerContent = trimmed.substring('|=layout-img-right=|'.length);
+      const match = innerContent.match(/^!\[(.*?)\]\((.*?)\)\|(.*)$/);
+      if (match) {
+        const [, alt, src, text] = match;
+        return (
+          <div key={index} className="blog-layout-grid-right flex flex-col md:flex-row-reverse gap-6 sm:gap-8 items-center my-10 bg-slate-50/65 p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-sm">
+            <div className="w-full md:w-[35%] shrink-0">
+              <img src={src} alt={alt} referrerPolicy="no-referrer" className="rounded-2xl w-full object-cover aspect-[4/3] shadow-md m-0" />
+            </div>
+            <div className="w-full md:w-[65%] text-slate-700 text-base md:text-lg leading-relaxed whitespace-normal text-right" style={{ direction: 'rtl' }}>
+              {parseInlineMarkdown(text)}
+            </div>
+          </div>
+        );
+      }
+    }
+
+    if (trimmed.startsWith('|=layout-card-img-below=|')) {
+      const innerContent = trimmed.substring('|=layout-card-img-below=|'.length);
+      const match = innerContent.match(/^!\[(.*?)\]\((.*?)\)\|(.*)$/);
+      if (match) {
+        const [, alt, src, text] = match;
+        return (
+          <div key={index} className="blog-layout-card-below flex flex-col gap-6 p-6 sm:p-8 bg-[#FF7112]/5 border border-[#FF7112]/10 rounded-3xl my-10 shadow-sm text-right" style={{ direction: 'rtl' }}>
+            <div className="text-slate-700 text-base md:text-lg leading-relaxed whitespace-normal">
+              {parseInlineMarkdown(text)}
+            </div>
+            <div className="w-full">
+              <img src={src} alt={alt} referrerPolicy="no-referrer" className="rounded-2xl w-full object-cover max-h-[450px] shadow-md m-0" />
+            </div>
+          </div>
+        );
+      }
+    }
+
+    if (trimmed.startsWith('|=layout-card-img-above=|')) {
+      const innerContent = trimmed.substring('|=layout-card-img-above=|'.length);
+      const match = innerContent.match(/^!\[(.*?)\]\((.*?)\)\|(.*)$/);
+      if (match) {
+        const [, alt, src, text] = match;
+        return (
+          <div key={index} className="blog-layout-card-above flex flex-col gap-6 p-6 sm:p-8 bg-[#002060]/5 border border-[#002060]/10 rounded-3xl my-10 shadow-sm text-right" style={{ direction: 'rtl' }}>
+            <div className="w-full">
+              <img src={src} alt={alt} referrerPolicy="no-referrer" className="rounded-2xl w-full object-cover max-h-[450px] shadow-md m-0" />
+            </div>
+            <div className="text-slate-700 text-base md:text-lg leading-relaxed whitespace-normal">
+              {parseInlineMarkdown(text)}
+            </div>
+          </div>
+        );
+      }
+    }
+
     if (trimmed.startsWith('## ')) {
       const title = trimmed.replace('## ', '');
       const id = generateId(title);
@@ -203,7 +275,7 @@ export default function BlogPage() {
   const toc = useMemo(() => {
     if (selectedPost?.content) {
       const lines = selectedPost.content.split('\n');
-      const headings: { id: string; title: React.ReactNode; level: number }[] = [];
+      const headings: { id: string; title: ReactNode; level: number }[] = [];
       lines.forEach(line => {
         const trimmed = line.trim();
         if (trimmed.startsWith('## ') || trimmed.startsWith('### ')) {

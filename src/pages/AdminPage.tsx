@@ -211,6 +211,14 @@ export default function AdminPage() {
   const blogTextareaRef = useRef<HTMLTextAreaElement>(null);
   const wysiwygEditorRef = useRef<HTMLDivElement>(null);
 
+  // Layout templates configuration states for modal selection
+  const [layoutModalOpen, setLayoutModalOpen] = useState(false);
+  const [layoutType, setLayoutType] = useState<'img-left' | 'img-right' | 'card-below' | 'card-above'>('img-left');
+  const [layoutImageUrl, setLayoutImageUrl] = useState('');
+  const [layoutText, setLayoutText] = useState('');
+  const [layoutAlt, setLayoutAlt] = useState('Academy Section Illustrative Picture');
+  const layoutImageFileInputRef = useRef<HTMLInputElement>(null);
+
   // Driving school course states
   const [drivingCourses, setDrivingCourses] = useState<DrivingCourse[]>([]);
   const [editingCourseId, setEditingCourseId] = useState<string | null>(null);
@@ -1057,6 +1065,40 @@ export default function AdminPage() {
         const trimmed = line.trim();
         if (!trimmed) return '<p><br></p>';
         
+        // Custom Block Layouts inside editor
+        if (trimmed.startsWith('|=layout-img-left=|')) {
+          const content = trimmed.substring('|=layout-img-left=|'.length);
+          const match = content.match(/^!\[(.*?)\]\((.*?)\)\|(.*)$/);
+          if (match) {
+            const [, alt, src, text] = match;
+            return `<div class="blog-layout-grid-left flex flex-col md:flex-row gap-6 items-center my-6 bg-slate-50/50 p-4 rounded-2xl border border-slate-100" contenteditable="false"><div class="w-full md:w-[35%] shrink-0" contenteditable="false"><img src="${src}" alt="${alt}" class="rounded-xl w-full object-cover aspect-[4/3] shadow-sm m-0" /></div><div class="w-full md:w-[65%] text-slate-700 text-sm leading-relaxed text-right" style="direction: rtl;" contenteditable="true"><p>${parseInlineMarkdownToHtml(text)}</p></div></div>`;
+          }
+        }
+        if (trimmed.startsWith('|=layout-img-right=|')) {
+          const content = trimmed.substring('|=layout-img-right=|'.length);
+          const match = content.match(/^!\[(.*?)\]\((.*?)\)\|(.*)$/);
+          if (match) {
+            const [, alt, src, text] = match;
+            return `<div class="blog-layout-grid-right flex flex-col md:flex-row-reverse gap-6 items-center my-6 bg-slate-50/50 p-4 rounded-2xl border border-slate-100" contenteditable="false"><div class="w-full md:w-[35%] shrink-0" contenteditable="false"><img src="${src}" alt="${alt}" class="rounded-xl w-full object-cover aspect-[4/3] shadow-sm m-0" /></div><div class="w-full md:w-[65%] text-slate-700 text-sm leading-relaxed text-right" style="direction: rtl;" contenteditable="true"><p>${parseInlineMarkdownToHtml(text)}</p></div></div>`;
+          }
+        }
+        if (trimmed.startsWith('|=layout-card-img-below=|')) {
+          const content = trimmed.substring('|=layout-card-img-below=|'.length);
+          const match = content.match(/^!\[(.*?)\]\((.*?)\)\|(.*)$/);
+          if (match) {
+            const [, alt, src, text] = match;
+            return `<div class="blog-layout-card-below flex flex-col gap-4 p-5 bg-[#FF7112]/5 border border-[#FF7112]/10 rounded-2xl my-6 text-right" style="direction: rtl;" contenteditable="false"><div class="text-slate-700 text-sm leading-relaxed" contenteditable="true"><p>${parseInlineMarkdownToHtml(text)}</p></div><div class="w-full" contenteditable="false"><img src="${src}" alt="${alt}" class="rounded-xl w-full object-cover max-h-[300px] shadow-sm m-0" /></div></div>`;
+          }
+        }
+        if (trimmed.startsWith('|=layout-card-img-above=|')) {
+          const content = trimmed.substring('|=layout-card-img-above=|'.length);
+          const match = content.match(/^!\[(.*?)\]\((.*?)\)\|(.*)$/);
+          if (match) {
+            const [, alt, src, text] = match;
+            return `<div class="blog-layout-card-above flex flex-col gap-4 p-5 bg-[#002060]/5 border border-[#002060]/10 rounded-2xl my-6 text-right" style="direction: rtl;" contenteditable="false"><div class="w-full" contenteditable="false"><img src="${src}" alt="${alt}" class="rounded-xl w-full object-cover max-h-[300px] shadow-sm m-0" /></div><div class="text-slate-700 text-sm leading-relaxed" contenteditable="true"><p>${parseInlineMarkdownToHtml(text)}</p></div></div>`;
+          }
+        }
+        
         // Unordered list item
         if (trimmed.startsWith('- ')) {
           const content = trimmed.substring(2);
@@ -1123,6 +1165,44 @@ export default function AdminPage() {
       if (node.nodeType === Node.ELEMENT_NODE) {
         const el = node as HTMLElement;
         const tagName = el.tagName.toUpperCase();
+
+        // Custom Layout Checks First
+        if (el.classList.contains('blog-layout-grid-left')) {
+          const img = el.querySelector('img');
+          const p = el.querySelector('p') || el;
+          const src = img?.getAttribute('src') || '';
+          const alt = img?.getAttribute('alt') || 'Car image';
+          const text = p ? cleanInlineStyles(p.innerHTML) : '';
+          lines.push(`|=layout-img-left=|![${alt}](${src})|${text}`);
+          return;
+        }
+        if (el.classList.contains('blog-layout-grid-right')) {
+          const img = el.querySelector('img');
+          const p = el.querySelector('p') || el;
+          const src = img?.getAttribute('src') || '';
+          const alt = img?.getAttribute('alt') || 'Car image';
+          const text = p ? cleanInlineStyles(p.innerHTML) : '';
+          lines.push(`|=layout-img-right=|![${alt}](${src})|${text}`);
+          return;
+        }
+        if (el.classList.contains('blog-layout-card-below')) {
+          const img = el.querySelector('img');
+          const p = el.querySelector('p') || el;
+          const src = img?.getAttribute('src') || '';
+          const alt = img?.getAttribute('alt') || 'Car image';
+          const text = p ? cleanInlineStyles(p.innerHTML) : '';
+          lines.push(`|=layout-card-img-below=|![${alt}](${src})|${text}`);
+          return;
+        }
+        if (el.classList.contains('blog-layout-card-above')) {
+          const img = el.querySelector('img');
+          const p = el.querySelector('p') || el;
+          const src = img?.getAttribute('src') || '';
+          const alt = img?.getAttribute('alt') || 'Car image';
+          const text = p ? cleanInlineStyles(p.innerHTML) : '';
+          lines.push(`|=layout-card-img-above=|![${alt}](${src})|${text}`);
+          return;
+        }
 
         if (tagName === 'H1' || tagName === 'H2') {
           lines.push(`## ${cleanInlineStyles(el.innerHTML)}`);
@@ -1243,6 +1323,37 @@ export default function AdminPage() {
     }
   };
 
+  const executePromptCommand = (command: string, promptMessage: string) => {
+    // Save current selection range before prompt opens and focus is lost
+    const selection = window.getSelection();
+    let savedRange: Range | null = null;
+    if (selection && selection.rangeCount > 0) {
+      savedRange = selection.getRangeAt(0);
+    }
+
+    // Prompt user for input
+    const value = prompt(promptMessage);
+    if (value === null || !value.trim()) return; // canceled or empty
+
+    // Refocus the editor
+    if (wysiwygEditorRef.current) {
+      wysiwygEditorRef.current.focus();
+    }
+    
+    // Restore the saved range
+    if (savedRange && selection) {
+      selection.removeAllRanges();
+      selection.addRange(savedRange);
+    }
+
+    // Safe document execution
+    document.execCommand(command, false, value.trim());
+    if (wysiwygEditorRef.current) {
+      const mdValue = htmlToMarkdown(wysiwygEditorRef.current.innerHTML);
+      setNewPost(prev => ({ ...prev, content: mdValue }));
+    }
+  };
+
   const formatBlock = (tag: string) => {
     let success = false;
     try {
@@ -1285,6 +1396,34 @@ export default function AdminPage() {
     }
   };
 
+  const insertLayoutTemplate = (type: 'img-left' | 'img-right' | 'card-below' | 'card-above') => {
+    setLayoutType(type);
+    setLayoutImageUrl('https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=800');
+    setLayoutText('ڈرائیونگ سیکھنے کے لیے بہترین معلوماتی مضمون۔ یہاں اپنی تفصیل درج کریں۔');
+    setLayoutAlt('Academy Section Illustrative Picture');
+    setLayoutModalOpen(true);
+  };
+
+  const handleConfirmInsertLayout = () => {
+    const finalUrl = layoutImageUrl.trim() || 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=800';
+    const finalText = layoutText.trim() || 'ڈرائیونگ سیکھنے کے لیے بہترین معلوماتی مضمون۔ یہاں اپنی تفصیل درج کریں۔';
+    const finalAlt = layoutAlt.trim() || 'Academy Section Illustrative Picture';
+    
+    let markdownLine = '';
+    if (layoutType === 'img-left') {
+      markdownLine = `|=layout-img-left=|![${finalAlt}](${finalUrl})|${finalText}`;
+    } else if (layoutType === 'img-right') {
+      markdownLine = `|=layout-img-right=|![${finalAlt}](${finalUrl})|${finalText}`;
+    } else if (layoutType === 'card-below') {
+      markdownLine = `|=layout-card-img-below=|![${finalAlt}](${finalUrl})|${finalText}`;
+    } else if (layoutType === 'card-above') {
+      markdownLine = `|=layout-card-img-above=|![${finalAlt}](${finalUrl})|${finalText}`;
+    }
+
+    insertTemplate(markdownLine);
+    setLayoutModalOpen(false);
+  };
+
   const cancelEdit = () => {
     setEditingPostId(null);
     setNewPost({ 
@@ -1323,6 +1462,78 @@ export default function AdminPage() {
     return content.split('\n').map((line, index) => {
       const trimmed = line.trim();
       if (!trimmed) return <div key={index} className="h-3" />;
+
+      if (trimmed.startsWith('|=layout-img-left=|')) {
+        const innerContent = trimmed.substring('|=layout-img-left=|'.length);
+        const match = innerContent.match(/^!\[(.*?)\]\((.*?)\)\|(.*)$/);
+        if (match) {
+          const [, alt, src, text] = match;
+          return (
+            <div key={index} className="blog-layout-grid-left flex flex-col md:flex-row gap-6 items-center my-6 bg-slate-50/50 p-5 rounded-2xl border border-slate-100">
+              <div className="w-full md:w-[35%] shrink-0">
+                <img src={src} alt={alt} className="rounded-xl w-full object-cover aspect-[4/3] shadow-sm m-0" />
+              </div>
+              <div className="w-full md:w-[65%] text-slate-700 text-xs sm:text-sm leading-relaxed whitespace-normal text-right" style={{ direction: 'rtl' }}>
+                {parseInlineMarkdown(text)}
+              </div>
+            </div>
+          );
+        }
+      }
+
+      if (trimmed.startsWith('|=layout-img-right=|')) {
+        const innerContent = trimmed.substring('|=layout-img-right=|'.length);
+        const match = innerContent.match(/^!\[(.*?)\]\((.*?)\)\|(.*)$/);
+        if (match) {
+          const [, alt, src, text] = match;
+          return (
+            <div key={index} className="blog-layout-grid-right flex flex-col md:flex-row-reverse gap-6 items-center my-6 bg-slate-50/50 p-5 rounded-2xl border border-slate-100">
+              <div className="w-full md:w-[35%] shrink-0">
+                <img src={src} alt={alt} className="rounded-xl w-full object-cover aspect-[4/3] shadow-sm m-0" />
+              </div>
+              <div className="w-full md:w-[65%] text-slate-700 text-xs sm:text-sm leading-relaxed whitespace-normal text-right" style={{ direction: 'rtl' }}>
+                {parseInlineMarkdown(text)}
+              </div>
+            </div>
+          );
+        }
+      }
+
+      if (trimmed.startsWith('|=layout-card-img-below=|')) {
+        const innerContent = trimmed.substring('|=layout-card-img-below=|'.length);
+        const match = innerContent.match(/^!\[(.*?)\]\((.*?)\)\|(.*)$/);
+        if (match) {
+          const [, alt, src, text] = match;
+          return (
+            <div key={index} className="blog-layout-card-below flex flex-col gap-4 p-5 bg-[#FF7112]/5 border border-[#FF7112]/10 rounded-2xl my-6 text-right" style={{ direction: 'rtl' }}>
+              <div className="text-slate-700 text-xs sm:text-sm leading-relaxed whitespace-normal font-sans">
+                {parseInlineMarkdown(text)}
+              </div>
+              <div className="w-full">
+                <img src={src} alt={alt} className="rounded-xl w-full object-cover max-h-[300px] shadow-sm m-0" />
+              </div>
+            </div>
+          );
+        }
+      }
+
+      if (trimmed.startsWith('|=layout-card-img-above=|')) {
+        const innerContent = trimmed.substring('|=layout-card-img-above=|'.length);
+        const match = innerContent.match(/^!\[(.*?)\]\((.*?)\)\|(.*)$/);
+        if (match) {
+          const [, alt, src, text] = match;
+          return (
+            <div key={index} className="blog-layout-card-above flex flex-col gap-4 p-5 bg-[#002060]/5 border border-[#002060]/10 rounded-2xl my-6 text-right" style={{ direction: 'rtl' }}>
+              <div className="w-full">
+                <img src={src} alt={alt} className="rounded-xl w-full object-cover max-h-[300px] shadow-sm m-0" />
+              </div>
+              <div className="text-slate-700 text-xs sm:text-sm leading-relaxed whitespace-normal font-sans">
+                {parseInlineMarkdown(text)}
+              </div>
+            </div>
+          );
+        }
+      }
 
       if (trimmed.startsWith('## ')) {
         return (
@@ -2337,7 +2548,7 @@ export default function AdminPage() {
 
             <div className="grid lg:grid-cols-12 gap-8 items-start">
               {/* Left Column: Advanced Workspace (Post Form) with Nested Sidebar Configs */}
-              <div className="lg:col-span-8 space-y-6">
+              <div className="lg:col-span-9 space-y-6">
                 
                 {/* Editing Notification Banner */}
                 {editingPostId && (
@@ -2616,30 +2827,6 @@ export default function AdminPage() {
                               >
                                 <ListOrdered className="w-4 h-4 text-slate-700" />
                               </button>
-                              <button
-                                type="button"
-                                onMouseDown={(e) => { 
-                                  e.preventDefault(); 
-                                  const url = prompt('Enter link URL:');
-                                  if (url) executeCommand('createLink', url); 
-                                }}
-                                title="Insert Link"
-                                className="p-2 bg-white hover:bg-slate-100 border border-gray-200 rounded-lg transition-all cursor-pointer"
-                              >
-                                <LinkIcon className="w-4 h-4 text-slate-700" />
-                              </button>
-                              <button
-                                type="button"
-                                onMouseDown={(e) => { 
-                                  e.preventDefault(); 
-                                  const url = prompt('Enter image URL:');
-                                  if (url) executeCommand('insertImage', url); 
-                                }}
-                                title="Insert Image"
-                                className="p-2 bg-white hover:bg-slate-100 border border-gray-200 rounded-lg transition-all cursor-pointer"
-                              >
-                                <ImageIcon className="w-4 h-4 text-slate-700" />
-                              </button>
                             </div>
 
                             <button
@@ -2649,6 +2836,18 @@ export default function AdminPage() {
                             >
                               <span className="text-[#FF7112] font-black text-xs">“</span> Quote
                             </button>
+
+                             <div className="flex flex-wrap gap-1.5 items-center pl-1 border-l border-gray-200 ml-1">
+                               <button
+                                 type="button"
+                                 onClick={() => insertLayoutTemplate('img-left')}
+                                 className="px-3 py-1.5 bg-gradient-to-r from-[#002060] to-[#FF7112] text-white hover:opacity-90 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all flex items-center gap-1 shadow-sm cursor-pointer"
+                                 title="Visual Layout Builder"
+                               >
+                                 <Sparkles className="w-3.5 h-3.5 text-yellow-300 animate-pulse" />
+                                 سیکشن ڈیزائنر (Layout Builder)
+                               </button>
+                             </div>
 
                             <div className="flex flex-wrap gap-1.5 items-center pl-1 border-l border-gray-200 ml-1">
                               <button
@@ -2690,7 +2889,7 @@ export default function AdminPage() {
               </div>
 
               {/* Right Column: SEO Assistant & Scheduling */}
-              <div className="lg:col-span-4 space-y-6">
+              <div className="lg:col-span-3 space-y-6">
                 {/* AI SEO Assistant */}
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden text-left">
                   <div className="bg-slate-900 px-5 py-4 border-b border-slate-800 flex items-center justify-between">
@@ -4334,6 +4533,303 @@ export default function AdminPage() {
               >
                 Close Vault
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Layout Composer Modal */}
+      {layoutModalOpen && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setLayoutModalOpen(false)} />
+          <div className="bg-white rounded-3xl overflow-hidden shadow-2xl relative w-full max-w-5xl max-h-[92vh] flex flex-col z-10 animate-fade-in border border-slate-200">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-gradient-to-r from-[#002060]/5 to-[#FF7112]/5">
+              <div className="text-left">
+                <span className="px-2.5 py-1 bg-[#FF7112]/10 text-[#FF7112] text-[10px] font-black uppercase tracking-wider rounded-full mb-1 inline-block">Visual Section layouter</span>
+                <h3 className="font-black text-gray-900 text-lg md:text-xl tracking-tight flex items-center gap-2">
+                  <span className="p-1.5 bg-[#002060]/10 text-[#002060] rounded-lg">
+                    <Sparkles className="w-5 h-5 text-[#002060]" />
+                  </span>
+                  سیکشن لے آؤٹ ترتیب دیں (Aesthetic Layout Builder)
+                </h3>
+                <p className="text-xs text-slate-500 font-sans mt-0.5">Build premium image-text modules with custom responsive alignment and Urdu typography.</p>
+              </div>
+              <button 
+                onClick={() => setLayoutModalOpen(false)}
+                className="p-2 bg-gray-105 hover:bg-gray-200 text-gray-500 rounded-full transition cursor-pointer"
+                type="button"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {/* Scrollable content */}
+            <div className="p-6 md:p-8 overflow-y-auto space-y-6 text-left">
+              
+              {/* Step 1: Visual Style Selector */}
+              <div>
+                <label className="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2.5 font-sans">
+                  مرحلہ 1: سیکشن کا انداز منتخب کریں (Step 1: Click to Choose Style)
+                </label>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  {/* Left split option */}
+                  <button
+                    type="button"
+                    onClick={() => setLayoutType('img-left')}
+                    className={`p-3.5 rounded-2xl border text-left transition-all flex flex-col justify-between h-[120px] ${
+                      layoutType === 'img-left' 
+                      ? 'border-[#FF7112] bg-[#FF7112]/5 ring-2 ring-[#FF7112]/30 shadow-md scale-[0.98]' 
+                      : 'border-slate-200 hover:border-slate-400 bg-white'
+                    }`}
+                  >
+                    <div className="flex justify-between items-center w-full">
+                      <span className="p-1.5 bg-[#002060]/5 rounded text-[#002060] font-bold text-xs uppercase">Split Left</span>
+                      {layoutType === 'img-left' && <div className="w-2.5 h-2.5 bg-[#FF7112] rounded-full animate-ping" />}
+                    </div>
+                    {/* Visual miniature draft representation */}
+                    <div className="flex gap-2 w-full my-auto items-center pointer-events-none">
+                      <div className="w-1/3 h-8 bg-slate-200 rounded border-2 border-dashed border-slate-300 flex items-center justify-center text-[9px] text-slate-400">🖼️</div>
+                      <div className="w-2/3 space-y-1">
+                        <div className="h-1.5 w-full bg-[#002060]/30 rounded" />
+                        <div className="h-1.5 w-5/6 bg-slate-350 bg-slate-200 rounded" />
+                        <div className="h-1.5 w-4/6 bg-slate-350 bg-slate-200 rounded" />
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-black text-slate-700 block">تصویر بائیں، تحریر دائیں</span>
+                  </button>
+
+                  {/* Right split option */}
+                  <button
+                    type="button"
+                    onClick={() => setLayoutType('img-right')}
+                    className={`p-3.5 rounded-2xl border text-left transition-all flex flex-col justify-between h-[120px] ${
+                      layoutType === 'img-right' 
+                      ? 'border-[#FF7112] bg-[#FF7112]/5 ring-2 ring-[#FF7112]/30 shadow-md scale-[0.98]' 
+                      : 'border-slate-200 hover:border-slate-400 bg-white'
+                    }`}
+                  >
+                    <div className="flex justify-between items-center w-full">
+                      <span className="p-1.5 bg-[#002060]/5 rounded text-[#002060] font-bold text-xs uppercase">Split Right</span>
+                      {layoutType === 'img-right' && <div className="w-2.5 h-2.5 bg-[#FF7112] rounded-full animate-ping" />}
+                    </div>
+                    {/* Visual miniature draft representation */}
+                    <div className="flex gap-2 w-full my-auto items-center pointer-events-none">
+                      <div className="w-2/3 space-y-1">
+                        <div className="h-1.5 w-full bg-[#002060]/30 rounded" />
+                        <div className="h-1.5 w-5/6 bg-slate-350 bg-slate-200 rounded" />
+                        <div className="h-1.5 w-4/6 bg-slate-350 bg-slate-200 rounded" />
+                      </div>
+                      <div className="w-1/3 h-8 bg-slate-200 rounded border-2 border-dashed border-slate-300 flex items-center justify-center text-[9px] text-slate-400">🖼️</div>
+                    </div>
+                    <span className="text-[10px] font-black text-slate-700 block">تصویر دائیں، تحریر بائیں</span>
+                  </button>
+
+                  {/* Card Image Above option */}
+                  <button
+                    type="button"
+                    onClick={() => setLayoutType('card-above')}
+                    className={`p-3.5 rounded-2xl border text-left transition-all flex flex-col justify-between h-[120px] ${
+                      layoutType === 'card-above' 
+                      ? 'border-[#FF7112] bg-[#FF7112]/5 ring-2 ring-[#FF7112]/30 shadow-md scale-[0.98]' 
+                      : 'border-slate-200 hover:border-slate-400 bg-white'
+                    }`}
+                  >
+                    <div className="flex justify-between items-center w-full">
+                      <span className="p-1.5 bg-emerald-50 rounded text-emerald-700 font-bold text-xs uppercase">Banner Top</span>
+                      {layoutType === 'card-above' && <div className="w-2.5 h-2.5 bg-[#FF7112] rounded-full animate-ping" />}
+                    </div>
+                    {/* Visual miniature draft representation */}
+                    <div className="flex flex-col gap-1 w-full my-auto pointer-events-none">
+                      <div className="w-full h-5 bg-slate-200 rounded border-2 border-dashed border-slate-300 flex items-center justify-center text-[8px] text-slate-400">🖼️ Image Banner</div>
+                      <div className="h-1.5 w-full bg-[#002060]/30 rounded" />
+                    </div>
+                    <span className="text-[10px] font-black text-slate-700 block">تصویر اوپر، تحریر نیچے</span>
+                  </button>
+
+                  {/* Card Image Below option */}
+                  <button
+                    type="button"
+                    onClick={() => setLayoutType('card-below')}
+                    className={`p-3.5 rounded-2xl border text-left transition-all flex flex-col justify-between h-[120px] ${
+                      layoutType === 'card-below' 
+                      ? 'border-[#FF7112] bg-[#FF7112]/5 ring-2 ring-[#FF7112]/30 shadow-md scale-[0.98]' 
+                      : 'border-slate-200 hover:border-slate-400 bg-white'
+                    }`}
+                  >
+                    <div className="flex justify-between items-center w-full">
+                      <span className="p-1.5 bg-emerald-50 rounded text-emerald-700 font-bold text-xs uppercase">Banner Bottom</span>
+                      {layoutType === 'card-below' && <div className="w-2.5 h-2.5 bg-[#FF7112] rounded-full animate-ping" />}
+                    </div>
+                    {/* Visual miniature draft representation */}
+                    <div className="flex flex-col gap-1 w-full my-auto pointer-events-none">
+                      <div className="h-1.5 w-full bg-[#002060]/30 rounded" />
+                      <div className="w-full h-5 bg-slate-200 rounded border-2 border-dashed border-slate-300 flex items-center justify-center text-[8px] text-slate-400">🖼️ Image Banner</div>
+                    </div>
+                    <span className="text-[10px] font-black text-slate-700 block">تحریر اوپر، تصویر نیچے</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Layout Content - 2 Columns (Image Selection / Upload Side & Content Side) */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                {/* Form column: Image and description config */}
+                <div className="lg:col-span-5 space-y-5 bg-slate-50/50 p-5 rounded-2xl border border-slate-100">
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-wider text-[#002060] mb-2 font-sans">مرحلہ 2: تصویر یا میڈیا (Step 2: Media Source)</label>
+                    
+                    {/* Tiny upload widget */}
+                    <div className="flex gap-2 mb-2.5">
+                      <button
+                        type="button"
+                        onClick={() => layoutImageFileInputRef.current?.click()}
+                        className="flex-1 py-2 px-3 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300/80 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+                      >
+                        <Upload className="w-3.5 h-3.5 text-[#FF7112]" />
+                        ڈسک سے اپ لوڈ کریں (Upload File)
+                      </button>
+                      <input 
+                        type="file" 
+                        ref={layoutImageFileInputRef} 
+                        accept="image/*" 
+                        className="hidden" 
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              if (typeof reader.result === 'string') {
+                                setLayoutImageUrl(reader.result);
+                                if (!layoutAlt || layoutAlt === 'Academy Section Illustrative Picture') {
+                                  setLayoutAlt(file.name.split('.')[0].replace(/[-_]/g, ' '));
+                                }
+                              }
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }} 
+                      />
+                    </div>
+
+                    <div className="relative">
+                      <input 
+                        type="text"
+                        className="w-full text-xs font-sans bg-white border border-slate-300/80 px-3.5 py-2.5 rounded-xl focus:ring-1 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none text-slate-800 placeholder:text-gray-400 shadow-inner font-bold" 
+                        placeholder="Or paste external image URL..." 
+                        value={layoutImageUrl} 
+                        onChange={e => setLayoutImageUrl(e.target.value)} 
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-black uppercase tracking-wider text-slate-450 mb-1 font-sans">SEO Picture Tag (مضمون کے لیے تصویر کا نام)</label>
+                    <input 
+                      type="text"
+                      className="w-full text-xs bg-white border border-slate-200 px-3.5 py-2.5 rounded-xl focus:ring-1 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none text-slate-800 font-sans shadow-inner font-semibold" 
+                      placeholder="e.g. Car parallel parking tutorial diagram" 
+                      value={layoutAlt} 
+                      onChange={e => setLayoutAlt(e.target.value)} 
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-black uppercase tracking-wider text-slate-450 mb-1.5 font-sans">Presaved Driving Illustrations (تیار تصاویر سے چنیں)</label>
+                    <div className="grid grid-cols-4 gap-1.5 max-h-[140px] overflow-y-auto p-1.5 border border-slate-200 rounded-xl bg-white">
+                      {[...PRESET_IMAGES, ...PRESET_CAR_IMAGES].map((img, i) => {
+                        const isSelected = layoutImageUrl === img.url;
+                        return (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => {
+                              setLayoutImageUrl(img.url);
+                              setLayoutAlt(img.label);
+                            }}
+                            className={`relative aspect-square rounded-lg overflow-hidden border-2 transition ${
+                              isSelected ? 'border-[#FF7112] ring-2 ring-orange-100 scale-95 shadow-md' : 'border-slate-200 hover:border-slate-400'
+                            }`}
+                            title={img.label}
+                          >
+                            <img src={img.url} alt={img.label} className="w-full h-full object-cover" />
+                            {isSelected && (
+                              <div className="absolute inset-0 bg-[#FF7112]/20 flex items-center justify-center">
+                                <Check className="w-4 h-4 text-white drop-shadow" />
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Text editor and preview on the other side (col-span-7) */}
+                <div className="lg:col-span-7 flex flex-col space-y-5">
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-wider text-[#002060] mb-2 font-sans justify-between flex items-center">
+                      <span>مرحلہ 3: تحریر لکھیں (Step 3: Text Content) *</span>
+                      <span className="text-[10px] font-black text-[#FF7112] font-sans tracking-wide">RTL URDU OPTIMIZED</span>
+                    </label>
+                    <textarea
+                      rows={5}
+                      className="w-full border border-slate-300 p-4 rounded-2xl text-sm leading-relaxed text-slate-800 placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-[#FF7112] transition-all font-sans font-medium"
+                      style={{ direction: 'rtl', textAlign: 'right' }} 
+                      placeholder="یہاں طویل عبارت یا مضمون درج کریں... (Urdu description layouts)"
+                      value={layoutText}
+                      onChange={e => setLayoutText(e.target.value)}
+                    />
+                    <span className="text-[10px] text-slate-400 mt-1 block leading-normal">Feel free to type Urdu paragraphs. Semicolons and brackets will layout correctly with standard alignment.</span>
+                  </div>
+
+                  {/* Real-time preview inside modal! */}
+                  <div className="border border-slate-200 bg-slate-50/50 p-5 rounded-2xl flex flex-col justify-between overflow-hidden">
+                    <span className="text-[10px] font-black uppercase text-[#002060] tracking-wider mb-2.5">Live Section Preview (پیش نظارہ)</span>
+                    <div className="border border-slate-200 rounded-2xl bg-white p-4 shadow-sm my-auto min-h-[140px] flex items-center justify-center overflow-hidden">
+                      {layoutImageUrl ? (
+                        <div className={`w-full ${
+                          layoutType === 'img-left' ? 'flex gap-4 items-center text-left' :
+                          layoutType === 'img-right' ? 'flex flex-row-reverse gap-4 items-center text-left' :
+                          layoutType === 'card-above' ? 'flex flex-col gap-3 text-left' : 'flex flex-col-reverse gap-3 text-left'
+                        }`}>
+                          <img src={layoutImageUrl} alt="preview" className={`rounded-xl object-cover border shrink-0 m-0 ${
+                            (layoutType === 'img-left' || layoutType === 'img-right') ? 'w-24 h-24' : 'w-full h-24'
+                          }`} />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[12px] text-slate-600 line-clamp-4 leading-relaxed font-sans" style={{ direction: 'rtl', textAlign: 'right' }}>
+                              {layoutText || 'عبارت یہاں ظاہر ہو گی۔'}
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-gray-400 italic text-center">Configure layout variables to preview...</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions Footer */}
+            <div className="p-6 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
+              <span className="text-[11px] text-slate-500 font-extrabold font-sans italic">Click layout section button to place block directly in text editor.</span>
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => setLayoutModalOpen(false)}
+                  className="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-black text-xs uppercase tracking-wider rounded-xl transition cursor-pointer"
+                  type="button"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleConfirmInsertLayout}
+                  className="px-6 py-2.5 bg-gradient-to-r from-[#002060] to-[#111827] hover:opacity-95 text-white font-black text-xs uppercase tracking-wider rounded-xl transition shadow-md shadow-indigo-150 cursor-pointer flex items-center gap-2"
+                  type="button"
+                >
+                  <Plus className="w-4 h-4 text-[#FF7112]" /> سیکشن شامل کریں (Insert Layout Section)
+                </button>
+              </div>
             </div>
           </div>
         </div>
