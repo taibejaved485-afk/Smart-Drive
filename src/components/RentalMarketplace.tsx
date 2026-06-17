@@ -217,7 +217,7 @@ function MarketplaceCarCard({ car, waUrl }: { car: RentalCar; waUrl: string; key
         {/* City Hub Indicator & Area */}
         <div className="absolute top-4 right-4 z-20 flex flex-col items-end gap-1.5">
           <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full text-[10px] font-bold text-white shadow-sm">
-            <MapPin className="w-3 h-3 text-red-500" />
+            <MapPin className="w-3 h-3 text-[#FF7112]/90" />
             <span>{car.city}</span>
           </div>
           {(car.area || car.id === '1') && (
@@ -235,7 +235,7 @@ function MarketplaceCarCard({ car, waUrl }: { car: RentalCar; waUrl: string; key
       {/* Meta Body Content */}
       <div className="p-5 sm:p-6 flex flex-col flex-grow">
         <div className="flex justify-between items-start gap-2 mb-2">
-          <h3 className="text-lg md:text-xl font-bold text-gray-900 tracking-tight leading-tight group-hover:text-red-700 transition-colors">
+          <h3 className="text-lg md:text-xl font-bold text-gray-900 tracking-tight leading-tight group-hover:text-[#E05A00] transition-colors">
             {car.name}
           </h3>
         </div>
@@ -335,7 +335,7 @@ function MarketplaceCarCard({ car, waUrl }: { car: RentalCar; waUrl: string; key
           </a>
           
           {isTodayBooked && (
-            <span className="bg-red-50 text-red-600 px-4 py-2.5 rounded-xl font-extrabold text-[10px] sm:text-xs uppercase tracking-wider flex items-center justify-center border border-red-100 flex-1 ml-2 text-center">
+            <span className="bg-[#FF7112]/10 text-[#FF7112] px-4 py-2.5 rounded-xl font-extrabold text-[10px] sm:text-xs uppercase tracking-wider flex items-center justify-center border border-[#FF7112]/20 flex-1 ml-2 text-center">
               Unavailable Today
             </span>
           )}
@@ -558,7 +558,7 @@ export default function RentalMarketplace() {
         
         {/* Marketplace Section Title */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <span className="text-red-650 font-black text-xs uppercase tracking-widest bg-red-50 border border-red-100 px-4 py-1.5 rounded-full">
+          <span className="text-[#E05A00] font-black text-xs uppercase tracking-widest bg-[#FF7112]/10 border border-[#FF7112]/20 px-4 py-1.5 rounded-full">
             Local Peer-to-Peer Marketplace
           </span>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black font-display text-gray-900 tracking-tight mt-4">
@@ -580,8 +580,8 @@ export default function RentalMarketplace() {
             
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3 sm:gap-4 items-center relative z-10">
               {/* Filter 1: Universal Search */}
-              <div className="relative flex items-center bg-white/60 backdrop-blur-md rounded-xl sm:rounded-2xl border border-gray-200/80 hover:border-red-300 hover:bg-white transition-all duration-300 px-4 py-3 sm:py-4 focus-within:!bg-white focus-within:!border-red-500 focus-within:ring-4 focus-within:ring-red-500/10 group shadow-sm h-full">
-                <Search className="w-5 h-5 text-gray-400 group-focus-within:text-red-600 group-focus-within:scale-110 transition-all shrink-0" />
+              <div className="relative flex items-center bg-white/60 backdrop-blur-md rounded-xl sm:rounded-2xl border border-gray-200/80 hover:border-red-300 hover:bg-white transition-all duration-300 px-4 py-3 sm:py-4 focus-within:!bg-white focus-within:!border-[#FF7112] focus-within:ring-4 focus-within:ring-[#FF7112]/10 group shadow-sm h-full">
+                <Search className="w-5 h-5 text-gray-400 group-focus-within:text-[#FF7112] group-focus-within:scale-110 transition-all shrink-0" />
                 <input
                   type="text"
                   placeholder="Enter brand or model..."
@@ -592,9 +592,9 @@ export default function RentalMarketplace() {
               </div>
 
               {/* Filter 2: Main Hub */}
-              <div className="relative flex flex-col justify-center bg-white/60 backdrop-blur-md rounded-xl sm:rounded-2xl border border-gray-200/80 hover:border-red-300 hover:bg-white transition-all px-4 py-3 sm:py-0 h-14 sm:h-[4.5rem] cursor-pointer group focus-within:!bg-white focus-within:!border-red-500 focus-within:ring-4 focus-within:ring-red-500/10 shadow-sm">
+              <div className="relative flex flex-col justify-center bg-white/60 backdrop-blur-md rounded-xl sm:rounded-2xl border border-gray-200/80 hover:border-red-300 hover:bg-white transition-all px-4 py-3 sm:py-0 h-14 sm:h-[4.5rem] cursor-pointer group focus-within:!bg-white focus-within:!border-[#FF7112] focus-within:ring-4 focus-within:ring-[#FF7112]/10 shadow-sm">
                 <div className="flex items-center gap-1.5 mb-0.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_5px_rgba(239,68,68,0.8)]"></div>
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#FF7112]/100 animate-pulse shadow-[0_0_5px_rgba(239,68,68,0.8)]"></div>
                   <label className="text-[9px] font-mono uppercase text-gray-500 tracking-[0.2em] font-semibold">Hub</label>
                 </div>
                 <select 
@@ -607,7 +607,7 @@ export default function RentalMarketplace() {
                 >
                   {cities.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
-                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none group-focus-within:text-red-500 transition-colors" />
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none group-focus-within:text-[#FF7112]/90 transition-colors" />
               </div>
 
               {/* Filter 3: Sector/Locality */}
@@ -632,7 +632,7 @@ export default function RentalMarketplace() {
               <button className="relative overflow-hidden bg-gray-950 hover:bg-black text-white rounded-xl sm:rounded-2xl font-black uppercase text-xs tracking-[0.15em] py-4 sm:py-0 h-14 sm:h-[4.5rem] px-6 transition-all shadow-[0_8px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_25px_rgba(220,38,38,0.25)] hover:scale-[1.02] flex items-center justify-center gap-2.5 w-full group">
                 {/* Sweep effect on hover */}
                 <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
-                <Search className="w-4 h-4 text-red-500 flex-shrink-0" />
+                <Search className="w-4 h-4 text-[#FF7112]/90 flex-shrink-0" />
                 <span className="relative z-10">Scan Fleet</span>
               </button>
             </div>
@@ -721,7 +721,7 @@ export default function RentalMarketplace() {
                   setDriverPreference('Any');
                   setSelectedTransmission('All');
                 }}
-                className="text-[10px] font-black uppercase text-red-600 hover:text-red-700 transition-colors cursor-pointer tracking-widest flex items-center gap-1.5 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md"
+                className="text-[10px] font-black uppercase text-[#FF7112] hover:text-[#E05A00] transition-colors cursor-pointer tracking-widest flex items-center gap-1.5 bg-[#FF7112]/10 hover:bg-[#FF7112]/20 px-3 py-1.5 rounded-md"
               >
                 <X className="w-3.5 h-3.5" /> Reset Array
               </button>

@@ -105,7 +105,7 @@ export default function HomePage() {
           <div className="text-center md:text-left">
             <h3 className="text-base sm:text-lg font-black text-gray-950 flex items-center gap-1.5 justify-center md:justify-start">
               <span>GoDriveify Hub</span>
-              <Sparkles className="w-4 h-4 text-red-500 fill-red-500/10" />
+              <Sparkles className="w-4 h-4 text-[#FF7112]/90 fill-red-500/10" />
             </h3>
             <p className="text-xs text-gray-400 font-medium">Choose a portal to start your journey</p>
           </div>
@@ -115,7 +115,7 @@ export default function HomePage() {
               onClick={() => setActiveService('learn')}
               className={`flex-1 sm:flex-initial flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider transition-all cursor-pointer ${
                 activeService === 'learn' 
-                  ? 'bg-red-600 text-white shadow-lg shadow-red-500/20' 
+                  ? 'bg-[#FF7112] text-white shadow-lg shadow-red-500/20' 
                   : 'text-gray-500 hover:text-gray-800 hover:bg-gray-200/50'
               }`}
               type="button"

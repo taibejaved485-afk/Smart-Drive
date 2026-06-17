@@ -253,7 +253,7 @@ export default function PricingPage() {
       <section className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-16">
-                <p className="text-red-500 font-bold tracking-widest text-sm mb-4">PRICING PACKAGE</p>
+                <p className="text-[#FF7112]/90 font-bold tracking-widest text-sm mb-4">PRICING PACKAGE</p>
                 <h2 className="text-3xl md:text-5xl font-bold text-gray-950 mb-8">Choose A Package That Suits Your Needs</h2>
                 <p className="text-gray-600 text-lg leading-relaxed">At GoDriveify, we offer a range of driving packages to suit your needs, skill level, and budget. Whether you're a beginner or looking to refine your driving skills, we've got the perfect package for you.</p>
             </div>
@@ -267,7 +267,7 @@ export default function PricingPage() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, margin: "-50px" }}
                         transition={{ duration: 0.5, delay: i * 0.15, ease: "easeOut" }}
-                        className="bg-white p-6 sm:p-8 rounded-3xl shadow-xl border border-gray-100 flex flex-col justify-between hover:border-red-100 hover:shadow-2xl hover:shadow-red-50/20 hover:-translate-y-3 transition-all duration-300 ease-out"
+                        className="bg-white p-6 sm:p-8 rounded-3xl shadow-xl border border-gray-100 flex flex-col justify-between hover:border-[#FF7112]/20 hover:shadow-2xl hover:shadow-red-50/20 hover:-translate-y-3 transition-all duration-300 ease-out"
                     >
                         <div>
                             {/* Course Image frame with zoom hover effect */}
@@ -292,26 +292,26 @@ export default function PricingPage() {
                             {/* Check bullet parameters from custom admin schema */}
                             <div className="space-y-3 mb-8 text-sm font-semibold text-gray-700">
                                 {pkg.lessonDuration && (
-                                    <div className="flex items-center gap-2.5"><CheckCircle2 className="w-5 h-5 text-red-650 shrink-0"/> {pkg.lessonDuration}</div>
+                                    <div className="flex items-center gap-2.5"><CheckCircle2 className="w-5 h-5 text-[#E05A00] shrink-0"/> {pkg.lessonDuration}</div>
                                 )}
                                 {pkg.dailyTime && (
-                                    <div className="flex items-center gap-2.5"><CheckCircle2 className="w-5 h-5 text-red-650 shrink-0"/> {pkg.dailyTime}</div>
+                                    <div className="flex items-center gap-2.5"><CheckCircle2 className="w-5 h-5 text-[#E05A00] shrink-0"/> {pkg.dailyTime}</div>
                                 )}
                                 {pkg.theoryDuration && (
-                                    <div className="flex items-center gap-2.5"><CheckCircle2 className="w-5 h-5 text-red-650 shrink-0"/> {pkg.theoryDuration}</div>
+                                    <div className="flex items-center gap-2.5"><CheckCircle2 className="w-5 h-5 text-[#E05A00] shrink-0"/> {pkg.theoryDuration}</div>
                                 )}
                                 {pkg.coursePeriod && (
-                                    <div className="flex items-center gap-2.5"><CheckCircle2 className="w-5 h-5 text-red-650 shrink-0"/> {pkg.coursePeriod}</div>
+                                    <div className="flex items-center gap-2.5"><CheckCircle2 className="w-5 h-5 text-[#E05A00] shrink-0"/> {pkg.coursePeriod}</div>
                                 )}
                                 {pkg.additionalTime && (
-                                    <div className="flex items-center gap-2.5"><CheckCircle2 className="w-5 h-5 text-red-650 shrink-0"/> {pkg.additionalTime}</div>
+                                    <div className="flex items-center gap-2.5"><CheckCircle2 className="w-5 h-5 text-[#E05A00] shrink-0"/> {pkg.additionalTime}</div>
                                 )}
                             </div>
                         </div>
                         
                         <button 
                             onClick={() => scrollToContact(pkg.courseTitle, pkg.courseFee)}
-                            className="w-full text-red-600 border-2 border-red-600 py-3 rounded-xl font-bold hover:bg-red-600 hover:text-white transition uppercase tracking-widest flex justify-center items-center gap-2 cursor-pointer font-sans"
+                            className="w-full text-[#FF7112] border-2 border-[#FF7112] py-3 rounded-xl font-bold hover:bg-[#FF7112] hover:text-white transition uppercase tracking-widest flex justify-center items-center gap-2 cursor-pointer font-sans"
                         >
                             GET STARTED <span className="text-lg">→</span>
                         </button>
@@ -347,8 +347,8 @@ export default function PricingPage() {
       <section id="contact" ref={contactFormRef} className="py-24 bg-slate-50 border-t border-slate-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="inline-flex items-center gap-1.5 bg-red-50 border border-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
-              <MessageSquare className="w-3.5 h-3.5 text-red-700" /> Corporate Inquiry Desk
+            <span className="inline-flex items-center gap-1.5 bg-[#FF7112]/10 border border-[#FF7112]/20 text-[#E05A00] px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
+              <MessageSquare className="w-3.5 h-3.5 text-[#E05A00]" /> Corporate Inquiry Desk
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 leading-none mb-4">
               Select Your Service Interest
@@ -359,7 +359,7 @@ export default function PricingPage() {
           </div>
 
           <div className="bg-white rounded-3xl border border-slate-200/60 p-6 sm:p-10 shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1.5 bg-red-700" />
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-[#E05A00]" />
             
             <AnimatePresence mode="wait">
               {!formSubmitted ? (
@@ -380,7 +380,7 @@ export default function PricingPage() {
                         required
                         type="text" 
                         placeholder="e.g. Muhammad Raza" 
-                        className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition text-sm font-medium"
+                        className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-medium"
                         value={formData.fullName}
                         onChange={e => setFormData({ ...formData, fullName: e.target.value })}
                       />
@@ -394,7 +394,7 @@ export default function PricingPage() {
                         required
                         type="text" 
                         placeholder="e.g. Malik Muhammad Ilyas" 
-                        className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition text-sm font-medium"
+                        className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-medium"
                         value={formData.fatherName}
                         onChange={e => setFormData({ ...formData, fatherName: e.target.value })}
                       />
@@ -409,7 +409,7 @@ export default function PricingPage() {
                       <input 
                         type="email" 
                         placeholder="e.g. name@domain.com" 
-                        className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition text-sm font-medium"
+                        className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-medium"
                         value={formData.email}
                         onChange={e => setFormData({ ...formData, email: e.target.value })}
                       />
@@ -423,7 +423,7 @@ export default function PricingPage() {
                         required
                         type="tel" 
                         placeholder="e.g. 03097666928" 
-                        className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition text-sm font-mono font-bold"
+                        className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-mono font-bold"
                         value={formData.whatsappNumber}
                         onChange={e => setFormData({ ...formData, whatsappNumber: e.target.value })}
                       />
@@ -437,7 +437,7 @@ export default function PricingPage() {
                     </label>
                     <select 
                       required
-                      className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none bg-white transition text-xs sm:text-sm font-extrabold text-slate-900 cursor-pointer"
+                      className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none bg-white transition text-xs sm:text-sm font-extrabold text-slate-900 cursor-pointer"
                       value={formData.inquiryType}
                       onChange={e => {
                         const val = e.target.value;
@@ -458,14 +458,14 @@ export default function PricingPage() {
                       required
                       rows={4} 
                       placeholder="Type details such as desired timing, transmission mode, vehicle configuration registration year or initial sale demand value..." 
-                      className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition text-sm font-medium resize-none leading-relaxed"
+                      className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-medium resize-none leading-relaxed"
                       value={formData.message}
                       onChange={e => setFormData({ ...formData, message: e.target.value })}
                     />
                   </div>
 
                   <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs font-semibold leading-relaxed text-slate-500 flex gap-2.5 items-start">
-                    <CheckCircle2 className="w-4.5 h-4.5 text-red-700 shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-4.5 h-4.5 text-[#E05A00] shrink-0 mt-0.5" />
                     <p>
                       By submitting or listing, you authorize GoDriveify support to review your registered assets and reach out directly at the WhatsApp number specified under Pakistani regulatory biometrics checks.
                     </p>
@@ -473,7 +473,7 @@ export default function PricingPage() {
 
                   <button 
                     type="submit"
-                    className="w-full bg-red-700 hover:bg-red-800 text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors cursor-pointer shadow-md"
+                    className="w-full bg-[#E05A00] hover:bg-red-800 text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors cursor-pointer shadow-md"
                   >
                     Submit Corporate Inquiry
                   </button>
@@ -491,7 +491,7 @@ export default function PricingPage() {
                   
                   <h3 className="text-2xl font-black text-slate-900 tracking-tight">Inquiry Registered Successfully!</h3>
                   <p className="text-xs text-slate-500 mt-2 font-bold uppercase tracking-widest">
-                    Your Ticket ID is: <span className="text-red-700 font-mono font-extrabold">{submissionTicketId}</span>
+                    Your Ticket ID is: <span className="text-[#E05A00] font-mono font-extrabold">{submissionTicketId}</span>
                   </p>
 
                   <p className="text-slate-650 text-xs sm:text-sm font-semibold max-w-md mx-auto mt-4 leading-relaxed bg-slate-50 p-4 border rounded-2xl">

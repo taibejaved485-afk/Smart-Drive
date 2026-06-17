@@ -452,7 +452,7 @@ export function CarRequestsGrid() {
             <div key={req.id} className="relative bg-white rounded-[1.5rem] border border-gray-200 shadow-sm hover:shadow-xl hover:border-indigo-200 transition-all duration-300 flex flex-col group p-6 sm:p-8 mt-4">
               
               {req.urgency === 'Urgent' && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-red-600 text-white px-4 py-1.5 rounded-full font-black text-[10px] uppercase tracking-widest shadow-[0_4px_15px_rgba(220,38,38,0.4)] flex items-center gap-1.5 animate-bounce z-10 border border-red-500">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#FF7112] text-white px-4 py-1.5 rounded-full font-black text-[10px] uppercase tracking-widest shadow-[0_4px_15px_rgba(220,38,38,0.4)] flex items-center gap-1.5 animate-bounce z-10 border border-[#FF7112]">
                   <span className="text-xs">🔥</span> URGENT REQUEST
                 </div>
               )}

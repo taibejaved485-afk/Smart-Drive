@@ -74,18 +74,18 @@ export default function Newsletter() {
           animation-play-state: running;
         }
       `}</style>
-      <div className="bg-white border-2 border-red-500 hover:border-red-600 rounded-3xl p-8 sm:p-12 shadow-xl shadow-slate-100/40 relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8 group transition-colors duration-500">
+      <div className="bg-white border-2 border-[#FF7112] hover:border-[#FF7112] rounded-3xl p-8 sm:p-12 shadow-xl shadow-slate-100/40 relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8 group transition-colors duration-500">
         
         {/* Rectangular Red Dot */}
         <div className="absolute w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 animate-travel-rectangle-newsletter shadow-[0_0_15px_5px_#dc2626] z-0 transition-opacity duration-500 pointer-events-none" />
 
         {/* Subtle Decorative Ambient Background Effects */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-red-50/40 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-80 h-80 bg-[#FF7112]/10/40 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-slate-50 rounded-full blur-2xl pointer-events-none" />
 
         {/* Text Area */}
         <div className="relative z-10 max-w-xl text-center lg:text-left">
-          <span className="inline-flex items-center gap-1.5 bg-red-50 border border-red-100 text-red-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider mb-4">
+          <span className="inline-flex items-center gap-1.5 bg-[#FF7112]/10 border border-[#FF7112]/20 text-[#E05A00] px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider mb-4">
             <Sparkles className="w-3.5 h-3.5" /> SMART DRIVE INSIGHTS
           </span>
           <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-snug mb-3">
@@ -122,12 +122,12 @@ export default function Newsletter() {
                         setEmail(e.target.value);
                         if (error) setError('');
                       }}
-                      className="w-full pl-11 pr-4 py-3.5 bg-slate-50/50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-red-600 focus:ring-2 focus:ring-red-100 transition text-sm font-medium text-slate-800"
+                      className="w-full pl-11 pr-4 py-3.5 bg-slate-50/50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#FF7112] focus:ring-2 focus:ring-red-100 transition text-sm font-medium text-slate-800"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="bg-red-700 hover:bg-red-800 active:scale-98 text-white px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-md shadow-red-700/10 shrink-0 cursor-pointer flex items-center justify-center gap-2"
+                    className="bg-[#E05A00] hover:bg-red-800 active:scale-98 text-white px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-md shadow-red-700/10 shrink-0 cursor-pointer flex items-center justify-center gap-2"
                   >
                     <span>Subscribe Now</span>
                     <Send className="w-3.5 h-3.5" />
@@ -140,7 +140,7 @@ export default function Newsletter() {
                       initial={{ opacity: 0, y: -5 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
-                      className="text-xs text-red-650 font-bold pl-2"
+                      className="text-xs text-[#E05A00] font-bold pl-2"
                     >
                       {error}
                     </motion.p>

@@ -59,7 +59,7 @@ export default function FAQPage() {
       <section className="py-12 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-2 gap-8 sm:gap-16 mb-16">
             <div>
-                <p className="text-red-500 font-bold tracking-widest text-sm mb-4">FAQ</p>
+                <p className="text-[#FF7112]/90 font-bold tracking-widest text-sm mb-4">FAQ</p>
                 <h2 className="text-3xl sm:text-5xl font-bold text-gray-950 mb-8">Get Quick Answers To Your Concerns</h2>
             </div>
             <div className="flex items-center">
@@ -99,7 +99,7 @@ export default function FAQPage() {
               window.scrollTo(0, 0);
               window.location.reload();
             }}
-            className="bg-red-600 text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest hover:bg-red-700 transition cursor-pointer"
+            className="bg-[#FF7112] text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest hover:bg-[#E05A00] transition cursor-pointer"
           >
             GET STARTED →
           </button>

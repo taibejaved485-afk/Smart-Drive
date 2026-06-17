@@ -75,8 +75,8 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         <AnimatePresence mode="popLayout">
           {toasts.map((toast) => {
             // Pick styles & colors to match GoDriveify's sleek premium black/red theme
-            let iconColor = 'text-red-500';
-            let borderColor = 'border-red-500/20';
+            let iconColor = 'text-[#FF7112]/90';
+            let borderColor = 'border-[#FF7112]/20';
             let bgColor = 'bg-slate-900/95';
             let IconComponent = Info;
 
@@ -88,8 +88,8 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 IconComponent = CheckCircle2;
                 break;
               case 'error':
-                iconColor = 'text-red-500';
-                borderColor = 'border-red-500/20';
+                iconColor = 'text-[#FF7112]/90';
+                borderColor = 'border-[#FF7112]/20';
                 bgColor = 'bg-slate-900/95';
                 IconComponent = AlertCircle;
                 break;
@@ -120,7 +120,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 className={`pointer-events-auto rounded-2xl border ${borderColor} ${bgColor} backdrop-blur-md p-4 shadow-[0_12px_40px_rgba(0,0,0,0.35)] flex items-start gap-3 relative overflow-hidden`}
               >
                 {/* Accent mini glow */}
-                <div className={`absolute top-0 left-0 w-1.5 h-full ${toast.type === 'success' ? 'bg-emerald-500' : toast.type === 'error' ? 'bg-red-500' : toast.type === 'warning' ? 'bg-amber-500' : 'bg-blue-500'}`} />
+                <div className={`absolute top-0 left-0 w-1.5 h-full ${toast.type === 'success' ? 'bg-emerald-500' : toast.type === 'error' ? 'bg-[#FF7112]/100' : toast.type === 'warning' ? 'bg-amber-500' : 'bg-blue-500'}`} />
 
                 {/* Toast Icon */}
                 <div className="shrink-0 pt-0.5 pl-1.5">
@@ -154,7 +154,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                     initial={{ width: '100%' }}
                     animate={{ width: '0%' }}
                     transition={{ duration: (toast.duration || 4000) / 1000, ease: 'linear' }}
-                    className={`h-full ${toast.type === 'success' ? 'bg-emerald-500' : toast.type === 'error' ? 'bg-red-500' : toast.type === 'warning' ? 'bg-amber-500' : 'bg-blue-500'}`}
+                    className={`h-full ${toast.type === 'success' ? 'bg-emerald-500' : toast.type === 'error' ? 'bg-[#FF7112]/100' : toast.type === 'warning' ? 'bg-amber-500' : 'bg-blue-500'}`}
                   />
                 </div>
               </motion.div>

@@ -35,7 +35,7 @@ interface ReviewCardProps {
 
 function ReviewCard({ name, text, rating, avatar }: ReviewCardProps) {
   return (
-    <div className="bg-white p-4 sm:p-4.5 rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.02)] border border-gray-100 flex flex-col w-[275px] sm:w-[315px] shrink-0 transition-all duration-300 hover:shadow-md hover:border-red-500/10 group">
+    <div className="bg-white p-4 sm:p-4.5 rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.02)] border border-gray-100 flex flex-col w-[275px] sm:w-[315px] shrink-0 transition-all duration-300 hover:shadow-md hover:border-[#FF7112]/10 group">
       <div className="flex justify-between items-start mb-2.5">
         <div className="flex gap-0.5">
           {[...Array(rating)].map((_, j) => (
@@ -61,7 +61,7 @@ function ReviewCard({ name, text, rating, avatar }: ReviewCardProps) {
           src={avatar} 
           alt={name} 
           referrerPolicy="no-referrer" 
-          className="w-8 h-8 rounded-full object-cover border border-red-500/10" 
+          className="w-8 h-8 rounded-full object-cover border border-[#FF7112]/10" 
         />
         <div>
           <p className="font-bold text-gray-950 text-xs tracking-tight">{name}</p>
@@ -104,7 +104,7 @@ export default function Reviews() {
       `}} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full text-center mb-7">
-        <span className="inline-flex items-center gap-1.5 bg-red-500/10 text-red-650 font-black text-[10px] tracking-widest uppercase py-1 px-3.5 rounded-full mb-2">
+        <span className="inline-flex items-center gap-1.5 bg-[#FF7112]/100/10 text-[#E05A00] font-black text-[10px] tracking-widest uppercase py-1 px-3.5 rounded-full mb-2">
           ⭐ Google Certified Reviews
         </span>
         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-950 font-display tracking-tight">

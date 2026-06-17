@@ -232,18 +232,18 @@ export default function ServicesPage() {
 
       {/* Hero Banner Section */}
       <section className="relative overflow-hidden bg-white border-b border-gray-100 pt-0 pb-16 lg:pt-0 lg:pb-28">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-red-100/30 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#FF7112]/20/30 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-slate-100/50 rounded-full blur-2xl pointer-events-none" />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="text-left">
-              <span className="inline-flex items-center gap-1 bg-red-50 border border-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4">
+              <span className="inline-flex items-center gap-1 bg-[#FF7112]/10 border border-[#FF7112]/20 text-[#E05A00] px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4">
                 <Sparkles className="w-3.5 h-3.5" /> All-in-One Automobile Hub
               </span>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-none mb-6">
                 Get Behind the Wheel. <br />
-                <span className="text-red-700">Explore Our Services.</span>
+                <span className="text-[#E05A00]">Explore Our Services.</span>
               </h1>
               <p className="max-w-xl text-slate-500 text-base sm:text-lg leading-relaxed font-medium">
                 Whether you are here to learn defensive driving, build steady passive income by renting your vehicle, or list your car for a high-value hassle-free sale, GoDriveify is your premium partner.
@@ -261,8 +261,8 @@ export default function ServicesPage() {
               onClick={() => setActiveTab('driving')}
               className={`whitespace-nowrap px-6 sm:px-8 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer border ${
                 activeTab === 'driving' 
-                  ? 'bg-red-700 hover:bg-red-800 text-white shadow-lg border-transparent shadow-red-700/20' 
-                  : 'bg-white border-slate-200 text-slate-700 hover:text-red-750 hover:border-red-500/30 hover:bg-red-50/30'
+                  ? 'bg-[#E05A00] hover:bg-red-800 text-white shadow-lg border-transparent shadow-red-700/20' 
+                  : 'bg-white border-slate-200 text-slate-700 hover:text-[#B34700] hover:border-[#FF7112]/30 hover:bg-[#FF7112]/10/30'
               }`}
             >
               LEARN DRIVING
@@ -306,7 +306,7 @@ export default function ServicesPage() {
             <section id="driving-school" className="py-24 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="text-xs font-black uppercase tracking-widest text-red-700">Section A</span>
+            <span className="text-xs font-black uppercase tracking-widest text-[#E05A00]">Section A</span>
             <h2 className="text-3.5xl sm:text-4xl font-black text-slate-900 mt-1 mb-3">
               Professional Driving Academy
             </h2>
@@ -324,7 +324,7 @@ export default function ServicesPage() {
                   viewport={{ once: true, margin: "-50px" }}
                   transition={{ duration: 0.5, delay: idx * 0.15, ease: "easeOut" }}
                   key={pkg.id}
-                  className="h-full bg-white rounded-3xl border border-slate-100 shadow-lg hover:shadow-2xl hover:border-red-100 hover:-translate-y-3 transition-all duration-300 ease-out overflow-hidden flex flex-col justify-between"
+                  className="h-full bg-white rounded-3xl border border-slate-100 shadow-lg hover:shadow-2xl hover:border-[#FF7112]/20 hover:-translate-y-3 transition-all duration-300 ease-out overflow-hidden flex flex-col justify-between"
                 >
                   <div>
                     {/* Course Image */}
@@ -345,8 +345,8 @@ export default function ServicesPage() {
                       <p className="text-slate-500 font-medium text-xs leading-relaxed mb-6">{pkg.courseDescription}</p>
 
                       {/* Course Fee Badge inside Service layout */}
-                      <div className="bg-red-50 text-red-850 p-4 rounded-xl flex items-center justify-between mb-6 border border-red-100/50">
-                        <span className="text-xs font-extrabold uppercase tracking-widest text-red-700">Course Fee</span>
+                      <div className="bg-[#FF7112]/10 text-red-850 p-4 rounded-xl flex items-center justify-between mb-6 border border-[#FF7112]/20/50">
+                        <span className="text-xs font-extrabold uppercase tracking-widest text-[#E05A00]">Course Fee</span>
                         <div className="text-right">
                           <span className="text-2xl font-black font-sans leading-none">{parseInt(pkg.courseFee).toLocaleString()}</span>
                           <span className="text-[10px] font-bold ml-1">PKR Only</span>
@@ -357,31 +357,31 @@ export default function ServicesPage() {
                       <div className="space-y-3 ps-1">
                         {pkg.lessonDuration && (
                           <div className="flex items-center gap-2.5 text-xs text-slate-650 font-semibold">
-                            <CheckCircle2 className="w-4 h-4 text-red-700 shrink-0" />
+                            <CheckCircle2 className="w-4 h-4 text-[#E05A00] shrink-0" />
                             <span>{pkg.lessonDuration}</span>
                           </div>
                         )}
                         {pkg.dailyTime && (
                           <div className="flex items-center gap-2.5 text-xs text-slate-650 font-semibold">
-                            <CheckCircle2 className="w-4 h-4 text-red-700 shrink-0" />
+                            <CheckCircle2 className="w-4 h-4 text-[#E05A00] shrink-0" />
                             <span>{pkg.dailyTime}</span>
                           </div>
                         )}
                         {pkg.theoryDuration && (
                           <div className="flex items-center gap-2.5 text-xs text-slate-650 font-semibold">
-                            <CheckCircle2 className="w-4 h-4 text-red-700 shrink-0" />
+                            <CheckCircle2 className="w-4 h-4 text-[#E05A00] shrink-0" />
                             <span>{pkg.theoryDuration}</span>
                           </div>
                         )}
                         {pkg.coursePeriod && (
                           <div className="flex items-center gap-2.5 text-xs text-slate-650 font-semibold">
-                            <CheckCircle2 className="w-4 h-4 text-red-700 shrink-0" />
+                            <CheckCircle2 className="w-4 h-4 text-[#E05A00] shrink-0" />
                             <span>{pkg.coursePeriod}</span>
                           </div>
                         )}
                         {pkg.additionalTime && (
                           <div className="flex items-center gap-2.5 text-xs text-slate-650 font-semibold">
-                            <CheckCircle2 className="w-4 h-4 text-red-700 shrink-0" />
+                            <CheckCircle2 className="w-4 h-4 text-[#E05A00] shrink-0" />
                             <span>{pkg.additionalTime}</span>
                           </div>
                         )}
@@ -395,7 +395,7 @@ export default function ServicesPage() {
                         'Learn Driving / Course Inquiry', 
                         `Hi GoDriveify Team, I am extremely interested in enrolling in your "${pkg.courseTitle}" driving program which costs PKR ${parseInt(pkg.courseFee).toLocaleString()}/-. Please guide me on scheduling daily slots.`
                       )}
-                      className="w-full bg-red-700 hover:bg-red-800 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors cursor-pointer text-center block"
+                      className="w-full bg-[#E05A00] hover:bg-red-800 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors cursor-pointer text-center block"
                     >
                       Book This Course
                     </button>
@@ -425,7 +425,7 @@ export default function ServicesPage() {
             <section id="rent-car" className="py-24 bg-slate-50 border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="text-xs font-black uppercase tracking-widest text-red-700">Section B</span>
+            <span className="text-xs font-black uppercase tracking-widest text-[#E05A00]">Section B</span>
             <h2 className="text-3.5xl sm:text-4xl font-black text-slate-900 mt-1 mb-3">
               Passive Income Rental Pipeline
             </h2>
@@ -438,7 +438,7 @@ export default function ServicesPage() {
             <ScrollReveal direction="up" delay={0.1}>
             <div className="h-full bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between">
               <div>
-                <div className="w-10 h-10 bg-red-50 text-red-700 rounded-xl flex items-center justify-center font-extrabold text-sm mb-4">
+                <div className="w-10 h-10 bg-[#FF7112]/10 text-[#E05A00] rounded-xl flex items-center justify-center font-extrabold text-sm mb-4">
                   01
                 </div>
                 <h4 className="text-lg font-black text-slate-900 mb-2">Register Your Vehicle</h4>
@@ -452,7 +452,7 @@ export default function ServicesPage() {
             <ScrollReveal direction="up" delay={0.2}>
             <div className="h-full bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between">
               <div>
-                <div className="w-10 h-10 bg-red-50 text-red-700 rounded-xl flex items-center justify-center font-extrabold text-sm mb-4">
+                <div className="w-10 h-10 bg-[#FF7112]/10 text-[#E05A00] rounded-xl flex items-center justify-center font-extrabold text-sm mb-4">
                   02
                 </div>
                 <h4 className="text-lg font-black text-slate-900 mb-2">Trusted Verification</h4>
@@ -466,7 +466,7 @@ export default function ServicesPage() {
             <ScrollReveal direction="up" delay={0.3}>
             <div className="h-full bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between">
               <div>
-                <div className="w-10 h-10 bg-red-50 text-red-700 rounded-xl flex items-center justify-center font-extrabold text-sm mb-4">
+                <div className="w-10 h-10 bg-[#FF7112]/10 text-[#E05A00] rounded-xl flex items-center justify-center font-extrabold text-sm mb-4">
                   03
                 </div>
                 <h4 className="text-lg font-black text-slate-900 mb-2">Receive Bookings</h4>
@@ -480,7 +480,7 @@ export default function ServicesPage() {
             <ScrollReveal direction="up" delay={0.4}>
             <div className="h-full bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between">
               <div>
-                <div className="w-10 h-10 bg-red-50 text-red-700 rounded-xl flex items-center justify-center font-extrabold text-sm mb-4">
+                <div className="w-10 h-10 bg-[#FF7112]/10 text-[#E05A00] rounded-xl flex items-center justify-center font-extrabold text-sm mb-4">
                   04
                 </div>
                 <h4 className="text-lg font-black text-slate-900 mb-2">Guaranteed Earnings</h4>
@@ -501,7 +501,7 @@ export default function ServicesPage() {
             <div className="flex flex-wrap gap-4 justify-center">
               <button 
                 onClick={handleOnboardCarModal}
-                className="bg-red-700 hover:bg-red-800 text-white px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                className="bg-[#E05A00] hover:bg-red-800 text-white px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
               >
                 Launch Onboarding Portal
               </button>
@@ -534,7 +534,7 @@ export default function ServicesPage() {
             <section id="sell-car" className="py-24 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="text-xs font-black uppercase tracking-widest text-red-700">Section C</span>
+            <span className="text-xs font-black uppercase tracking-widest text-[#E05A00]">Section C</span>
             <h2 className="text-3.5xl sm:text-4xl font-black text-slate-900 mt-1 mb-3">
               Zero-Hassle Direct Car Sales
             </h2>
@@ -547,8 +547,8 @@ export default function ServicesPage() {
           <div className="grid lg:grid-cols-12 gap-12 items-center mb-16">
             <div className="lg:col-span-7 space-y-6">
               {/* Premium Bullet Points with Catchy AI Sales Copy */}
-              <div className="p-4 rounded-2xl bg-red-50/50 border border-red-100 inline-block">
-                <span className="text-xs font-extrabold uppercase tracking-wider text-red-800 flex items-center gap-1">
+              <div className="p-4 rounded-2xl bg-[#FF7112]/10/50 border border-[#FF7112]/20 inline-block">
+                <span className="text-xs font-extrabold uppercase tracking-wider text-[#B34700] flex items-center gap-1">
                   <Star className="w-4 h-4 fill-red-800" /> Premium Direct Trade Offer
                 </span>
               </div>
@@ -565,28 +565,28 @@ export default function ServicesPage() {
 
               <div className="grid sm:grid-cols-2 gap-4 pt-2">
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-red-700 shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-[#E05A00] shrink-0 mt-0.5" />
                   <div>
                     <h5 className="font-bold text-slate-900 text-sm">No Dealer Commissions</h5>
                     <p className="text-[11px] text-slate-400 font-medium">Keep 100% of your selling price, transparent & direct.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-red-700 shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-[#E05A00] shrink-0 mt-0.5" />
                   <div>
                     <h5 className="font-bold text-slate-900 text-sm">Professional Photography</h5>
                     <p className="text-[11px] text-slate-400 font-medium">We catalog and render high-resolution photos of your ride.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-red-700 shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-[#E05A00] shrink-0 mt-0.5" />
                   <div>
                     <h5 className="font-bold text-slate-900 text-sm">Vetted Genuine Buyers</h5>
                     <p className="text-[11px] text-slate-400 font-medium">No spam, only verified, serious corporate offers managed by us.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-red-700 shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-[#E05A00] shrink-0 mt-0.5" />
                   <div>
                     <h5 className="font-bold text-slate-900 text-sm">Safe Title Transfer Escrow</h5>
                     <p className="text-[11px] text-slate-400 font-medium">Full bank security and biometrics paperwork assistance.</p>
@@ -598,11 +598,11 @@ export default function ServicesPage() {
             {/* Side Static Interactive Widget for Sales Stats */}
             <ScrollReveal direction="up" delay={0.2} className="lg:col-span-5 h-full relative">
             <div className="bg-slate-50 border border-slate-200/50 p-6 sm:p-8 rounded-3xl relative h-full">
-              <div className="absolute -top-3 -right-3 bg-red-700 text-white font-bold text-[10px] tracking-widest px-3 py-1 rounded-full shadow-md uppercase">
+              <div className="absolute -top-3 -right-3 bg-[#E05A00] text-white font-bold text-[10px] tracking-widest px-3 py-1 rounded-full shadow-md uppercase">
                 DIRECT SELLING
               </div>
               <h4 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-red-700" /> Executive Metrics
+                <TrendingUp className="w-5 h-5 text-[#E05A00]" /> Executive Metrics
               </h4>
               
               <div className="space-y-4">
@@ -627,7 +627,7 @@ export default function ServicesPage() {
                     <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Verified Active Buyers</span>
                     <span className="text-lg font-black text-slate-900 leading-none">4,120+ Users</span>
                   </div>
-                  <span className="text-xs bg-red-50 text-red-750 font-extrabold px-2.5 py-1 rounded-md">Live Cash Offers</span>
+                  <span className="text-xs bg-[#FF7112]/10 text-[#B34700] font-extrabold px-2.5 py-1 rounded-md">Live Cash Offers</span>
                 </div>
               </div>
 
@@ -655,8 +655,8 @@ export default function ServicesPage() {
       <section ref={contactFormRef} className="py-24 bg-slate-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="inline-flex items-center gap-1.5 bg-red-50 border border-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
-              <MessageSquare className="w-3.5 h-3.5 text-red-700" /> Corporate Inquiry Desk
+            <span className="inline-flex items-center gap-1.5 bg-[#FF7112]/10 border border-[#FF7112]/20 text-[#E05A00] px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
+              <MessageSquare className="w-3.5 h-3.5 text-[#E05A00]" /> Corporate Inquiry Desk
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 leading-none mb-4">
               Select Your Service Interest
@@ -667,7 +667,7 @@ export default function ServicesPage() {
           </div>
 
           <div className="bg-white rounded-3xl border border-slate-200/60 p-6 sm:p-10 shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1.5 bg-red-700" />
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-[#E05A00]" />
             
             <AnimatePresence mode="wait">
               {!formSubmitted ? (
@@ -688,7 +688,7 @@ export default function ServicesPage() {
                         required
                         type="text" 
                         placeholder="e.g. Muhammad Raza" 
-                        className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition text-sm font-medium"
+                        className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-medium"
                         value={formData.fullName}
                         onChange={e => setFormData({ ...formData, fullName: e.target.value })}
                       />
@@ -702,7 +702,7 @@ export default function ServicesPage() {
                         required
                         type="text" 
                         placeholder="e.g. Malik Muhammad Ilyas" 
-                        className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition text-sm font-medium"
+                        className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-medium"
                         value={formData.fatherName}
                         onChange={e => setFormData({ ...formData, fatherName: e.target.value })}
                       />
@@ -717,7 +717,7 @@ export default function ServicesPage() {
                       <input 
                         type="email" 
                         placeholder="e.g. name@domain.com" 
-                        className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition text-sm font-medium"
+                        className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-medium"
                         value={formData.email}
                         onChange={e => setFormData({ ...formData, email: e.target.value })}
                       />
@@ -731,7 +731,7 @@ export default function ServicesPage() {
                         required
                         type="tel" 
                         placeholder="e.g. 03097666928" 
-                        className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition text-sm font-mono font-bold"
+                        className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-mono font-bold"
                         value={formData.whatsappNumber}
                         onChange={e => setFormData({ ...formData, whatsappNumber: e.target.value })}
                       />
@@ -745,7 +745,7 @@ export default function ServicesPage() {
                     </label>
                     <select 
                       required
-                      className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none bg-white transition text-xs sm:text-sm font-extrabold text-slate-900 cursor-pointer"
+                      className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none bg-white transition text-xs sm:text-sm font-extrabold text-slate-900 cursor-pointer"
                       value={formData.inquiryType}
                       onChange={e => {
                         const val = e.target.value;
@@ -773,14 +773,14 @@ export default function ServicesPage() {
                       required
                       rows={4} 
                       placeholder="Type details such as desired timing, transmission mode, vehicle configuration registration year or initial sale demand value..." 
-                      className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition text-sm font-medium resize-none leading-relaxed"
+                      className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-medium resize-none leading-relaxed"
                       value={formData.message}
                       onChange={e => setFormData({ ...formData, message: e.target.value })}
                     />
                   </div>
 
                   <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs font-semibold leading-relaxed text-slate-500 flex gap-2.5 items-start">
-                    <CheckCircle2 className="w-4.5 h-4.5 text-red-700 shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-4.5 h-4.5 text-[#E05A00] shrink-0 mt-0.5" />
                     <p>
                       By submitting or listing, you authorize GoDriveify support to review your registered assets and reach out directly at the WhatsApp number specified under Pakistani regulatory biometrics checks.
                     </p>
@@ -788,7 +788,7 @@ export default function ServicesPage() {
 
                   <button 
                     type="submit"
-                    className="w-full bg-red-700 hover:bg-red-800 text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors cursor-pointer shadow-md"
+                    className="w-full bg-[#E05A00] hover:bg-red-800 text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors cursor-pointer shadow-md"
                   >
                     Submit Corporate Inquiry
                   </button>
@@ -806,7 +806,7 @@ export default function ServicesPage() {
                   
                   <h3 className="text-2xl font-black text-slate-900 tracking-tight">Inquiry Registered Successfully!</h3>
                   <p className="text-xs text-slate-500 mt-2 font-bold uppercase tracking-widest">
-                    Your Ticket ID is: <span className="text-red-700 font-mono font-extrabold">{submissionTicketId}</span>
+                    Your Ticket ID is: <span className="text-[#E05A00] font-mono font-extrabold">{submissionTicketId}</span>
                   </p>
 
                   <p className="text-slate-650 text-xs sm:text-sm font-semibold max-w-md mx-auto mt-4 leading-relaxed bg-slate-50 p-4 border rounded-2xl">

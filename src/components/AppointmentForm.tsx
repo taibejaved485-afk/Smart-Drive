@@ -75,7 +75,7 @@ export default function AppointmentForm() {
             whileInView={{ opacity: 1, y: 0 }}
             className="space-y-6 lg:space-y-8 lg:order-first"
           >
-            <p className="text-red-500 font-extrabold uppercase tracking-widest text-xs sm:text-sm">Registrations</p>
+            <p className="text-[#FF7112]/90 font-extrabold uppercase tracking-widest text-xs sm:text-sm">Registrations</p>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black font-display leading-tight text-white tracking-tight">
               Get Appointments With Our Best Instructors
             </h2>
@@ -90,7 +90,7 @@ export default function AppointmentForm() {
                 'Customized driving programs with mock tests'
               ].map((item, i) => (
                 <div key={i} className="flex gap-3 items-start text-xs sm:text-sm text-gray-300 font-medium">
-                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF7112]/90 shrink-0 mt-0.5" />
                   <span>{item}</span>
                 </div>
               ))}
@@ -98,7 +98,7 @@ export default function AppointmentForm() {
 
             <div className="flex flex-col sm:flex-row gap-6 pt-6 border-t border-white/10">
               <div className="flex items-center gap-4.5">
-                <div className="p-3 bg-gray-900 rounded-2xl text-red-500 border border-white/5 shrink-0">
+                <div className="p-3 bg-gray-900 rounded-2xl text-[#FF7112]/90 border border-white/5 shrink-0">
                   <Mail className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div>
@@ -107,7 +107,7 @@ export default function AppointmentForm() {
                 </div>
               </div>
               <div className="flex items-center gap-4.5">
-                <div className="p-3 bg-gray-900 rounded-2xl text-red-500 border border-white/5 shrink-0">
+                <div className="p-3 bg-gray-900 rounded-2xl text-[#FF7112]/90 border border-white/5 shrink-0">
                   <Phone className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div>
@@ -130,16 +130,16 @@ export default function AppointmentForm() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="text-center py-8 space-y-4"
               >
-                <div className="w-16 h-16 bg-red-600/10 border border-red-500/20 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-[#FF7112]/10 border border-[#FF7112]/20 text-[#FF7112]/90 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Check className="w-8 h-8 stroke-[3]" />
                 </div>
                 <h3 className="text-2xl font-black font-display text-white">Booking Received!</h3>
                 <p className="text-gray-300 text-sm max-w-sm mx-auto leading-relaxed">
-                  Excellent choice! Your appointment request for <strong className="text-red-500">{firstName}</strong> has been saved under state bookings. Our team will verify your preferred timings and call you shortly.
+                  Excellent choice! Your appointment request for <strong className="text-[#FF7112]/90">{firstName}</strong> has been saved under state bookings. Our team will verify your preferred timings and call you shortly.
                 </p>
                 <button 
                   onClick={resetFormState}
-                  className="mt-6 bg-red-650 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition hover:scale-103 cursor-pointer"
+                  className="mt-6 bg-[#E05A00] hover:bg-[#E05A00] text-white px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition hover:scale-103 cursor-pointer"
                   type="button"
                 >
                   Book Another Lesson
@@ -155,7 +155,7 @@ export default function AppointmentForm() {
                       <input 
                         type="text" 
                         required 
-                        className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none text-white text-sm transition" 
+                        className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-[#FF7112] focus:ring-1 focus:ring-[#FF7112] outline-none text-white text-sm transition" 
                         placeholder="e.g. Muhammad" 
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
@@ -166,7 +166,7 @@ export default function AppointmentForm() {
                       <input 
                         type="text" 
                         required 
-                        className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none text-white text-sm transition" 
+                        className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-[#FF7112] focus:ring-1 focus:ring-[#FF7112] outline-none text-white text-sm transition" 
                         placeholder="e.g. Ahmad" 
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
@@ -178,7 +178,7 @@ export default function AppointmentForm() {
                     <input 
                       type="email" 
                       required 
-                      className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none text-white text-sm transition" 
+                      className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-[#FF7112] focus:ring-1 focus:ring-[#FF7112] outline-none text-white text-sm transition" 
                       placeholder="e.g. ahmad@gmail.com" 
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -189,7 +189,7 @@ export default function AppointmentForm() {
                     <input 
                       type="tel" 
                       required 
-                      className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none text-white text-sm transition" 
+                      className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-[#FF7112] focus:ring-1 focus:ring-[#FF7112] outline-none text-white text-sm transition" 
                       placeholder="e.g. 03097666928" 
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
@@ -198,7 +198,7 @@ export default function AppointmentForm() {
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-400">Course / Subject *</label>
                     <select 
-                      className="w-full p-3 rounded-xl bg-gray-800 border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none text-white text-sm transition"
+                      className="w-full p-3 rounded-xl bg-gray-800 border border-white/10 focus:border-[#FF7112] focus:ring-1 focus:ring-[#FF7112] outline-none text-white text-sm transition"
                       value={subject}
                       onChange={(e) => setSubject(e.target.value)}
                     >
@@ -214,13 +214,13 @@ export default function AppointmentForm() {
                     <textarea 
                       rows={3} 
                       required 
-                      className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none text-white text-sm transition resize-none leading-relaxed" 
+                      className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-[#FF7112] focus:ring-1 focus:ring-[#FF7112] outline-none text-white text-sm transition resize-none leading-relaxed" 
                       placeholder="Tell us about your driving experience or details..."
                       value={comments}
                       onChange={(e) => setComments(e.target.value)}
                     />
                   </div>
-                  <button type="submit" className="w-full bg-red-650 hover:bg-red-700 text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition shadow-[0_0_20px_rgba(220,38,38,0.2)] active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2">
+                  <button type="submit" className="w-full bg-[#E05A00] hover:bg-[#E05A00] text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition shadow-[0_0_20px_rgba(220,38,38,0.2)] active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2">
                     <span>SEND REQUEST</span>
                     <Send className="w-3.5 h-3.5" />
                   </button>

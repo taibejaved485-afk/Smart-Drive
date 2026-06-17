@@ -16,7 +16,7 @@ export default function About() {
         {/* Header */}
         <ScrollReveal>
           <div className="mb-12">
-            <p className="text-red-600 font-bold tracking-widest uppercase text-sm mb-2">About Us</p>
+            <p className="text-[#FF7112] font-bold tracking-widest uppercase text-sm mb-2">About Us</p>
             <h2 className="text-4xl md:text-5xl font-display font-bold text-gray-900 leading-tight tracking-tight">
               We are your reliable, all-in-one platform for experienced and professional driving solutions.
             </h2>
@@ -47,9 +47,9 @@ export default function About() {
               <div className="grid sm:grid-cols-2 gap-8 mb-10">
                 {features.map((feature, i) => (
                   <div key={i} className="flex gap-3 group cursor-default">
-                    <CheckCircle2 className="w-6 h-6 text-red-600 flex-shrink-0" />
+                    <CheckCircle2 className="w-6 h-6 text-[#FF7112] flex-shrink-0" />
                     <div>
-                      <h3 className="font-bold text-gray-900 mb-1 group-hover:text-red-600 transition-colors duration-300">{feature.title}</h3>
+                      <h3 className="font-bold text-gray-900 mb-1 group-hover:text-[#FF7112] transition-colors duration-300">{feature.title}</h3>
                       <p className="text-sm text-gray-600">{feature.desc}</p>
                     </div>
                   </div>
@@ -58,7 +58,7 @@ export default function About() {
 
               {/* Action Bar */}
               <div className="flex items-center justify-start">
-                <Link to="/pricing" className="flex items-center gap-2 border border-red-600 text-red-600 px-6 py-3 rounded-full font-bold hover:bg-red-600 hover:text-white transition shadow-sm hover:shadow-md">
+                <Link to="/pricing" className="flex items-center gap-2 border border-[#FF7112] text-[#FF7112] px-6 py-3 rounded-full font-bold hover:bg-[#FF7112] hover:text-white transition shadow-sm hover:shadow-md">
                   APPLY NOW <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>

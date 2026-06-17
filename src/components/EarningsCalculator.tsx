@@ -77,13 +77,13 @@ export default function EarningsCalculator() {
   return (
     <div id="income-calculator-section" className="bg-white text-slate-900 rounded-3xl overflow-hidden border border-slate-100 shadow-xl relative font-sans">
       {/* Abstract background decorative brand glows */}
-      <div className="absolute top-0 right-0 w-80 h-80 bg-red-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-0 w-80 h-80 bg-[#FF7112]/100/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="p-6 sm:p-10 lg:p-12 relative z-10">
         <div className="max-w-3xl mx-auto text-center mb-10">
-          <span className="text-red-700 font-extrabold tracking-widest text-xs uppercase bg-red-50 border border-red-100 px-3.5 py-1.5 rounded-full inline-flex items-center gap-1.5 mb-3">
-            <Coins className="w-3.5 h-3.5 text-red-650" />
+          <span className="text-[#E05A00] font-extrabold tracking-widest text-xs uppercase bg-[#FF7112]/10 border border-[#FF7112]/20 px-3.5 py-1.5 rounded-full inline-flex items-center gap-1.5 mb-3">
+            <Coins className="w-3.5 h-3.5 text-[#E05A00]" />
             Passive Income Program
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 leading-tight">
@@ -113,12 +113,12 @@ export default function EarningsCalculator() {
                       onClick={() => setCarType(type)}
                       className={`py-3.5 px-3 rounded-xl border text-xs sm:text-sm font-extrabold tracking-wide transition-all outline-none flex flex-col items-center justify-center gap-1 cursor-pointer ${
                         isActive
-                          ? 'bg-red-50 text-red-900 border-red-500 shadow-sm ring-1 ring-red-500 scale-[1.01]'
+                          ? 'bg-[#FF7112]/10 text-red-900 border-[#FF7112] shadow-sm ring-1 ring-[#FF7112] scale-[1.01]'
                           : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-350 shadow-xs'
                       }`}
                     >
                       <span className="font-sans font-extrabold">{type}</span>
-                      <span className={`text-[10px] font-mono ${isActive ? 'text-red-700/85 font-extrabold' : 'text-slate-400'}`}>
+                      <span className={`text-[10px] font-mono ${isActive ? 'text-[#E05A00]/85 font-extrabold' : 'text-slate-400'}`}>
                         PKR {rates[type].toLocaleString()}/day
                       </span>
                     </button>
@@ -135,7 +135,7 @@ export default function EarningsCalculator() {
                 </label>
                 <div className="flex items-center gap-2">
                   {bonusBadge}
-                  <span className="font-mono font-bold text-red-700 bg-red-50 px-3 py-1 rounded-lg border border-red-100 text-sm shrink-0">
+                  <span className="font-mono font-bold text-[#E05A00] bg-[#FF7112]/10 px-3 py-1 rounded-lg border border-[#FF7112]/20 text-sm shrink-0">
                     {days} {days === 1 ? 'Day' : 'Days'}
                   </span>
                 </div>
@@ -209,7 +209,7 @@ export default function EarningsCalculator() {
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-slate-500 font-medium">Annual potential return:</span>
-                <span className="font-mono font-bold text-red-650">PKR {(targetEarnings * 12).toLocaleString()}</span>
+                <span className="font-mono font-bold text-[#E05A00]">PKR {(targetEarnings * 12).toLocaleString()}</span>
               </div>
             </div>
 
@@ -225,7 +225,7 @@ export default function EarningsCalculator() {
                   window.dispatchEvent(customModalOpen);
                 }
               }}
-              className="w-full bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs uppercase tracking-widest py-4 rounded-xl transition-all shadow-md shadow-red-600/10 cursor-pointer active:scale-[0.98] duration-250 hover:shadow-lg hover:shadow-red-700/20"
+              className="w-full bg-[#FF7112] hover:bg-[#E05A00] text-white font-extrabold text-xs uppercase tracking-widest py-4 rounded-xl transition-all shadow-md shadow-red-600/10 cursor-pointer active:scale-[0.98] duration-250 hover:shadow-lg hover:shadow-red-700/20"
             >
               List Your Car &amp; Earn
             </button>

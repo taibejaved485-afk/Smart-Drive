@@ -133,7 +133,7 @@ export default function FeaturedCourses() {
 
   return (
     <section className="py-20 bg-white text-gray-950 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-96 h-96 bg-red-100/30 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-[#FF7112]/20/30 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-gray-50 rounded-full blur-2xl pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -151,7 +151,7 @@ export default function FeaturedCourses() {
               <motion.div 
                 key={course.id || i}
                 whileHover={{ y: -8 }}
-                className="group bg-white rounded-3xl overflow-hidden border border-gray-200 hover:border-red-500/50 transition-all shadow-xl flex flex-col h-full"
+                className="group bg-white rounded-3xl overflow-hidden border border-gray-200 hover:border-[#FF7112]/50 transition-all shadow-xl flex flex-col h-full"
               >
                 <img src={course.image} alt={course.title} className="w-full h-64 object-cover" referrerPolicy="no-referrer" />
                 <div className="p-8 flex flex-col flex-grow justify-between">
@@ -171,10 +171,10 @@ export default function FeaturedCourses() {
                     <p className="text-gray-600 mb-8 text-sm leading-relaxed">{course.desc}</p>
                   </div>
                   <div className="flex items-center justify-between pt-6 border-t border-gray-100">
-                    <Link to="/pricing" className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-full font-bold text-xs uppercase tracking-wider transition">
+                    <Link to="/pricing" className="flex items-center gap-2 bg-[#FF7112] hover:bg-[#E05A00] text-white px-5 py-3 rounded-full font-bold text-xs uppercase tracking-wider transition">
                       VIEW COURSE <ArrowRight className="w-4 h-4" />
                     </Link>
-                    <p className="text-2xl font-black text-red-650 font-mono">{course.price} <span className="text-xs text-gray-500 font-sans tracking-normal font-medium">PKR</span></p>
+                    <p className="text-2xl font-black text-[#E05A00] font-mono">{course.price} <span className="text-xs text-gray-500 font-sans tracking-normal font-medium">PKR</span></p>
                   </div>
                 </div>
               </motion.div>
@@ -240,13 +240,13 @@ export default function FeaturedCourses() {
                     <div className="flex items-center justify-between pt-5 border-t border-gray-100">
                       <Link 
                         to="/pricing" 
-                        className="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-full font-bold text-[10.5px] uppercase tracking-wider transition-colors"
+                        className="flex items-center gap-1.5 bg-[#FF7112] hover:bg-[#E05A00] text-white px-4 py-2.5 rounded-full font-bold text-[10.5px] uppercase tracking-wider transition-colors"
                       >
                         VIEW COURSE <ArrowRight className="w-3.5 h-3.5" />
                       </Link>
                       <div>
                         <span className="block text-[8px] uppercase tracking-wider text-right font-bold text-gray-400">Total Price</span>
-                        <p className="text-xl font-black text-red-600 font-mono">{currentCourse.price} <span className="text-[10px] text-gray-500 font-sans tracking-normal font-medium">PKR</span></p>
+                        <p className="text-xl font-black text-[#FF7112] font-mono">{currentCourse.price} <span className="text-[10px] text-gray-500 font-sans tracking-normal font-medium">PKR</span></p>
                       </div>
                     </div>
                   </div>
@@ -258,7 +258,7 @@ export default function FeaturedCourses() {
             <div className="flex justify-center items-center gap-5 mt-6">
               <button
                 onClick={prevSlide}
-                className="flex items-center justify-center bg-white hover:bg-red-650 hover:text-white text-gray-800 w-10 h-10 rounded-full shadow-md border border-gray-200 transition-all cursor-pointer active:scale-95"
+                className="flex items-center justify-center bg-white hover:bg-[#E05A00] hover:text-white text-gray-800 w-10 h-10 rounded-full shadow-md border border-gray-200 transition-all cursor-pointer active:scale-95"
                 aria-label="Previous Course"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -274,7 +274,7 @@ export default function FeaturedCourses() {
                     }}
                     className={`h-2 rounded-full transition-all cursor-pointer ${
                       idx === currentIndex 
-                        ? 'w-7 bg-red-600' 
+                        ? 'w-7 bg-[#FF7112]' 
                         : 'w-2 bg-gray-350 hover:bg-gray-400'
                     }`}
                     aria-label={`Go to slide ${idx + 1}`}
@@ -284,7 +284,7 @@ export default function FeaturedCourses() {
 
               <button
                 onClick={nextSlide}
-                className="flex items-center justify-center bg-white hover:bg-red-650 hover:text-white text-gray-800 w-10 h-10 rounded-full shadow-md border border-gray-200 transition-all cursor-pointer active:scale-95"
+                className="flex items-center justify-center bg-white hover:bg-[#E05A00] hover:text-white text-gray-800 w-10 h-10 rounded-full shadow-md border border-gray-200 transition-all cursor-pointer active:scale-95"
                 aria-label="Next Course"
               >
                 <ChevronRight className="w-4 h-4" />

@@ -33,11 +33,11 @@ const StatCard = (props: any) => {
           animation-play-state: running;
         }
       `}</style>
-      <div className="absolute inset-0 border-2 border-transparent group-hover:border-red-500/30 rounded-3xl transition-colors duration-500"></div>
+      <div className="absolute inset-0 border-2 border-transparent group-hover:border-[#FF7112]/30 rounded-3xl transition-colors duration-500"></div>
       <div className="absolute w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 animate-rotate-dot shadow-[0_0_15px_5px_#dc2626] z-0 transition-opacity duration-500 pointer-events-none"></div>
 
       <div className="relative z-10 flex flex-col items-center">
-        <Icon className="w-12 h-12 text-red-500 mb-4 drop-shadow-[0_0_10px_rgba(220,38,38,0.5)] group-hover:scale-110 transition-transform" />
+        <Icon className="w-12 h-12 text-[#FF7112]/90 mb-4 drop-shadow-[0_0_10px_rgba(220,38,38,0.5)] group-hover:scale-110 transition-transform" />
         <h3 className="text-4xl md:text-5xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400">
           <motion.span>{rounded}</motion.span>{suffix ?? ''}
         </h3>

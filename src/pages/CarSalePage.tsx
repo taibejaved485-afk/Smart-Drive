@@ -61,15 +61,15 @@ export default function CarSalePage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-red-950/50 via-slate-900 to-black z-0"></div>
         {/* Subtle decorative background patterns */}
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-red-500/30 to-transparent"></div>
-        <div className="absolute -bottom-16 -left-16 w-64 h-64 bg-red-600/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-16 -left-16 w-64 h-64 bg-[#FF7112]/10 rounded-full blur-3xl"></div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <ScrollReveal direction="down">
-            <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-black uppercase tracking-widest mb-6">
+            <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#FF7112]/100/10 border border-[#FF7112]/30 text-[#FF7112]/70 text-xs font-black uppercase tracking-widest mb-6">
               <ShieldCheck className="w-3.5 h-3.5" /> 100% Direct Owner Marketplace
             </span>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-black mb-6 tracking-tight leading-tight">
-              Premium Verified <span className="text-red-500 bg-clip-text">Cars For Sale</span>
+              Premium Verified <span className="text-[#FF7112]/90 bg-clip-text">Cars For Sale</span>
             </h1>
             <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto font-medium mb-10 leading-relaxed">
               Buy your next vehicle directly from trusted local owners. ZERO commission, transparent listings, and immediate WhatsApp response.
@@ -92,7 +92,7 @@ export default function CarSalePage() {
                   placeholder="e.g. Honda Civic, Toyota Corolla..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none bg-white transition text-xs sm:text-sm font-semibold text-slate-800"
+                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none bg-white transition text-xs sm:text-sm font-semibold text-slate-800"
                 />
               </div>
             </div>
@@ -103,7 +103,7 @@ export default function CarSalePage() {
               <select 
                 value={selectedCity}
                 onChange={(e) => setSelectedCity(e.target.value)}
-                className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none bg-white transition text-xs sm:text-sm font-semibold text-slate-700"
+                className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none bg-white transition text-xs sm:text-sm font-semibold text-slate-700"
               >
                 {cities.map((city) => (
                   <option key={city} value={city}>{city}</option>
@@ -117,7 +117,7 @@ export default function CarSalePage() {
               <select 
                 value={selectedTransmission}
                 onChange={(e) => setSelectedTransmission(e.target.value)}
-                className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none bg-white transition text-xs sm:text-sm font-semibold text-slate-700"
+                className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none bg-white transition text-xs sm:text-sm font-semibold text-slate-700"
               >
                 {transmissions.map((trans) => (
                   <option key={trans} value={trans}>{trans}</option>
@@ -133,11 +133,11 @@ export default function CarSalePage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 pb-4 border-b border-slate-200/60">
           <div>
             <h2 className="text-2xl sm:text-3xl font-display font-black text-slate-950 flex items-center gap-3">
-              <Car className="w-7 h-7 text-red-650" /> Featured Active Units ({filteredCars.length})
+              <Car className="w-7 h-7 text-[#E05A00]" /> Featured Active Units ({filteredCars.length})
             </h2>
             <p className="text-xs text-slate-500 font-bold mt-1 uppercase tracking-wide">Handpicked & directly uploaded by verified sellers</p>
           </div>
-          <div className="w-16 h-1.5 bg-red-600 rounded-full hidden sm:block"></div>
+          <div className="w-16 h-1.5 bg-[#FF7112] rounded-full hidden sm:block"></div>
         </div>
 
         {filteredCars.length === 0 ? (
@@ -164,7 +164,7 @@ export default function CarSalePage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredCars.map((car, idx) => (
               <ScrollReveal direction="up" delay={idx * 0.08} key={car.id}>
-                <div className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-lg shadow-slate-200/40 hover:shadow-2xl hover:shadow-red-500/10 hover:border-red-500/20 group flex flex-col h-full transform transition-all duration-300 hover:-translate-y-2.5 relative">
+                <div className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-lg shadow-slate-200/40 hover:shadow-2xl hover:shadow-red-500/10 hover:border-[#FF7112]/20 group flex flex-col h-full transform transition-all duration-300 hover:-translate-y-2.5 relative">
                   
                   {/* Glowing gradient back-accent on hover */}
                   <div className="absolute inset-0 bg-gradient-to-br from-red-500/[0.02] via-transparent to-emerald-500/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-3xl"></div>
@@ -187,14 +187,14 @@ export default function CarSalePage() {
                     </div>
 
                     <div className="absolute top-4 right-4 bg-slate-950/85 backdrop-blur-md text-white px-3 py-1.5 rounded-full font-extrabold text-[10px] shadow-md tracking-wider uppercase flex items-center gap-1.5 z-10 border border-white/10">
-                      <MapPin className="w-3 h-3 text-red-500 animate-pulse" />
+                      <MapPin className="w-3 h-3 text-[#FF7112]/90 animate-pulse" />
                       {car.city}
                     </div>
 
                     {/* Dark gradient fade for crisp text details */}
                     <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent flex items-end p-5">
                       <div className="flex justify-between items-center w-full z-10">
-                        <span className="font-sans text-[10px] font-black uppercase text-red-400 tracking-widest bg-red-500/15 backdrop-blur-md px-2.5 py-1 rounded-md border border-red-500/25">
+                        <span className="font-sans text-[10px] font-black uppercase text-[#FF7112]/70 tracking-widest bg-[#FF7112]/100/15 backdrop-blur-md px-2.5 py-1 rounded-md border border-[#FF7112]/25">
                           {car.fuelType || 'Petrol'}
                         </span>
                         <span className="text-white/90 text-xs font-semibold bg-white/10 backdrop-blur-sm px-2.5 py-1 rounded-md border border-white/5 font-mono">
@@ -209,7 +209,7 @@ export default function CarSalePage() {
                     
                     {/* Header Title section */}
                     <div className="mb-4">
-                      <h3 className="text-xl sm:text-2xl font-black text-slate-950 leading-tight tracking-tight group-hover:text-red-650 transition duration-200">
+                      <h3 className="text-xl sm:text-2xl font-black text-slate-950 leading-tight tracking-tight group-hover:text-[#E05A00] transition duration-200">
                         {car.name}
                       </h3>
                       <div className="flex items-center gap-1.5 mt-1.5">
@@ -221,8 +221,8 @@ export default function CarSalePage() {
                     {/* Styled Price bar */}
                     <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4.5 mb-5 flex items-center justify-between">
                       <span className="text-[11px] uppercase font-black text-slate-400 tracking-wider">Demand (PKR)</span>
-                      <div className="text-2xl font-black font-mono text-red-650 flex items-center gap-1.5 tracking-tight">
-                        <span className="text-xs font-black text-red-500 px-1.5 py-0.5 bg-red-100 rounded">PKR</span>
+                      <div className="text-2xl font-black font-mono text-[#E05A00] flex items-center gap-1.5 tracking-tight">
+                        <span className="text-xs font-black text-[#FF7112]/90 px-1.5 py-0.5 bg-[#FF7112]/20 rounded">PKR</span>
                         {car.rentPrice}
                       </div>
                     </div>
@@ -231,7 +231,7 @@ export default function CarSalePage() {
                     <div className="grid grid-cols-2 gap-3 mb-6">
                       <div className="bg-slate-50/70 border border-slate-100/80 rounded-xl p-3 flex items-center gap-3">
                         <div className="p-2 bg-white rounded-lg border border-slate-100 shadow-sm shrink-0">
-                          <Gauge className="w-4 h-4 text-red-600" />
+                          <Gauge className="w-4 h-4 text-[#FF7112]" />
                         </div>
                         <div className="truncate">
                           <p className="text-[9px] font-black uppercase text-slate-400 tracking-wider">Transmission</p>
@@ -296,21 +296,21 @@ export default function CarSalePage() {
           <div className="grid md:grid-cols-3 gap-8 text-center md:text-left">
             <div className="space-y-2">
               <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mx-auto md:mx-0">
-                <CheckCircle className="w-5 h-5 text-red-500" />
+                <CheckCircle className="w-5 h-5 text-[#FF7112]/90" />
               </div>
               <h4 className="text-base font-bold">100% Commission-free</h4>
               <p className="text-xs text-slate-400 leading-relaxed">No dealer commission or service charges. Talk directly with owners and settle your own terms of transaction.</p>
             </div>
             <div className="space-y-2">
               <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mx-auto md:mx-0">
-                <ShieldCheck className="w-5 h-5 text-red-500" />
+                <ShieldCheck className="w-5 h-5 text-[#FF7112]/90" />
               </div>
               <h4 className="text-base font-bold">Verified Registrations</h4>
               <p className="text-xs text-slate-400 leading-relaxed">Admin staff reviews registration documentation and verified active status of lists to ensure high security of leads.</p>
             </div>
             <div className="space-y-2">
               <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mx-auto md:mx-0">
-                <HelpCircle className="w-5 h-5 text-red-500" />
+                <HelpCircle className="w-5 h-5 text-[#FF7112]/90" />
               </div>
               <h4 className="text-base font-bold">Want to Sell Your Car?</h4>
               <p className="text-xs text-slate-400 leading-relaxed">Instantly post your car by clicking the <strong>Apply Now</strong> button in the navigation header, select "Sale", and watch calls pour in.</p>

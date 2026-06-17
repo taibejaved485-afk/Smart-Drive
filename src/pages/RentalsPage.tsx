@@ -95,7 +95,7 @@ function ImageLightbox({ images, initialIndex, carName, onClose }: ImageLightbox
             <button
               key={idx}
               onClick={() => setIndex(idx)}
-              className={`w-12 h-12 rounded-lg overflow-hidden border-2 flex-shrink-0 transition-all ${idx === index ? 'border-red-500 scale-105' : 'border-transparent opacity-60 hover:opacity-100'}`}
+              className={`w-12 h-12 rounded-lg overflow-hidden border-2 flex-shrink-0 transition-all ${idx === index ? 'border-[#FF7112] scale-105' : 'border-transparent opacity-60 hover:opacity-100'}`}
             >
               <img src={img} className="w-full h-full object-cover" alt="" referrerPolicy="no-referrer" />
             </button>
@@ -141,7 +141,7 @@ function CarImageCarousel({ car }: { car: RentalCar }) {
             e.stopPropagation();
             setShowLightbox(true);
           }}
-          className="absolute bottom-3 right-3 z-30 bg-black/60 shadow-lg hover:bg-red-650 hover:bg-red-600 text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-lg backdrop-blur-md opacity-0 group-hover/carousel:opacity-100 transition-all duration-300 flex items-center gap-1.5 cursor-pointer"
+          className="absolute bottom-3 right-3 z-30 bg-black/60 shadow-lg hover:bg-[#E05A00] hover:bg-[#FF7112] text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-lg backdrop-blur-md opacity-0 group-hover/carousel:opacity-100 transition-all duration-300 flex items-center gap-1.5 cursor-pointer"
         >
           <Maximize2 className="w-3.5 h-3.5 text-white" />
           View Full Pic
@@ -431,7 +431,7 @@ export default function RentalsPage() {
           <motion.p 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-red-500 font-extrabold tracking-widest text-xs uppercase mb-3"
+            className="text-[#FF7112]/90 font-extrabold tracking-widest text-xs uppercase mb-3"
           >
             Premium Transport Fleet
           </motion.p>
@@ -493,7 +493,7 @@ export default function RentalsPage() {
               {/* Section Introduction */}
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
             <div className="max-w-2xl">
-              <span className="text-red-650 font-black tracking-wider text-xs uppercase block mb-2">Our Vehicle Fleet</span>
+              <span className="text-[#E05A00] font-black tracking-wider text-xs uppercase block mb-2">Our Vehicle Fleet</span>
               <h2 className="text-2xl sm:text-4xl font-extrabold text-gray-950 tracking-tight leading-none">
                 Select Your Desired Transmission & City
               </h2>
@@ -504,7 +504,7 @@ export default function RentalsPage() {
 
             {/* Quick trust seals */}
             <div className="flex items-center gap-4 shrink-0 bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
-              <div className="bg-red-50 p-2.5 rounded-xl text-red-600">
+              <div className="bg-[#FF7112]/10 p-2.5 rounded-xl text-[#FF7112]">
                 <Sliders className="w-5 h-5" />
               </div>
               <div>
@@ -518,8 +518,8 @@ export default function RentalsPage() {
           <div className="bg-white rounded-2xl sm:rounded-[2rem] border border-gray-200 p-3 sm:p-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] mb-6 mx-auto relative overflow-hidden z-20">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3 sm:gap-4 items-center">
               {/* Column 1: Search */}
-              <div className="relative flex items-center bg-gray-50 rounded-xl sm:rounded-2xl border border-gray-100 hover:border-gray-200 transition-colors px-4 py-3 sm:py-4 focus-within:bg-white focus-within:ring-2 focus-within:ring-red-100 focus-within:border-red-500 group">
-                <Search className="w-5 h-5 text-gray-400 group-focus-within:text-red-500 transition-colors shrink-0" />
+              <div className="relative flex items-center bg-gray-50 rounded-xl sm:rounded-2xl border border-gray-100 hover:border-gray-200 transition-colors px-4 py-3 sm:py-4 focus-within:bg-white focus-within:ring-2 focus-within:ring-red-100 focus-within:border-[#FF7112] group">
+                <Search className="w-5 h-5 text-gray-400 group-focus-within:text-[#FF7112]/90 transition-colors shrink-0" />
                 <input
                   type="text"
                   placeholder="Search car brand or model (e.g. Civic, Alto)..."
@@ -530,7 +530,7 @@ export default function RentalsPage() {
               </div>
 
               {/* Column 2: Main City */}
-              <div className="relative flex flex-col justify-center bg-gray-50 rounded-xl sm:rounded-2xl border border-gray-100 hover:border-gray-200 transition-colors px-4 py-2 sm:py-3 cursor-pointer group focus-within:bg-white focus-within:ring-2 focus-within:ring-red-100 focus-within:border-red-500">
+              <div className="relative flex flex-col justify-center bg-gray-50 rounded-xl sm:rounded-2xl border border-gray-100 hover:border-gray-200 transition-colors px-4 py-2 sm:py-3 cursor-pointer group focus-within:bg-white focus-within:ring-2 focus-within:ring-red-100 focus-within:border-[#FF7112]">
                 <label className="text-[9px] font-black uppercase text-gray-400 tracking-widest pl-1 mb-0.5">Location</label>
                 <select 
                   value={selectedCity} 
@@ -547,7 +547,7 @@ export default function RentalsPage() {
               </div>
 
               {/* Column 3: Area/Locality */}
-              <div className={`relative flex flex-col justify-center bg-gray-50 rounded-xl sm:rounded-2xl border border-gray-100 transition-colors px-4 py-2 sm:py-3 cursor-pointer group ${selectedCity !== 'All Cities' && selectedCity ? 'hover:border-gray-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-red-100 focus-within:border-red-500' : 'opacity-60 cursor-not-allowed'}`}>
+              <div className={`relative flex flex-col justify-center bg-gray-50 rounded-xl sm:rounded-2xl border border-gray-100 transition-colors px-4 py-2 sm:py-3 cursor-pointer group ${selectedCity !== 'All Cities' && selectedCity ? 'hover:border-gray-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-red-100 focus-within:border-[#FF7112]' : 'opacity-60 cursor-not-allowed'}`}>
                 <label className="text-[9px] font-black uppercase text-gray-400 tracking-widest pl-1 mb-0.5">Locality</label>
                 <select 
                   value={selectedArea}
@@ -637,7 +637,7 @@ export default function RentalsPage() {
                       setDriverPreference('Any');
                       setSelectedTransmission('All');
                     }}
-                    className="text-[10px] font-black uppercase text-red-650 hover:text-red-750 transition-colors cursor-pointer tracking-wider flex items-center gap-1"
+                    className="text-[10px] font-black uppercase text-[#E05A00] hover:text-[#B34700] transition-colors cursor-pointer tracking-wider flex items-center gap-1"
                   >
                     <X className="w-3.5 h-3.5" /> Clear All Filters
                   </button>
@@ -690,7 +690,7 @@ export default function RentalsPage() {
                         <CarImageCarousel car={car} />
                         <div className="absolute top-4 left-4 flex flex-col gap-1.5 items-start z-10 pointer-events-none">
                           <span className="bg-gray-900/95 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow-md">
-                            <MapPin className="w-3.5 h-3.5 text-red-500" />
+                            <MapPin className="w-3.5 h-3.5 text-[#FF7112]/90" />
                             {car.city}
                           </span>
                           {car.isVerified && (
@@ -734,8 +734,8 @@ export default function RentalsPage() {
                               {car.fuelType || 'Petrol'}
                             </span>
                             {(!car.ownerName || car.id.startsWith('rc-')) && (
-                              <span className="flex items-center gap-1 text-red-650 bg-red-50 px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase">
-                                <Sliders className="w-3.5 h-3.5 text-red-500" /> Dual-Control
+                              <span className="flex items-center gap-1 text-[#E05A00] bg-[#FF7112]/10 px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase">
+                                <Sliders className="w-3.5 h-3.5 text-[#FF7112]/90" /> Dual-Control
                               </span>
                             )}
                           </div>
@@ -817,13 +817,13 @@ export default function RentalsPage() {
           
           {/* Driving School Practices Note */}
           <div className="mt-16 bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-sm max-w-5xl mx-auto flex flex-col sm:flex-row items-center gap-6">
-            <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-red-650 shrink-0">
+            <div className="w-14 h-14 bg-[#FF7112]/10 rounded-2xl flex items-center justify-center text-[#E05A00] shrink-0">
               <HelpCircle className="w-7 h-7" />
             </div>
             <div>
               <h4 className="font-extrabold text-lg text-gray-950 mb-1">Are you an absolute beginner with zero road experience?</h4>
               <p className="text-gray-500 text-sm leading-relaxed max-w-3xl">
-                We strongly recommend joining our <a href="/programs" className="text-red-650 underline font-bold">10-day intensive driving courses</a> first. Our instructors provide fully certified manual and automatic gear coaching on official, dual-clutch training vehicles with systematic supervision to teach defense maneuvers prior to renting private practice models.
+                We strongly recommend joining our <a href="/programs" className="text-[#E05A00] underline font-bold">10-day intensive driving courses</a> first. Our instructors provide fully certified manual and automatic gear coaching on official, dual-clutch training vehicles with systematic supervision to teach defense maneuvers prior to renting private practice models.
               </p>
             </div>
           </div>
@@ -874,7 +874,7 @@ export default function RentalsPage() {
                   <X className="w-4 h-4" />
                 </button>
                 <div className="absolute bottom-4 left-6 text-white">
-                  <span className="text-[9px] uppercase font-black bg-red-600 px-2 py-0.5 rounded tracking-widest">Booking Request</span>
+                  <span className="text-[9px] uppercase font-black bg-[#FF7112] px-2 py-0.5 rounded tracking-widest">Booking Request</span>
                   <h3 className="font-extrabold text-xl mt-1 tracking-tight">{selectedCar.name}</h3>
                 </div>
               </div>
@@ -892,12 +892,12 @@ export default function RentalsPage() {
                     </div>
                     <h4 className="text-2xl font-black text-gray-900 tracking-tight">Booking Request Logged!</h4>
                     <p className="text-xs sm:text-sm text-gray-500 max-w-sm mx-auto leading-relaxed">
-                      Assigned dynamic rental vehicle <strong className="text-red-650">{selectedCar.name}</strong> for <strong className="text-gray-900">{bookingDuration} Days</strong>. To secure your slot instantly, tap the button below to send your **Executive Invoice Statement** to our branch desk officer.
+                      Assigned dynamic rental vehicle <strong className="text-[#E05A00]">{selectedCar.name}</strong> for <strong className="text-gray-900">{bookingDuration} Days</strong>. To secure your slot instantly, tap the button below to send your **Executive Invoice Statement** to our branch desk officer.
                     </p>
                     
                     <div className="text-xs text-gray-400 bg-gray-50 p-3 rounded-xl border max-w-sm mx-auto text-left space-y-1">
                       <div>Assigned Location: <strong className="text-gray-800">{selectedCar.city} Office Hub</strong></div>
-                      <div>Total Price Estimate: <strong className="text-red-600 font-mono">PKR {(parseInt(String(selectedCar.rentPrice || '0').replace(/,/g, '')) * bookingDuration).toLocaleString()}</strong></div>
+                      <div>Total Price Estimate: <strong className="text-[#FF7112] font-mono">PKR {(parseInt(String(selectedCar.rentPrice || '0').replace(/,/g, '')) * bookingDuration).toLocaleString()}</strong></div>
                     </div>
 
                     <div className="pt-2">
@@ -947,13 +947,13 @@ export default function RentalsPage() {
                     <div className="bg-gray-50 p-3 rounded-xl border flex items-center justify-between text-xs sm:text-sm">
                       <span className="font-bold text-gray-600">Location Area:</span>
                       <span className="font-extrabold text-gray-900 flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-red-500" /> {selectedCar.city} Office
+                        <MapPin className="w-3.5 h-3.5 text-[#FF7112]/90" /> {selectedCar.city} Office
                       </span>
                     </div>
 
-                    <div className="bg-red-50/55 p-3 rounded-xl border border-red-100 flex items-center justify-between text-xs sm:text-sm">
-                      <span className="font-bold text-red-800">Price Rate:</span>
-                      <span className="font-black text-red-650">
+                    <div className="bg-[#FF7112]/10/55 p-3 rounded-xl border border-[#FF7112]/20 flex items-center justify-between text-xs sm:text-sm">
+                      <span className="font-bold text-[#B34700]">Price Rate:</span>
+                      <span className="font-black text-[#E05A00]">
                         PKR {selectedCar.rentPrice} / {selectedCar.rentUnit || 'Day'}
                       </span>
                     </div>
@@ -967,7 +967,7 @@ export default function RentalsPage() {
                         placeholder="e.g. Hammad Javed"
                         value={bookingName}
                         onChange={e => setBookingName(e.target.value)}
-                        className="w-full border border-gray-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition"
+                        className="w-full border border-gray-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition"
                       />
                     </div>
 
@@ -979,7 +979,7 @@ export default function RentalsPage() {
                         placeholder="e.g. 0300-1234567"
                         value={bookingPhone}
                         onChange={e => setBookingPhone(e.target.value)}
-                        className="w-full border border-gray-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition font-mono"
+                        className="w-full border border-gray-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition font-mono"
                       />
                     </div>
 
@@ -991,7 +991,7 @@ export default function RentalsPage() {
                           type="date"
                           value={bookingDate}
                           onChange={e => setBookingDate(e.target.value)}
-                          className="w-full border border-gray-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition font-mono"
+                          className="w-full border border-gray-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition font-mono"
                         />
                       </div>
                       <div>
@@ -1003,7 +1003,7 @@ export default function RentalsPage() {
                           max="30"
                           value={bookingDuration}
                           onChange={e => setBookingDuration(Number(e.target.value))}
-                          className="w-full border border-gray-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition font-mono"
+                          className="w-full border border-gray-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition font-mono"
                         />
                       </div>
                     </div>
@@ -1013,7 +1013,7 @@ export default function RentalsPage() {
                       <div className="bg-gray-900 text-white rounded-2xl p-4 flex items-center justify-between">
                         <div>
                           <p className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Total Rent Estimate</p>
-                          <p className="text-xl font-black text-red-500">
+                          <p className="text-xl font-black text-[#FF7112]/90">
                             PKR {(parseInt(String(selectedCar.rentPrice || '0').replace(/,/g, '')) * bookingDuration).toLocaleString()}
                           </p>
                         </div>
@@ -1025,7 +1025,7 @@ export default function RentalsPage() {
 
                     <button 
                       type="submit"
-                      className="w-full bg-red-600 hover:bg-red-700 text-white font-extrabold uppercase tracking-widest text-xs py-3.5 rounded-xl transition shadow-md shadow-red-200 cursor-pointer"
+                      className="w-full bg-[#FF7112] hover:bg-[#E05A00] text-white font-extrabold uppercase tracking-widest text-xs py-3.5 rounded-xl transition shadow-md shadow-red-200 cursor-pointer"
                     >
                       Confirm Rental Appointment
                     </button>

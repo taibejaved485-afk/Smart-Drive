@@ -257,8 +257,8 @@ export default function Navbar() {
     <>
       <nav className="sticky top-0 w-full bg-white z-50 border-b border-gray-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-20 items-center">
-            <Link to="/" className="cursor-pointer select-none">
+          <div className="flex justify-between h-24 items-center">
+            <Link to="/" className="cursor-pointer select-none h-full flex items-center py-2">
               <BrandLogo />
             </Link>
             
@@ -269,7 +269,7 @@ export default function Navbar() {
                   <Link 
                     key={link.name} 
                     to={link.path} 
-                    className={`transition tracking-wide text-uppercase pb-1 ${isActive ? 'text-red-600 border-b-2 border-red-600' : 'hover:text-red-600'}`}
+                    className={`transition tracking-wide text-uppercase pb-1 ${isActive ? 'text-[#FF7112] border-b-2 border-[#FF7112]' : 'hover:text-[#FF7112]'}`}
                   >
                     {link.name.toUpperCase()}
                   </Link>
@@ -280,13 +280,13 @@ export default function Navbar() {
             <div className="hidden lg:flex items-center gap-3">
               <Link
                 to="/blog"
-                className="flex items-center gap-2 bg-[#002060] hover:bg-[#FF5500] text-white px-5 py-2.5 rounded-xl font-bold transition-colors duration-300 shadow-md text-xs uppercase tracking-wider cursor-pointer transform hover:scale-102 active:scale-98"
+                className="flex items-center gap-2 bg-[#002060] hover:bg-[#FF7112] text-white px-5 py-2.5 rounded-xl font-bold transition-colors duration-300 shadow-md text-xs uppercase tracking-wider cursor-pointer transform hover:scale-102 active:scale-98"
               >
                 <BookOpen className="w-4 h-4" /> BLOG UPDATES
               </Link>
               <div className="relative group">
                 <button 
-                  className="flex items-center gap-2 bg-[#FF5500] hover:bg-[#002060] text-white px-5 py-2.5 rounded-xl font-bold transition-colors duration-300 shadow-md text-xs uppercase tracking-wider cursor-pointer transform hover:scale-102 active:scale-98"
+                  className="flex items-center gap-2 bg-[#FF7112] hover:bg-[#002060] text-white px-5 py-2.5 rounded-xl font-bold transition-colors duration-300 shadow-md text-xs uppercase tracking-wider cursor-pointer transform hover:scale-102 active:scale-98"
                   type="button"
                 >
                   <Plus className="w-4 h-4" /> APPLY NOW
@@ -300,7 +300,7 @@ export default function Navbar() {
                   <div className="bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden">
                     <Link 
                       to="/contact"
-                      className="block w-full text-left px-4 py-3 text-xs font-bold hover:bg-gray-50 uppercase tracking-wider text-gray-800 hover:text-red-600 transition-colors"
+                      className="block w-full text-left px-4 py-3 text-xs font-bold hover:bg-gray-50 uppercase tracking-wider text-gray-800 hover:text-[#FF7112] transition-colors"
                     >
                       Apply For Learning
                     </Link>
@@ -310,7 +310,7 @@ export default function Navbar() {
                         setSubmissionComplete(false);
                         setModalType('Rent');
                       }}
-                      className="block w-full text-left px-4 py-3 text-xs font-bold hover:bg-gray-50 hover:text-red-600 transition-colors uppercase tracking-wider cursor-pointer"
+                      className="block w-full text-left px-4 py-3 text-xs font-bold hover:bg-gray-50 hover:text-[#FF7112] transition-colors uppercase tracking-wider cursor-pointer"
                     >
                       Rent Your Car
                     </button>
@@ -320,7 +320,7 @@ export default function Navbar() {
                         setSubmissionComplete(false);
                         setModalType('Sale');
                       }}
-                      className="block w-full text-left px-4 py-3 text-xs font-bold hover:bg-gray-50 hover:text-red-600 transition-colors uppercase tracking-wider cursor-pointer"
+                      className="block w-full text-left px-4 py-3 text-xs font-bold hover:bg-gray-50 hover:text-[#FF7112] transition-colors uppercase tracking-wider cursor-pointer"
                     >
                       Sale Your Car
                     </button>
@@ -343,7 +343,7 @@ export default function Navbar() {
                   key={link.name} 
                   to={link.path} 
                   onClick={() => setIsOpen(false)} 
-                  className={`block pb-1.5 border-b ${isActive ? 'text-red-600 border-red-600' : 'hover:text-red-600 border-gray-50'}`}
+                  className={`block pb-1.5 border-b ${isActive ? 'text-[#FF7112] border-[#FF7112]' : 'hover:text-[#FF7112] border-gray-50'}`}
                 >
                   {link.name}
                 </Link>
@@ -363,7 +363,7 @@ export default function Navbar() {
                   onClick={() => {
                     setIsOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 bg-red-650 hover:bg-red-700 text-white py-3 rounded-xl font-bold transition text-xs uppercase tracking-wider cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 bg-[#FF7112] hover:bg-[#E05A00] text-white py-3 rounded-xl font-bold transition text-xs uppercase tracking-wider cursor-pointer"
                 >
                   Apply For Learning
                 </Link>
@@ -410,7 +410,7 @@ export default function Navbar() {
               {/* Header */}
               <div className="p-5 sm:p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-red-50 text-red-600 rounded-2xl border border-red-100">
+                  <div className="p-2.5 bg-[#FF7112]/10 text-[#FF7112] rounded-2xl border border-[#FF7112]/10">
                     <Car className="w-6 h-6" />
                   </div>
                   <div>
@@ -435,17 +435,17 @@ export default function Navbar() {
               {!submissionComplete && (
                 <div className="px-6 py-4 bg-white border-b border-gray-100 flex items-center justify-between text-xs sm:text-sm font-bold shrink-0">
                   <div className="flex items-center gap-1.5 sm:gap-2">
-                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black transition-all ${step >= 1 ? 'bg-red-650 text-white' : 'bg-gray-150 text-gray-500'}`}>1</span>
+                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black transition-all ${step >= 1 ? 'bg-[#FF7112] text-white' : 'bg-gray-150 text-gray-500'}`}>1</span>
                     <span className={step >= 1 ? 'text-gray-800' : 'text-gray-400 font-medium'}>Owner Info</span>
                   </div>
                   <ChevronRight className="w-4 h-4 text-gray-300" />
                   <div className="flex items-center gap-1.5 sm:gap-2">
-                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black transition-all ${step >= 2 ? 'bg-red-650 text-white' : 'bg-gray-150 text-gray-500'}`}>2</span>
+                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black transition-all ${step >= 2 ? 'bg-[#FF7112] text-white' : 'bg-gray-150 text-gray-500'}`}>2</span>
                     <span className={step >= 2 ? 'text-gray-800' : 'text-gray-400 font-medium'}>Car Specs</span>
                   </div>
                   <ChevronRight className="w-4 h-4 text-gray-300" />
                   <div className="flex items-center gap-1.5 sm:gap-2">
-                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black transition-all ${step >= 3 ? 'bg-red-650 text-white' : 'bg-gray-150 text-gray-500'}`}>3</span>
+                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black transition-all ${step >= 3 ? 'bg-[#FF7112] text-white' : 'bg-gray-150 text-gray-500'}`}>3</span>
                     <span className={step >= 3 ? 'text-gray-800' : 'text-gray-400 font-medium'}>Pricing & Terms</span>
                   </div>
                 </div>
@@ -465,7 +465,7 @@ export default function Navbar() {
                         `Your car has been listed for sale on our website. Customers in ` : 
                         `Your car listing has been sent to the administrator for verification. Once approved, local customers in `
                       } 
-                      <strong className="text-red-650">{formData.city}</strong> will be able to contact you directly on your WhatsApp number.
+                      <strong className="text-[#FF7112]">{formData.city}</strong> will be able to contact you directly on your WhatsApp number.
                     </p>
                     <div className="bg-gray-50 border rounded-2xl p-4 w-full max-w-sm mt-6 text-left text-xs space-y-2 font-medium">
                       <div className="flex justify-between"><span className="text-gray-400">Owner Name:</span> <span className="font-bold text-gray-800">{formData.ownerName}</span></div>
@@ -503,7 +503,7 @@ export default function Navbar() {
                             <input 
                               required
                               type="text" 
-                              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition text-sm font-medium" 
+                              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-medium" 
                               placeholder="e.g. Muhammad Ahmad Malik" 
                               value={formData.ownerName} 
                               onChange={e => setFormData({...formData, ownerName: e.target.value})} 
@@ -517,7 +517,7 @@ export default function Navbar() {
                             <input 
                               required
                               type="tel" 
-                              className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition text-sm font-mono font-bold" 
+                              className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-mono font-bold" 
                               placeholder="e.g. 03097666928" 
                               value={formData.ownerPhone} 
                               onChange={e => setFormData({...formData, ownerPhone: e.target.value})} 
@@ -528,7 +528,7 @@ export default function Navbar() {
                           <div>
                             <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-1.5">Your Hometown City *</label>
                             <select 
-                              className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none bg-white transition text-xs sm:text-sm font-medium"
+                              className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none bg-white transition text-xs sm:text-sm font-medium"
                               value={formData.ownerCity}
                               onChange={e => setFormData({...formData, ownerCity: e.target.value})}
                             >
@@ -544,14 +544,14 @@ export default function Navbar() {
 
                         <div>
                           <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-1.5">Upload CNIC (Front & Back) *</label>
-                          <div className={`relative border-2 border-dashed rounded-xl p-4 transition-colors ${formData.cnicDoc ? 'border-green-300 bg-green-50' : 'border-gray-300 bg-gray-50 hover:border-red-500'}`}>
+                          <div className={`relative border-2 border-dashed rounded-xl p-4 transition-colors ${formData.cnicDoc ? 'border-green-300 bg-green-50' : 'border-gray-300 bg-gray-50 hover:border-[#FF7112]'}`}>
                             <input 
                               type="file" accept="image/*" required
                               onChange={(e) => handleDocFileUpload(e, 'cnic')}
                               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                             />
                             <div className="flex flex-col items-center justify-center text-center">
-                              <ShieldCheck className={`w-6 h-6 mb-2 ${formData.cnicDoc ? 'text-green-500' : 'text-red-400'}`} />
+                              <ShieldCheck className={`w-6 h-6 mb-2 ${formData.cnicDoc ? 'text-green-500' : 'text-[#FF7112]/60'}`} />
                               <span className={`text-xs font-bold ${formData.cnicDoc ? 'text-green-700' : 'text-gray-700'}`}>
                                 {formData.cnicDoc ? 'CNIC Uploaded ✓' : 'Click to upload CNIC'}
                               </span>
@@ -569,7 +569,7 @@ export default function Navbar() {
                           <input 
                             required
                             type="text" 
-                            className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition text-sm font-medium" 
+                            className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-medium" 
                             placeholder="e.g. Honda City Aspire 1.5 CVT (2023)" 
                             value={formData.name} 
                             onChange={e => setFormData({...formData, name: e.target.value})} 
@@ -581,7 +581,7 @@ export default function Navbar() {
                           <input 
                             required
                             type="text" 
-                            className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition text-sm font-mono font-bold" 
+                            className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-mono font-bold" 
                             placeholder="e.g. LED-19-4509" 
                             value={formData.registrationNumber} 
                             onChange={e => setFormData({...formData, registrationNumber: e.target.value})} 
@@ -590,14 +590,14 @@ export default function Navbar() {
 
                         <div>
                           <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-1.5">Upload Vehicle Registration Book *</label>
-                          <div className={`relative border-2 border-dashed rounded-xl p-4 transition-colors ${formData.registrationDoc ? 'border-green-300 bg-green-50' : 'border-gray-300 bg-gray-50 hover:border-red-500'}`}>
+                          <div className={`relative border-2 border-dashed rounded-xl p-4 transition-colors ${formData.registrationDoc ? 'border-green-300 bg-green-50' : 'border-gray-300 bg-gray-50 hover:border-[#FF7112]'}`}>
                             <input 
                               type="file" accept="image/*" required
                               onChange={(e) => handleDocFileUpload(e, 'registration')}
                               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                             />
                             <div className="flex flex-col items-center justify-center text-center">
-                              <Car className={`w-6 h-6 mb-2 ${formData.registrationDoc ? 'text-green-500' : 'text-red-400'}`} />
+                              <Car className={`w-6 h-6 mb-2 ${formData.registrationDoc ? 'text-green-500' : 'text-[#FF7112]/60'}`} />
                               <span className={`text-xs font-bold ${formData.registrationDoc ? 'text-green-700' : 'text-gray-700'}`}>
                                 {formData.registrationDoc ? 'Registration Uploaded ✓' : 'Click to upload Registration Book'}
                               </span>
@@ -610,7 +610,7 @@ export default function Navbar() {
                           <div>
                             <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-1.5">Transmission *</label>
                             <select 
-                              className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none bg-white transition text-xs sm:text-sm font-medium"
+                              className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none bg-white transition text-xs sm:text-sm font-medium"
                               value={formData.transmission}
                               onChange={e => setFormData({...formData, transmission: e.target.value as 'Automatic' | 'Manual'})}
                             >
@@ -622,7 +622,7 @@ export default function Navbar() {
                           <div>
                             <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-1.5">Fuel Type *</label>
                             <select 
-                              className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none bg-white transition text-xs sm:text-sm font-medium"
+                              className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none bg-white transition text-xs sm:text-sm font-medium"
                               value={formData.fuelType}
                               onChange={e => setFormData({...formData, fuelType: e.target.value as any})}
                             >
@@ -636,7 +636,7 @@ export default function Navbar() {
                           <div>
                             <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-1.5">Availability Hub *</label>
                             <select 
-                              className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none bg-white transition text-xs sm:text-sm font-medium"
+                              className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none bg-white transition text-xs sm:text-sm font-medium"
                               value={formData.city}
                               onChange={e => setFormData({...formData, city: e.target.value})}
                             >
@@ -653,7 +653,7 @@ export default function Navbar() {
                           <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2">Upload Car Images (Max 4 pics)</label>
                           <p className="text-[10px] text-gray-500 mb-3 font-medium">PNG, JPG, JPEG up to 5MB</p>
                           
-                          <div className="relative border-2 border-dashed border-gray-300 hover:border-red-500 bg-white rounded-xl p-8 flex flex-col items-center justify-center transition-colors group cursor-pointer text-center overflow-hidden">
+                          <div className="relative border-2 border-dashed border-gray-300 hover:border-[#FF7112] bg-white rounded-xl p-8 flex flex-col items-center justify-center transition-colors group cursor-pointer text-center overflow-hidden">
                             <input 
                               type="file" 
                               multiple 
@@ -662,7 +662,7 @@ export default function Navbar() {
                               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
                               title="" 
                             />
-                            <div className="bg-red-50 text-red-650 p-3 rounded-full mb-3 group-hover:scale-110 transition-transform">
+                            <div className="bg-[#FF7112]/10 text-[#FF7112] p-3 rounded-full mb-3 group-hover:scale-110 transition-transform">
                               <UploadCloud className="w-6 h-6" />
                             </div>
                             <span className="text-sm font-bold text-gray-700">Click or drag images here</span>
@@ -678,7 +678,7 @@ export default function Navbar() {
                                   <button 
                                     type="button" 
                                     onClick={() => removeImage(index)}
-                                    className="absolute top-1.5 right-1.5 bg-red-600/90 text-white p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700 shadow-sm cursor-pointer"
+                                    className="absolute top-1.5 right-1.5 bg-[#FF7112]/90 text-white p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[#E05A00] shadow-sm cursor-pointer"
                                   >
                                     <Trash2 className="w-3.5 h-3.5" />
                                   </button>
@@ -705,7 +705,7 @@ export default function Navbar() {
                               <input 
                                 required
                                 type="text" 
-                                className="w-full pl-13 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition text-sm font-mono font-extrabold" 
+                                className="w-full pl-13 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-mono font-extrabold" 
                                 placeholder="e.g. 7,000" 
                                 value={formData.rentPrice} 
                                 onChange={e => setFormData({...formData, rentPrice: e.target.value})} 
@@ -717,7 +717,7 @@ export default function Navbar() {
                             <div>
                               <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-1.5">Billing Interval *</label>
                               <select 
-                                className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none bg-white transition text-xs sm:text-sm font-medium"
+                                className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none bg-white transition text-xs sm:text-sm font-medium"
                                 value={formData.rentUnit}
                                 onChange={e => setFormData({...formData, rentUnit: e.target.value as 'Day' | 'Hour'})}
                               >
@@ -733,15 +733,15 @@ export default function Navbar() {
                           <textarea 
                             required
                             rows={3} 
-                            className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition text-sm font-medium resize-none leading-relaxed" 
+                            className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-medium resize-none leading-relaxed" 
                             placeholder="Zabardast automatic sedan in pristine mechanical shape. Available with or without driver inside Faisalabad. Car is fully clean, features cold climate control." 
                             value={formData.description} 
                             onChange={e => setFormData({...formData, description: e.target.value})} 
                           />
                         </div>
 
-                        <div className="border border-dashed border-red-200 bg-red-50/50 p-4 rounded-2xl flex items-start gap-3 text-xs leading-relaxed text-red-800 font-medium">
-                          <input type="checkbox" required className="mt-1 shrink-0 accent-red-650 cursor-pointer" id="agree-terms" />
+                        <div className="border border-dashed border-[#FF7112]/20 bg-[#FF7112]/10/50 p-4 rounded-2xl flex items-start gap-3 text-xs leading-relaxed text-[#993300] font-medium">
+                          <input type="checkbox" required className="mt-1 shrink-0 accent-[#FF7112] cursor-pointer" id="agree-terms" />
                           <label htmlFor="agree-terms" className="cursor-pointer select-none">
                             I confirm that the vehicle details, registration documents, and rental parameters supplied are authentic and comply with GoDriveify marketplace guidelines. I authorize customer contact via WhatsApp.
                           </label>
@@ -766,7 +766,7 @@ export default function Navbar() {
                   {step < 3 ? (
                     <button 
                       onClick={handleNextStep}
-                      className="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1 transition shadow-md cursor-pointer"
+                      className="bg-[#FF7112] hover:bg-[#E05A00] text-white px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1 transition shadow-md cursor-pointer"
                       type="button"
                     >
                       Next Step <ChevronRight className="w-4 h-4" />

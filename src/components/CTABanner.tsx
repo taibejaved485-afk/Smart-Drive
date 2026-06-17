@@ -19,7 +19,7 @@ export default function CTABanner() {
   return (
     <section className="bg-gray-950 py-12 relative overflow-hidden border-t border-white/5">
       {/* Decorative Lights & Shadows */}
-      <div className="absolute top-0 right-1/4 w-72 h-72 bg-red-650/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-72 h-72 bg-[#E05A00]/10 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-0 left-10 w-60 h-60 bg-slate-900/30 rounded-full blur-[80px] pointer-events-none" />
 
       <div className="w-full max-w-7xl mx-auto px-6 relative z-10">
@@ -43,11 +43,11 @@ export default function CTABanner() {
           {/* White Rectangular Dot */}
           <div className="absolute w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 animate-travel-rectangle-banner shadow-[0_0_15px_5px_#ffffff] z-0 transition-opacity duration-500 pointer-events-none" />
 
-          <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#FF7112]/100/10 rounded-full blur-3xl pointer-events-none" />
           
           <div className="space-y-4 max-w-2xl text-center lg:text-left relative z-10">
-            <span className="inline-flex items-center gap-1.5 bg-red-500/10 border border-red-500/20 text-red-400 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest font-sans">
-              <Sparkles className="w-3.5 h-3.5 text-red-500" /> Start Driving Safely today
+            <span className="inline-flex items-center gap-1.5 bg-[#FF7112]/100/10 border border-[#FF7112]/20 text-[#FF7112]/70 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest font-sans">
+              <Sparkles className="w-3.5 h-3.5 text-[#FF7112]/90" /> Start Driving Safely today
             </span>
             <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight font-sans leading-tight min-h-[4rem]">
               {headingText}
@@ -60,7 +60,7 @@ export default function CTABanner() {
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto shrink-0 relative z-10">
             <Link 
               to="/pricing#contact" 
-              className="w-full sm:w-auto bg-red-700 hover:bg-red-800 text-white font-extrabold px-8 py-4 rounded-xl text-center shadow-lg shadow-red-900/30 transition-all text-xs uppercase tracking-widest font-sans border border-transparent hover:border-red-550/20"
+              className="w-full sm:w-auto bg-[#E05A00] hover:bg-red-800 text-white font-extrabold px-8 py-4 rounded-xl text-center shadow-lg shadow-red-900/30 transition-all text-xs uppercase tracking-widest font-sans border border-transparent hover:border-red-550/20"
             >
               APPLY NOW
             </Link>

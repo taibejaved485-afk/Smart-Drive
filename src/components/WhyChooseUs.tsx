@@ -19,7 +19,7 @@ export default function WhyChooseUs() {
             whileInView={{ opacity: 1, x: 0 }}
             className="space-y-4"
           >
-            <p className="text-red-500 font-bold uppercase tracking-widest text-sm">Why Choose Us?</p>
+            <p className="text-[#FF7112]/90 font-bold uppercase tracking-widest text-sm">Why Choose Us?</p>
             <h2 className="text-5xl md:text-6xl font-bold font-display leading-tight">
               Best Driving Course Even For Beginners
             </h2>
@@ -41,9 +41,9 @@ export default function WhyChooseUs() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="bg-gray-50 border border-gray-100 p-8 rounded-3xl group hover:border-red-500/50 transition-colors"
+              className="bg-gray-50 border border-gray-100 p-8 rounded-3xl group hover:border-[#FF7112]/50 transition-colors"
             >
-              <feature.icon className="w-12 h-12 text-red-500 mb-6" />
+              <feature.icon className="w-12 h-12 text-[#FF7112]/90 mb-6" />
               <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
               <p className="text-gray-600 text-sm leading-relaxed">{feature.desc}</p>
             </motion.div>

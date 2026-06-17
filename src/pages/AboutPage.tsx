@@ -86,7 +86,7 @@ export default function AboutPage() {
           </ScrollReveal>
           <ScrollReveal direction="up" delay={0.2}>
             <p className="text-xs sm:text-sm font-medium tracking-widest uppercase">
-              Home <span className="text-red-500 mx-2">&rsaquo;</span> About
+              Home <span className="text-[#FF7112]/90 mx-2">&rsaquo;</span> About
             </p>
           </ScrollReveal>
         </div>
@@ -96,7 +96,7 @@ export default function AboutPage() {
       <section className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="mb-12">
-            <p className="text-red-600 font-bold tracking-widest uppercase text-sm mb-3">About Us</p>
+            <p className="text-[#FF7112] font-bold tracking-widest uppercase text-sm mb-3">About Us</p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-gray-900 leading-tight tracking-tight max-w-4xl">
               We are your reliable, all-in-one platform for experienced and professional driving solutions.
             </h2>
@@ -126,7 +126,7 @@ export default function AboutPage() {
           <div className="lg:col-span-6">
             <ScrollReveal direction="right" delay={0.2}>
               <p className="text-gray-600 leading-relaxed text-base sm:text-lg mb-8">
-                Welcome to <span className="text-red-600 font-semibold underline underline-offset-4 decoration-red-600/30">GoDriveify</span>, the leading <span className="text-red-600 font-semibold underline underline-offset-4 decoration-red-600/30">Driving lessons in Faisalabad</span>, dedicated to helping learners become skilled, responsible, and confident drivers. Whether you're a beginner or looking to refine your driving skills, our expert instructors ensure a smooth learning experience tailored to your needs.
+                Welcome to <span className="text-[#FF7112] font-semibold underline underline-offset-4 decoration-[#FF7112]/30">GoDriveify</span>, the leading <span className="text-[#FF7112] font-semibold underline underline-offset-4 decoration-[#FF7112]/30">Driving lessons in Faisalabad</span>, dedicated to helping learners become skilled, responsible, and confident drivers. Whether you're a beginner or looking to refine your driving skills, our expert instructors ensure a smooth learning experience tailored to your needs.
               </p>
             </ScrollReveal>
 
@@ -136,7 +136,7 @@ export default function AboutPage() {
               <ScrollReveal direction="up" delay={0.3}>
                 <div className="py-6 pr-0 md:pr-6 border-b border-gray-100 h-full">
                   <div className="flex gap-4">
-                    <CheckCircle2 className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
+                    <CheckCircle2 className="w-6 h-6 text-[#FF7112] flex-shrink-0 mt-1" />
                     <div>
                       <h3 className="font-bold text-gray-950 text-base md:text-lg mb-2">{features[0].title}</h3>
                       <p className="text-sm text-gray-600 leading-relaxed">{features[0].desc}</p>
@@ -149,7 +149,7 @@ export default function AboutPage() {
               <ScrollReveal direction="up" delay={0.4}>
                 <div className="py-6 md:pl-6 border-b border-gray-100 h-full">
                   <div className="flex gap-4">
-                    <CheckCircle2 className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
+                    <CheckCircle2 className="w-6 h-6 text-[#FF7112] flex-shrink-0 mt-1" />
                     <div>
                       <h3 className="font-bold text-gray-950 text-base md:text-lg mb-2">{features[1].title}</h3>
                       <p className="text-sm text-gray-600 leading-relaxed">{features[1].desc}</p>
@@ -162,7 +162,7 @@ export default function AboutPage() {
               <ScrollReveal direction="up" delay={0.5}>
                 <div className="py-6 pr-0 md:pr-6 border-b md:border-b-0 border-gray-100 h-full">
                   <div className="flex gap-4">
-                    <CheckCircle2 className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
+                    <CheckCircle2 className="w-6 h-6 text-[#FF7112] flex-shrink-0 mt-1" />
                     <div>
                       <h3 className="font-bold text-gray-950 text-base md:text-lg mb-2">{features[2].title}</h3>
                       <p className="text-sm text-gray-600 leading-relaxed">{features[2].desc}</p>
@@ -175,7 +175,7 @@ export default function AboutPage() {
               <ScrollReveal direction="up" delay={0.6}>
                 <div className="py-6 md:pl-6 h-full">
                   <div className="flex gap-4">
-                    <CheckCircle2 className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
+                    <CheckCircle2 className="w-6 h-6 text-[#FF7112] flex-shrink-0 mt-1" />
                     <div>
                       <h3 className="font-bold text-gray-950 text-base md:text-lg mb-2">{features[3].title}</h3>
                       <p className="text-sm text-gray-600 leading-relaxed">{features[3].desc}</p>
@@ -244,7 +244,7 @@ export default function AboutPage() {
             {/* Right side: Text Content */}
             <div className="space-y-6">
               <ScrollReveal direction="left">
-                <p className="text-red-600 font-bold tracking-widest uppercase text-sm">
+                <p className="text-[#FF7112] font-bold tracking-widest uppercase text-sm">
                   OUR HISTORY
                 </p>
               </ScrollReveal>

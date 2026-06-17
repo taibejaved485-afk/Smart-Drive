@@ -25,7 +25,7 @@ export default function Footer() {
       {/* Premium Ambient Lights & Glassy Grid Overlays */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-500/50 to-transparent" />
       <div className="absolute inset-0 bg-[radial-gradient(#ffffff03_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none" />
-      <div className="absolute -bottom-24 left-1/4 w-96 h-96 bg-red-600/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute -bottom-24 left-1/4 w-96 h-96 bg-[#FF7112]/10 rounded-full blur-[140px] pointer-events-none" />
       <div className="absolute -top-12 right-10 w-80 h-80 bg-blue-600/5 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
@@ -38,7 +38,7 @@ export default function Footer() {
             <div>
               <Link to="/" className="flex items-center group select-none">
                 <div className="font-display tracking-tighter text-2xl font-black flex items-center">
-                  <span className="text-[#FF5500]">Go</span>
+                  <span className="text-[#FF7112]">Go</span>
                   <span className="text-white">Driveify</span>
                 </div>
               </Link>
@@ -49,7 +49,7 @@ export default function Footer() {
             </p>
 
             <div className="flex items-center gap-2.5 bg-white/5 border border-white/5 p-3 rounded-2xl">
-              <CheckCircle2 className="w-5 h-5 text-red-500 shrink-0" />
+              <CheckCircle2 className="w-5 h-5 text-[#FF7112]/90 shrink-0" />
               <div>
                 <p className="text-[10px] uppercase font-black text-white leading-none">NHA Criteria Approved</p>
                 <p className="text-[9px] text-slate-500 mt-0.5">Government standard vehicle tracks</p>
@@ -70,7 +70,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  className="w-9 h-9 bg-slate-900 border border-slate-800 hover:border-red-500/45 text-slate-400 hover:text-red-500 rounded-full flex items-center justify-center transition-all duration-300 hover:shadow-lg hover:shadow-red-550/10 hover:scale-110 cursor-pointer"
+                  className="w-9 h-9 bg-slate-900 border border-slate-800 hover:border-[#FF7112]/45 text-slate-400 hover:text-[#FF7112]/90 rounded-full flex items-center justify-center transition-all duration-300 hover:shadow-lg hover:shadow-red-550/10 hover:scale-110 cursor-pointer"
                 >
                   <social.icon className="w-3.5 h-3.5" />
                 </a>
@@ -81,7 +81,7 @@ export default function Footer() {
           {/* Column 2: Comprehensive Training Programs */}
           <div className="space-y-5">
             <h4 className="text-white font-extrabold tracking-wider uppercase text-xs flex items-center gap-2">
-              <span className="w-1.5 h-1.5 bg-[#FF5500] rounded-full" /> Academy Courses
+              <span className="w-1.5 h-1.5 bg-[#FF7112] rounded-full" /> Academy Courses
             </h4>
             <ul className="space-y-3 text-xs sm:text-sm">
               {[
@@ -92,8 +92,8 @@ export default function Footer() {
                 { title: "Automatic Sedan Training" }
               ].map((item, idx) => (
                 <li key={idx} className="group">
-                  <Link to="/pricing" className="text-slate-400 hover:text-[#FF5500] transition-colors duration-300 flex items-center gap-2 pointer-events-auto">
-                    <ArrowRight className="w-3 h-3 text-slate-605 group-hover:text-[#FF5500] group-hover:translate-x-0.5 transition-all duration-300 shrink-0" />
+                  <Link to="/pricing" className="text-slate-400 hover:text-[#FF7112] transition-colors duration-300 flex items-center gap-2 pointer-events-auto">
+                    <ArrowRight className="w-3 h-3 text-slate-605 group-hover:text-[#FF7112] group-hover:translate-x-0.5 transition-all duration-300 shrink-0" />
                     <span className="font-semibold">
                       {item.title}
                     </span>
@@ -106,7 +106,7 @@ export default function Footer() {
           {/* Column 3: Navigation & Safe Resources */}
           <div className="space-y-5">
             <h4 className="text-white font-extrabold tracking-wider uppercase text-xs flex items-center gap-2">
-              <span className="w-1.5 h-1.5 bg-red-500 rounded-full" /> Academy Links
+              <span className="w-1.5 h-1.5 bg-[#FF7112]/100 rounded-full" /> Academy Links
             </h4>
             <ul className="space-y-3.5 text-xs sm:text-sm">
               {[
@@ -118,8 +118,8 @@ export default function Footer() {
                 { title: "FAQ Guidance", path: "/faq" }
               ].map((link, idx) => (
                 <li key={idx}>
-                  <Link to={link.path} className="text-slate-400 hover:text-red-500 transition-colors duration-300 flex items-center gap-2 font-semibold">
-                    <ArrowRight className="w-3 h-3 text-red-650" /> {link.title}
+                  <Link to={link.path} className="text-slate-400 hover:text-[#FF7112]/90 transition-colors duration-300 flex items-center gap-2 font-semibold">
+                    <ArrowRight className="w-3 h-3 text-[#E05A00]" /> {link.title}
                   </Link>
                 </li>
               ))}
@@ -129,36 +129,36 @@ export default function Footer() {
           {/* Column 4: Contact Coordinates & Active Campus */}
           <div className="space-y-5">
             <h4 className="text-white font-extrabold tracking-wider uppercase text-xs flex items-center gap-2">
-              <span className="w-1.5 h-1.5 bg-red-500 rounded-full" /> Active Operations
+              <span className="w-1.5 h-1.5 bg-[#FF7112]/100 rounded-full" /> Active Operations
             </h4>
             
             <div className="space-y-4 text-xs sm:text-sm">
               <div className="flex gap-3 items-start">
-                <div className="p-2 bg-slate-900 border border-slate-800 text-red-500 rounded-lg shrink-0">
+                <div className="p-2 bg-slate-900 border border-slate-800 text-[#FF7112]/90 rounded-lg shrink-0">
                   <Phone className="w-3.5 h-3.5" />
                 </div>
                 <div>
                   <span className="text-[9px] uppercase tracking-wider font-extrabold text-slate-500 block mb-0.5">Helpline Support</span>
-                  <a href="tel:03097666928" className="font-mono text-white hover:text-red-500 font-bold transition-colors">
+                  <a href="tel:03097666928" className="font-mono text-white hover:text-[#FF7112]/90 font-bold transition-colors">
                     03097666928
                   </a>
                 </div>
               </div>
 
               <div className="flex gap-3 items-start">
-                <div className="p-2 bg-slate-900 border border-slate-800 text-red-500 rounded-lg shrink-0">
+                <div className="p-2 bg-slate-900 border border-slate-800 text-[#FF7112]/90 rounded-lg shrink-0">
                   <Mail className="w-3.5 h-3.5" />
                 </div>
                 <div>
                   <span className="text-[9px] uppercase tracking-wider font-extrabold text-slate-500 block mb-0.5">Corporate Email</span>
-                  <a href="mailto:info@godriveify.com" className="text-slate-305 hover:text-red-500 transition-colors font-medium">
+                  <a href="mailto:info@godriveify.com" className="text-slate-305 hover:text-[#FF7112]/90 transition-colors font-medium">
                     info@godriveify.com
                   </a>
                 </div>
               </div>
 
               <div className="flex gap-3 items-start">
-                <div className="p-2 bg-slate-900 border border-slate-800 text-red-500 rounded-lg shrink-0">
+                <div className="p-2 bg-slate-900 border border-slate-800 text-[#FF7112]/90 rounded-lg shrink-0">
                   <MapPin className="w-3.5 h-3.5" />
                 </div>
                 <div>
@@ -179,13 +179,13 @@ export default function Footer() {
             <p className="font-medium">&copy; 2026 GoDriveify. All rights reserved.</p>
             <span className="hidden sm:inline text-white/10">|</span>
             <div className="flex items-center gap-1.5 text-xs text-slate-400 bg-white/5 py-1 px-3 rounded-full border border-white/5 shadow-inner">
-              <ShieldCheck className="w-3.5 h-3.5 text-red-500" />
+              <ShieldCheck className="w-3.5 h-3.5 text-[#FF7112]/90" />
               <span className="font-bold">Accredited Driving Academy</span>
             </div>
           </div>
           
           <div className="flex items-center gap-4 font-mono text-[10px] tracking-widest text-slate-600 bg-black/30 py-1.5 px-4 rounded-xl border border-white/5">
-            <Link to="/admin" className="hover:text-red-500 transition-colors uppercase font-bold">Admin Portal</Link>
+            <Link to="/admin" className="hover:text-[#FF7112]/90 transition-colors uppercase font-bold">Admin Portal</Link>
             <span>•</span>
             <span className="text-[9px] uppercase font-bold text-emerald-500 animate-pulse">SYSTEM_V1.2.0_LIVE</span>
           </div>

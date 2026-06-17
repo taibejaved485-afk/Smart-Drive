@@ -15,7 +15,7 @@ const courses = [
       "Free pickup & drop-off service"
     ],
     image: 'https://trainingdrivingschool.pk/wp-content/uploads/2025/02/download-2.jpeg',
-    badgeBg: 'bg-red-500/10 text-red-400 border border-red-500/20',
+    badgeBg: 'bg-[#FF7112]/100/10 text-[#FF7112]/70 border border-[#FF7112]/20',
     link: '/pricing'
   },
   {
@@ -69,7 +69,7 @@ export default function Lessons() {
   return (
     <section className="py-24 bg-gray-950 text-white relative overflow-hidden" id="courses">
       {/* Background Decorative Ambient Gradients */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-600/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#FF7112]/5 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/5 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
@@ -80,7 +80,7 @@ export default function Lessons() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-1 bg-red-500/10 border border-red-500/20 text-red-500 px-3.5 py-1.5 rounded-full text-xs font-extrabold tracking-widest uppercase mb-4 shadow-sm"
+            className="inline-flex items-center gap-1 bg-[#FF7112]/100/10 border border-[#FF7112]/20 text-[#FF7112]/90 px-3.5 py-1.5 rounded-full text-xs font-extrabold tracking-widest uppercase mb-4 shadow-sm"
           >
             <Shield className="w-3.5 h-3.5" /> Certified Instructors
           </motion.div>
@@ -117,7 +117,7 @@ export default function Lessons() {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
               whileHover={{ y: -8 }}
-              className="group relative bg-[#0f1115]/90 border border-white/5 rounded-3xl p-6 flex flex-col justify-between hover:border-red-500/30 transition-all duration-300 hover:shadow-[0_20px_50px_rgba(239,68,68,0.15)] overflow-hidden"
+              className="group relative bg-[#0f1115]/90 border border-white/5 rounded-3xl p-6 flex flex-col justify-between hover:border-[#FF7112]/30 transition-all duration-300 hover:shadow-[0_20px_50px_rgba(239,68,68,0.15)] overflow-hidden"
             >
               {/* Image Frame Container */}
               <div className="relative aspect-[16/10] bg-white rounded-2xl p-4 overflow-hidden mb-6 flex items-center justify-center border border-white/10 shadow-md">
@@ -130,7 +130,7 @@ export default function Lessons() {
 
               {/* Title & Content */}
               <div className="flex-grow flex flex-col justify-center">
-                <h3 className="text-2xl font-black text-white group-hover:text-red-500 transition-colors mb-6 tracking-tight text-center">
+                <h3 className="text-2xl font-black text-white group-hover:text-[#FF7112]/90 transition-colors mb-6 tracking-tight text-center">
                   {course.title}
                 </h3>
               </div>
@@ -138,7 +138,7 @@ export default function Lessons() {
               {/* Pricing Redirect Button */}
               <Link
                 to={course.link}
-                className="w-full bg-white/5 hover:bg-red-600 text-white border border-white/10 hover:border-transparent py-4 rounded-xl font-bold text-center flex items-center justify-center gap-2 group-hover:shadow-lg hover:shadow-red-900/30 transition-all duration-300 tracking-wide text-sm"
+                className="w-full bg-white/5 hover:bg-[#FF7112] text-white border border-white/10 hover:border-transparent py-4 rounded-xl font-bold text-center flex items-center justify-center gap-2 group-hover:shadow-lg hover:shadow-red-900/30 transition-all duration-300 tracking-wide text-sm"
               >
                 <span>View Plans & Classes</span>
                 <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-white group-hover:translate-x-1 transition-all" />
@@ -156,10 +156,10 @@ export default function Lessons() {
           className="mt-16 text-center border-t border-white/5 pt-10 flex flex-col sm:flex-row items-center justify-center gap-4 text-gray-400 text-sm"
         >
           <span className="flex items-center gap-2 bg-white/5 border border-white/5 px-3.5 py-1.5 rounded-full text-xs font-bold text-gray-300">
-            <Award className="w-4 h-4 text-red-500" /> Government Accredited & Approved Curriculum
+            <Award className="w-4 h-4 text-[#FF7112]/90" /> Government Accredited & Approved Curriculum
           </span>
           <span>•</span>
-          <p>Need custom timing? <Link to="/contact" className="text-red-500 hover:underline font-bold">Contact Our Support</Link> to design a personalized timeline.</p>
+          <p>Need custom timing? <Link to="/contact" className="text-[#FF7112]/90 hover:underline font-bold">Contact Our Support</Link> to design a personalized timeline.</p>
         </motion.div>
       </div>
     </section>

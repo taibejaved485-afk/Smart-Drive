@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import CTABanner from '../components/CTABanner';
-import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag, Bold, Italic, List, ListOrdered, BookOpen, User, Calendar, Zap, UserCheck, Users } from 'lucide-react';
+import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag, Bold, Italic, Underline, Link as LinkIcon, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, BookOpen, User, Calendar, Zap, UserCheck, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RentalCar } from '../data/inventory';
 import { 
@@ -1040,6 +1040,15 @@ export default function AdminPage() {
     }
   };
 
+  const parseInlineMarkdownToHtml = (text: string) => {
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/__(.*?)__/g, '<u>$1</u>')
+      .replace(/!\[([^\]]*)\]\((.*?)\)/g, '<img src="$2" alt="$1" style="max-width: 100%; height: auto;" />')
+      .replace(/\[([^\]]*)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  };
+
   const markdownToHtml = (markdown: string): string => {
     if (!markdown) return '';
     return markdown
@@ -1051,53 +1060,55 @@ export default function AdminPage() {
         // Unordered list item
         if (trimmed.startsWith('- ')) {
           const content = trimmed.substring(2);
-          const parsed = content
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+          const parsed = parseInlineMarkdownToHtml(content);
           return `<ul><li>${parsed}</li></ul>`;
         }
         
         // Ordered list item
         if (/^\d+\.\s/.test(trimmed)) {
           const content = trimmed.replace(/^\d+\.\s/, '');
-          const parsed = content
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+          const parsed = parseInlineMarkdownToHtml(content);
           return `<ol><li>${parsed}</li></ol>`;
         }
         
         // Blockquote
         if (trimmed.startsWith('> ')) {
           const content = trimmed.substring(2);
-          const parsed = content
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+          const parsed = parseInlineMarkdownToHtml(content);
           return `<blockquote>${parsed}</blockquote>`;
         }
         
         // Heading 1 (##)
         if (trimmed.startsWith('## ')) {
           const content = trimmed.substring(3);
-          const parsed = content
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+          const parsed = parseInlineMarkdownToHtml(content);
           return `<h2>${parsed}</h2>`;
         }
         
         // Heading 2 (###)
         if (trimmed.startsWith('### ')) {
           const content = trimmed.substring(4);
-          const parsed = content
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+          const parsed = parseInlineMarkdownToHtml(content);
           return `<h3>${parsed}</h3>`;
         }
         
+        let alignStyle = '';
+        let textContent = line;
+        
+        if (textContent.startsWith('|=center=|')) {
+          alignStyle = ' style="text-align: center;"';
+          textContent = textContent.replace('|=center=|', '');
+        } else if (textContent.startsWith('|=right=|')) {
+          alignStyle = ' style="text-align: right;"';
+          textContent = textContent.replace('|=right=|', '');
+        } else if (textContent.startsWith('|=justify=|')) {
+          alignStyle = ' style="text-align: justify;"';
+          textContent = textContent.replace('|=justify=|', '');
+        }
+
         // Regular paragraph or plain line
-        const parsed = line
-          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-          .replace(/\*(.*?)\*/g, '<em>$1</em>');
-        return `<p>${parsed}</p>`;
+        const parsed = parseInlineMarkdownToHtml(textContent);
+        return `<div${alignStyle}>${parsed}</div>`;
       })
       .join('');
   };
@@ -1127,6 +1138,7 @@ export default function AdminPage() {
             lines.push(`- ${cleanInlineStyles(el.innerHTML)}`);
           }
         } else if (tagName === 'P' || tagName === 'DIV') {
+          const alignment = el.style.textAlign;
           const innerHTML = el.innerHTML;
           if (innerHTML === '<br>' || innerHTML === '') {
             lines.push('');
@@ -1134,10 +1146,16 @@ export default function AdminPage() {
             const hasBlockChildren = Array.from(el.children).some(child => 
               ['P', 'DIV', 'H1', 'H2', 'H3', 'H4', 'UL', 'OL', 'LI'].includes(child.tagName.toUpperCase())
             );
+            
+            let prefix = '';
+            if (alignment === 'center') prefix = '|=center=|';
+            if (alignment === 'right') prefix = '|=right=|';
+            if (alignment === 'justify') prefix = '|=justify=|';
+
             if (hasBlockChildren) {
               Array.from(el.childNodes).forEach(traverse);
             } else {
-              lines.push(cleanInlineStyles(innerHTML));
+              lines.push(`${prefix}${cleanInlineStyles(innerHTML)}`);
             }
           }
         } else if (tagName === 'UL' || tagName === 'OL') {
@@ -1170,6 +1188,10 @@ export default function AdminPage() {
       text = text.replace(/<b[^>]*>(.*?)<\/b>/gi, '**$1**');
       text = text.replace(/<em[^>]*>(.*?)<\/em>/gi, '*$1*');
       text = text.replace(/<i[^>]*>(.*?)<\/i>/gi, '*$1*');
+      text = text.replace(/<u[^>]*>(.*?)<\/u>/gi, '__$1__');
+      text = text.replace(/<a[^>]*href=["'](.*?)["'][^>]*>(.*?)<\/a>/gi, '[$2]($1)');
+      text = text.replace(/<img[^>]*src=["'](.*?)["'][^>]*alt=["'](.*?)["'][^>]*>/gi, '![$2]($1)');
+      text = text.replace(/<img[^>]*src=["'](.*?)["'][^>]*>/gi, '![]($1)');
       text = text.replace(/<[^>]*>/g, '');
       text = text
         .replace(/&nbsp;/g, ' ')
@@ -1285,17 +1307,15 @@ export default function AdminPage() {
     }
   };
 
-  const parseBoldAndItalic = (text: string) => {
-    const parts = text.split(/(\*\*.*?\*\*|\*.*?\*)/g);
-    return parts.map((part, i) => {
-      if (part.startsWith('**') && part.endsWith('**')) {
-        return <strong key={i} className="font-extrabold text-slate-950">{part.slice(2, -2)}</strong>;
-      }
-      if (part.startsWith('*') && part.endsWith('*')) {
-        return <em key={i} className="text-red-650 font-semibold italic">{part.slice(1, -1)}</em>;
-      }
-      return part;
-    });
+  const parseInlineMarkdown = (text: string) => {
+    let html = text
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-900">$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
+      .replace(/__(.*?)__/g, '<u class="underline">$1</u>')
+      .replace(/!\[([^\]]*)\]\((.*?)\)/g, '<img src="$2" alt="$1" style="max-width: 100%; height: auto;" class="rounded-lg my-3" />')
+      .replace(/\[([^\]]*)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline hover:text-blue-800">$1</a>');
+      
+    return <span dangerouslySetInnerHTML={{ __html: html }} />;
   };
 
   const renderPreviewBlogContent = (content: string) => {
@@ -1307,7 +1327,7 @@ export default function AdminPage() {
       if (trimmed.startsWith('## ')) {
         return (
           <h3 key={index} className="text-xl md:text-2xl font-black text-slate-900 mt-6 mb-3 border-b border-gray-100 pb-1.5 font-sans">
-            {trimmed.replace('## ', '')}
+            {parseInlineMarkdown(trimmed.replace('## ', ''))}
           </h3>
         );
       }
@@ -1315,15 +1335,15 @@ export default function AdminPage() {
       if (trimmed.startsWith('### ')) {
         return (
           <h4 key={index} className="text-lg md:text-xl font-extrabold text-slate-800 mt-4 mb-2 font-sans">
-            {trimmed.replace('### ', '')}
+            {parseInlineMarkdown(trimmed.replace('### ', ''))}
           </h4>
         );
       }
 
       if (trimmed.startsWith('> ')) {
         return (
-          <blockquote key={index} className="border-l-4 border-[#FF5500] pl-4 italic text-[#002060] my-4 bg-slate-50/80 p-3.5 rounded-r-xl text-left font-sans text-sm md:text-base">
-            {parseBoldAndItalic(trimmed.replace('> ', ''))}
+          <blockquote key={index} className="border-l-4 border-[#FF7112] pl-4 italic text-[#002060] my-4 bg-slate-50/80 p-3.5 rounded-r-xl text-left font-sans text-sm md:text-base">
+            {parseInlineMarkdown(trimmed.replace('> ', ''))}
           </blockquote>
         );
       }
@@ -1331,7 +1351,7 @@ export default function AdminPage() {
       if (trimmed.startsWith('- ')) {
         return (
           <li key={index} className="ml-5 list-disc text-slate-705 my-1 pl-1 text-[13px] sm:text-sm leading-relaxed">
-            {parseBoldAndItalic(trimmed.replace('- ', ''))}
+            {parseInlineMarkdown(trimmed.replace('- ', ''))}
           </li>
         );
       }
@@ -1340,14 +1360,28 @@ export default function AdminPage() {
         const parts = trimmed.split(/^\d+\.\s/);
         return (
           <li key={index} className="ml-5 list-decimal text-slate-705 my-1 pl-1 text-[13px] sm:text-sm leading-relaxed">
-            {parseBoldAndItalic(parts[1] || '')}
+            {parseInlineMarkdown(parts[1] || '')}
           </li>
         );
       }
 
+      let alignClass = 'text-left';
+      let contentLine = line;
+      
+      if (contentLine.startsWith('|=center=|')) {
+        alignClass = 'text-center';
+        contentLine = contentLine.replace('|=center=|', '');
+      } else if (contentLine.startsWith('|=right=|')) {
+        alignClass = 'text-right';
+        contentLine = contentLine.replace('|=right=|', '');
+      } else if (contentLine.startsWith('|=justify=|')) {
+        alignClass = 'text-justify';
+        contentLine = contentLine.replace('|=justify=|', '');
+      }
+
       return (
-        <p key={index} className="text-slate-600 text-[13px] sm:text-sm leading-relaxed mb-3 text-left font-normal font-sans">
-          {parseBoldAndItalic(line)}
+        <p key={index} className={`text-slate-600 text-[13px] sm:text-sm leading-relaxed mb-3 font-normal font-sans ${alignClass}`}>
+          {parseInlineMarkdown(contentLine)}
         </p>
       );
     });
@@ -1513,25 +1547,23 @@ export default function AdminPage() {
 
   // Blog Editor Operations
   const deletePost = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this blog post?')) {
-      setPosts(prevPosts => {
-        const updatedPosts = prevPosts.filter(p => String(p.id) !== String(id));
-        localStorage.setItem('blogPosts', JSON.stringify(updatedPosts));
-        return updatedPosts;
-      });
-      showToast('Blog post deleted successfully.', 'info');
-      if (editingPostId === id) {
-        cancelEdit();
-      }
+    setPosts(prevPosts => {
+      const updatedPosts = prevPosts.filter(p => String(p.id) !== String(id));
+      localStorage.setItem('blogPosts', JSON.stringify(updatedPosts));
+      return updatedPosts;
+    });
+    showToast('Blog post deleted successfully.', 'info');
+    if (editingPostId === id) {
+      cancelEdit();
     }
   };
 
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-gray-100 flex items-center justify-center p-4">
-        <form onSubmit={handleLogin} className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm border border-red-100">
+        <form onSubmit={handleLogin} className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm border border-[#FF7112]/20">
           <div className="text-center mb-8">
-            <div className="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-red-600">
+            <div className="bg-[#FF7112]/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-[#FF7112]">
               <Sparkles className="w-8 h-8" />
             </div>
             <h2 className="text-3xl font-black text-gray-900 tracking-tight">Admin Portal</h2>
@@ -1544,7 +1576,7 @@ export default function AdminPage() {
               <input 
                 type="text" 
                 placeholder="e.g. admin" 
-                className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition" 
+                className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition" 
                 value={username} 
                 onChange={e => setUsername(e.target.value)} 
               />
@@ -1554,19 +1586,19 @@ export default function AdminPage() {
               <input 
                 type="password" 
                 placeholder="••••••••" 
-                className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition" 
+                className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition" 
                 value={password} 
                 onChange={e => setPassword(e.target.value)} 
               />
             </div>
           </div>
           
-          <button className="w-full bg-red-600 hover:bg-red-700 text-white py-3.5 rounded-xl font-bold transition mt-6 tracking-wide shadow-md shadow-red-200">
+          <button className="w-full bg-[#FF7112] hover:bg-[#E05A00] text-white py-3.5 rounded-xl font-bold transition mt-6 tracking-wide shadow-md shadow-red-200">
             Secure Sign In
           </button>
           
           <div className="text-center mt-4">
-            <Link to="/blog" className="text-xs text-gray-500 hover:text-red-600 flex items-center justify-center gap-1">
+            <Link to="/blog" className="text-xs text-gray-500 hover:text-[#FF7112] flex items-center justify-center gap-1">
               <ArrowLeft className="w-3.5 h-3.5" /> Back to Blogs
             </Link>
           </div>
@@ -1576,7 +1608,7 @@ export default function AdminPage() {
           <div className="fixed z-50 bottom-6 right-6 max-w-sm w-full bg-slate-900 border border-slate-800 text-white rounded-2xl p-4 shadow-2xl flex items-start gap-3 animate-slide-up">
             <div className={`p-1.5 rounded-lg shrink-0 mt-0.5 ${
               toastMessage.type === 'success' ? 'bg-emerald-500/10 text-emerald-400' :
-              toastMessage.type === 'error' ? 'bg-red-500/10 text-red-400' :
+              toastMessage.type === 'error' ? 'bg-[#FF7112]/100/10 text-[#FF7112]/70' :
               'bg-blue-500/10 text-blue-400'
             }`}>
               {toastMessage.type === 'success' ? <Check className="w-5 h-5" /> :
@@ -1611,12 +1643,12 @@ export default function AdminPage() {
         
         {/* Professional Header Panel */}
         <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-red-500/5 rounded-full blur-[120px] pointer-events-none" />
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[#FF7112]/100/5 rounded-full blur-[120px] pointer-events-none" />
           <div className="absolute -bottom-10 left-1/3 w-64 h-64 bg-slate-100 rounded-full blur-2xl pointer-events-none" />
           
           <div className="relative z-10">
             <div className="flex flex-wrap items-center gap-2 mb-3">
-              <span className="bg-red-50 text-red-700 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border border-red-100">
+              <span className="bg-[#FF7112]/10 text-[#E05A00] text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border border-[#FF7112]/20">
                 SYSTEM OPERATOR PAGE
               </span>
               <span className="bg-slate-100 text-slate-800 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border border-slate-200">
@@ -1639,7 +1671,7 @@ export default function AdminPage() {
             </Link>
             <button 
               onClick={purgeLocalStorage}
-              className="p-3 bg-white border border-slate-200 text-slate-400 hover:text-red-650 hover:border-red-200 hover:bg-red-50 rounded-xl transition cursor-pointer shadow-sm shrink-0"
+              className="p-3 bg-white border border-slate-200 text-slate-400 hover:text-[#E05A00] hover:border-[#FF7112]/30 hover:bg-[#FF7112]/10 rounded-xl transition cursor-pointer shadow-sm shrink-0"
               title="Factory Reset LocalStorage State"
             >
               <Trash2 className="w-4.5 h-4.5" />
@@ -1652,7 +1684,7 @@ export default function AdminPage() {
           <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between mb-2">
               <span className="text-slate-400 text-[10px] font-black uppercase tracking-wider">Bookings Registered</span>
-              <div className="w-7 h-7 bg-red-50 rounded-lg flex items-center justify-center text-red-650">
+              <div className="w-7 h-7 bg-[#FF7112]/10 rounded-lg flex items-center justify-center text-[#E05A00]">
                 <FileSpreadsheet className="w-4 h-4" />
               </div>
             </div>
@@ -1748,7 +1780,7 @@ export default function AdminPage() {
                   onClick={() => setActiveTab('bookings')}
                   className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
                     activeTab === 'bookings'
-                      ? 'bg-red-700 text-white font-extrabold shadow-md shadow-red-700/10'
+                      ? 'bg-[#E05A00] text-white font-extrabold shadow-md shadow-red-700/10'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
                   }`}
                 >
@@ -1768,7 +1800,7 @@ export default function AdminPage() {
                   onClick={() => setActiveTab('courses')}
                   className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
                     activeTab === 'courses'
-                      ? 'bg-red-700 text-white font-extrabold shadow-md shadow-red-700/10'
+                      ? 'bg-[#E05A00] text-white font-extrabold shadow-md shadow-red-700/10'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
                   }`}
                 >
@@ -1788,7 +1820,7 @@ export default function AdminPage() {
                   onClick={() => setActiveTab('rentals')}
                   className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
                     activeTab === 'rentals'
-                      ? 'bg-red-700 text-white font-extrabold shadow-md shadow-red-700/10'
+                      ? 'bg-[#E05A00] text-white font-extrabold shadow-md shadow-red-700/10'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
                   }`}
                 >
@@ -1808,7 +1840,7 @@ export default function AdminPage() {
                   onClick={() => setActiveTab('requests')}
                   className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
                     activeTab === 'requests'
-                      ? 'bg-red-700 text-white font-extrabold shadow-md shadow-red-700/10'
+                      ? 'bg-[#E05A00] text-white font-extrabold shadow-md shadow-red-700/10'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
                   }`}
                 >
@@ -1828,7 +1860,7 @@ export default function AdminPage() {
                   onClick={() => setActiveTab('car-sales')}
                   className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
                     activeTab === 'car-sales'
-                      ? 'bg-red-700 text-white font-extrabold shadow-md shadow-red-700/10'
+                      ? 'bg-[#E05A00] text-white font-extrabold shadow-md shadow-red-700/10'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
                   }`}
                 >
@@ -1848,7 +1880,7 @@ export default function AdminPage() {
                   onClick={() => setActiveTab('blogs')}
                   className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
                     activeTab === 'blogs'
-                      ? 'bg-red-700 text-white font-extrabold shadow-md shadow-red-700/10'
+                      ? 'bg-[#E05A00] text-white font-extrabold shadow-md shadow-red-700/10'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
                   }`}
                 >
@@ -1868,7 +1900,7 @@ export default function AdminPage() {
                   onClick={() => setActiveTab('dns')}
                   className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
                     activeTab === 'dns'
-                      ? 'bg-red-700 text-white font-extrabold shadow-md shadow-red-700/10'
+                      ? 'bg-[#E05A00] text-white font-extrabold shadow-md shadow-red-700/10'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
                   }`}
                 >
@@ -1891,7 +1923,7 @@ export default function AdminPage() {
             {activeTab === 'dashboard' && (
               <div className="animate-fade-in space-y-8">
                 <div className="bg-slate-950 rounded-[2.5rem] p-8 md:p-12 text-white relative overflow-hidden shadow-2xl shadow-slate-900/40">
-                  <div className="absolute top-0 right-0 p-20 opacity-10 blur-3xl bg-red-600 rounded-full -mr-20 -mt-20" />
+                  <div className="absolute top-0 right-0 p-20 opacity-10 blur-3xl bg-[#FF7112] rounded-full -mr-20 -mt-20" />
                   <div className="relative z-10 max-w-2xl">
                     <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tighter leading-tight">Welcome back, Academy Admin</h2>
                     <p className="text-slate-400 text-lg font-medium leading-relaxed">
@@ -1910,8 +1942,8 @@ export default function AdminPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {/* Status Card 1: Bookings */}
-                  <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 group hover:border-red-600/30 transition-all duration-500 hover:-translate-y-1">
-                    <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 mb-6 group-hover:scale-110 group-hover:bg-red-600 group-hover:text-white transition-all duration-500">
+                  <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 group hover:border-[#FF7112]/30 transition-all duration-500 hover:-translate-y-1">
+                    <div className="w-14 h-14 bg-[#FF7112]/10 rounded-2xl flex items-center justify-center text-[#FF7112] mb-6 group-hover:scale-110 group-hover:bg-[#FF7112] group-hover:text-white transition-all duration-500">
                       <Calendar className="w-7 h-7" />
                     </div>
                     <h3 className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Pending Applications</h3>
@@ -1926,7 +1958,7 @@ export default function AdminPage() {
                         <Zap className="w-3 h-3 fill-emerald-500" />
                         <span>Active System</span>
                       </div>
-                      <button onClick={() => setActiveTab('bookings')} className="text-slate-400 hover:text-red-600 transition-colors">Manage Enrolls &rarr;</button>
+                      <button onClick={() => setActiveTab('bookings')} className="text-slate-400 hover:text-[#FF7112] transition-colors">Manage Enrolls &rarr;</button>
                     </div>
                   </div>
 
@@ -1977,11 +2009,11 @@ export default function AdminPage() {
                 <div className="bg-white rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50 p-8">
                   <h3 className="text-lg font-black text-slate-950 mb-6 tracking-tight">System Quick-Actions</h3>
                   <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <button onClick={purgeLocalStorage} className="flex items-center gap-3 p-4 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-red-50 hover:border-red-100 transition-all group text-left cursor-pointer">
-                      <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-red-600 transition-transform group-hover:scale-95">
+                    <button onClick={purgeLocalStorage} className="flex items-center gap-3 p-4 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-[#FF7112]/10 hover:border-[#FF7112]/20 transition-all group text-left cursor-pointer">
+                      <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-[#FF7112] transition-transform group-hover:scale-95">
                         <Trash2 className="w-5 h-5" />
                       </div>
-                      <span className="text-xs font-bold text-slate-600 group-hover:text-red-700">Clear System Log</span>
+                      <span className="text-xs font-bold text-slate-600 group-hover:text-[#E05A00]">Clear System Log</span>
                     </button>
                     <button onClick={() => { setActiveTab('courses'); setEditingCourseId(null); }} className="flex items-center gap-3 p-4 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-100 transition-all group text-left cursor-pointer">
                       <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-emerald-600 transition-transform group-hover:scale-95">
@@ -2012,7 +2044,7 @@ export default function AdminPage() {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <h2 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
-                        <FileSpreadsheet className="w-6 h-6 text-red-650" />
+                        <FileSpreadsheet className="w-6 h-6 text-[#E05A00]" />
                         Manage Driving Academy Bookings (بکنگز مینیجر)
                   </h2>
                   <p className="text-gray-500 text-xs sm:text-sm mt-1">
@@ -2022,7 +2054,7 @@ export default function AdminPage() {
                 
                 {/* Metric Summary count badges */}
                 <div className="flex gap-2">
-                  <span className="bg-red-50 text-red-650 px-3.5 py-1.5 rounded-xl text-xs font-bold border border-red-100">
+                  <span className="bg-[#FF7112]/10 text-[#E05A00] px-3.5 py-1.5 rounded-xl text-xs font-bold border border-[#FF7112]/20">
                     Total: {bookings.length}
                   </span>
                   <span className="bg-yellow-50 text-yellow-700 px-3.5 py-1.5 rounded-xl text-xs font-bold border border-yellow-100">
@@ -2042,7 +2074,7 @@ export default function AdminPage() {
                   placeholder="Search student, email, phone number, or course..."
                   value={bookingSearch}
                   onChange={(e) => setBookingSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-250 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none text-xs sm:text-sm bg-white text-gray-800 transition"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-250 rounded-xl focus:border-[#FF7112] focus:ring-1 focus:ring-[#FF7112] outline-none text-xs sm:text-sm bg-white text-gray-800 transition"
                 />
                 {bookingSearch && (
                   <button
@@ -2068,7 +2100,7 @@ export default function AdminPage() {
                       onClick={() => setBookingStatusFilter(status)}
                       className={`px-3 py-1.5 rounded-xl text-xs font-black min-w-[64px] transition cursor-pointer select-none text-center ${
                         isActive
-                          ? 'bg-red-600 text-white shadow-sm'
+                          ? 'bg-[#FF7112] text-white shadow-sm'
                           : 'bg-white text-gray-650 hover:bg-gray-100 hover:text-gray-900 border border-gray-200'
                       }`}
                     >
@@ -2113,7 +2145,7 @@ export default function AdminPage() {
                     <p className="text-gray-400 text-xs sm:text-sm">No bookings fit the search queries or status criteria.</p>
                     <button 
                       onClick={() => { setBookingSearch(''); setBookingStatusFilter('All'); }}
-                      className="mt-3 text-xs text-red-650 font-bold hover:underline font-sans cursor-pointer"
+                      className="mt-3 text-xs text-[#E05A00] font-bold hover:underline font-sans cursor-pointer"
                     >
                       Clear filters & view all
                     </button>
@@ -2144,7 +2176,7 @@ export default function AdminPage() {
                         if (isConfirmed) badgeCol = 'bg-green-100 text-green-700 font-bold';
                         if (isPending) badgeCol = 'bg-yellow-50 text-yellow-750 font-bold border border-yellow-100';
                         if (isRescheduled) badgeCol = 'bg-blue-50 text-blue-700 font-bold border border-blue-100';
-                        if (isCancelled) badgeCol = 'bg-red-55 text-red-750 font-bold border border-red-150';
+                        if (isCancelled) badgeCol = 'bg-red-55 text-[#B34700] font-bold border border-red-150';
 
                         return (
                           <tr key={b.id} className="hover:bg-gray-50/60 transition-colors">
@@ -2223,8 +2255,8 @@ export default function AdminPage() {
                                   }}
                                   className={`px-2.5 py-1 rounded font-extrabold text-[10px] uppercase tracking-wide cursor-pointer transition ${
                                     isCancelled
-                                      ? 'bg-red-700 text-white border border-red-800'
-                                      : 'bg-red-650 hover:bg-red-700 text-white'
+                                      ? 'bg-[#E05A00] text-white border border-red-800'
+                                      : 'bg-[#E05A00] hover:bg-[#E05A00] text-white'
                                   }`}
                                   type="button"
                                 >
@@ -2247,7 +2279,7 @@ export default function AdminPage() {
 
                                 <button
                                   onClick={() => removeBookingRecord(b.id)}
-                                  className="p-1.5 text-gray-400 hover:text-red-650 hover:bg-red-50 rounded transition cursor-pointer ml-1"
+                                  className="p-1.5 text-gray-400 hover:text-[#E05A00] hover:bg-[#FF7112]/10 rounded transition cursor-pointer ml-1"
                                   title="Delete Booking Permanently"
                                   type="button"
                                 >
@@ -2276,7 +2308,7 @@ export default function AdminPage() {
                   <p className="text-3xl font-black mt-1">{posts.length}</p>
                 </div>
                 <div className="p-3 bg-white/10 rounded-xl">
-                  <BookOpen className="w-6 h-6 text-[#FF5500]" />
+                  <BookOpen className="w-6 h-6 text-[#FF7112]" />
                 </div>
               </div>
               <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between">
@@ -2297,7 +2329,7 @@ export default function AdminPage() {
                     {posts.length * 142 + 24} <span className="text-xs text-emerald-600 font-bold font-sans">+12%</span>
                   </p>
                 </div>
-                <div className="p-3 bg-red-50 rounded-xl text-red-600">
+                <div className="p-3 bg-[#FF7112]/10 rounded-xl text-[#FF7112]">
                   <Sparkles className="w-6 h-6" />
                 </div>
               </div>
@@ -2342,7 +2374,7 @@ export default function AdminPage() {
                           </>
                         ) : (
                           <>
-                            <span className="p-1.5 bg-[#FF5500]/10 text-[#FF5500] rounded-lg">
+                            <span className="p-1.5 bg-[#FF7112]/10 text-[#FF7112] rounded-lg">
                               <Plus className="w-5 h-5" />
                             </span>
                             Create New Article
@@ -2355,7 +2387,7 @@ export default function AdminPage() {
                     {editingPostId && (
                       <button 
                         onClick={cancelEdit} 
-                        className="text-xs font-bold text-red-650 hover:text-white hover:bg-red-655 bg-red-50 border border-red-200 px-3 py-1.5 rounded-lg flex items-center gap-1 transition cursor-pointer"
+                        className="text-xs font-bold text-[#E05A00] hover:text-white hover:bg-red-655 bg-[#FF7112]/10 border border-[#FF7112]/30 px-3 py-1.5 rounded-lg flex items-center gap-1 transition cursor-pointer"
                       >
                         <X className="w-3.5 h-3.5" /> Stop Editing
                       </button>
@@ -2370,7 +2402,7 @@ export default function AdminPage() {
                         <label className="block text-xs font-bold uppercase tracking-wider text-gray-650 mb-1.5 font-sans">Article Title *</label>
                         <input 
                           type="text"
-                          className="w-full border border-gray-300 px-4 py-3 rounded-xl focus:ring-2 focus:ring-[#FF5500] focus:border-[#FF5500] outline-none transition font-sans text-base text-gray-900 placeholder:text-gray-400 font-semibold shadow-sm" 
+                          className="w-full border border-gray-300 px-4 py-3 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition font-sans text-base text-gray-900 placeholder:text-gray-400 font-semibold shadow-sm" 
                           placeholder="e.g. 5 Critical Road Signals Every Pakistani Driver Must Understand ..." 
                           value={newPost.title} 
                           onChange={e => setNewPost({...newPost, title: e.target.value})} 
@@ -2396,7 +2428,7 @@ export default function AdminPage() {
                               <button
                                 type="button"
                                 onClick={() => setNewPost(prev => ({ ...prev, imageUrl: '', imageAlt: '' }))}
-                                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-black rounded-lg transition-all flex items-center gap-1 cursor-pointer"
+                                className="px-4 py-2 bg-[#FF7112] hover:bg-[#E05A00] text-white text-xs font-black rounded-lg transition-all flex items-center gap-1 cursor-pointer"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                                 Remove
@@ -2414,8 +2446,8 @@ export default function AdminPage() {
                             onClick={() => fileInputRef.current?.click()}
                             className={`relative h-44 border-2 border-dashed rounded-xl flex flex-col items-center justify-center text-center p-6 cursor-pointer transition-all duration-200 ${
                               isDragging 
-                                ? 'border-[#FF5500] bg-orange-50/20 shadow-lg scale-[0.99] ring-4 ring-orange-100' 
-                                : 'border-slate-300 hover:border-[#FF5500] bg-slate-50/50 hover:bg-white hover:shadow-sm'
+                                ? 'border-[#FF7112] bg-orange-50/20 shadow-lg scale-[0.99] ring-4 ring-orange-100' 
+                                : 'border-slate-300 hover:border-[#FF7112] bg-slate-50/50 hover:bg-white hover:shadow-sm'
                             }`}
                           >
                             <input 
@@ -2429,7 +2461,7 @@ export default function AdminPage() {
                               <Upload className="w-6 h-6 text-slate-400" />
                             </div>
                             <p className="text-xs font-bold text-slate-700 font-sans">
-                              Drag &amp; drop post cover imagery here, or <span className="text-[#FF5500]">browse device</span>
+                              Drag &amp; drop post cover imagery here, or <span className="text-[#FF7112]">browse device</span>
                             </p>
                           </div>
                         )}
@@ -2438,7 +2470,7 @@ export default function AdminPage() {
                           <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wide font-sans mb-1 block">Image Alt Text (SEO)</label>
                           <input 
                             type="text"
-                            className="w-full bg-slate-50 border border-gray-200 px-3.5 py-2 rounded-xl focus:ring-1 focus:ring-[#FF5500] focus:border-[#FF5500] outline-none text-xs text-slate-800 placeholder:text-gray-400 font-sans shadow-inner" 
+                            className="w-full bg-slate-50 border border-gray-200 px-3.5 py-2 rounded-xl focus:ring-1 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none text-xs text-slate-800 placeholder:text-gray-400 font-sans shadow-inner" 
                             placeholder="Describe this image for screen readers ..." 
                             value={newPost.imageAlt || ''} 
                             onChange={e => setNewPost({...newPost, imageAlt: e.target.value})} 
@@ -2469,7 +2501,7 @@ export default function AdminPage() {
                             onClick={() => setEditorWorkspaceTab('preview')}
                             className={`px-4 py-2 rounded-lg font-bold text-xs tracking-wide uppercase transition-all flex items-center gap-1.5 cursor-pointer ${
                               editorWorkspaceTab === 'preview'
-                                ? 'bg-[#FF5500] text-white shadow-sm font-black'
+                                ? 'bg-[#FF7112] text-white shadow-sm font-black'
                                 : 'bg-slate-100 text-gray-600 hover:bg-slate-200'
                             }`}
                           >
@@ -2490,6 +2522,7 @@ export default function AdminPage() {
                               <button
                                 type="button"
                                 onMouseDown={(e) => { e.preventDefault(); executeCommand('bold'); }}
+                                title="Bold"
                                 className="p-2 bg-white hover:bg-slate-100 border border-gray-200 rounded-lg transition-all cursor-pointer"
                               >
                                 <Bold className="w-4 h-4 text-slate-700" />
@@ -2497,33 +2530,123 @@ export default function AdminPage() {
                               <button
                                 type="button"
                                 onMouseDown={(e) => { e.preventDefault(); executeCommand('italic'); }}
+                                title="Italic"
                                 className="p-2 bg-white hover:bg-slate-100 border border-gray-200 rounded-lg transition-all cursor-pointer"
                               >
                                 <Italic className="w-4 h-4 text-slate-700" />
                               </button>
+                              <button
+                                type="button"
+                                onMouseDown={(e) => { e.preventDefault(); executeCommand('underline'); }}
+                                title="Underline"
+                                className="p-2 bg-white hover:bg-slate-100 border border-gray-200 rounded-lg transition-all cursor-pointer"
+                              >
+                                <Underline className="w-4 h-4 text-slate-700" />
+                              </button>
                             </div>
 
-                            <button
-                              type="button"
-                              onMouseDown={(e) => { e.preventDefault(); formatBlock('h2'); }}
-                              className="px-3 py-2 bg-white hover:bg-[#002060] hover:text-white border border-gray-200 text-[11px] font-black rounded-lg transition-all cursor-pointer"
-                            >
-                              H2
-                            </button>
+                            <div className="flex gap-1 pr-2 border-r border-gray-200">
+                              <button
+                                type="button"
+                                onMouseDown={(e) => { e.preventDefault(); executeCommand('justifyLeft'); }}
+                                title="Align Left"
+                                className="p-2 bg-white hover:bg-slate-100 border border-gray-200 rounded-lg transition-all cursor-pointer"
+                              >
+                                <AlignLeft className="w-4 h-4 text-slate-700" />
+                              </button>
+                              <button
+                                type="button"
+                                onMouseDown={(e) => { e.preventDefault(); executeCommand('justifyCenter'); }}
+                                title="Align Center"
+                                className="p-2 bg-white hover:bg-slate-100 border border-gray-200 rounded-lg transition-all cursor-pointer"
+                              >
+                                <AlignCenter className="w-4 h-4 text-slate-700" />
+                              </button>
+                              <button
+                                type="button"
+                                onMouseDown={(e) => { e.preventDefault(); executeCommand('justifyRight'); }}
+                                title="Align Right"
+                                className="p-2 bg-white hover:bg-slate-100 border border-gray-200 rounded-lg transition-all cursor-pointer"
+                              >
+                                <AlignRight className="w-4 h-4 text-slate-700" />
+                              </button>
+                            </div>
+
+                            <div className="flex gap-1 pr-2 border-r border-gray-200">
+                              <button
+                                type="button"
+                                onMouseDown={(e) => { e.preventDefault(); formatBlock('h2'); }}
+                                title="Heading 2"
+                                className="px-3 py-2 bg-white hover:bg-slate-100 border border-gray-200 text-[11px] font-black rounded-lg transition-all cursor-pointer text-slate-700"
+                              >
+                                H2
+                              </button>
+                              <button
+                                type="button"
+                                onMouseDown={(e) => { e.preventDefault(); formatBlock('h3'); }}
+                                title="Heading 3"
+                                className="px-3 py-2 bg-white hover:bg-slate-100 border border-gray-200 text-[11px] font-black rounded-lg transition-all cursor-pointer text-slate-700"
+                              >
+                                H3
+                              </button>
+                            </div>
+                            
+                            <div className="flex gap-1 pr-2 border-r border-gray-200">
+                              <button
+                                type="button"
+                                onMouseDown={(e) => { e.preventDefault(); executeCommand('insertUnorderedList'); }}
+                                title="Bullet List"
+                                className="p-2 bg-white hover:bg-slate-100 border border-gray-200 rounded-lg transition-all cursor-pointer"
+                              >
+                                <List className="w-4 h-4 text-slate-700" />
+                              </button>
+                              <button
+                                type="button"
+                                onMouseDown={(e) => { e.preventDefault(); executeCommand('insertOrderedList'); }}
+                                title="Numbered List"
+                                className="p-2 bg-white hover:bg-slate-100 border border-gray-200 rounded-lg transition-all cursor-pointer"
+                              >
+                                <ListOrdered className="w-4 h-4 text-slate-700" />
+                              </button>
+                              <button
+                                type="button"
+                                onMouseDown={(e) => { 
+                                  e.preventDefault(); 
+                                  const url = prompt('Enter link URL:');
+                                  if (url) executeCommand('createLink', url); 
+                                }}
+                                title="Insert Link"
+                                className="p-2 bg-white hover:bg-slate-100 border border-gray-200 rounded-lg transition-all cursor-pointer"
+                              >
+                                <LinkIcon className="w-4 h-4 text-slate-700" />
+                              </button>
+                              <button
+                                type="button"
+                                onMouseDown={(e) => { 
+                                  e.preventDefault(); 
+                                  const url = prompt('Enter image URL:');
+                                  if (url) executeCommand('insertImage', url); 
+                                }}
+                                title="Insert Image"
+                                className="p-2 bg-white hover:bg-slate-100 border border-gray-200 rounded-lg transition-all cursor-pointer"
+                              >
+                                <ImageIcon className="w-4 h-4 text-slate-700" />
+                              </button>
+                            </div>
 
                             <button
                               type="button"
                               onMouseDown={(e) => { e.preventDefault(); insertTemplate('> “ٹائپ کیجئے اپنی اہم بات...”'); }}
                               className="px-3 py-2 bg-white hover:bg-slate-100 border border-gray-200 text-[10px] font-extrabold rounded-lg flex items-center gap-1 transition-all cursor-pointer"
                             >
-                              <span className="text-[#FF5500] font-black text-xs">“</span> Blockquote
+                              <span className="text-[#FF7112] font-black text-xs">“</span> Quote
                             </button>
 
                             <div className="flex flex-wrap gap-1.5 items-center pl-1 border-l border-gray-200 ml-1">
                               <button
                                 type="button"
                                 onClick={() => insertTemplate(`## 🚗 اہم حفاظتی تدابیر\n- سیٹ بیلٹ کا استعمال لازمی بنائیں۔\n- شیشوں کو اپنی سیٹ کے مطابق ایڈجسٹ کریں۔`)}
-                                className="px-2 py-1 text-[9px] font-black text-red-700 bg-red-50 hover:bg-red-100 rounded-lg uppercase tracking-wide cursor-pointer"
+                                className="px-2 py-1 text-[9px] font-black text-[#E05A00] bg-[#FF7112]/10 hover:bg-[#FF7112]/20 rounded-lg uppercase tracking-wide cursor-pointer"
                               >
                                 + Safety Template
                               </button>
@@ -2533,7 +2656,7 @@ export default function AdminPage() {
                           <div
                             ref={wysiwygEditorRef}
                             contentEditable
-                            className="w-full border border-gray-300 p-4 rounded-b-2xl focus:ring-2 focus:ring-[#FF5500] focus:border-[#FF5500] outline-none transition min-h-[380px] max-h-[600px] overflow-y-auto font-sans text-sm leading-relaxed bg-white text-gray-900 prose prose-slate max-w-none wysiwyg-editor text-left"
+                            className="w-full border border-gray-300 p-4 rounded-b-2xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition min-h-[380px] max-h-[600px] overflow-y-auto font-sans text-sm leading-relaxed bg-white text-gray-900 prose prose-slate max-w-none wysiwyg-editor text-left"
                             onInput={(e) => {
                               const htmlValue = e.currentTarget.innerHTML;
                               const mdValue = htmlToMarkdown(htmlValue);
@@ -2564,7 +2687,7 @@ export default function AdminPage() {
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden text-left">
                   <div className="bg-slate-900 px-5 py-4 border-b border-slate-800 flex items-center justify-between">
                     <h3 className="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-[#FF5500]" /> AI SEO ASSISTANT
+                      <Sparkles className="w-4 h-4 text-[#FF7112]" /> AI SEO ASSISTANT
                     </h3>
                     <button 
                       onClick={handleAutoGenerateSEO}
@@ -2579,7 +2702,7 @@ export default function AdminPage() {
                       <label className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">Meta Title</label>
                       <input 
                         type="text" 
-                        className="w-full bg-slate-50 border border-slate-200 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 focus:ring-1 focus:ring-[#FF5500] outline-none"
+                        className="w-full bg-slate-50 border border-slate-200 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 focus:ring-1 focus:ring-[#FF7112] outline-none"
                         placeholder="Optimized title tag..."
                         value={newPost.metaTitle || ''}
                         onChange={e => setNewPost({...newPost, metaTitle: e.target.value})}
@@ -2589,7 +2712,7 @@ export default function AdminPage() {
                       <label className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">Focus Keywords</label>
                       <input 
                         type="text" 
-                        className="w-full bg-slate-50 border border-slate-200 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 focus:ring-1 focus:ring-[#FF5500] outline-none"
+                        className="w-full bg-slate-50 border border-slate-200 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 focus:ring-1 focus:ring-[#FF7112] outline-none"
                         placeholder="driving-school, faisalabad, safety..."
                         value={newPost.focusKeywords || ''}
                         onChange={e => setNewPost({...newPost, focusKeywords: e.target.value})}
@@ -2598,7 +2721,7 @@ export default function AdminPage() {
                     <div>
                       <label className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">Meta Description / Excerpt</label>
                       <textarea 
-                        className="w-full bg-slate-50 border border-slate-200 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 focus:ring-1 focus:ring-[#FF5500] outline-none min-h-[80px] resize-none"
+                        className="w-full bg-slate-50 border border-slate-200 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 focus:ring-1 focus:ring-[#FF7112] outline-none min-h-[80px] resize-none"
                         placeholder="Brief summary for Google results..."
                         value={newPost.metaDescription || ''}
                         onChange={e => setNewPost({...newPost, metaDescription: e.target.value})}
@@ -2611,7 +2734,7 @@ export default function AdminPage() {
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden text-left">
                   <div className="bg-slate-50 px-5 py-4 border-b border-gray-200">
                     <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-[#FF5500]" /> Scheduling
+                      <Clock className="w-4 h-4 text-[#FF7112]" /> Scheduling
                     </h3>
                   </div>
                   <div className="p-5 space-y-4">
@@ -2722,7 +2845,7 @@ export default function AdminPage() {
                             <button 
                               onClick={() => deletePost(post.id)} 
                               title="Delete this post"
-                              className="p-1.5 text-gray-400 hover:text-red-650 hover:bg-red-50 rounded-md transition cursor-pointer"
+                              className="p-1.5 text-gray-400 hover:text-[#E05A00] hover:bg-[#FF7112]/10 rounded-md transition cursor-pointer"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -2742,13 +2865,13 @@ export default function AdminPage() {
           <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-8">
             <div className="border-b border-gray-100 pb-5">
               <div className="flex items-center gap-2.5 mb-2">
-                <span className="p-2 bg-red-50 text-red-600 rounded-lg">
+                <span className="p-2 bg-[#FF7112]/10 text-[#FF7112] rounded-lg">
                   <Globe className="w-5 h-5" />
                 </span>
                 <h2 className="text-2xl font-black text-gray-900 tracking-tight">SEO &amp; Email Authentication settings</h2>
               </div>
               <p className="text-gray-500 text-sm max-w-3xl leading-relaxed">
-                theHoth SEO Checker has recommended configuring email security protocols to protect your official domain address <strong className="text-red-650">godriveify.com</strong>. Setting up a DMARC and SPF policy boosts your general email deliverability rates to clients (preventing Gmail/Outlook spam filters) and strengthens your overall online authority ranking.
+                theHoth SEO Checker has recommended configuring email security protocols to protect your official domain address <strong className="text-[#E05A00]">godriveify.com</strong>. Setting up a DMARC and SPF policy boosts your general email deliverability rates to clients (preventing Gmail/Outlook spam filters) and strengthens your overall online authority ranking.
               </p>
               <div className="mt-4 bg-yellow-50 border border-yellow-200/80 rounded-xl p-4 text-xs sm:text-sm text-yellow-800 leading-relaxed">
                 <strong>Urdu Guide (رہنمائی):</strong> اپنے ڈومین رجسٹرار (جیسے Cloudflare, Namecheap, GoDaddy یا cPanel) کی DNS Settings میں جا کر نیچے دیے گئے <strong>TXT</strong> ریکارڈز کو کاپی کر کے شامل کریں۔ DMARC آپ کی Driving School ای میلز کی سیکیورٹی اور ڈیلیوری کو بہترین بناتا ہے اور دوسروں کو آپ کے نام پر جعلی ای میلز بھیجنے سے روکتا ہے۔
@@ -2760,7 +2883,7 @@ export default function AdminPage() {
               <div className="border border-gray-200 rounded-xl p-5 hover:border-gray-300 transition bg-slate-50/50 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-black uppercase bg-red-100 text-red-700 px-2.5 py-1 rounded-md tracking-wider">
+                    <span className="text-xs font-black uppercase bg-[#FF7112]/20 text-[#E05A00] px-2.5 py-1 rounded-md tracking-wider">
                       DMARC Record (Required)
                     </span>
                     <span className="flex items-center gap-1 text-[11px] text-yellow-600 font-bold">
@@ -2782,7 +2905,7 @@ export default function AdminPage() {
                       </div>
                       <button 
                         onClick={() => copyToClipboard('_dmarc', 'dmarc-host')}
-                        className="text-xs text-red-600 hover:text-red-750 font-bold flex items-center gap-1 bg-red-50 hover:bg-red-100 px-2.5 py-1 rounded-md transition"
+                        className="text-xs text-[#FF7112] hover:text-[#B34700] font-bold flex items-center gap-1 bg-[#FF7112]/10 hover:bg-[#FF7112]/20 px-2.5 py-1 rounded-md transition"
                       >
                         {copiedText === 'dmarc-host' ? <span className="text-green-600">Copied!</span> : <><Copy className="w-3 h-3" /> Copy</>}
                       </button>
@@ -2796,7 +2919,7 @@ export default function AdminPage() {
                       </div>
                       <button 
                         onClick={() => copyToClipboard('TXT', 'dmarc-type')}
-                        className="text-xs text-red-600 hover:text-red-750 font-bold flex items-center gap-1 bg-red-50 hover:bg-red-100 px-2.5 py-1 rounded-md transition"
+                        className="text-xs text-[#FF7112] hover:text-[#B34700] font-bold flex items-center gap-1 bg-[#FF7112]/10 hover:bg-[#FF7112]/20 px-2.5 py-1 rounded-md transition"
                       >
                         {copiedText === 'dmarc-type' ? <span className="text-green-600">Copied!</span> : <><Copy className="w-3 h-3" /> Copy</>}
                       </button>
@@ -2808,7 +2931,7 @@ export default function AdminPage() {
                         <p className="text-[10px] text-gray-400 font-bold uppercase">Record VALUE / CONTENT</p>
                         <button 
                           onClick={() => copyToClipboard('v=DMARC1; p=none; rua=mailto:trainingdrivingschool@gmail.com; pct=100', 'dmarc-val')}
-                          className="text-[11px] text-red-600 hover:text-red-750 font-bold flex items-center gap-1 bg-red-50 hover:bg-red-100 px-2.5 py-1 rounded-md transition"
+                          className="text-[11px] text-[#FF7112] hover:text-[#B34700] font-bold flex items-center gap-1 bg-[#FF7112]/10 hover:bg-[#FF7112]/20 px-2.5 py-1 rounded-md transition"
                         >
                           {copiedText === 'dmarc-val' ? <span className="text-green-600">Copied!</span> : <><Copy className="w-3 h-3" /> Copy Full Code</>}
                         </button>
@@ -2851,7 +2974,7 @@ export default function AdminPage() {
                       </div>
                       <button 
                         onClick={() => copyToClipboard('@', 'spf-host')}
-                        className="text-xs text-red-600 hover:text-red-750 font-bold flex items-center gap-1 bg-red-50 hover:bg-red-100 px-2.5 py-1 rounded-md transition"
+                        className="text-xs text-[#FF7112] hover:text-[#B34700] font-bold flex items-center gap-1 bg-[#FF7112]/10 hover:bg-[#FF7112]/20 px-2.5 py-1 rounded-md transition"
                       >
                         {copiedText === 'spf-host' ? <span className="text-green-600">Copied!</span> : <><Copy className="w-3 h-3" /> Copy</>}
                       </button>
@@ -2865,7 +2988,7 @@ export default function AdminPage() {
                       </div>
                       <button 
                         onClick={() => copyToClipboard('TXT', 'spf-type')}
-                        className="text-xs text-red-600 hover:text-red-750 font-bold flex items-center gap-1 bg-red-50 hover:bg-red-100 px-2.5 py-1 rounded-md transition"
+                        className="text-xs text-[#FF7112] hover:text-[#B34700] font-bold flex items-center gap-1 bg-[#FF7112]/10 hover:bg-[#FF7112]/20 px-2.5 py-1 rounded-md transition"
                       >
                         {copiedText === 'spf-type' ? <span className="text-green-600">Copied!</span> : <><Copy className="w-3 h-3" /> Copy</>}
                       </button>
@@ -2877,7 +3000,7 @@ export default function AdminPage() {
                         <p className="text-[10px] text-gray-400 font-bold uppercase">Record VALUE / CONTENT</p>
                         <button 
                           onClick={() => copyToClipboard('v=spf1 include:_spf.google.com ~all', 'spf-val')}
-                          className="text-[11px] text-red-600 hover:text-red-750 font-bold flex items-center gap-1 bg-red-50 hover:bg-red-100 px-2.5 py-1 rounded-md transition"
+                          className="text-[11px] text-[#FF7112] hover:text-[#B34700] font-bold flex items-center gap-1 bg-[#FF7112]/10 hover:bg-[#FF7112]/20 px-2.5 py-1 rounded-md transition"
                         >
                           {copiedText === 'spf-val' ? <span className="text-green-600">Copied!</span> : <><Copy className="w-3 h-3" /> Copy Full Code</>}
                         </button>
@@ -2898,7 +3021,7 @@ export default function AdminPage() {
             {/* General Site Analytics, Robots, and Sitemaps Status */}
             <div className="border border-gray-200 rounded-xl p-5 bg-gradient-to-br from-gray-50 to-white">
               <h3 className="font-bold text-gray-900 text-base mb-4 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-red-600 animate-spin" style={{ animationDuration: '6s' }} />
+                <Sparkles className="w-5 h-5 text-[#FF7112] animate-spin" style={{ animationDuration: '6s' }} />
                 Active Site Integrations Status (Completed Tasks)
               </h3>
 
@@ -2935,7 +3058,7 @@ export default function AdminPage() {
                     href="/sitemap.xml" 
                     target="_blank" 
                     rel="noreferrer" 
-                    className="bg-red-50 hover:bg-red-100 border border-red-200 p-2 rounded text-center block text-xs font-bold text-red-650 transition cursor-pointer"
+                    className="bg-[#FF7112]/10 hover:bg-[#FF7112]/20 border border-[#FF7112]/30 p-2 rounded text-center block text-xs font-bold text-[#E05A00] transition cursor-pointer"
                   >
                     View sitemap.xml &rarr;
                   </a>
@@ -2965,9 +3088,9 @@ export default function AdminPage() {
             </div>
 
             {/* Quick 3-Step Domain instructions card */}
-            <div className="bg-red-50/50 border border-red-150 rounded-xl p-5">
+            <div className="bg-[#FF7112]/10/50 border border-red-150 rounded-xl p-5">
               <h3 className="font-bold text-gray-900 text-sm mb-3 flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
+                <AlertCircle className="w-5 h-5 text-[#FF7112] shrink-0" />
                 How to implement this / DNS me isy add krnay ka triqa:
               </h3>
               <ol className="list-decimal list-inside space-y-2.5 text-xs sm:text-sm text-gray-700 leading-relaxed font-medium">
@@ -3047,7 +3170,7 @@ export default function AdminPage() {
             <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm p-6 sm:p-8 space-y-6">
               <div className="border-b border-gray-100 pb-5">
                 <h2 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
-                  <Car className="w-6 h-6 text-red-650" />
+                  <Car className="w-6 h-6 text-[#E05A00]" />
                   Car Owner Submissions Awaiting Approval
                 </h2>
                 <p className="text-gray-500 text-xs sm:text-sm mt-1">
@@ -3092,7 +3215,7 @@ export default function AdminPage() {
                               <h3 className="font-bold text-gray-950 text-sm sm:text-base leading-snug truncate">
                                 {car.name}
                               </h3>
-                              <span className="text-xs font-black font-mono text-red-650 shrink-0">
+                              <span className="text-xs font-black font-mono text-[#E05A00] shrink-0">
                                 PKR {car.rentPrice} / {car.rentUnit || 'Day'}
                               </span>
                             </div>
@@ -3120,7 +3243,7 @@ export default function AdminPage() {
                             <div className="bg-white rounded-lg p-2.5 border mt-3 text-[11px] text-gray-500 space-y-1">
                               <p className="font-bold text-gray-800 flex items-center gap-1">
                                 <span>Owner:</span>
-                                <strong className="text-red-650">{car.ownerName || 'Unknown Owner'}</strong>
+                                <strong className="text-[#E05A00]">{car.ownerName || 'Unknown Owner'}</strong>
                               </p>
                               {car.ownerPhone && (
                                 <p className="font-mono">
@@ -3178,7 +3301,7 @@ export default function AdminPage() {
                             <button
                               type="button"
                               onClick={() => rejectCarOnboarding(car.id)}
-                              className="flex-1 bg-red-50 hover:bg-red-150 text-red-750 font-extrabold text-xs uppercase tracking-wider py-2.5 rounded-xl border border-red-200 transition cursor-pointer"
+                              className="flex-1 bg-[#FF7112]/10 hover:bg-red-150 text-[#B34700] font-extrabold text-xs uppercase tracking-wider py-2.5 rounded-xl border border-[#FF7112]/30 transition cursor-pointer"
                             >
                               Reject &amp; Discard
                             </button>
@@ -3197,7 +3320,7 @@ export default function AdminPage() {
             <div className="lg:col-span-6 space-y-6">
               <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm transition">
                 <div className="flex items-center gap-2 mb-6 border-b border-gray-100 pb-4">
-                  <span className="p-2 bg-red-50 text-red-600 rounded-lg">
+                  <span className="p-2 bg-[#FF7112]/10 text-[#FF7112] rounded-lg">
                     <Car className="w-5 h-5" />
                   </span>
                   <h2 className="text-xl font-bold text-gray-900">{editingCarId ? 'Edit Rental Car' : 'Add New Rental Car'}</h2>
@@ -3205,7 +3328,7 @@ export default function AdminPage() {
                     <button 
                       type="button" 
                       onClick={cancelEditingCar}
-                      className="ml-auto text-xs font-bold text-gray-500 hover:text-red-600 underline"
+                      className="ml-auto text-xs font-bold text-gray-500 hover:text-[#FF7112] underline"
                     >
                       Cancel Edit
                     </button>
@@ -3218,7 +3341,7 @@ export default function AdminPage() {
                     <input 
                       required
                       type="text" 
-                      className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition text-sm font-medium" 
+                      className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-medium" 
                       placeholder="e.g. Toyota Civic, Honda City, Fortuner 2024" 
                       value={newCar.name} 
                       onChange={e => setNewCar({...newCar, name: e.target.value})} 
@@ -3229,7 +3352,7 @@ export default function AdminPage() {
                     <div>
                       <label className="block text-sm font-bold text-gray-700 mb-1">Transmission *</label>
                       <select 
-                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none bg-white transition text-xs sm:text-sm font-medium"
+                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none bg-white transition text-xs sm:text-sm font-medium"
                         value={newCar.transmission}
                         onChange={e => setNewCar({...newCar, transmission: e.target.value as 'Automatic' | 'Manual' })}
                       >
@@ -3241,7 +3364,7 @@ export default function AdminPage() {
                     <div>
                       <label className="block text-sm font-bold text-gray-700 mb-1">City Hub *</label>
                       <select 
-                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none bg-white transition text-xs sm:text-sm font-medium"
+                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none bg-white transition text-xs sm:text-sm font-medium"
                         value={newCar.city}
                         onChange={e => setNewCar({...newCar, city: e.target.value})}
                       >
@@ -3259,7 +3382,7 @@ export default function AdminPage() {
                       <input 
                         required
                         type="text" 
-                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition text-sm font-mono font-bold" 
+                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-mono font-bold" 
                         placeholder="e.g. 6,500" 
                         value={newCar.rentPrice} 
                         onChange={e => setNewCar({...newCar, rentPrice: e.target.value})}
@@ -3269,7 +3392,7 @@ export default function AdminPage() {
                     <div>
                       <label className="block text-sm font-bold text-gray-700 mb-1">Billing Interval *</label>
                       <select 
-                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none bg-white transition text-xs sm:text-sm font-medium"
+                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none bg-white transition text-xs sm:text-sm font-medium"
                         value={newCar.rentUnit}
                         onChange={e => setNewCar({...newCar, rentUnit: e.target.value as 'Day' | 'Hour' })}
                       >
@@ -3283,7 +3406,7 @@ export default function AdminPage() {
                     <label className="block text-sm font-bold text-gray-700 mb-1">Car Cover Image URL</label>
                     <input 
                       type="text" 
-                      className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition text-xs font-mono" 
+                      className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-xs font-mono" 
                       placeholder="Or enter custom URL instead of preset" 
                       value={newCar.imageUrl} 
                       onChange={e => setNewCar({...newCar, imageUrl: e.target.value})} 
@@ -3328,8 +3451,8 @@ export default function AdminPage() {
                           >
                             <img src={img.url} alt={img.label} className="w-full h-full object-cover" />
                             {isSelected && (
-                              <div className="absolute inset-0 bg-red-600/20 flex items-center justify-center">
-                                <span className="bg-red-600 text-white rounded-full p-0.5">
+                              <div className="absolute inset-0 bg-[#FF7112]/20 flex items-center justify-center">
+                                <span className="bg-[#FF7112] text-white rounded-full p-0.5">
                                   <Check className="w-3 h-3" />
                                 </span>
                               </div>
@@ -3349,7 +3472,7 @@ export default function AdminPage() {
                         <button 
                           type="button" 
                           onClick={() => setNewCar(prev => ({ ...prev, imageUrl: '' }))} 
-                          className="text-gray-400 hover:text-red-500 p-1 rounded-full hover:bg-gray-100 transition"
+                          className="text-gray-400 hover:text-[#FF7112]/90 p-1 rounded-full hover:bg-gray-100 transition"
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -3369,7 +3492,7 @@ export default function AdminPage() {
                             newCar.status === status 
                               ? status === 'Available'
                                 ? 'bg-green-50 text-green-700 border-green-500 scale-98'
-                                : 'bg-red-50 text-red-750 border-red-550 scale-98'
+                                : 'bg-[#FF7112]/10 text-[#B34700] border-red-550 scale-98'
                               : 'bg-white text-gray-600 border-gray-200'
                           }`}
                         >
@@ -3381,7 +3504,7 @@ export default function AdminPage() {
 
                   <button 
                     type="submit" 
-                    className="w-full bg-red-600 hover:bg-red-700 text-white py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-md shadow-red-200 cursor-pointer text-sm"
+                    className="w-full bg-[#FF7112] hover:bg-[#E05A00] text-white py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-md shadow-red-200 cursor-pointer text-sm"
                   >
                     {editingCarId ? (
                       <>
@@ -3433,7 +3556,7 @@ export default function AdminPage() {
                                 <span className="bg-slate-50 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded border border-gray-100 uppercase">
                                   {car.transmission}
                                 </span>
-                                <span className="bg-red-50 text-red-650 text-[10px] font-semibold px-2 py-0.5 rounded border border-red-100/50">
+                                <span className="bg-[#FF7112]/10 text-[#E05A00] text-[10px] font-semibold px-2 py-0.5 rounded border border-[#FF7112]/20/50">
                                   {car.city}
                                 </span>
                                 <span className="text-gray-900 text-xs font-black font-mono">
@@ -3477,7 +3600,7 @@ export default function AdminPage() {
                                 onClick={() => deleteRentalCar(car.id)} 
                                 title="Remove vehicle from inventory"
                                 type="button"
-                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition cursor-pointer"
+                                className="p-2 text-gray-400 hover:text-[#FF7112] hover:bg-[#FF7112]/10 rounded-xl transition cursor-pointer"
                               >
                                 <Trash2 className="w-5 h-5" />
                               </button>
@@ -3547,7 +3670,7 @@ export default function AdminPage() {
                           <p className="text-xs text-gray-400">{req.city} {req.area && `(${req.area})`}</p>
                         </td>
                         <td className="p-4">
-                          <p className="font-bold text-gray-800">{req.carModel} {req.urgency === 'Urgent' && <span className="text-red-600 text-[10px] font-black uppercase ml-1 animate-pulse">🔥 URGENT</span>}</p>
+                          <p className="font-bold text-gray-800">{req.carModel} {req.urgency === 'Urgent' && <span className="text-[#FF7112] text-[10px] font-black uppercase ml-1 animate-pulse">🔥 URGENT</span>}</p>
                           <p className="text-[10px] text-gray-500 uppercase mt-0.5">{req.transmission} • {req.fuelPreference || 'Any Fuel'} • Driver: {req.driverRequired}</p>
                           <p className="text-[10px] text-indigo-600 mt-0.5 font-bold bg-indigo-50 px-1.5 py-0.5 rounded inline-block">{req.travelScope || 'Local'} ({req.estimatedKM || 'Under 500 KM'})</p>
                         </td>
@@ -3579,7 +3702,7 @@ export default function AdminPage() {
                             )}
                             <button
                               onClick={() => handleRejectRequest(req.id)}
-                              className="p-1.5 text-gray-400 hover:text-red-650 hover:bg-red-50 rounded-lg transition cursor-pointer"
+                              className="p-1.5 text-gray-400 hover:text-[#E05A00] hover:bg-[#FF7112]/10 rounded-lg transition cursor-pointer"
                               title="Delete Request"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -3602,7 +3725,7 @@ export default function AdminPage() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h2 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
-                    <Tag className="w-6 h-6 text-red-650" />
+                    <Tag className="w-6 h-6 text-[#E05A00]" />
                     Car Sales Onboarding & Verification
                   </h2>
                   <p className="text-gray-500 text-xs sm:text-sm mt-1">
@@ -3652,7 +3775,7 @@ export default function AdminPage() {
                         <div className="absolute top-3 right-3 bg-black/70 text-white px-2.5 py-1 rounded-lg font-bold font-mono text-[10px] uppercase">
                           {car.city}
                         </div>
-                        <div className="absolute bottom-3 left-3 bg-red-650 text-white px-3 py-1 rounded-lg font-black text-xs font-mono">
+                        <div className="absolute bottom-3 left-3 bg-[#E05A00] text-white px-3 py-1 rounded-lg font-black text-xs font-mono">
                           PKR {car.rentPrice}
                         </div>
                       </div>
@@ -3712,7 +3835,7 @@ export default function AdminPage() {
                         </button>
                         <button
                           onClick={() => rejectSaleCarOnboarding(car.id)}
-                          className="bg-gray-100 hover:bg-red-50 text-gray-700 hover:text-red-600 font-extrabold px-4 py-2.5 rounded-xl transition text-xs cursor-pointer border border-gray-200 border-solid hover:border-red-100 shrink-0"
+                          className="bg-gray-100 hover:bg-[#FF7112]/10 text-gray-700 hover:text-[#FF7112] font-extrabold px-4 py-2.5 rounded-xl transition text-xs cursor-pointer border border-gray-200 border-solid hover:border-[#FF7112]/20 shrink-0"
                         >
                           Reject
                         </button>
@@ -3774,7 +3897,7 @@ export default function AdminPage() {
                             <td className="p-4 text-center">
                               <button
                                 onClick={() => deleteApprovedSaleCar(car.id)}
-                                className="p-2 text-slate-400 hover:text-red-650 hover:bg-red-50 rounded-xl transition cursor-pointer"
+                                className="p-2 text-slate-400 hover:text-[#E05A00] hover:bg-[#FF7112]/10 rounded-xl transition cursor-pointer"
                                 title="Remove listing permanently"
                               >
                                 <Trash2 className="w-5 h-5" />
@@ -3798,7 +3921,7 @@ export default function AdminPage() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h2 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
-                    <Sliders className="w-6 h-6 text-red-650" />
+                    <Sliders className="w-6 h-6 text-[#E05A00]" />
                     Manage Academy Driving Courses (ڈرائیونگ کورسز مینیجر)
                   </h2>
                   <p className="text-gray-500 text-xs sm:text-sm mt-1">
@@ -3806,7 +3929,7 @@ export default function AdminPage() {
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <span className="bg-red-50 text-red-650 px-3.5 py-1.5 rounded-xl text-xs font-bold border border-red-100">
+                  <span className="bg-[#FF7112]/10 text-[#E05A00] px-3.5 py-1.5 rounded-xl text-xs font-bold border border-[#FF7112]/20">
                     Active Courses: {drivingCourses.length}
                   </span>
                 </div>
@@ -3818,7 +3941,7 @@ export default function AdminPage() {
               <div className="lg:col-span-5 space-y-6">
                 <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
                   <div className="flex items-center gap-2 mb-6 border-b border-gray-100 pb-4">
-                    <span className="p-2 bg-red-50 text-red-600 rounded-lg">
+                    <span className="p-2 bg-[#FF7112]/10 text-[#FF7112] rounded-lg">
                       <Plus className="w-5 h-5" />
                     </span>
                     <h3 className="text-xl font-extrabold text-gray-900">
@@ -3876,7 +3999,7 @@ export default function AdminPage() {
                       <input 
                         required
                         type="text" 
-                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition text-sm font-medium" 
+                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-medium" 
                         placeholder="e.g. Honda Civic (Manual)" 
                         value={newCourse.courseTitle} 
                         onChange={e => setNewCourse({...newCourse, courseTitle: e.target.value})} 
@@ -3888,7 +4011,7 @@ export default function AdminPage() {
                       <input 
                         required
                         type="text" 
-                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition text-sm font-medium" 
+                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-medium" 
                         placeholder="e.g. Learn driving with automatic or manual Honda Civic." 
                         value={newCourse.courseDescription} 
                         onChange={e => setNewCourse({...newCourse, courseDescription: e.target.value})} 
@@ -3900,7 +4023,7 @@ export default function AdminPage() {
                       <input 
                         required
                         type="text" 
-                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition text-sm font-mono font-bold" 
+                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-mono font-bold" 
                         placeholder="e.g. 25000" 
                         value={newCourse.courseFee} 
                         onChange={e => setNewCourse({...newCourse, courseFee: e.target.value})} 
@@ -3911,7 +4034,7 @@ export default function AdminPage() {
                       <label className="block text-sm font-bold text-gray-700 mb-1">Car Cover Image URL</label>
                       <input 
                         type="text" 
-                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition text-xs font-mono" 
+                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-xs font-mono" 
                         placeholder="Or leave empty & choose a preset image below" 
                         value={newCourse.carImage} 
                         onChange={e => setNewCourse({...newCourse, carImage: e.target.value})} 
@@ -3961,8 +4084,8 @@ export default function AdminPage() {
                             >
                               <img src={img.url} alt={img.label} className="w-full h-full object-cover" />
                               {isSelected && (
-                                <div className="absolute inset-0 bg-red-600/20 flex items-center justify-center">
-                                  <span className="bg-red-600 text-white rounded-full p-0.5">
+                                <div className="absolute inset-0 bg-[#FF7112]/20 flex items-center justify-center">
+                                  <span className="bg-[#FF7112] text-white rounded-full p-0.5">
                                     <Check className="w-2.5 h-2.5" />
                                   </span>
                                 </div>
@@ -4037,7 +4160,7 @@ export default function AdminPage() {
                     <div className="flex gap-2 pt-2">
                       <button 
                         type="submit"
-                        className="flex-grow bg-red-650 hover:bg-red-700 text-white py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-md shadow-red-200 cursor-pointer text-sm font-sans"
+                        className="flex-grow bg-[#E05A00] hover:bg-[#E05A00] text-white py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-md shadow-red-200 cursor-pointer text-sm font-sans"
                       >
                         <Save className="w-4 h-4" />
                         {editingCourseId ? 'Save Core Package' : 'Publish Package'}
@@ -4095,7 +4218,7 @@ export default function AdminPage() {
                                 className="w-full h-full object-cover" 
                                 referrerPolicy="no-referrer"
                               />
-                              <div className="absolute top-2.5 right-2.5 bg-red-600 text-white font-mono font-black text-xs px-2.5 py-1 rounded-lg">
+                              <div className="absolute top-2.5 right-2.5 bg-[#FF7112] text-white font-mono font-black text-xs px-2.5 py-1 rounded-lg">
                                 PKR {course.courseFee}
                               </div>
                             </div>
@@ -4104,11 +4227,11 @@ export default function AdminPage() {
                             <p className="text-xs text-gray-500 leading-relaxed mt-1 font-sans">{course.courseDescription}</p>
 
                             <ul className="text-[10px] space-y-1.5 mt-3 font-medium text-gray-600 bg-white p-2.5 rounded-xl border border-gray-150">
-                              <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-red-600 shrink-0" /> {course.lessonDuration}</li>
-                              <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-red-600 shrink-0" /> {course.dailyTime}</li>
-                              <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-red-650 shrink-0" /> {course.theoryDuration}</li>
-                              <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-red-650 shrink-0" /> {course.coursePeriod}</li>
-                              <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-red-650 shrink-0" /> {course.additionalTime}</li>
+                              <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[#FF7112] shrink-0" /> {course.lessonDuration}</li>
+                              <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[#FF7112] shrink-0" /> {course.dailyTime}</li>
+                              <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[#E05A00] shrink-0" /> {course.theoryDuration}</li>
+                              <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[#E05A00] shrink-0" /> {course.coursePeriod}</li>
+                              <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[#E05A00] shrink-0" /> {course.additionalTime}</li>
                             </ul>
                           </div>
 
@@ -4136,7 +4259,7 @@ export default function AdminPage() {
                                   window.dispatchEvent(new Event('storage'));
                                 }
                               }}
-                              className="bg-white hover:bg-red-50 text-red-600 border border-red-200 hover:border-red-300 font-bold text-xs p-2 rounded-xl transition cursor-pointer"
+                              className="bg-white hover:bg-[#FF7112]/10 text-[#FF7112] border border-[#FF7112]/30 hover:border-red-300 font-bold text-xs p-2 rounded-xl transition cursor-pointer"
                               title="Delete template"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -4212,11 +4335,11 @@ export default function AdminPage() {
         <div className="fixed z-50 bottom-12 right-6 max-w-sm w-full bg-slate-950 border border-slate-800 text-white rounded-2xl p-4 shadow-2xl flex items-start gap-3 animate-slide-up">
           <div className={`p-1.5 rounded-lg shrink-0 mt-0.5 ${
             toastMessage.type === 'success' ? 'bg-emerald-500/10 text-emerald-400' :
-            toastMessage.type === 'error' ? 'bg-red-500/10 text-red-400' :
+            toastMessage.type === 'error' ? 'bg-[#FF7112]/100/10 text-[#FF7112]/70' :
             'bg-blue-500/10 text-blue-400'
           }`}>
             {toastMessage.type === 'success' ? <CheckCircle2 className="w-5 h-5 text-emerald-400" /> :
-             toastMessage.type === 'error' ? <AlertCircle className="w-5 h-5 text-red-400" /> :
+             toastMessage.type === 'error' ? <AlertCircle className="w-5 h-5 text-[#FF7112]/70" /> :
              <Sparkles className="w-5 h-5 text-amber-400" />}
           </div>
           <div className="flex-1 min-w-0">

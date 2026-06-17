@@ -7,7 +7,7 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
   /* Map custom brand colors */
-  --color-brand-orange: #FF5500;
+  --color-brand-orange: #FF7112;
   --color-brand-navy: #002060;
 
   /* Also redefine red completely to our exact brand orange so that any existing */
@@ -17,7 +17,7 @@
   --color-red-200: #ffcca8;
   --color-red-300: #ffa570;
   --color-red-400: #ff7c3b;
-  --color-red-500: #FF5500; /* Brand Accent Orange */
+  --color-red-500: #FF7112; /* Brand Accent Orange */
   --color-red-600: #dd4400;
   --color-red-700: #b53300;
   --color-red-750: #9e2a00;
@@ -41,7 +41,7 @@ input[type="range"].custom-slider::-webkit-slider-thumb {
   width: 22px;
   height: 22px;
   border-radius: 9999px;
-  background: #FF5500; /* GoDriveify Brand Orange */
+  background: #FF7112; /* GoDriveify Brand Orange */
   border: 4px solid #ffffff;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(255, 85, 0, 0.4);
@@ -59,7 +59,7 @@ input[type="range"].custom-slider::-moz-range-thumb {
   width: 22px;
   height: 22px;
   border-radius: 9999px;
-  background: #FF5500;
+  background: #FF7112;
   border: 4px solid #ffffff;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(255, 85, 0, 0.4);
@@ -146,4 +146,9 @@ body {
 .wysiwyg-editor p {
   margin-bottom: 0.75rem !important;
   line-height: 1.625 !important;
+}
+
+/* Urdu Font Stack Placeholder */
+.font-urdu {
+  font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Nafees Nastaleeq', Tahoma, sans-serif;
 }

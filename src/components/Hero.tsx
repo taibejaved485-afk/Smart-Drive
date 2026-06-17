@@ -20,7 +20,7 @@ export default function Hero() {
     <section ref={ref} className="relative h-[80vh] min-h-[480px] sm:h-[85vh] sm:min-h-[640px] lg:h-screen flex items-center overflow-hidden bg-slate-950 font-sans">
       
       {/* Decorative ambient subtle light ring */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-red-600/20 rounded-full blur-[140px] pointer-events-none z-0" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#FF7112]/20 rounded-full blur-[140px] pointer-events-none z-0" />
 
       {/* Modern Grid Background overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_0%,#000_70%,transparent_100%)] z-0" />
@@ -60,7 +60,7 @@ export default function Hero() {
             transition={{ delay: 0.5, duration: 0.7 }}
             className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/15 px-4 py-1.5 rounded-full mb-5 sm:mb-7 shadow-lg"
           >
-            <ShieldCheck className="w-4 h-4 text-red-500 fill-red-500/10" />
+            <ShieldCheck className="w-4 h-4 text-[#FF7112]/90 fill-red-500/10" />
             <span className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-200">
               Faisalabad's #1 Certified Driving Academy
             </span>
@@ -94,7 +94,7 @@ export default function Hero() {
             onClick={() => {
               window.location.href = 'tel:03097666928';
             }}
-            className="bg-red-650 hover:bg-red-500 text-white px-8 py-3.5 sm:px-10 sm:py-4.5 rounded-full font-black text-[11px] sm:text-xs uppercase tracking-widest transition-all flex items-center gap-2.5 shadow-[0_0_25px_rgba(220,38,38,0.3)] hover:shadow-[0_0_35px_rgba(220,38,38,0.5)] hover:-translate-y-1 active:scale-95 mx-auto cursor-pointer border border-transparent hover:border-red-400"
+            className="bg-[#E05A00] hover:bg-[#FF7112]/100 text-white px-8 py-3.5 sm:px-10 sm:py-4.5 rounded-full font-black text-[11px] sm:text-xs uppercase tracking-widest transition-all flex items-center gap-2.5 shadow-[0_0_25px_rgba(220,38,38,0.3)] hover:shadow-[0_0_35px_rgba(220,38,38,0.5)] hover:-translate-y-1 active:scale-95 mx-auto cursor-pointer border border-transparent hover:border-red-400"
           >
             CALL US NOW <Phone className="w-4 h-4 shrink-0 transition-transform hover:rotate-12" />
           </motion.button>
