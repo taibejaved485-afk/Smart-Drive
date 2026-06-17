@@ -31,6 +31,32 @@ const parseInlineMarkdown = (text: string) => {
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 };
 
+const stripMarkdown = (content: string) => {
+  if (!content) return '';
+  return content
+    .split('\n')
+    .map(line => {
+      let l = line.trim();
+      // Remove headers, list markers, quotes, and HTML/markdown tags
+      if (l.startsWith('#') || l.startsWith('>') || l.startsWith('-') || l.startsWith('*') || l.startsWith('![')) {
+        l = l.replace(/^#+\s+/, '')
+             .replace(/^>\s+/, '')
+             .replace(/^[-*+]\s+/, '')
+             .replace(/^!\[.*\]\(.*\)/, '')
+             .replace(/^\[(.*)\]\(.*\)/, '$1');
+      }
+      l = l.replace(/\*\/(.*?)\*\//g, '$1')
+           .replace(/\*\*(.*?)\*\*/g, '$1')
+           .replace(/\*(.*?)\*/g, '$1')
+           .replace(/__(.*?)__/g, '$1')
+           .replace(/`([^`]+)`/g, '$1')
+           .replace(/\[([^\]]*)\]\((.*?)\)/g, '$1');
+      return l;
+    })
+    .filter(line => line.length > 0)
+    .join(' ');
+};
+
 const generateId = (text: string) => {
   return text
     .replace(/[\*\_]/g, '')     // Remove bold/italic markdown characters
@@ -387,7 +413,7 @@ export default function BlogPage() {
       <div className="flex-grow max-w-7xl mx-auto px-4 pt-8 pb-24 w-full">
         <div className="mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3 tracking-tight">Latest Articles</h2>
-          <div className="h-1 w-16 bg-indigo-600 rounded"></div>
+          <div className="h-1 w-16 bg-[#FF7112] rounded"></div>
         </div>
 
         {posts.length === 0 ? (
@@ -399,54 +425,87 @@ export default function BlogPage() {
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {posts.map((post, i) => (
-              <ScrollReveal direction="up" delay={i * 0.1} key={post.id}>
-                <div 
-                  className="flex flex-col h-full bg-white rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_15px_40px_rgb(0,0,0,0.1)] overflow-hidden group cursor-pointer transition-all duration-300 hover:-translate-y-1 border border-gray-50"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setSelectedPost(post);
-                    window.scrollTo({ top: 0, behavior: 'auto' });
-                  }}
-                >
-                  {/* Flushed Image Container */}
-                  <div className="w-full h-[280px] overflow-hidden bg-gray-100 flex-shrink-0">
-                    <img 
-                      src={post.imageUrl} 
-                      alt={post.title} 
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                    />
-                  </div>
-                  
-                  {/* Details Container */}
-                  <div className="p-7 flex flex-col flex-grow">
-                    <h3 className="text-[22px] font-semibold text-slate-800 mb-3 line-clamp-2 leading-snug group-hover:text-indigo-600 transition-colors">
-                      {post.title}
-                    </h3>
-                    
-                    <p className="text-slate-500 text-[15px] leading-relaxed mb-8 line-clamp-3">
-                      {post.content}
-                    </p>
-                    
-                    <div className="mt-auto pt-5 border-t border-gray-100 flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0">
-                        {post.authorAvatar ? (
-                          <img src={post.authorAvatar} alt="" className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full bg-indigo-50 border border-indigo-100 flex items-center justify-center p-2">
-                             <img src="/static/godriveify-logo.jpg" alt="Logo" className="w-full h-full object-contain" />
-                          </div>
-                        )}
+            {posts.map((post, i) => {
+              const excerpt = stripMarkdown(post.content);
+              const readTime = Math.max(2, Math.ceil(excerpt.split(/\s+/).filter(Boolean).length / 180));
+              
+              return (
+                <ScrollReveal direction="up" delay={i * 0.1} key={post.id}>
+                  <div 
+                    className="flex flex-col h-full bg-white rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(255,113,18,0.12)] overflow-hidden group cursor-pointer transition-all duration-300 hover:-translate-y-1.5 border border-slate-100"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setSelectedPost(post);
+                      window.scrollTo({ top: 0, behavior: 'auto' });
+                    }}
+                  >
+                    {/* Image Container with Floating Badge */}
+                    <div className="w-full h-[240px] overflow-hidden bg-slate-50 flex-shrink-0 relative">
+                      <div className="absolute top-4 left-4 z-10">
+                        <span className="bg-[#FF7112] text-white text-[10px] font-black uppercase tracking-widest px-3.5 py-1.5 rounded-full shadow-md">
+                          {post.category || "ACADEMY BLOG"}
+                        </span>
                       </div>
-                      <div>
-                        <p className="text-sm font-semibold text-slate-800 tracking-tight">{post.author}</p>
-                        <p className="text-xs text-slate-500 mt-0.5">{post.date}</p>
+                      <img 
+                        src={post.imageUrl} 
+                        alt={post.title} 
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    </div>
+                    
+                    {/* Details Container */}
+                    <div className="p-7 flex flex-col flex-grow">
+                      {/* Meta information */}
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-[#FF7112] text-xs font-bold uppercase tracking-wider">
+                          {post.category || "Safety Guide"}
+                        </span>
+                        <span className="text-slate-300">•</span>
+                        <span className="text-slate-400 text-xs font-medium flex items-center gap-1">
+                          <Clock className="w-3.5 h-3.5 text-slate-400" />
+                          {readTime} min read
+                        </span>
+                      </div>
+
+                      {/* Heading */}
+                      <h3 className="text-xl md:text-[22px] font-semibold text-slate-800 mb-3 line-clamp-2 leading-snug group-hover:text-[#FF7112] transition-colors font-sans tracking-tight">
+                        {post.title}
+                      </h3>
+                      
+                      {/* Excerpt */}
+                      <p className="text-slate-500 text-sm md:text-base leading-relaxed mb-6 line-clamp-3 font-normal font-sans">
+                        {excerpt}
+                      </p>
+                      
+                      {/* Author Profile and Date in Card Footer */}
+                      <div className="mt-auto pt-5 border-t border-slate-100 flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
+                            {post.authorAvatar ? (
+                              <img src={post.authorAvatar} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full bg-[#FF7112]/5 border border-[#FF7112]/20 flex items-center justify-center p-1.5">
+                                 <img src="/static/godriveify-logo.jpg" alt="Logo" className="w-full h-full object-contain" />
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold text-slate-800 tracking-tight">{post.author}</p>
+                            <p className="text-[10px] text-slate-400 font-medium">{post.authorRole || "Instructor"}</p>
+                          </div>
+                        </div>
+
+                        <div className="text-[11px] font-bold text-slate-400 flex items-center gap-1.5 font-mono bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100/50">
+                          <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                          {post.date}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </ScrollReveal>
-            ))}
+                </ScrollReveal>
+              );
+            })}
           </div>
         )}
       </div>
