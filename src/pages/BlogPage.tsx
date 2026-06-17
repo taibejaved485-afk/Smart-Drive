@@ -163,17 +163,30 @@ export default function BlogPage() {
     ]
   };
 
-  const activeTitle = language === 'ur' ? dummyBilingualData.title_ur : dummyBilingualData.title_en;
+  const activeTitle = language === 'ur' ? dummyBilingualData.title_ur : (selectedPost?.title || dummyBilingualData.title_en);
   const activeContentBlocks = language === 'ur' ? dummyBilingualData.content_ur : dummyBilingualData.content_en;
   const activeCategory = language === 'ur' ? "اکیڈمی بلاگ" : (selectedPost?.category || 'ACADEMY BLOG');
 
   const toc = useMemo(() => {
+    if (language === 'en' && selectedPost?.content) {
+      const lines = selectedPost.content.split('\n');
+      const headings: { id: string; title: React.ReactNode; level: number }[] = [];
+      lines.forEach(line => {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('## ') || trimmed.startsWith('### ')) {
+          const level = trimmed.startsWith('### ') ? 3 : 2;
+          const titleText = trimmed.replace(/^#+\s/, '');
+          headings.push({ id: generateId(titleText), title: parseInlineMarkdown(titleText), level });
+        }
+      });
+      return headings;
+    }
     return activeContentBlocks.map(block => ({
       id: generateId(block.heading),
       title: block.heading,
       level: 2
     }));
-  }, [activeContentBlocks]);
+  }, [language, selectedPost, activeContentBlocks]);
 
   if (selectedPost) {
 
@@ -293,19 +306,23 @@ export default function BlogPage() {
                       className={`prose prose-lg max-w-none prose-slate bg-transparent text-left font-sans ${language === 'ur' ? 'font-urdu' : ''}`}
                       dir={language === 'ur' ? 'rtl' : 'ltr'}
                     >
-                      {activeContentBlocks.map((block, index) => (
-                        <div key={index} className="mb-8">
-                          <h2 
-                            id={generateId(block.heading)} 
-                            className="text-2xl md:text-3xl font-black text-[#002060] mb-4 scroll-mt-24"
-                          >
-                            {block.heading}
-                          </h2>
-                          <p className="text-slate-600 leading-relaxed text-lg">
-                            {block.body}
-                          </p>
-                        </div>
-                      ))}
+                      {language === 'en' && selectedPost?.content ? (
+                        renderBlogContent(selectedPost.content)
+                      ) : (
+                        activeContentBlocks.map((block, index) => (
+                          <div key={index} className="mb-8">
+                            <h2 
+                              id={generateId(block.heading)} 
+                              className="text-2xl md:text-3xl font-black text-[#002060] mb-4 scroll-mt-24"
+                            >
+                              {block.heading}
+                            </h2>
+                            <p className="text-slate-600 leading-relaxed text-lg">
+                              {block.body}
+                            </p>
+                          </div>
+                        ))
+                      )}
                     </div>
                  </div>
 
