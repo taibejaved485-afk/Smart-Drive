@@ -96,13 +96,21 @@
               <!-- Neon tail light bar -->
               <path d="M4 17.5h3" stroke="#ff3333" stroke-width="2" stroke-linecap="round" style="filter: drop-shadow(0 0 3px #ff3333);"/>
               <!-- High-velocity futuristic hubless wheels -->
-              <g class="cyber-wheel">
-                <circle cx="15" cy="22" r="5" stroke="#FF7112" stroke-width="1.5" stroke-dasharray="3 2"/>
-                <circle cx="15" cy="22" r="2.5" fill="#FF7112"/>
+              <g class="cyber-wheel wheel-back">
+                <!-- Outer glowing neon ring -->
+                <circle cx="16" cy="24" r="6.5" stroke="#FF7112" stroke-width="1.8" fill="none" style="filter: drop-shadow(0 0 3px #FF7112);" />
+                <!-- Inner technical segment accents to show spinning motion visibly -->
+                <circle cx="16" cy="24" r="3.5" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="3 3.5" fill="none" />
+                <!-- Central core power node -->
+                <circle cx="16" cy="24" r="1.5" fill="#FF7112" />
               </g>
-              <g class="cyber-wheel">
-                <circle cx="43" cy="22" r="5" stroke="#FF7112" stroke-width="1.5" stroke-dasharray="3 2"/>
-                <circle cx="43" cy="22" r="2.5" fill="#FF7112"/>
+              <g class="cyber-wheel wheel-front">
+                <!-- Outer glowing neon ring -->
+                <circle cx="46" cy="24" r="6.5" stroke="#FF7112" stroke-width="1.8" fill="none" style="filter: drop-shadow(0 0 3px #FF7112);" />
+                <!-- Inner technical segment accents to show spinning motion visibly -->
+                <circle cx="46" cy="24" r="3.5" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="3 3.5" fill="none" />
+                <!-- Central core power node -->
+                <circle cx="46" cy="24" r="1.5" fill="#FF7112" />
               </g>
             </svg>
           </div>
@@ -120,12 +128,10 @@
             animation: drive 2.5s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
           }
           .cyber-wheel {
+            transform-box: fill-box;
             transform-origin: center;
             animation: spin 0.3s linear infinite;
           }
-          /* Setup transformation origin inside svg elements */
-          circle:nth-of-type(1), circle:nth-of-type(2) { transform-origin: 15px 22px; }
-          circle:nth-of-type(3), circle:nth-of-type(4) { transform-origin: 43px 22px; }
           
           .warp-particle {
             position: absolute;
