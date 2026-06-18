@@ -24,10 +24,11 @@ export default function EarningsCalculator() {
 
   if (days >= 1 && days <= 9) {
     retentionBonus = 0;
-    bonusHelper = "Lock 10 days to unlock cash bonus";
+    const daysRemaining = 10 - days;
+    bonusHelper = `Rent your car for ${daysRemaining} more ${daysRemaining === 1 ? 'day' : 'days'} to unlock your Loyalty Cash Bonus!`;
   } else if (days >= 10 && days <= 20) {
     retentionBonus = 5000;
-    bonusHelper = "✨ Growth Tier Unlocked (+PKR 5,000)";
+    bonusHelper = "✨ Growth Tier Unlocked (+PKR 5,000 Cash Bonus)";
     bonusBadge = (
       <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-full text-[10px] font-extrabold tracking-wide">
         ✨ Growth Tier Unlocked
@@ -35,7 +36,7 @@ export default function EarningsCalculator() {
     );
   } else if (days >= 21 && days <= 30) {
     retentionBonus = 12000;
-    bonusHelper = "💎 Elite Partner Tier Unlocked (+PKR 12,000)";
+    bonusHelper = "💎 Elite Partner Tier Unlocked (+PKR 12,000 Cash Bonus)";
     bonusBadge = (
       <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-1 rounded-full text-[10px] font-extrabold tracking-wide shadow-sm animate-pulse">
         💎 Elite Partner Tier Unlocked
@@ -147,9 +148,9 @@ export default function EarningsCalculator() {
                   max="30"
                   value={days}
                   onChange={(e) => setDays(Number(e.target.value))}
-                  className="custom-slider"
+                  className="w-full custom-slider outline-none cursor-pointer"
                   style={{
-                    background: `linear-gradient(to right, #dc2626 0%, #dc2626 ${sliderPercentage}%, #e2e8f0 ${sliderPercentage}%, #e2e8f0 100%)`
+                    background: `linear-gradient(to right, #FF7112 0%, #FF7112 ${sliderPercentage}%, #e2e8f0 ${sliderPercentage}%, #e2e8f0 100%)`
                   }}
                 />
                 <div className="flex justify-between text-[10px] text-slate-450 font-mono">
