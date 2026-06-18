@@ -58,114 +58,156 @@
   <body>
     <div id="root">
       <!-- Visual Preloader -->
-      <div style="font-family: system-ui, -apple-system, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background-color: #f8fafc;">
+      <div style="font-family: 'Inter', system-ui, -apple-system, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: radial-gradient(circle at center, #0B1120 0%, #030712 100%); overflow: hidden; position: relative;">
+        <!-- Backdrop Ambient Glow -->
+        <div style="position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(255, 113, 18, 0.08) 0%, transparent 70%); top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; filter: blur(40px); animation: ambientPulse 4s ease-in-out infinite;"></div>
         
-        <div style="width: 280px; height: 60px; position: relative; border-bottom: 3px solid #e2e8f0; margin-bottom: 30px;">
-          <!-- Dashed lines for the road -->
-          <div style="position: absolute; bottom: -3px; left: 0; width: 100%; height: 3px; background: repeating-linear-gradient(90deg, #94a3b8 0, #94a3b8 10px, transparent 10px, transparent 20px);"></div>
+        <div style="width: 320px; height: 80px; position: relative; margin-bottom: 35px;">
+          <!-- Laser Road Grid Line -->
+          <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background: rgba(255, 113, 18, 0.15); box-shadow: 0 0 4px rgba(255, 113, 18, 0.1);"></div>
+          <!-- Dashed scanning lines for the road grid -->
+          <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background: repeating-linear-gradient(90deg, rgba(255, 113, 18, 0.4) 0, rgba(255, 113, 18, 0.4) 15px, transparent 15px, transparent 30px); animation: roadScan 1.2s linear infinite;"></div>
           
           <!-- Colored Progress Line moving with the car -->
           <div class="road-progress"></div>
 
-          <!-- Finish Line -->
-          <div style="position: absolute; right: 0; bottom: -3px; width: 10px; height: 35px; background: repeating-conic-gradient(#000 0% 25%, #fff 0% 50%) 50% / 10px 10px; border: 1px solid #94a3b8; border-bottom: none; z-index: 1;"></div>
-          <!-- Flag pole -->
-          <div style="position: absolute; right: -2px; bottom: 0; width: 2px; height: 45px; background-color: #64748b; z-index: 1;"></div>
+          <!-- Futuristic Gate Finish Line -->
+          <div class="finish-gate" style="position: absolute; right: 0; bottom: 0; width: 6px; height: 35px; background: repeating-linear-gradient(0deg, #f8fafc 0, #f8fafc 4px, #030712 4px, #030712 8px); border: 1.5px solid #FF7112; box-shadow: 0 0 10px rgba(255, 113, 18, 0.6); z-index: 1;"></div>
+          <!-- Scanning beam from finishing gate -->
+          <div style="position: absolute; right: 1.5px; bottom: 0; width: 1px; height: 35px; background: #fff; box-shadow: 0 0 8px #fff, 0 0 15px #FF7112; z-index: 2;"></div>
 
-          <!-- Car Wrapper -->
-          <div class="car-wrapper" style="position: absolute; bottom: -10px; left: 0; width: 56px; height: 56px; z-index: 2;">
-            <div class="smoke"></div>
-            <div class="smoke smoke-2"></div>
+          <!-- Car Wrapper containing the neon vehicle & warp particles -->
+          <div class="car-wrapper" style="position: absolute; bottom: -4px; left: 0; width: 72px; height: 36px; z-index: 3;">
+            <!-- Warp/thrust particles flying backward -->
+            <div class="warp-particle particle-1"></div>
+            <div class="warp-particle particle-2"></div>
+            <div class="warp-particle particle-3"></div>
             
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 100%; height: 100%;">
-              <g class="chassis">
-                <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/>
-                <path d="M9 17h6"/>
+            <!-- Highly futuristic custom supercar SVG contour -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 32" fill="none" style="width: 100%; height: 100%; filter: drop-shadow(0 0 5px rgba(255, 113, 18, 0.8));">
+              <!-- Aero-hypercar outer chassis frame -->
+              <path d="M4 22h4c1 0 1.8-.7 2-1.7l1.5-6c.3-1.2 1.3-2 2.5-2h14c1.2 0 2.2.8 2.5 2l1.5 6c.2 1 .9 1.7 2 1.7h18c1.1 0 2-.9 2-2v-2c0-1.8-1.1-3.4-2.8-4l-8.6-3.2C41.8 4.2 38.3 3 34.7 3H19.6c-2.4 0-4.7 1.1-6.1 3L5.4 17.6C4.5 18.8 4 20.3 4 22z" stroke="#FF7112" stroke-width="2" stroke-linejoin="round"/>
+              <!-- Glowing neon composite energy cabin -->
+              <path d="M16 11.5h14c1 0 1.8.7 2 1.7l1 3.5H13.6l1.2-4.2c.2-.6.7-1 1.2-1z" fill="rgba(255, 113, 18, 0.25)" stroke="#FF7112" stroke-width="1.2"/>
+              <!-- Laser light core strip (speed accent line on chassis side) -->
+              <path d="M21 16.5h15" stroke="#FF9E59" stroke-width="1.5" stroke-linecap="round" opacity="0.9"/>
+              <!-- Hyper white LED headlight strip -->
+              <path d="M53 18.5h4.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.95" style="filter: drop-shadow(0 0 3px #fff);"/>
+              <!-- Neon tail light bar -->
+              <path d="M4 17.5h3" stroke="#ff3333" stroke-width="2" stroke-linecap="round" style="filter: drop-shadow(0 0 3px #ff3333);"/>
+              <!-- High-velocity futuristic hubless wheels -->
+              <g class="cyber-wheel">
+                <circle cx="15" cy="22" r="5" stroke="#FF7112" stroke-width="1.5" stroke-dasharray="3 2"/>
+                <circle cx="15" cy="22" r="2.5" fill="#FF7112"/>
               </g>
-              <g class="wheel wheel-back">
-                <circle cx="7" cy="17" r="2.2" fill="#f8fafc"/>
-                <path d="M7 14.8v4.4 M4.8 17h4.4" stroke="#e2e8f0" stroke-width="0.8" />
-              </g>
-              <g class="wheel wheel-front">
-                <circle cx="17" cy="17" r="2.2" fill="#f8fafc"/>
-                <path d="M17 14.8v4.4 M14.8 17h4.4" stroke="#e2e8f0" stroke-width="0.8" />
+              <g class="cyber-wheel">
+                <circle cx="43" cy="22" r="5" stroke="#FF7112" stroke-width="1.5" stroke-dasharray="3 2"/>
+                <circle cx="43" cy="22" r="2.5" fill="#FF7112"/>
               </g>
             </svg>
           </div>
         </div>
 
-        <h2 style="color: #0f172a; font-size: 24px; font-weight: 700; margin: 0; letter-spacing: -0.025em; position: relative;">GoDriveify</h2>
-        <p style="color: #64748b; font-size: 14px; margin-top: 8px; font-weight: 500;">Starting your engine<span class="dots"></span></p>
+        <h2 class="loader-title" style="color: #ffffff; font-size: 26px; font-weight: 900; margin: 0; letter-spacing: 0.15em; text-transform: uppercase;">
+          <span style="color: #FF7112; text-shadow: 0 0 10px rgba(255, 113, 18, 0.5);">Go</span>Driveify
+        </h2>
+        <p style="color: #94a3b8; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 11px; margin-top: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 4px;">
+          Starting engine<span class="dots"></span>
+        </p>
 
         <style>
           .car-wrapper {
             animation: drive 2.5s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
           }
-          .chassis {
-            animation: bounce 0.2s infinite;
+          .cyber-wheel {
+            transform-origin: center;
+            animation: spin 0.3s linear infinite;
           }
-          .wheel {
-            animation: spin 0.4s linear infinite;
-          }
-          .wheel-back { transform-origin: 7px 17px; }
-          .wheel-front { transform-origin: 17px 17px; }
+          /* Setup transformation origin inside svg elements */
+          circle:nth-of-type(1), circle:nth-of-type(2) { transform-origin: 15px 22px; }
+          circle:nth-of-type(3), circle:nth-of-type(4) { transform-origin: 43px 22px; }
           
-          .smoke {
+          .warp-particle {
             position: absolute;
-            bottom: 6px;
-            left: -10px;
-            width: 12px;
-            height: 12px;
-            background: #cbd5e1;
-            border-radius: 50%;
+            height: 1.5px;
+            background: linear-gradient(90deg, transparent, #FF7112, transparent);
             opacity: 0;
-            animation: emitSmoke 0.6s linear infinite;
+            border-radius: 999px;
           }
-          .smoke-2 {
-            left: -16px;
-            bottom: 10px;
-            width: 8px;
-            height: 8px;
-            animation-delay: 0.3s;
+          .particle-1 {
+            left: -15px;
+            bottom: 14px;
+            width: 25px;
+            animation: emitWarp 0.5s linear infinite;
           }
-
-          @keyframes drive {
-            0% { transform: translateX(0); opacity: 0; }
-            5% { opacity: 1; }
-            45% { transform: translateX(230px); opacity: 1; }
-            50% { transform: translateX(230px); opacity: 1; }
-            60% { transform: translateX(260px); opacity: 0; }
-            100% { transform: translateX(260px); opacity: 0; }
+          .particle-2 {
+            left: -22px;
+            bottom: 8px;
+            width: 18px;
+            animation: emitWarp 0.4s linear infinite 0.15s;
           }
-          @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-0.5px); }
-          }
-          @keyframes spin {
-            100% { transform: rotate(360deg); }
-          }
-          @keyframes emitSmoke {
-            0% { transform: translate(0, 0) scale(0.5); opacity: 0.8; }
-            100% { transform: translate(-20px, -10px) scale(1.5); opacity: 0; }
+          .particle-3 {
+            left: -18px;
+            bottom: 20px;
+            width: 20px;
+            animation: emitWarp 0.6s linear infinite 0.3s;
           }
 
           .road-progress {
             position: absolute;
             left: 0;
-            bottom: -3px;
-            height: 3px;
-            width: 280px;
-            background: #dc2626;
-            box-shadow: 0 0 8px #dc2626;
+            bottom: 0px;
+            height: 2px;
+            width: 320px;
+            background: linear-gradient(90deg, #FF7112 0%, #FF9E59 100%);
+            box-shadow: 0 0 12px #FF7112, 0 0 4px #FF7112;
             transform-origin: left;
             animation: fillRoad 2.5s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
           }
+
+          .loader-title {
+            animation: textGlow 2.5s ease-in-out infinite alternate;
+          }
+
+          @keyframes ambientPulse {
+            0%, 100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 1.2; transform: translate(-50%, -50%) scale(1.1); }
+          }
+          
+          @keyframes textGlow {
+            0% { text-shadow: 0 0 8px rgba(255, 113, 18, 0.2); }
+            100% { text-shadow: 0 0 18px rgba(255, 113, 18, 0.6); }
+          }
+
+          @keyframes roadScan {
+            0% { background-position-x: 0px; }
+            100% { background-position-x: -30px; }
+          }
+
+          @keyframes drive {
+            0% { transform: translateX(0); opacity: 0; }
+            4% { opacity: 1; }
+            45% { transform: translateX(238px); opacity: 1; }
+            52% { transform: translateX(238px); opacity: 1; }
+            62% { transform: translateX(265px); opacity: 0; }
+            100% { transform: translateX(265px); opacity: 0; }
+          }
+
+          @keyframes spin {
+            100% { transform: rotate(360deg); }
+          }
+
+          @keyframes emitWarp {
+            0% { transform: translateX(5px) scaleX(0.4); opacity: 0.8; }
+            100% { transform: translateX(-35px) scaleX(1.8); opacity: 0; }
+          }
+
           @keyframes fillRoad {
             0% { transform: scaleX(0); opacity: 0;}
-            5% { opacity: 1; }
-            45% { transform: scaleX(0.85); opacity: 1; }
-            50% { transform: scaleX(0.85); opacity: 1; }
-            60% { transform: scaleX(1); opacity: 0; }
+            4% { opacity: 1; }
+            45% { transform: scaleX(0.81); opacity: 1; }
+            52% { transform: scaleX(0.81); opacity: 1; }
+            62% { transform: scaleX(1); opacity: 0; }
             100% { transform: scaleX(1); opacity: 0; }
           }
 
@@ -182,7 +224,7 @@
           }
           @keyframes blink {
             0% { width: 0; }
-            100% { width: 14px; }
+            100% { width: 15px; }
           }
         </style>
       </div>
