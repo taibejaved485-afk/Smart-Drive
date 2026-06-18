@@ -34,10 +34,32 @@ export default function ServicesPage() {
 
   // Ensure high performance instant playback of services video
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.play().catch(err => {
-        console.log("Autoplay was prevented by browser, retrying...", err);
-      });
+    const video = videoRef.current;
+    if (video) {
+      video.muted = true;
+      video.defaultMuted = true;
+      video.playsInline = true;
+      video.preload = "auto";
+      video.load();
+      
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(err => {
+          console.log("Autoplay was prevented by browser, adding backup interaction listeners...", err);
+          
+          // Backup: Play as soon as user touches or clicks the screen
+          const playOnInteraction = () => {
+            if (video) {
+              video.play().then(() => {
+                document.removeEventListener('click', playOnInteraction);
+                document.removeEventListener('touchstart', playOnInteraction);
+              }).catch(e => console.log("Interaction play failed:", e));
+            }
+          };
+          document.addEventListener('click', playOnInteraction);
+          document.addEventListener('touchstart', playOnInteraction);
+        });
+      }
     }
   }, []);
 
