@@ -8,6 +8,7 @@ import { Trophy, AlertCircle, Lightbulb, RefreshCw, ChevronRight, CheckCircle2, 
 const quizData = [
   {
     id: 1,
+    difficulty: "medium",
     question: "According to the GoDriveify safety guide, why is it critical to maintain a safe distance from the vehicle ahead while driving on a highway?",
     options: [
       { text: "To stay out of the vehicle's rear blind spot.", isCorrect: false, rationale: "While true, safe following distance is legally and physical-defensively designed for reaction and stopping distance." },
@@ -19,6 +20,7 @@ const quizData = [
   },
   {
     id: 2,
+    difficulty: "hard",
     question: "When preparing to change lanes on a high-speed road, what is the correct sequence for checking your surroundings based on safety principles?",
     options: [
       { text: "Signal, check rearview mirror, and turn the wheel.", isCorrect: false, rationale: "Omitting side mirror checks and physical shoulder checks leaves you vulnerable to blind-spot collisions." },
@@ -30,6 +32,7 @@ const quizData = [
   },
   {
     id: 3,
+    difficulty: "easy",
     question: "You approach an intersection with a flashing yellow signal light. How should you proceed?",
     options: [
       { text: "Treat it like a green light and maintain your speed.", isCorrect: false, rationale: "Failing to slow down or look for cross-traffic can lead to severe side-impact collisions." },
@@ -41,6 +44,7 @@ const quizData = [
   },
   {
     id: 4,
+    difficulty: "medium",
     question: "At an intersection without signs or signals (uncontrolled), two vehicles arrive at the same time at right angles. Who has the right-of-way?",
     options: [
       { text: "The vehicle traveling at a higher speed.", isCorrect: false, rationale: "Speed does not dictate right-of-way; safe, structural traffic laws do." },
@@ -52,6 +56,7 @@ const quizData = [
   },
   {
     id: 5,
+    difficulty: "easy",
     question: "What is the primary purpose of a 'Yield' sign compared to a 'Stop' sign?",
     options: [
       { text: "A yield sign is only for pedestrians, not other motor vehicles.", isCorrect: false, rationale: "Yield signs apply to all approaching road users, including motor vehicles." },
@@ -63,6 +68,7 @@ const quizData = [
   },
   {
     id: 6,
+    difficulty: "hard",
     question: "Hydroplaning occurs when a layer of water builds between the tires and the road. What is the safest immediate action if you feel your car hydroplaning?",
     options: [
       { text: "Ease off the accelerator and keep the steering wheel straight.", isCorrect: true, rationale: "Slowing down naturally without braking allows the tires to regain contact with the pavement." },
@@ -74,6 +80,7 @@ const quizData = [
   },
   {
     id: 7,
+    difficulty: "easy",
     question: "When an emergency vehicle with flashing lights and sirens is approaching from behind, what should you do?",
     options: [
       { text: "Stop immediately in your current lane of travel.", isCorrect: false, rationale: "Stopping suddenly in the middle of a lane blocks the vehicle behind you and causes pile-ups." },
@@ -85,6 +92,7 @@ const quizData = [
   },
   {
     id: 8,
+    difficulty: "medium",
     question: "In a roundabout, which of the following is a correct rule of operation?",
     options: [
       { text: "Traffic inside must yield to vehicles entering from the right.", isCorrect: false, rationale: "Incoming drivers must yield, not those who are already inside the roundabout flow." },
@@ -96,6 +104,7 @@ const quizData = [
   },
   {
     id: 9,
+    difficulty: "hard",
     question: "If your vehicle is equipped with Anti-lock Braking System (ABS), how should you perform an emergency stop?",
     options: [
       { text: "Pump the brake pedal rapidly to prevent wheel lock.", isCorrect: false, rationale: "Pumping manually fights the computer system and decreases braking efficiency." },
@@ -107,6 +116,7 @@ const quizData = [
   },
   {
     id: 10,
+    difficulty: "easy",
     question: "Which of the following is true regarding a blind spot when driving a standard passenger vehicle?",
     options: [
       { text: "It is an area around the vehicle that cannot be seen in the mirrors.", isCorrect: true, rationale: "Physical pillars of the car and mirror angles create zones alongside the car that only shoulder-checks can reveal." },
@@ -115,6 +125,66 @@ const quizData = [
       { text: "It can be completely eliminated by adjusting your rearview mirror upwards.", isCorrect: false, rationale: "No mirror adjustment can completely eliminate the need for head shoulder checks." }
     ],
     hint: "It requires a physical head turn to see."
+  },
+  {
+    id: 11,
+    difficulty: "medium",
+    question: "While driving in heavy rainfall, what is the safest recommended following distance?",
+    options: [
+      { text: "At least 4 seconds to compensate for reduced tyre friction.", isCorrect: true, rationale: "Slippery roads heavily reduce tyre grip and increase the stopping distance, requiring at least a 4-second gap." },
+      { text: "Maintain the standard 2-second rule regardless of weather.", isCorrect: false, rationale: "The 2-second rule is only safe for perfect dry-pavement daylight situations." },
+      { text: "A gap of 1 car length for every 50 km/h of speed.", isCorrect: false, rationale: "Using car lengths is highly inaccurate at modern speeds and rain conditions." },
+      { text: "Flicker high beams frequently to warn the driver in front.", isCorrect: false, rationale: "Flickering high beams blurs mirrors, blinding the leading driver and increasing risk." }
+    ],
+    hint: "Rainwater cuts brake competence in half. Double your normal stopping gap."
+  },
+  {
+    id: 12,
+    difficulty: "hard",
+    question: "You are cruising at 100 km/h and experience a sudden tyre blowout. What is the safest response?",
+    options: [
+      { text: "Slam the brakes immediately and turn off the road.", isCorrect: false, rationale: "Braking hard on a blown tyre will instantly destabilize the car, potentially causing a roll." },
+      { text: "Hold the steering wheel firmly straight, ease off the gas, and brake gently once stable.", isCorrect: true, rationale: "Keeping the wheel steady prevents initial loss of control. Letting deceleration occur naturally is safest." },
+      { text: "Shift immediately into reverse or park to force a lockup.", isCorrect: false, rationale: "This will shred your transmission and lock wheels, triggering an uncontrollable roll." },
+      { text: "Turn the wheel rapidly towards the direction of the blown tyre.", isCorrect: false, rationale: "Abrupt steering inputs at high speed during tyre blowouts lead to severe rollover crashes." }
+    ],
+    hint: "Prioritize keeping the vehicle straight and avoiding any abrupt control inputs."
+  },
+  {
+    id: 13,
+    difficulty: "easy",
+    question: "What does an unbroken, solid white line painted along your side of the lane indicate?",
+    options: [
+      { text: "You are allowed to overtake but must do so rapidly.", isCorrect: false, rationale: "Broken or dashed lines indicate overtaking permissions, not solid unbroken lanes." },
+      { text: "Changing lanes or crossing this line is highly discouraged and often illegal.", isCorrect: true, rationale: "Unbroken white lines signify lane borders designed to prevent crossing in high-hazard areas." },
+      { text: "It marks a designated pathway only for slow-moving trucks.", isCorrect: false, rationale: "Solid white lines partition standard lanes, they do not denote specific vehicles." },
+      { text: "This line is only active as a marker during nighttime operations.", isCorrect: false, rationale: "Lane markings are active constantly, regardless of ambient lighting." }
+    ],
+    hint: "Solid borders are visual blockades. They indicate you must stick to your present lane."
+  },
+  {
+    id: 14,
+    difficulty: "medium",
+    question: "Under what circumstances is performing a mid-road U-turn illegal or unsafe?",
+    options: [
+      { text: "Near hillcrests, sharp curves, or where vision is restricted.", isCorrect: true, rationale: "You need ample visible clearance in both directions to safely complete a U-turn without forcing oncoming cars to slam brakes." },
+      { text: "Only when the temperature exceeds 40°C on concrete structures.", isCorrect: false, rationale: "Weather conditions do not govern U-turn legality; visibility and clearance do." },
+      { text: "Anytime there is no law enforcement vehicle actively watching.", isCorrect: false, rationale: "Safety rules are structural and legal constants, not conditional upon enforcement presence." },
+      { text: "Whenever you are driving with a full fuel tank.", isCorrect: false, rationale: "Fuel level has no impact on driving maneuver legality." }
+    ],
+    hint: "Think about whether oncoming traffic can see you from a safe distance."
+  },
+  {
+    id: 15,
+    difficulty: "hard",
+    question: "If you double your driving speed (e.g., from 40 km/h to 80 km/h), what happens to your vehicle's physical stopping distance?",
+    options: [
+      { text: "It doubles in a linear 1:1 relationship.", isCorrect: false, rationale: "Kinetic energy does not scale linearly; it scales quadratically, making stopping distance much worse than double." },
+      { text: "It remains exactly the same due to brake friction.", isCorrect: false, rationale: "Higher speeds mean far more kinetic energy to disperse, requiring significantly greater track distance." },
+      { text: "It increases by approximately four times (quadruples).", isCorrect: true, rationale: "Deceleration kinetic energy equation is (E = 1/2 * m * v²). When velocity (v) doubles, kinetic energy (and slide distance) increases by four." },
+      { text: "It increases tenfold due to aerodynamic vacuum drag.", isCorrect: false, rationale: "Aerodynamic resistance helps decelerate vehicles slightly, but the kinetic stopping distance increases four times based on tire physics." }
+    ],
+    hint: "Kinetic energy scales quadratically with speed (v squared)."
   }
 ];
 
@@ -133,12 +203,18 @@ export default function QuizPage() {
     isCorrect: boolean;
     rationale: string;
   }>>([]);
+  const [selectedDifficulty, setSelectedDifficulty] = useState<"all" | "easy" | "medium" | "hard">("all");
+
+  const activeQuestions = React.useMemo(() => {
+    if (selectedDifficulty === "all") return quizData;
+    return quizData.filter(q => q.difficulty === selectedDifficulty);
+  }, [selectedDifficulty]);
 
   const handleSubmit = (forcedByTimeout: boolean = false) => {
     if (isSubmitted) return;
     if (selectedOpt === null && !forcedByTimeout) return;
 
-    const currentQuestion = quizData[currentIdx];
+    const currentQuestion = activeQuestions[currentIdx];
     const hasChosen = selectedOpt !== null;
     const isCorrect = hasChosen ? currentQuestion.options[selectedOpt].isCorrect : false;
 
@@ -204,14 +280,14 @@ export default function QuizPage() {
     setSelectedOpt(null);
     setIsSubmitted(false);
 
-    if (currentIdx + 1 < quizData.length) {
+    if (currentIdx + 1 < activeQuestions.length) {
       setCurrentIdx(prev => prev + 1);
     } else {
       setQuizFinished(true);
     }
   };
 
-  const progressPct = ((currentIdx + (isSubmitted ? 1 : 0)) / quizData.length) * 100;
+  const progressPct = ((currentIdx + (isSubmitted ? 1 : 0)) / activeQuestions.length) * 100;
 
   const quizSchema = {
     "@context": "https://schema.org",
@@ -276,7 +352,7 @@ export default function QuizPage() {
                   <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="font-bold text-xs text-slate-800 uppercase tracking-widest">10 Questions</h4>
+                      <h4 className="font-bold text-xs text-slate-800 uppercase tracking-widest">{activeQuestions.length} Questions</h4>
                       <p className="text-[11px] text-slate-500 mt-0.5">Comprehensive real scenarios</p>
                     </div>
                   </div>
@@ -284,7 +360,7 @@ export default function QuizPage() {
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                     <div>
                       <h4 className="font-bold text-xs text-slate-800 uppercase tracking-widest">70% to Pass</h4>
-                      <p className="text-[11px] text-slate-500 mt-0.5">Requires 7/10 correct</p>
+                      <p className="text-[11px] text-slate-500 mt-0.5">Requires {Math.ceil(activeQuestions.length * 0.7)}/{activeQuestions.length} correct</p>
                     </div>
                   </div>
                   <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-start gap-3">
@@ -293,6 +369,42 @@ export default function QuizPage() {
                       <h4 className="font-bold text-xs text-slate-800 uppercase tracking-widest">Detail Explanations</h4>
                       <p className="text-[11px] text-slate-500 mt-0.5">Immediate logic feedback</p>
                     </div>
+                  </div>
+                </div>
+
+                {/* Challenge Tier Selection Card Grid */}
+                <div className="w-full mb-8">
+                  <h3 className="text-xs font-black text-[#002060] uppercase tracking-widest mb-4 flex items-center justify-center gap-1.5 leading-none">
+                    <AlertCircle className="w-4 h-4 text-orange-500" /> Choose Your Difficulty Tier
+                  </h3>
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    {[
+                      { id: "all", label: "Full Test (All)", desc: "Consolidated rules", count: 15, activeColor: "border-[#002060] bg-[#002060]/5 text-[#002060]" },
+                      { id: "easy", label: "Easy Tier", desc: "Basic road signs", count: 5, activeColor: "border-[#10b981] bg-green-50/50 text-[#065f46]" },
+                      { id: "medium", label: "Medium Tier", desc: "Right-of-way rules", count: 5, activeColor: "border-amber-500 bg-amber-50/50 text-[#92400e]" },
+                      { id: "hard", label: "Hard Tier", desc: "Emergency handling", count: 5, activeColor: "border-rose-500 bg-rose-50/50 text-[#9f1239]" }
+                    ].map((tier) => {
+                      const isSelected = selectedDifficulty === tier.id;
+                      return (
+                        <button
+                          key={tier.id}
+                          type="button"
+                          onClick={() => setSelectedDifficulty(tier.id as any)}
+                          className={`p-4 rounded-2xl border text-center transition-all duration-150 cursor-pointer ${
+                            isSelected 
+                              ? `${tier.activeColor} ring-2 ring-[#FF7112]/40 font-extrabold shadow-xs` 
+                              : "border-slate-200 bg-slate-50/35 hover:bg-slate-50/80 text-slate-705 text-slate-700"
+                          }`}
+                        >
+                          <span className="block text-xs uppercase tracking-wider font-extrabold">
+                            {tier.label}
+                          </span>
+                          <span className="block text-[10px] text-slate-500 mt-1 font-medium select-none whitespace-nowrap">
+                            {tier.desc} ({tier.count} Qs)
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -310,16 +422,16 @@ export default function QuizPage() {
             <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-10 shadow-xl overflow-hidden">
               <div className="text-center py-6 flex flex-col items-center">
                 <div className={`w-20 h-20 rounded-3xl flex items-center justify-center mb-6 shadow-md ${
-                  score >= 7 ? 'bg-green-50 border border-green-200 text-green-600' : 'bg-red-50 border border-red-200 text-red-600'
+                  score >= Math.ceil(activeQuestions.length * 0.7) ? 'bg-green-50 border border-green-200 text-green-600' : 'bg-red-50 border border-red-200 text-red-600'
                 }`}>
                   <Trophy className="w-10 h-10" />
                 </div>
                 
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-[#002060] tracking-tight">
-                  {score >= 7 ? "🎉 Congratulations! You Passed" : "⚠️ Practice Recommended"}
+                  {score >= Math.ceil(activeQuestions.length * 0.7) ? "🎉 Congratulations! You Passed" : "⚠️ Practice Recommended"}
                 </h2>
                 <p className="text-slate-500 text-sm mt-2 max-w-md">
-                  {score >= 7 
+                  {score >= Math.ceil(activeQuestions.length * 0.7) 
                     ? "Fantastic job! Your defense-oriented driving knowledge matches professional road safety standards." 
                     : "Almost there! Keep reviewing the safety criteria to build unbreakable safety instincts."
                   }
@@ -327,11 +439,11 @@ export default function QuizPage() {
 
                 <div className="my-8 flex flex-wrap items-center justify-center gap-6 w-full max-w-md">
                   <div className="flex-1 p-4 bg-slate-50 border rounded-2xl min-w-[130px] shadow-xs">
-                    <span className="block text-4xl font-extrabold text-[#002060] tracking-tight leading-none mb-1 font-mono">{score} / {quizData.length}</span>
+                    <span className="block text-4xl font-extrabold text-[#002060] tracking-tight leading-none mb-1 font-mono">{score} / {activeQuestions.length}</span>
                     <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Correct Answers</span>
                   </div>
                   <div className="flex-1 p-4 bg-slate-50 border rounded-2xl min-w-[130px] shadow-xs">
-                    <span className="block text-4xl font-extrabold text-orange-600 tracking-tight leading-none mb-1 font-mono">{Math.round((score / quizData.length) * 100)}%</span>
+                    <span className="block text-4xl font-extrabold text-orange-600 tracking-tight leading-none mb-1 font-mono">{Math.round((score / activeQuestions.length) * 100)}%</span>
                     <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Success Rate</span>
                   </div>
                 </div>
@@ -380,8 +492,19 @@ export default function QuizPage() {
             /* ACTIVE QUIZ CARD VIEW */
             <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-10 shadow-xl overflow-hidden">
               {/* Question metadata row */}
-              <div className="flex justify-between items-center mb-4 text-xs font-bold text-slate-500 uppercase tracking-widest">
-                <span>QUESTION {currentIdx + 1} OF {quizData.length}</span>
+              <div className="flex flex-wrap justify-between items-center gap-3 mb-4 text-xs font-bold text-slate-500 uppercase tracking-widest pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <span>QUESTION {currentIdx + 1} OF {activeQuestions.length}</span>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black border uppercase tracking-wider ${
+                    activeQuestions[currentIdx]?.difficulty === 'easy' 
+                      ? 'bg-emerald-50 border-emerald-250 text-emerald-700' 
+                      : activeQuestions[currentIdx]?.difficulty === 'medium'
+                        ? 'bg-amber-50 border-amber-250 text-amber-700'
+                        : 'bg-rose-50 border-rose-250 text-rose-700'
+                  }`}>
+                    {activeQuestions[currentIdx]?.difficulty}
+                  </span>
+                </div>
                 <span className="font-mono text-orange-600 bg-orange-100/50 px-2.5 py-1 rounded-full">SCORE: {score}</span>
               </div>
 
@@ -435,12 +558,12 @@ export default function QuizPage() {
 
               {/* Actual Question */}
               <h3 className="text-lg sm:text-xl font-bold text-[#002060] mb-6 leading-relaxed">
-                {quizData[currentIdx].question}
+                {activeQuestions[currentIdx]?.question}
               </h3>
 
               {/* Options list structured identically to driver tests */}
               <div className="space-y-3 mb-6">
-                {quizData[currentIdx].options.map((option, idx) => {
+                {activeQuestions[currentIdx]?.options.map((option, idx) => {
                   let optionStyles = "border-slate-200/80 hover:bg-slate-50/50 text-slate-700";
                   
                   if (selectedOpt === idx) {
@@ -492,8 +615,8 @@ export default function QuizPage() {
               {/* Active feedback banner when submitted */}
               {isSubmitted && (() => {
                 const hasChosen = selectedOpt !== null;
-                const isCorrect = hasChosen ? quizData[currentIdx].options[selectedOpt].isCorrect : false;
-                const correctOption = quizData[currentIdx].options.find(o => o.isCorrect);
+                const isCorrect = hasChosen ? activeQuestions[currentIdx]?.options[selectedOpt].isCorrect : false;
+                const correctOption = activeQuestions[currentIdx]?.options.find(o => o.isCorrect);
 
                 return (
                   <div className={`p-4 rounded-2xl border mb-6 text-xs sm:text-sm leading-relaxed ${
@@ -512,7 +635,7 @@ export default function QuizPage() {
                     <p className="font-medium text-slate-700">
                       {!hasChosen 
                         ? `You ran out of time to answer this question. The correct answer is: "${correctOption?.text}". ${correctOption?.rationale}`
-                        : quizData[currentIdx].options[selectedOpt].rationale
+                        : activeQuestions[currentIdx]?.options[selectedOpt].rationale
                       }
                     </p>
                   </div>
@@ -524,7 +647,7 @@ export default function QuizPage() {
                 <div className="p-4 rounded-2xl bg-amber-50/50 border border-amber-200/50 text-amber-900 text-xs sm:text-sm mb-6 flex gap-3">
                   <Lightbulb className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                   <p>
-                    <strong className="font-extrabold text-amber-950">Study Hint:</strong> {quizData[currentIdx].hint}
+                    <strong className="font-extrabold text-amber-950">Study Hint:</strong> {activeQuestions[currentIdx]?.hint}
                   </p>
                 </div>
               )}
@@ -559,7 +682,7 @@ export default function QuizPage() {
                     onClick={handleNext}
                     className="w-full bg-[#FF7112] hover:bg-[#E05A00] text-white font-extrabold py-3.5 rounded-2xl transition-all shadow-md flex items-center justify-center gap-1 text-xs uppercase tracking-widest cursor-pointer"
                   >
-                    {currentIdx + 1 < quizData.length ? "Next Question" : "Finish & View Score"} <ChevronRight className="w-4 h-4" />
+                    {currentIdx + 1 < activeQuestions.length ? "Next Question" : "Finish & View Score"} <ChevronRight className="w-4 h-4" />
                   </button>
                 )}
               </div>
