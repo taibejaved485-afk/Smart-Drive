@@ -95,7 +95,7 @@ export default function EarningsCalculator() {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-12 gap-8 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           {/* Inputs Panel */}
           <div className="lg:col-span-7 bg-slate-50/50 backdrop-blur-md rounded-2xl border border-slate-100 p-6 sm:p-8 space-y-6 flex flex-col justify-between">
             
@@ -104,7 +104,7 @@ export default function EarningsCalculator() {
               <label className="block text-xs font-extrabold uppercase text-slate-500 tracking-wider">
                 1. Select Vehicle Type
               </label>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {(['Economy', 'Sedan', 'Luxury'] as CarType[]).map((type) => {
                   const isActive = carType === type;
                   return (

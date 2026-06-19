@@ -44,6 +44,7 @@ export default function EnrollCTA() {
           src="https://trainingdrivingschool.pk/wp-content/uploads/2025/02/image-2.png"
           alt="Traffic Light Sign"
           className="mx-auto w-48 h-48 object-contain"
+          referrerPolicy="no-referrer"
         />
       </div>
     </section>

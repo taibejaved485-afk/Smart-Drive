@@ -25,7 +25,7 @@ export default function Features() {
   return (
     <section className="py-20 bg-white z-20 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-3 gap-12 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 items-stretch">
           {features.map((feature, i) => (
             <ScrollReveal key={i} delay={i * 0.1} width="100%" className="h-full">
               <FeatureCard feature={feature} index={i} />

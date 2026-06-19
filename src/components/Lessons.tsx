@@ -125,6 +125,7 @@ export default function Lessons() {
                   src={course.image} 
                   alt={course.title} 
                   className="max-h-full max-w-full object-contain relative z-10 transition-transform duration-500 group-hover:scale-105" 
+                  referrerPolicy="no-referrer"
                 />
               </div>
 

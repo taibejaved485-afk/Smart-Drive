@@ -23,7 +23,7 @@ export default function About() {
           </div>
         </ScrollReveal>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Images Section */}
           <ScrollReveal direction="left">
             <div className="grid grid-cols-2 gap-4">
@@ -44,7 +44,7 @@ export default function About() {
               </p>
 
               {/* Feature Grid */}
-              <div className="grid sm:grid-cols-2 gap-8 mb-10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-10">
                 {features.map((feature, i) => (
                   <div key={i} className="flex gap-3 group cursor-default">
                     <CheckCircle2 className="w-6 h-6 text-[#FF7112] flex-shrink-0" />
