@@ -841,24 +841,30 @@ export default function QuizPage() {
               <div className="mb-8 p-4 rounded-2xl bg-slate-50 border border-slate-200/60 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-2xs">
                 <div className="flex items-center gap-2.5">
                   <div className={`p-2 rounded-xl transition-all ${
-                    timeLeft < 15 
-                      ? 'bg-red-100 text-red-600 animate-pulse' 
-                      : timeLeft < 30 
-                        ? 'bg-amber-100 text-amber-605' 
-                        : 'bg-[#FF7112]/10 text-[#FF7112]'
+                    timeLeft === 0 || (isSubmitted && selectedOpt === null)
+                      ? 'bg-red-100 text-red-650 animate-bounce'
+                      : timeLeft < 15 
+                        ? 'bg-red-100 text-red-600 animate-pulse' 
+                        : timeLeft < 30 
+                          ? 'bg-amber-100 text-amber-500' 
+                          : 'bg-[#FF7112]/10 text-[#FF7112]'
                   }`}>
-                    <Timer className={`w-5 h-5 ${timeLeft < 15 ? 'animate-[pulse_1s_infinite]' : ''}`} />
+                    <Timer className={`w-5 h-5 ${(timeLeft < 15 || timeLeft === 0 || (isSubmitted && selectedOpt === null)) ? 'animate-[pulse_1s_infinite]' : ''}`} />
                   </div>
                   <div>
-                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Time Remaining</p>
+                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">
+                      {(timeLeft === 0 || (isSubmitted && selectedOpt === null)) ? "Status" : "Time Remaining"}
+                    </p>
                     <p className={`text-sm sm:text-base font-black font-mono leading-none ${
-                      timeLeft < 15 
-                        ? 'text-red-600 animate-pulse' 
-                        : timeLeft < 30 
-                          ? 'text-amber-600' 
-                          : 'text-[#002060]'
+                      timeLeft === 0 || (isSubmitted && selectedOpt === null)
+                        ? 'text-red-600 uppercase font-black tracking-wide animate-pulse'
+                        : timeLeft < 15 
+                          ? 'text-red-600 animate-pulse' 
+                          : timeLeft < 30 
+                            ? 'text-amber-600' 
+                            : 'text-[#002060]'
                     }`}>
-                      {timeLeft} seconds {timeLeft <= 15 && '⚠️'}
+                      {(timeLeft === 0 || (isSubmitted && selectedOpt === null)) ? "⏱️ Time's Up!" : `${timeLeft} seconds ${timeLeft <= 15 ? '⚠️' : ''}`}
                     </p>
                   </div>
                 </div>
@@ -866,13 +872,15 @@ export default function QuizPage() {
                 <div className="flex-grow sm:max-w-[280px] md:max-w-[360px] h-2 bg-slate-200 rounded-full overflow-hidden">
                   <div 
                     className={`h-full rounded-full transition-all duration-1000 ${
-                      timeLeft < 15 
-                        ? 'bg-gradient-to-r from-red-500 to-rose-600' 
-                        : timeLeft < 30 
-                          ? 'bg-gradient-to-r from-amber-400 to-amber-500' 
-                          : 'bg-gradient-to-r from-[#002060] to-indigo-600'
+                      timeLeft === 0 || (isSubmitted && selectedOpt === null)
+                        ? 'bg-red-600'
+                        : timeLeft < 15 
+                          ? 'bg-gradient-to-r from-red-500 to-rose-600' 
+                          : timeLeft < 30 
+                            ? 'bg-gradient-to-r from-amber-400 to-amber-500' 
+                            : 'bg-gradient-to-r from-[#002060] to-indigo-600'
                     }`}
-                    style={{ width: `${(timeLeft / 60) * 100}%` }}
+                    style={{ width: (timeLeft === 0 || (isSubmitted && selectedOpt === null)) ? '100%' : `${(timeLeft / 60) * 100}%` }}
                   />
                 </div>
               </div>
