@@ -4,6 +4,7 @@ import Footer from '../components/Footer';
 import SEO from '../components/SEO';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { Trophy, AlertCircle, Lightbulb, RefreshCw, ChevronRight, CheckCircle2, Info, BookOpen, Timer, Award, ShieldCheck, Zap, Star, Heart, Check, X, CheckSquare, Sparkles } from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 const quizData = [
   {
@@ -385,6 +386,43 @@ export default function QuizPage() {
   const progressPct = ((currentIdx + (isSubmitted ? 1 : 0)) / activeQuestions.length) * 100;
   const isPassing = score >= Math.ceil(activeQuestions.length * 0.7);
   const finalPercent = Math.round((score / activeQuestions.length) * 100);
+
+  // Trigger modern canvas-confetti on successful quiz completion
+  useEffect(() => {
+    if (quizFinished && isPassing) {
+      // Dynamic bursts of celebratory stars and paper
+      const duration = 4 * 1000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 99999 };
+
+      const randomInRange = (min: number, max: number) => {
+        return Math.random() * (max - min) + min;
+      };
+
+      const interval = setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
+
+        if (timeLeft <= 0) {
+          return clearInterval(interval);
+        }
+
+        const particleCount = 50 * (timeLeft / duration);
+        // Left & right celebration cannons
+        confetti({ 
+          ...defaults, 
+          particleCount, 
+          origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } 
+        });
+        confetti({ 
+          ...defaults, 
+          particleCount, 
+          origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } 
+        });
+      }, 250);
+
+      return () => clearInterval(interval);
+    }
+  }, [quizFinished, isPassing]);
 
   const handleShare = () => {
     setShareToast(true);

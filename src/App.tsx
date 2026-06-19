@@ -24,51 +24,11 @@ import { ToastProvider } from './components/Toast';
 
 export default function App() {
   useEffect(() => {
-    // 1. Create the Audio object for preloading the engine start audio file
-    const engineAudio = new Audio("https://assets.mixkit.co/active_storage/sfx/2653/2653-84.wav");
-    engineAudio.preload = "auto";
-    engineAudio.volume = 0.55; // perfect balance
-
-    let hasPlayed = false;
-
-    const playEngineSound = () => {
-      if (hasPlayed) return;
-      
-      const playPromise = engineAudio.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            hasPlayed = true;
-            // Clean up event listeners once played successfully
-            removeEventListeners();
-          })
-          .catch((error) => {
-            console.log("Audio play deferred or blocked by browser policies. Waiting for user interaction...", error);
-          });
-      }
-    };
-
-    const handleUserInteraction = () => {
-      playEngineSound();
-    };
-
-    const removeEventListeners = () => {
-      document.removeEventListener('click', handleUserInteraction);
-      document.removeEventListener('touchstart', handleUserInteraction);
-      document.removeEventListener('keydown', handleUserInteraction);
-    };
-
-    // Attempt autoplay immediately (some browsers/configurations allow it, e.g. hybrid app shells or custom settings)
-    playEngineSound();
-
-    // Attach listeners for standard user interactions (forces play as soon as browser allows it)
-    document.addEventListener('click', handleUserInteraction, { once: true });
-    document.addEventListener('touchstart', handleUserInteraction, { once: true });
-    document.addEventListener('keydown', handleUserInteraction, { once: true });
-
-    return () => {
-      removeEventListeners();
-    };
+    // Dynamically invoke the persistent global engine starter sound initialized in index.html
+    const globalPlayer = (window as any).playEngineSound;
+    if (globalPlayer && typeof globalPlayer === "function") {
+      globalPlayer();
+    }
   }, []);
 
   return (
