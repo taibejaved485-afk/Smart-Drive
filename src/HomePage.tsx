@@ -9,7 +9,6 @@ import Lessons from './components/Lessons';
 import FeaturedCourses from './components/FeaturedCourses';
 import EnrollCTA from './components/EnrollCTA';
 import WhyChooseUs from './components/WhyChooseUs';
-import AppointmentForm from './components/AppointmentForm';
 import OurProcess from './components/OurProcess';
 import Reviews from './components/Reviews';
 import RentalMarketplace from './components/RentalMarketplace';
@@ -183,7 +182,6 @@ export default function HomePage() {
             <ScrollReveal direction="up" delay={0.1}><CoursePlanner /></ScrollReveal>
             <ScrollReveal direction="up" delay={0.1}><EnrollCTA /></ScrollReveal>
             <ScrollReveal direction="up" delay={0.1}><WhyChooseUs /></ScrollReveal>
-            <ScrollReveal direction="up" delay={0.1}><AppointmentForm /></ScrollReveal>
             <ScrollReveal direction="up" delay={0.1}><TrafficSigns /></ScrollReveal>
             <ScrollReveal direction="up" delay={0.1}><OurProcess /></ScrollReveal>
             <ScrollReveal direction="up" delay={0.1}><Reviews /></ScrollReveal>
