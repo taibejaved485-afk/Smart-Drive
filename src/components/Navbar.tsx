@@ -76,6 +76,7 @@ export default function Navbar() {
     { name: 'Services', path: '/services' },
     { name: 'Rent Car', path: '/rentals' },
     { name: 'Sale Car', path: '/car-sale' },
+    { name: 'Students Quiz', path: '/quiz' },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' }
   ];

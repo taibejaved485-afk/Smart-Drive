@@ -16,6 +16,7 @@ import PricingPage from './pages/PricingPage';
 import ServicesPage from './pages/ServicesPage';
 import RentalsPage from './pages/RentalsPage';
 import CarSalePage from './pages/CarSalePage';
+import QuizPage from './pages/QuizPage';
 import BackToTopButton from './components/BackToTopButton';
 import { ToastProvider } from './components/Toast';
 
@@ -36,6 +37,7 @@ export default function App() {
             <Route path="/programs" element={<ServicesPage />} />
             <Route path="/rentals" element={<RentalsPage />} />
             <Route path="/car-sale" element={<CarSalePage />} />
+            <Route path="/quiz" element={<QuizPage />} />
           </Routes>
         <WhatsAppButton />
         <BackToTopButton />
