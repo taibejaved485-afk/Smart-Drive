@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import SEO from '../components/SEO';
 import { ScrollReveal } from '../components/ScrollReveal';
-import { Trophy, AlertCircle, Lightbulb, RefreshCw, ChevronRight, CheckCircle2, Info, BookOpen, Timer } from 'lucide-react';
+import { Trophy, AlertCircle, Lightbulb, RefreshCw, ChevronRight, CheckCircle2, Info, BookOpen, Timer, Award, ShieldCheck, Zap, Star, Heart, Check, X, CheckSquare, Sparkles } from 'lucide-react';
 
 const quizData = [
   {
@@ -186,9 +186,7 @@ const quizData = [
     ],
     hint: "Kinetic energy scales quadratically with speed (v squared)."
   }
-];
-
-export default function QuizPage() {
+];export default function QuizPage() {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedOpt, setSelectedOpt] = useState<number | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -197,11 +195,18 @@ export default function QuizPage() {
   const [quizFinished, setQuizFinished] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [timeLeft, setTimeLeft] = useState(60);
+  const [studentName, setStudentName] = useState("");
+  const [streak, setStreak] = useState(0);
+  const [maxStreak, setMaxStreak] = useState(0);
+  const [showCertificate, setShowCertificate] = useState(false);
+  const [reviewFilter, setReviewFilter] = useState<"all" | "correct" | "incorrect">("all");
+  const [shareToast, setShareToast] = useState(false);
   const [history, setHistory] = useState<Array<{
     question: string;
     selected: string;
     isCorrect: boolean;
     rationale: string;
+    correctText: string;
   }>>([]);
   const [selectedDifficulty, setSelectedDifficulty] = useState<"all" | "easy" | "medium" | "hard">("all");
 
@@ -220,6 +225,13 @@ export default function QuizPage() {
 
     if (isCorrect) {
       setScore(prev => prev + 1);
+      setStreak(prev => {
+        const next = prev + 1;
+        if (next > maxStreak) setMaxStreak(next);
+        return next;
+      });
+    } else {
+      setStreak(0);
     }
 
     const correctOption = currentQuestion.options.find(o => o.isCorrect);
@@ -230,7 +242,8 @@ export default function QuizPage() {
       isCorrect: isCorrect,
       rationale: hasChosen 
         ? currentQuestion.options[selectedOpt].rationale 
-        : `Time ran out! The correct answer is: "${correctOption?.text}". ${correctOption?.rationale}`
+        : `Time ran out! The correct answer is: "${correctOption?.text}". ${correctOption?.rationale}`,
+      correctText: correctOption?.text || ""
     }]);
 
     setIsSubmitted(true);
@@ -264,10 +277,13 @@ export default function QuizPage() {
     setQuizFinished(false);
     setCurrentIdx(0);
     setScore(0);
+    setStreak(0);
+    setMaxStreak(0);
     setHistory([]);
     setSelectedOpt(null);
     setIsSubmitted(false);
     setTimeLeft(60);
+    setShowCertificate(false);
   };
 
   const handleOptionClick = (idx: number) => {
@@ -287,7 +303,21 @@ export default function QuizPage() {
     }
   };
 
+  // Filtered review list
+  const filteredHistory = history.filter(item => {
+    if (reviewFilter === "correct") return item.isCorrect;
+    if (reviewFilter === "incorrect") return !item.isCorrect;
+    return true;
+  });
+
   const progressPct = ((currentIdx + (isSubmitted ? 1 : 0)) / activeQuestions.length) * 100;
+  const isPassing = score >= Math.ceil(activeQuestions.length * 0.7);
+  const finalPercent = Math.round((score / activeQuestions.length) * 100);
+
+  const handleShare = () => {
+    setShareToast(true);
+    setTimeout(() => setShareToast(false), 3000);
+  };
 
   const quizSchema = {
     "@context": "https://schema.org",
@@ -301,7 +331,7 @@ export default function QuizPage() {
   };
 
   return (
-    <div className="font-sans text-gray-900 bg-slate-50/50 min-h-screen flex flex-col">
+    <div className="font-sans text-gray-900 bg-slate-50/50 min-h-screen flex flex-col antialiased">
       <SEO 
         title="Students Driving Theory Quiz | GoDriveify"
         description="Verify your theoretical highway rules, road safety regulations, and defensive driving preparedness with GoDriveify Faisalabad interactive testing suite."
@@ -310,97 +340,138 @@ export default function QuizPage() {
       />
       <Navbar />
 
-      {/* Header Banner */}
-      <section 
-        className="relative h-48 flex items-center justify-center text-white bg-cover bg-center"
-        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=1200&q=80')" }}
-      >
-        <div className="absolute inset-0 bg-[#002060]/70 backdrop-blur-xs" />
-        <div className="relative z-10 text-center px-4">
+      {/* Header Banner - Sleek dynamic gradient design with modern highway visual mask */}
+      <section className="relative py-16 sm:py-20 flex items-center justify-center text-white overflow-hidden bg-slate-950">
+        <div className="absolute inset-0 z-0 bg-cover bg-center opacity-30 mix-blend-overlay scale-105 transform motion-safe:animate-[pulse_10s_infinite]"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=1200&q=80')" }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#002060]/95 via-indigo-950/80 to-[#FF7112]/20 mix-blend-multiply z-1" />
+        
+        {/* Abstract glowing fluid rings inside header mask */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#FF7112]/10 rounded-full blur-3xl pointer-events-none z-1 transform translate-x-1/3 -translate-y-1/3" />
+        <div className="absolute -bottom-10 -left-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none z-1" />
+
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <ScrollReveal direction="down">
-            <h1 className="text-3xl sm:text-4xl font-extrabold mb-1 font-display tracking-tight uppercase">Students Academy Quiz</h1>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-[#FF7112] text-white tracking-widest uppercase mb-4 shadow-md shadow-orange-500/20 select-none animate-pulse">
+              <Sparkles className="w-3.5 h-3.5" /> Theory Exam Simulator
+            </span>
+          </ScrollReveal>
+          <ScrollReveal direction="up" delay={0.1}>
+            <h1 className="text-3xl sm:text-5xl font-black font-display tracking-tight text-white uppercase drop-shadow-md">
+              Students Academy Quiz
+            </h1>
           </ScrollReveal>
           <ScrollReveal direction="up" delay={0.2}>
-            <p className="text-xs font-semibold tracking-widest text-orange-400 uppercase">
-              DEFENSIVE DRIVING THEORY &amp; SAFETY PORTAL
+            <p className="text-slate-300 text-xs sm:text-sm font-medium tracking-wide mt-3 max-w-xl mx-auto leading-relaxed">
+              Based on official Punjab Driving Licensing manual and defensive road protection paradigms. Secure your driving skills seamlessly.
             </p>
           </ScrollReveal>
         </div>
       </section>
 
       {/* Quiz Area Container */}
-      <main className="flex-grow py-12 px-4 max-w-4xl mx-auto w-full">
+      <main className="flex-grow py-8 sm:py-12 px-4 max-w-4xl mx-auto w-full relative z-10">
         <ScrollReveal>
           {!quizStarted ? (
             /* LANDING VIEW */
-            <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-10 shadow-xl overflow-hidden relative">
-              <div className="absolute right-0 top-0 w-32 h-32 bg-orange-500/5 rounded-bl-full pointer-events-none" />
-              <div className="flex flex-col items-center text-center max-w-2xl mx-auto py-4">
-                <div className="w-16 h-16 bg-[#002060]/10 text-[#002060] border border-[#002060]/20 rounded-2xl flex items-center justify-center mb-6">
+            <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-10 shadow-xl overflow-hidden relative">
+              <div className="absolute right-0 top-0 w-48 h-48 bg-[#FF7112]/5 rounded-bl-full pointer-events-none z-0" />
+              <div className="absolute left-0 bottom-0 w-48 h-48 bg-blue-500/5 rounded-tr-full pointer-events-none z-0" />
+              
+              <div className="flex flex-col items-center text-center max-w-2xl mx-auto py-2 relative z-10">
+                <div className="w-16 h-16 bg-gradient-to-tr from-[#002060] to-indigo-900 text-white rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-900/20">
                   <BookOpen className="w-8 h-8" />
                 </div>
                 
-                <h2 className="text-2xl sm:text-3xl font-black text-[#002060] tracking-tight mb-4">
-                  GoDriveify Driving School Student Quiz
+                <h2 className="text-2xl sm:text-3xl font-black text-[#002060] tracking-tight mb-4 font-display">
+                  Test Your Defensive Road Intuition
                 </h2>
                 
-                <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-8">
-                  Test your defensive driving skills, emergency controls, and theoretical traffic laws before taking the real provincial driver license test. This interactive suite is meticulously crafted in alignment with GoDriveify safety guidelines.
+                <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-8 max-w-lg">
+                  Before facing public roads in Faisalabad, verify your capability in critical stopping geometry, blind-spot precautions, roundabout priority, and emergency tire situations.
                 </p>
 
-                <div className="grid sm:grid-cols-3 gap-4 w-full mb-8 text-left">
-                  <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                {/* Name Input for Certificate customization */}
+                <div className="w-full max-w-md mb-8 bg-slate-50 border border-slate-200/60 p-5 rounded-2xl text-left shadow-sm">
+                  <label htmlFor="student-name-input" className="block text-[11px] font-black uppercase text-[#002060] tracking-wider mb-2">
+                    🎓 Enter Your Full Name (For Certificate)
+                  </label>
+                  <input
+                    id="student-name-input"
+                    type="text"
+                    placeholder="Enter full name for custom diploma..."
+                    value={studentName}
+                    onChange={(e) => setStudentName(e.target.value)}
+                    className="w-full bg-white border border-slate-250 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 font-semibold transition-all placeholder:text-slate-400"
+                  />
+                  <p className="text-[10px] text-slate-400 mt-1.5 leading-normal">
+                    Passing this simulator at &gt;70% generates a downloadable certificate with your legal name!
+                  </p>
+                </div>
+
+                {/* Essential Indicators panel */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full mb-8 text-left">
+                  <div className="p-4 bg-white border border-slate-100 rounded-2xl flex items-start gap-3.5 shadow-sm hover:border-[#FF7112]/30 transition-all">
+                    <div className="p-2 rounded-xl bg-orange-50 text-orange-600">
+                      <Zap className="w-5 h-5" />
+                    </div>
                     <div>
-                      <h4 className="font-bold text-xs text-slate-800 uppercase tracking-widest">{activeQuestions.length} Questions</h4>
-                      <p className="text-[11px] text-slate-500 mt-0.5">Comprehensive real scenarios</p>
+                      <h4 className="font-extrabold text-xs text-slate-800 uppercase tracking-wider">{activeQuestions.length} Questions</h4>
+                      <p className="text-[11px] text-slate-500 mt-0.5">Defensive scenario based</p>
                     </div>
                   </div>
-                  <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                  <div className="p-4 bg-white border border-slate-100 rounded-2xl flex items-start gap-3.5 shadow-sm hover:border-[#FF7112]/30 transition-all">
+                    <div className="p-2 rounded-xl bg-green-50 text-emerald-600">
+                      <ShieldCheck className="w-5 h-5" />
+                    </div>
                     <div>
-                      <h4 className="font-bold text-xs text-slate-800 uppercase tracking-widest">70% to Pass</h4>
-                      <p className="text-[11px] text-slate-500 mt-0.5">Requires {Math.ceil(activeQuestions.length * 0.7)}/{activeQuestions.length} correct</p>
+                      <h4 className="font-extrabold text-xs text-slate-800 uppercase tracking-wider">70% to Pass</h4>
+                      <p className="text-[11px] text-slate-500 mt-0.5">Require {Math.ceil(activeQuestions.length * 0.7)}/{activeQuestions.length} correct</p>
                     </div>
                   </div>
-                  <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                  <div className="p-4 bg-white border border-slate-100 rounded-2xl flex items-start gap-3.5 shadow-sm hover:border-[#FF7112]/30 transition-all">
+                    <div className="p-2 rounded-xl bg-indigo-50 text-indigo-600">
+                      <Award className="w-5 h-5" />
+                    </div>
                     <div>
-                      <h4 className="font-bold text-xs text-slate-800 uppercase tracking-widest">Detail Explanations</h4>
-                      <p className="text-[11px] text-slate-500 mt-0.5">Immediate logic feedback</p>
+                      <h4 className="font-extrabold text-[#002060] text-xs uppercase tracking-wider">Certify Instantly</h4>
+                      <p className="text-[11px] text-slate-500 mt-0.5">Faisalabad premium digital tier</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Challenge Tier Selection Card Grid */}
                 <div className="w-full mb-8">
-                  <h3 className="text-xs font-black text-[#002060] uppercase tracking-widest mb-4 flex items-center justify-center gap-1.5 leading-none">
-                    <AlertCircle className="w-4 h-4 text-orange-500" /> Choose Your Difficulty Tier
+                  <h3 className="text-xs font-black text-[#002060] uppercase tracking-widest mb-4 flex items-center justify-center gap-1.5 leading-none bg-[#002060]/5 w-fit mx-auto px-3.5 py-1.5 rounded-full select-none">
+                    <AlertCircle className="w-3.5 h-3.5 text-orange-500" /> CHOOSE TEST DIFFICULTY
                   </h3>
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {[
-                      { id: "all", label: "Full Test (All)", desc: "Consolidated rules", count: 15, activeColor: "border-[#002060] bg-[#002060]/5 text-[#002060]" },
-                      { id: "easy", label: "Easy Tier", desc: "Basic road signs", count: 5, activeColor: "border-[#10b981] bg-green-50/50 text-[#065f46]" },
-                      { id: "medium", label: "Medium Tier", desc: "Right-of-way rules", count: 5, activeColor: "border-amber-500 bg-amber-50/50 text-[#92400e]" },
-                      { id: "hard", label: "Hard Tier", desc: "Emergency handling", count: 5, activeColor: "border-rose-500 bg-rose-50/50 text-[#9f1239]" }
+                      { id: "all", label: "Full Test (All)", desc: "15 Random Qs", icon: Star, color: "text-[#002060]", activeColor: "border-[#002060] bg-[#002060]/5 text-[#002060]" },
+                      { id: "easy", label: "Easy Tier", desc: "Basic signs", icon: BadgeCheckPlaceholder, color: "text-emerald-600", activeColor: "border-emerald-500 bg-emerald-50/40 text-emerald-950" },
+                      { id: "medium", label: "Medium Tier", desc: "Right of way", icon: ShieldCheck, color: "text-amber-600", activeColor: "border-amber-500 bg-amber-50/40 text-amber-950" },
+                      { id: "hard", label: "Hard Tier", desc: "Blowouts & ABS", icon: Zap, color: "text-rose-600", activeColor: "border-rose-500 bg-rose-50/40 text-rose-950" }
                     ].map((tier) => {
                       const isSelected = selectedDifficulty === tier.id;
+                      const IconComponent = tier.id === "easy" ? CheckCircle2 : tier.icon;
                       return (
                         <button
                           key={tier.id}
                           type="button"
                           onClick={() => setSelectedDifficulty(tier.id as any)}
-                          className={`p-4 rounded-2xl border text-center transition-all duration-150 cursor-pointer ${
+                          className={`p-4 rounded-2xl border text-center transition-all duration-150 cursor-pointer flex flex-col items-center group relative overflow-hidden ${
                             isSelected 
-                              ? `${tier.activeColor} ring-2 ring-[#FF7112]/40 font-extrabold shadow-xs` 
-                              : "border-slate-200 bg-slate-50/35 hover:bg-slate-50/80 text-slate-705 text-slate-700"
+                              ? `${tier.activeColor} ring-2 ring-orange-500/30 font-extrabold shadow-sm` 
+                              : "border-slate-200 bg-slate-50/20 hover:bg-slate-50 text-slate-705 text-slate-700"
                           }`}
                         >
-                          <span className="block text-xs uppercase tracking-wider font-extrabold">
+                          <IconComponent className={`w-5 h-5 mb-2 transition-transform group-hover:scale-110 ${isSelected ? tier.color : "text-slate-400"}`} />
+                          <span className="block text-xs uppercase tracking-wider font-extrabold leading-none">
                             {tier.label}
                           </span>
-                          <span className="block text-[10px] text-slate-500 mt-1 font-medium select-none whitespace-nowrap">
-                            {tier.desc} ({tier.count} Qs)
+                          <span className="block text-[10px] text-slate-500 mt-1.5 font-medium select-none">
+                            {tier.desc}
                           </span>
                         </button>
                       );
@@ -411,70 +482,203 @@ export default function QuizPage() {
                 <button
                   type="button"
                   onClick={handleStart}
-                  className="w-full sm:w-auto px-10 py-4 bg-[#FF7112] hover:bg-[#E05A00] text-white font-extrabold rounded-2xl shadow-lg shadow-orange-500/20 transform hover:-translate-y-0.5 active:translate-y-0 transition cursor-pointer text-sm tracking-uppercase uppercase"
+                  className="w-full sm:w-auto px-12 py-4 bg-[#FF7112] hover:bg-[#E05A00] text-white font-extrabold rounded-2xl shadow-xl shadow-orange-500/25 hover:shadow-orange-500/35 transform hover:-translate-y-0.5 active:translate-y-0 active:scale-98 transition-all cursor-pointer text-xs sm:text-sm tracking-wider uppercase flex items-center justify-center gap-2"
                 >
-                  Start Theoretical Test
+                  Start Exam Simulator <ChevronRight className="w-4 h-4 text-white" />
                 </button>
               </div>
             </div>
           ) : quizFinished ? (
-            /* COMPLETION SENSATIONAL VIEW */
-            <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-10 shadow-xl overflow-hidden">
+            /* COMPLETION SENSATIONAL VIEW WITH CERTIFICATE */
+            <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-10 shadow-xl overflow-hidden relative">
+              <div className="absolute right-0 top-0 w-64 h-64 bg-slate-50 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2" />
+              
               <div className="text-center py-6 flex flex-col items-center">
-                <div className={`w-20 h-20 rounded-3xl flex items-center justify-center mb-6 shadow-md ${
-                  score >= Math.ceil(activeQuestions.length * 0.7) ? 'bg-green-50 border border-green-200 text-green-600' : 'bg-red-50 border border-red-200 text-red-600'
+                <div className={`w-20 h-20 rounded-3xl flex items-center justify-center mb-6 shadow-lg transform scale-102 ${
+                  isPassing 
+                    ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-green-500/20' 
+                    : 'bg-gradient-to-br from-rose-500 to-red-600 text-white shadow-red-500/20'
                 }`}>
-                  <Trophy className="w-10 h-10" />
+                  {isPassing ? <Award className="w-10 h-10 animate-[bounce_1.5s_infinite]" /> : <AlertCircle className="w-10 h-10 animate-pulse" />}
                 </div>
                 
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-[#002060] tracking-tight">
-                  {score >= Math.ceil(activeQuestions.length * 0.7) ? "🎉 Congratulations! You Passed" : "⚠️ Practice Recommended"}
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-[#002060] tracking-tight font-display uppercase">
+                  {isPassing ? "🔥 Excellent Pass!" : "⚠️ Drive Practice Core"}
                 </h2>
-                <p className="text-slate-500 text-sm mt-2 max-w-md">
-                  {score >= Math.ceil(activeQuestions.length * 0.7) 
-                    ? "Fantastic job! Your defense-oriented driving knowledge matches professional road safety standards." 
-                    : "Almost there! Keep reviewing the safety criteria to build unbreakable safety instincts."
+                <p className="text-slate-500 text-sm mt-3 max-w-md mx-auto leading-relaxed">
+                  {isPassing 
+                    ? `Brilliant job, ${studentName || "Candidate"}! You have shown elite preparedness for real Pakistani roads.` 
+                    : `You scored ${finalPercent}%. In Pakistan driving safety regulations, the passing rate is strictly 70%. We suggest running the test again.`
                   }
                 </p>
 
-                <div className="my-8 flex flex-wrap items-center justify-center gap-6 w-full max-w-md">
-                  <div className="flex-1 p-4 bg-slate-50 border rounded-2xl min-w-[130px] shadow-xs">
-                    <span className="block text-4xl font-extrabold text-[#002060] tracking-tight leading-none mb-1 font-mono">{score} / {activeQuestions.length}</span>
-                    <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Correct Answers</span>
+                {/* Score panel detailed breakdown */}
+                <div className="my-8 grid grid-cols-2 sm:grid-cols-4 gap-4 w-full">
+                  <div className="p-4 bg-slate-50/70 border border-slate-200/50 rounded-2xl shadow-xs text-center">
+                    <span className="block text-3xl font-black text-[#002060] tracking-tight mb-1 font-mono">{score} / {activeQuestions.length}</span>
+                    <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wide">Correct Qs</span>
                   </div>
-                  <div className="flex-1 p-4 bg-slate-50 border rounded-2xl min-w-[130px] shadow-xs">
-                    <span className="block text-4xl font-extrabold text-orange-600 tracking-tight leading-none mb-1 font-mono">{Math.round((score / activeQuestions.length) * 100)}%</span>
-                    <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Success Rate</span>
+                  <div className="p-4 bg-slate-50/70 border border-slate-200/50 rounded-2xl shadow-xs text-center">
+                    <span className="block text-3xl font-black text-[#FF7112] tracking-tight mb-1 font-mono">{finalPercent}%</span>
+                    <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wide">Final Percent</span>
+                  </div>
+                  <div className="p-4 bg-slate-50/70 border border-slate-200/50 rounded-2xl shadow-xs text-center">
+                    <span className="block text-3xl font-black text-emerald-600 tracking-tight mb-1 font-mono">{maxStreak}🔥</span>
+                    <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wide">Max Streak</span>
+                  </div>
+                  <div className="p-4 bg-slate-50/70 border border-slate-200/50 rounded-2xl shadow-xs text-center">
+                    <span className={`block text-xl font-extrabold tracking-tight mb-2 uppercase ${isPassing ? 'text-emerald-600' : 'text-rose-600'}`}>
+                      {isPassing ? 'CERTIFIED' : 'PENDING'}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wide">Status badge</span>
                   </div>
                 </div>
+
+                {/* Certificate Generator Trigger Block if passed */}
+                {isPassing && (
+                  <div className="w-full max-w-md bg-gradient-to-r from-[#002060] to-indigo-950 p-6 rounded-3xl text-white shadow-xl mb-8 relative overflow-hidden text-left">
+                    <div className="absolute right-0 bottom-0 translate-y-1/4 translate-x-1/4 opacity-10 pointer-events-none">
+                      <Award className="w-48 h-48 text-white" />
+                    </div>
+                    <h3 className="font-extrabold text-base mb-1 flex items-center gap-2">
+                      <Award className="w-5 h-5 text-amber-400 animate-pulse" /> Custom Safe-Driving Badge
+                    </h3>
+                    <p className="text-xs text-slate-300 leading-relaxed mb-4">
+                      Download your certificate immediately printed under your candidate name: <strong>{studentName || "Guest Student"}</strong>.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setShowCertificate(!showCertificate)}
+                      className="w-full bg-amber-400 hover:bg-amber-300 text-[#002060] font-black py-3 rounded-xl text-xs uppercase tracking-widest cursor-pointer transition-all active:scale-98 flex items-center justify-center gap-2 shadow-lg hover:shadow-amber-500/10"
+                    >
+                      {showCertificate ? "Close Certificate View" : "View Safe Driver Certificate"}
+                    </button>
+                  </div>
+                )}
+
+                {/* The Live Certificate View element */}
+                {showCertificate && isPassing && (
+                  <div className="w-full border-4 border-double border-amber-500 bg-amber-50/10 p-4 sm:p-8 rounded-2xl my-6 relative bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white to-amber-50/40 text-slate-900 shadow-2xl">
+                    <div className="border border-amber-600/30 p-6 rounded-xl flex flex-col items-center">
+                      <div className="flex justify-between items-center w-full mb-6">
+                        <div className="text-left">
+                          <span className="text-[10px] font-black tracking-widest text-[#002060] uppercase">GoDriveify Academic</span>
+                        </div>
+                        <Award className="w-12 h-12 text-amber-500" />
+                        <div className="text-right">
+                          <span className="text-[10px] font-mono text-slate-500 font-black">REGID: GD-{new Date().getFullYear()}-{Math.floor(1000 + Math.random() * 9005)}</span>
+                        </div>
+                      </div>
+
+                      <h4 className="font-serif text-2xl sm:text-3xl font-extrabold text-[#002060] tracking-tight my-2">
+                        SAFE DRIVER CERTIFICATE
+                      </h4>
+                      <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold italic mb-6">
+                        This document honors the academic achievement of
+                      </p>
+
+                      <p className="font-sans text-xl sm:text-2xl font-black text-slate-900 border-b border-dashed border-slate-400 px-6 pb-2 inline-block min-w-[200px] text-center italic">
+                        {studentName || "Graduate Scholar"}
+                      </p>
+
+                      <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed mt-6">
+                        For verifying stellar mastery in theoretical highway driving metrics, passing the high-fidelity simulator with a cumulative score of <strong>{finalPercent}%</strong> correct.
+                      </p>
+
+                      <div className="grid grid-cols-2 gap-12 w-full mt-10 border-t border-slate-200/80 pt-6">
+                        <div className="text-center">
+                          <p className="font-serif text-sm italic font-extrabold">Faisalabad Board</p>
+                          <p className="text-[9px] text-slate-400 uppercase tracking-wider font-bold mt-1">Authorized Agency Branch</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="font-serif text-sm italic font-extrabold">GoDriveify Principal</p>
+                          <p className="text-[9px] text-slate-400 uppercase tracking-wider font-bold mt-1">Official Academy Stamp</p>
+                        </div>
+                      </div>
+
+                      {/* Download Simulated Trigger */}
+                      <button 
+                        type="button" 
+                        onClick={handleShare}
+                        className="mt-8 text-xs text-[#002060] hover:text-[#FF7112] font-black uppercase tracking-wider underline flex items-center gap-1 cursor-pointer"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" /> Force PDF Generate (Simulated)
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Scrollable Answers Review Box */}
+              {/* Share Toast */}
+              {shareToast && (
+                <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-xs px-6 py-3 rounded-full shadow-2xl z-50 animate-bounce flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-ping" />
+                  <span>Certificate loaded! Ready to save to device storage.</span>
+                </div>
+              )}
+
+              {/* Review Answers Box with filter toggles */}
               <div className="border border-slate-100 rounded-2xl bg-slate-50/50 p-4 sm:p-6 mb-8">
-                <h3 className="font-extrabold text-[#002060] text-sm uppercase tracking-wider border-b border-slate-200 pb-3.5 mb-4 flex items-center gap-2">
-                  <Info className="w-4 h-4 text-orange-500" /> Review Questions and Rationales
-                </h3>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-4 mb-4 gap-3">
+                  <h3 className="font-extrabold text-[#002060] text-sm uppercase tracking-wider flex items-center gap-2">
+                    <Info className="w-4 h-4 text-[#FF7112]" /> Review Questions and Rationales
+                  </h3>
+                  
+                  {/* Practical review Filter Controls */}
+                  <div className="flex bg-white border border-slate-250 p-1 rounded-xl text-xs gap-1 shadow-2xs">
+                    {[
+                      { id: "all", label: `All (${history.length})` },
+                      { id: "correct", label: `Correct (${history.filter(h=>h.isCorrect).length})` },
+                      { id: "incorrect", label: `Wrong (${history.filter(h=>!h.isCorrect).length})` }
+                    ].map(btn => (
+                      <button
+                        key={btn.id}
+                        type="button"
+                        onClick={() => setReviewFilter(btn.id as any)}
+                        className={`px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
+                          reviewFilter === btn.id 
+                            ? "bg-[#002060] text-white shadow-xs" 
+                            : "text-slate-500 hover:text-[#002060] hover:bg-slate-50"
+                        }`}
+                      >
+                        {btn.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 
                 <div className="space-y-4 max-h-[380px] overflow-y-auto pr-1">
-                  {history.map((item, idx) => (
-                    <div key={idx} className={`p-4 rounded-xl border bg-white ${item.isCorrect ? 'border-green-200' : 'border-red-200'}`}>
-                      <div className="flex justify-between items-start gap-2 mb-2">
-                        <p className="font-bold text-slate-800 text-sm leading-snug">{idx + 1}. {item.question}</p>
-                        <span className={`text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full font-extrabold ${item.isCorrect ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                          {item.isCorrect ? "Correct" : "Incorrect"}
-                        </span>
-                      </div>
-                      
-                      <div className="text-xs text-slate-650 mb-2">
-                        <strong>Your Selection:</strong> <span className={item.isCorrect ? 'text-green-700 font-semibold' : 'text-danger font-medium'}>{item.selected}</span>
-                      </div>
-                      
-                      <div className="text-xs bg-slate-50 p-3 rounded-lg border border-slate-100/80 text-slate-500 flex gap-2">
-                        <span className="font-bold text-[#002060] shrink-0">Rationale:</span>
-                        <span className="italic leading-relaxed">{item.rationale}</span>
-                      </div>
+                  {filteredHistory.length === 0 ? (
+                    <div className="text-center py-10 text-slate-400 text-sm italic">
+                      No matching records found for this filter.
                     </div>
-                  ))}
+                  ) : (
+                    filteredHistory.map((item, idx) => (
+                      <div key={idx} className={`p-4 rounded-xl border bg-white shadow-2xs transition-all hover:border-slate-350 ${item.isCorrect ? 'border-green-200' : 'border-red-200'}`}>
+                        <div className="flex justify-between items-start gap-2 mb-2">
+                          <p className="font-bold text-slate-800 text-sm leading-snug">{idx + 1}. {item.question}</p>
+                          <span className={`text-[9px] uppercase tracking-widest px-2.5 py-0.5 rounded-full font-black ${item.isCorrect ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-00 text-red-800'}`}>
+                            {item.isCorrect ? "Correct" : "Incorrect"}
+                          </span>
+                        </div>
+                        
+                        <div className="text-xs text-slate-650 mb-2">
+                          <strong>Your Selection:</strong> <span className={item.isCorrect ? 'text-green-700 font-semibold' : 'text-rose-600 font-semibold md:font-bold'}>{item.selected}</span>
+                        </div>
+
+                        {!item.isCorrect && (
+                          <div className="text-xs text-slate-600 mb-2.5">
+                            <strong>Correct Answer:</strong> <span className="text-emerald-700 font-bold">{item.correctText}</span>
+                          </div>
+                        )}
+                        
+                        <div className="text-xs bg-slate-50 p-3 rounded-lg border border-slate-100/80 text-slate-500 flex gap-2">
+                          <span className="font-extrabold text-[#002060] shrink-0">Rationale:</span>
+                          <span className="italic leading-relaxed">{item.rationale}</span>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
 
@@ -482,15 +686,15 @@ export default function QuizPage() {
                 <button
                   type="button"
                   onClick={handleStart}
-                  className="flex-1 bg-[#002060] hover:bg-opacity-95 text-white font-extrabold py-3.5 px-6 rounded-2xl transition cursor-pointer flex items-center justify-center gap-2 text-sm uppercase tracking-wider"
+                  className="flex-1 bg-[#002060] hover:bg-opacity-95 text-white font-extrabold py-4 px-6 rounded-2xl transition cursor-pointer flex items-center justify-center gap-2 text-xs uppercase tracking-wider shadow-lg active:scale-98"
                 >
-                  <RefreshCw className="w-4 h-4 animate-spin-reverse" /> Retake Test
+                  <RefreshCw className="w-4 h-4 animate-spin-reverse" /> Retake Test Simulator
                 </button>
               </div>
             </div>
           ) : (
             /* ACTIVE QUIZ CARD VIEW */
-            <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-10 shadow-xl overflow-hidden">
+            <div className="bg-white border border-slate-200/80 rounded-3xl p-5 sm:p-10 shadow-xl overflow-hidden relative">
               {/* Question metadata row */}
               <div className="flex flex-wrap justify-between items-center gap-3 mb-4 text-xs font-bold text-slate-500 uppercase tracking-widest pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2">
@@ -505,32 +709,39 @@ export default function QuizPage() {
                     {activeQuestions[currentIdx]?.difficulty}
                   </span>
                 </div>
-                <span className="font-mono text-orange-600 bg-orange-100/50 px-2.5 py-1 rounded-full">SCORE: {score}</span>
+                <div className="flex items-center gap-3">
+                  {streak > 0 && (
+                    <span className="font-mono text-xs text-orange-600 bg-orange-100/50 px-2.5 py-1 rounded-full animate-bounce">
+                      STRK: {streak}🔥
+                    </span>
+                  )}
+                  <span className="font-mono text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-full">SCOREID: {score}</span>
+                </div>
               </div>
 
-              {/* Progress bar */}
-              <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden mb-8">
+              {/* Progress bar with glowing handle */}
+              <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden mb-8 relative">
                 <div
-                  className="bg-orange-500 h-full transition-all duration-300"
+                  className="bg-gradient-to-r from-[#002060] to-[#FF7112] h-full transition-all duration-300 rounded-full"
                   style={{ width: `${progressPct}%` }}
                 />
               </div>
 
               {/* Visual Countdown Timer Bar */}
-              <div className="mb-8 p-4 rounded-2xl bg-slate-50 border border-slate-200/60 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-xs">
-                <div className="flex items-center gap-2">
+              <div className="mb-8 p-4 rounded-2xl bg-slate-50 border border-slate-200/60 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-2xs">
+                <div className="flex items-center gap-2.5">
                   <div className={`p-2 rounded-xl transition-all ${
                     timeLeft < 15 
                       ? 'bg-red-100 text-red-600 animate-pulse' 
                       : timeLeft < 30 
                         ? 'bg-amber-100 text-amber-605' 
-                        : 'bg-[#002060]/10 text-[#002060]'
+                        : 'bg-[#FF7112]/10 text-[#FF7112]'
                   }`}>
                     <Timer className={`w-5 h-5 ${timeLeft < 15 ? 'animate-[pulse_1s_infinite]' : ''}`} />
                   </div>
                   <div>
-                    <p className="text-[10px] font-extrabold text-slate-550 uppercase tracking-wider leading-none mb-1">Time Remaining</p>
-                    <p className={`text-base font-black font-mono leading-none ${
+                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Time Remaining</p>
+                    <p className={`text-sm sm:text-base font-black font-mono leading-none ${
                       timeLeft < 15 
                         ? 'text-red-600 animate-pulse' 
                         : timeLeft < 30 
@@ -542,41 +753,41 @@ export default function QuizPage() {
                   </div>
                 </div>
 
-                <div className="flex-grow sm:max-w-[280px] md:max-w-[360px] h-2 bg-slate-250 bg-slate-200 rounded-full overflow-hidden">
+                <div className="flex-grow sm:max-w-[280px] md:max-w-[360px] h-2 bg-slate-200 rounded-full overflow-hidden">
                   <div 
                     className={`h-full rounded-full transition-all duration-1000 ${
                       timeLeft < 15 
-                        ? 'bg-red-500' 
+                        ? 'bg-gradient-to-r from-red-500 to-rose-600' 
                         : timeLeft < 30 
-                          ? 'bg-amber-500' 
-                          : 'bg-[#002060]'
+                          ? 'bg-gradient-to-r from-amber-400 to-amber-500' 
+                          : 'bg-gradient-to-r from-[#002060] to-indigo-600'
                     }`}
                     style={{ width: `${(timeLeft / 60) * 100}%` }}
                   />
                 </div>
               </div>
 
-              {/* Actual Question */}
-              <h3 className="text-lg sm:text-xl font-bold text-[#002060] mb-6 leading-relaxed">
+              {/* Actual Question Header */}
+              <h3 className="text-base sm:text-lg font-extrabold text-[#002060] mb-6 leading-relaxed">
                 {activeQuestions[currentIdx]?.question}
               </h3>
 
               {/* Options list structured identically to driver tests */}
               <div className="space-y-3 mb-6">
                 {activeQuestions[currentIdx]?.options.map((option, idx) => {
-                  let optionStyles = "border-slate-200/80 hover:bg-slate-50/50 text-slate-700";
+                  let optionStyles = "border-slate-200/80 hover:bg-slate-50/50 text-slate-700 hover:border-slate-350";
                   
                   if (selectedOpt === idx) {
-                    optionStyles = "border-[#FF7112] bg-[#FF7112]/5 text-[#002060] font-semibold";
+                    optionStyles = "border-[#FF7112] bg-orange-50/20 text-[#002060] font-semibold ring-1 ring-orange-500/20";
                   }
 
                   if (isSubmitted) {
                     if (option.isCorrect) {
-                      optionStyles = "border-green-500 bg-green-50/60 text-green-950 font-bold";
+                      optionStyles = "border-green-500 bg-green-50/40 text-green-950 font-bold";
                     } else if (selectedOpt === idx) {
-                      optionStyles = "border-red-500 bg-red-50/60 text-red-950 font-semibold";
+                      optionStyles = "border-red-500 bg-red-50/40 text-red-955 font-semibold";
                     } else {
-                      optionStyles = "border-slate-100 bg-slate-50/50 text-slate-400 cursor-not-allowed";
+                      optionStyles = "border-slate-100 bg-slate-50/30 text-slate-405 text-slate-400 cursor-not-allowed";
                     }
                   }
 
@@ -587,7 +798,7 @@ export default function QuizPage() {
                       key={idx}
                       disabled={isSubmitted}
                       onClick={() => handleOptionClick(idx)}
-                      className={`w-full text-left p-4 rounded-2xl border transition-all duration-150 flex items-start gap-4 cursor-pointer ${optionStyles} ${isSelectedWrong ? 'shake-wrong' : ''}`}
+                      className={`w-full text-left p-4 rounded-xl sm:rounded-2xl border transition-all duration-150 flex items-start gap-4 cursor-pointer outline-none ${optionStyles} ${isSelectedWrong ? 'shake-wrong' : ''}`}
                       type="button"
                     >
                       {/* Interactive Check Badge bubble resembling A, B, C, D */}
@@ -606,7 +817,7 @@ export default function QuizPage() {
                       }`}>
                         {String.fromCharCode(65 + idx)}
                       </span>
-                      <span className="text-xs sm:text-sm pt-0.5 leading-snug">{option.text}</span>
+                      <span className="text-xs sm:text-sm pt-0.5 leading-normal sm:leading-snug">{option.text}</span>
                     </button>
                   );
                 })}
@@ -659,18 +870,18 @@ export default function QuizPage() {
                     <button
                       type="button"
                       onClick={() => setShowHint(!showHint)}
-                      className="text-slate-400 hover:text-orange-600 text-xs sm:text-sm font-extrabold uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1"
+                      className="text-slate-400 hover:text-[#FF7112] text-xs sm:text-sm font-extrabold uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1 leading-none"
                     >
                       <Lightbulb className="w-4 h-4" /> {showHint ? "Hide Hint" : "Get Hint"}
                     </button>
                     <button
                       type="button"
-                      onClick={handleSubmit}
+                      onClick={() => handleSubmit(false)}
                       disabled={selectedOpt === null}
-                      className={`px-8 py-3 rounded-2xl font-extrabold text-xs uppercase tracking-widest text-white shadow-md transition-all ${
+                      className={`px-6 sm:px-8 py-3 rounded-xl sm:rounded-2xl font-black text-xs uppercase tracking-widest text-white shadow-md transition-all ${
                         selectedOpt === null 
-                          ? 'bg-slate-200 cursor-not-allowed shadow-none' 
-                          : 'bg-[#002060] hover:bg-[#FF7112]/90 transform hover:-translate-y-0.5 pointer-events-auto'
+                          ? 'bg-slate-200 cursor-not-allowed shadow-none text-slate-400' 
+                          : 'bg-[#002060] hover:bg-[#FF7112] transform hover:-translate-y-0.5 active:translate-y-0 active:scale-98 cursor-pointer'
                       }`}
                     >
                       Submit Response
@@ -680,7 +891,7 @@ export default function QuizPage() {
                   <button
                     type="button"
                     onClick={handleNext}
-                    className="w-full bg-[#FF7112] hover:bg-[#E05A00] text-white font-extrabold py-3.5 rounded-2xl transition-all shadow-md flex items-center justify-center gap-1 text-xs uppercase tracking-widest cursor-pointer"
+                    className="w-full bg-[#FF7112] hover:bg-[#E05A00] text-white font-black py-4 rounded-xl sm:rounded-2xl transition-all shadow-md flex items-center justify-center gap-1 text-xs uppercase tracking-widest cursor-pointer active:scale-98"
                   >
                     {currentIdx + 1 < activeQuestions.length ? "Next Question" : "Finish & View Score"} <ChevronRight className="w-4 h-4" />
                   </button>
@@ -694,4 +905,8 @@ export default function QuizPage() {
       <Footer />
     </div>
   );
+}
+
+function BadgeCheckPlaceholder(props: any) {
+  return <CheckCircle2 {...props} />;
 }
