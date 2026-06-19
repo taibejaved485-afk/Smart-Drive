@@ -118,6 +118,8 @@ function playSynthesizedV8Startup() {
 
 export default function AppPreloader({ onComplete }: AppPreloaderProps) {
   const [progress, setProgress] = useState(0);
+  const [isReadyToIgnite, setIsReadyToIgnite] = useState(false);
+  const [isIgnited, setIsIgnited] = useState(false);
   const [isFading, setIsFading] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
   const playTriggeredRef = React.useRef(false);
@@ -133,7 +135,7 @@ export default function AppPreloader({ onComplete }: AppPreloaderProps) {
     // 2. Play Mixkit offline sound fallback
     try {
       const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2653/2653-84.wav");
-      audio.volume = 0.85;
+      audio.volume = 0.95; // Maximum crystal-clear fullness
       audio.play().catch(e => console.log("Audio play deferred or blocked by browser.", e));
     } catch (e) {
       console.warn("Media file play failed.", e);
@@ -154,17 +156,6 @@ export default function AppPreloader({ onComplete }: AppPreloaderProps) {
           }
         }
       } catch (e) {}
-      
-      // Remove listeners once audio is unlocked
-      removeListeners();
-    };
-
-    const removeListeners = () => {
-      window.removeEventListener('click', unlockAudio);
-      window.removeEventListener('touchstart', unlockAudio);
-      window.removeEventListener('keydown', unlockAudio);
-      window.removeEventListener('mousedown', unlockAudio);
-      window.removeEventListener('pointerdown', unlockAudio);
     };
 
     window.addEventListener('click', unlockAudio, { passive: true });
@@ -174,13 +165,17 @@ export default function AppPreloader({ onComplete }: AppPreloaderProps) {
     window.addEventListener('pointerdown', unlockAudio, { passive: true });
 
     return () => {
-      removeListeners();
+      window.removeEventListener('click', unlockAudio);
+      window.removeEventListener('touchstart', unlockAudio);
+      window.removeEventListener('keydown', unlockAudio);
+      window.removeEventListener('mousedown', unlockAudio);
+      window.removeEventListener('pointerdown', unlockAudio);
     };
   }, []);
 
   useEffect(() => {
-    // Fill the progress bar over 1800ms to keep it snappy and responsive
-    const totalDuration = 1800; // ms
+    // Fill the progress bar over 1500ms to keep it fast, snappy and responsive
+    const totalDuration = 1500; // ms
     const intervalTime = 30; // ms
     const increment = 100 / (totalDuration / intervalTime);
 
@@ -189,6 +184,7 @@ export default function AppPreloader({ onComplete }: AppPreloaderProps) {
         const next = prev + increment;
         if (next >= 100) {
           clearInterval(timer);
+          setIsReadyToIgnite(true);
           return 100;
         }
         return next;
@@ -198,24 +194,36 @@ export default function AppPreloader({ onComplete }: AppPreloaderProps) {
     return () => clearInterval(timer);
   }, []);
 
-  // Run automatic transition sequence as soon as progress completes 100%!
+  const handleIgnition = () => {
+    if (isIgnited) return;
+
+    setIsIgnited(true);
+    setHasInteracted(true);
+
+    // Warm-up / Trigger startup roar exactly when triggered
+    triggerStartupSound();
+
+    // Create high-velocity launch and fade transition
+    const fadeTimeout = setTimeout(() => {
+      setIsFading(true);
+      const completeTimeout = setTimeout(() => {
+        onComplete();
+      }, 500); // fade out duration
+      return () => clearTimeout(completeTimeout);
+    }, 1200); // Allow car startup roar to flourish for 1.2s before entering the site
+
+    return () => clearTimeout(fadeTimeout);
+  };
+
+  // Run transition automatically IF user has already interacted, or wait for click to guarantee audio
   useEffect(() => {
-    if (progress >= 100) {
-      // Trigger startup engine sound automatically!
-      triggerStartupSound();
-
-      // Trigger high-velocity launch output and automatic fade-out
-      const fadeTimeout = setTimeout(() => {
-        setIsFading(true);
-        const completeTimeout = setTimeout(() => {
-          onComplete();
-        }, 500); // fade out duration
-        return () => clearTimeout(completeTimeout);
-      }, 1200); // Allow car startup roar to flourish for 1.2s before entering the site
-
-      return () => clearTimeout(fadeTimeout);
+    if (isReadyToIgnite && !isIgnited) {
+      if (hasInteracted) {
+        // If they already clicked or touched the page during loading, trigger completely automatically!
+        handleIgnition();
+      }
     }
-  }, [progress, onComplete]);
+  }, [isReadyToIgnite, hasInteracted, isIgnited]);
 
   // Safe early background unlock on click anywhere on full preloader
   const handlePreloaderScreenClick = () => {
@@ -230,19 +238,17 @@ export default function AppPreloader({ onComplete }: AppPreloaderProps) {
       }
     } catch (e) {}
 
-    // Instantly try playing early if they clicked the screen before 100%
-    if (progress < 100) {
-      // Warm up / preload state
+    // If preloader is already loaded (progress 100%), tapping ANYWHERE on the screen ignites engine automatically
+    if (isReadyToIgnite && !isIgnited) {
+      handleIgnition();
     }
   };
-
-  const isIgnited = progress >= 100;
 
   return (
     <div 
       id="app-preloader"
       onClick={handlePreloaderScreenClick}
-      className={`fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-radial from-[#0B1120] to-[#030712] overflow-hidden select-none transition-all duration-500 ease-in-out ${
+      className={`fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-radial from-[#0B1120] to-[#030712] overflow-hidden select-none transition-all duration-500 ease-in-out cursor-pointer ${
         isFading ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100'
       }`}
     >
@@ -318,15 +324,48 @@ export default function AppPreloader({ onComplete }: AppPreloaderProps) {
 
       {/* Dynamic Content: Check whether to show the Start Button or Loading Progress */}
       <div className="mt-8 flex flex-col items-center justify-center min-h-[140px] text-center px-4">
-        {isIgnited ? (
-          <div className="flex flex-col items-center justify-center">
-            {/* Action text */}
-            <p className="text-rose-500 font-mono text-xs uppercase tracking-[0.2em] font-black animate-pulse select-none">
-              V8 Engine Ignited! 🔥
-            </p>
-            <p className="mt-2 text-slate-400 text-[10px] uppercase font-bold tracking-widest select-none">
-              Engaging custom gear system...
-            </p>
+        {isReadyToIgnite ? (
+          <div className="flex flex-col items-center justify-center animate-[fadeIn_0.5s_ease-out]">
+            {isIgnited ? (
+              <>
+                <p className="text-[#FF7112] font-mono text-xs uppercase tracking-[0.25em] font-black animate-pulse select-none">
+                  V8 ENGINE IGNITED! 🔥
+                </p>
+                <p className="mt-2 text-slate-400 text-[10px] uppercase font-bold tracking-widest select-none font-mono">
+                  Engaging drive transmissions...
+                </p>
+              </>
+            ) : (
+              <>
+                {/* Hyper-realistic supercar Push to Start Engine button */}
+                <button
+                  type="button"
+                  onClick={handleIgnition}
+                  className="group relative flex flex-col items-center justify-center w-28 h-28 rounded-full bg-gradient-to-b from-zinc-800 to-zinc-950 border-4 border-[#FF7112]/30 active:scale-95 cursor-pointer transition-all duration-300 shadow-[0_0_35px_rgba(255,113,18,0.25)] hover:shadow-[0_0_55px_rgba(255,113,18,0.45)] hover:border-[#FF7112] mb-4"
+                >
+                  {/* Subtle spinning dashboard gauge style ring */}
+                  <div className="absolute inset-1 rounded-full border border-dashed border-red-500/40 group-hover:rotate-180 transition-transform duration-1000" />
+                  
+                  {/* Outer glowing pulsing ring */}
+                  <span className="absolute -inset-1 rounded-full bg-orange-500/10 animate-ping opacity-75 pointer-events-none" />
+                  <span className="absolute -inset-2.5 rounded-full border border-[#FF7112]/15 animate-pulse pointer-events-none" />
+
+                  {/* Red Engine Core */}
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-red-500 via-red-600 to-rose-800 flex flex-col items-center justify-center border border-red-400/30 shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)]">
+                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-rose-100/90 leading-none">ENGINE</span>
+                    <span className="text-sm font-black uppercase tracking-[0.1em] text-white leading-none mt-1.5 drop-shadow-[0_2px_3px_rgba(0,0,0,0.6)]">START</span>
+                    <span className="text-[8px] font-bold uppercase tracking-[0.15em] text-rose-200/60 leading-none mt-1">STOP</span>
+                  </div>
+                </button>
+
+                <p className="text-zinc-400 font-mono text-[10px] uppercase tracking-[0.25em] font-black select-none">
+                  DRIVE PROTOCOL ARMED
+                </p>
+                <p className="mt-1.5 text-[#FF7112] text-xs uppercase font-black tracking-[0.2em] select-none animate-pulse">
+                  PUSH TO IGNITE ENGINE
+                </p>
+              </>
+            )}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center animate-pulse">
@@ -347,8 +386,8 @@ export default function AppPreloader({ onComplete }: AppPreloaderProps) {
 
       {/* Pre-interaction Guide */}
       {!hasInteracted && (
-        <div className="absolute bottom-8 mx-auto text-slate-500 text-[9px] uppercase font-bold tracking-widest text-center flex items-center gap-1.5 opacity-60">
-          <Volume2 className="w-3.5 h-3.5 text-orange-400 animate-pulse" /> ANY Mouse movement or tap auto-unlocks sound
+        <div className="absolute bottom-8 mx-auto text-slate-500 text-[9px] uppercase font-bold tracking-[0.2em] text-center flex items-center gap-1.5 opacity-60">
+          <Volume2 className="w-3.5 h-3.5 text-orange-400 animate-pulse" /> PRESS ANY KEY OR TAP SCREEN TO START ENGINE
         </div>
       )}
     </div>
