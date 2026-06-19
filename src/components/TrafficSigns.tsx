@@ -97,9 +97,9 @@ const signsData: TrafficSign[] = [
         <line x1="30" y1="74" x2="70" y2="74" stroke="black" strokeWidth="3.5" strokeLinecap="round" />
         <line x1="35" y1="79" x2="65" y2="79" stroke="black" strokeWidth="3.5" strokeLinecap="round" />
         {/* Walking person detailed silhouette */}
-        <circle cx="50" cy="35" r="4.5" fill="black" />
-        <path d="M48,41 h4 l3,9.5 l-2,1.5 l-2.5,-8 h-1 L45,64 h-3.5 l4,-17 L44,46 L41,52 l-2.5,-1.5 Z" fill="black" />
-        <path d="M48,51 l4.5,13 h3.5 l-6.5,-15 Z" fill="black" />
+        <circle cx="50" cy="38" r="4.5" fill="black" />
+        <path d="M48,44 h4 l3,9.5 l-2,1.5 l-2.5,-8 h-1 L45,67 h-3.5 l4,-17 L44,49 L41,55 l-2.5,-1.5 Z" fill="black" />
+        <path d="M48,54 l4.5,13 h3.5 l-6.5,-15 Z" fill="black" />
       </svg>
     )
   },
@@ -139,19 +139,20 @@ const signsData: TrafficSign[] = [
     icon: (
       <svg viewBox="0 0 100 100" className="w-16 h-16 drop-shadow-md">
         <polygon points="50,12 92,85 8,85" fill="white" stroke="#dc2626" strokeWidth="8" strokeLinejoin="round" />
-        {/* Left Child (Taller silhouette) */}
-        <g transform="translate(-2, 2)">
-          <circle cx="44" cy="35" r="4" fill="black" />
-          <path d="M41,40 h6 l2.5,14 h-2.5 l-1,10 h-3 l-1,-10 h-2 Z" fill="black" />
-          <rect x="37" y="42" width="4" height="6.5" rx="1" fill="black" />
-        </g>
-        {/* Right Child (Smaller silhouette) */}
-        <g transform="translate(3, 5)">
-          <circle cx="56" cy="38" r="3.5" fill="black" />
-          <polygon points="56,43 51,54 61,54" fill="black" />
-          <rect x="53.5" y="54" width="2" height="7" fill="black" />
-          <rect x="56.5" y="54" width="2" height="7" fill="black" />
-        </g>
+        {/* Taller child */}
+        <circle cx="42" cy="46" r="4" fill="black" />
+        <path d="M37,52 h10 l-1.5,16 h-7 Z" fill="black" />
+        <rect x="39" y="68" width="2" height="8" fill="black" rx="0.5" />
+        <rect x="43" y="68" width="2" height="8" fill="black" rx="0.5" />
+        
+        {/* Smaller child */}
+        <circle cx="55" cy="51" r="3.5" fill="black" />
+        <path d="M51,57 h8 l-1,12 h-6 Z" fill="black" />
+        <rect x="52.5" y="69" width="1.8" height="6" fill="black" rx="0.5" />
+        <rect x="55.7" y="69" width="1.8" height="6" fill="black" rx="0.5" />
+
+        {/* Hand in hand connection */}
+        <path d="M45,56 Q49,58 53,60" stroke="black" strokeWidth="2" strokeLinecap="round" fill="none" />
       </svg>
     )
   },
@@ -166,9 +167,9 @@ const signsData: TrafficSign[] = [
       <svg viewBox="0 0 100 100" className="w-16 h-16 drop-shadow-md">
         <polygon points="50,12 92,85 8,85" fill="white" stroke="#dc2626" strokeWidth="8" strokeLinejoin="round" />
         {/* Circular U-Turn arrow curve */}
-        <path d="M62,64 L62,47 a 12,12 0 0 0 -24,0 L38,64" stroke="black" strokeWidth="6" strokeLinecap="round" fill="none" />
+        <path d="M58,68 L58,45 a 8,8 0 0 0 -16,0 L42,60" stroke="black" strokeWidth="6" strokeLinecap="round" fill="none" />
         {/* Downward pointing arrowhead on the left leg */}
-        <polygon points="31,61 38,72 45,61" fill="black" />
+        <polygon points="35,58 42,69 49,58" fill="black" />
       </svg>
     )
   },
