@@ -236,54 +236,6 @@
         <!-- Preloader design finishes cleanly without inline scripts -->
       </div>
     </div>
-    <script>
-      (function() {
-        try {
-          // Initialize and preload the single, persistent engine sound instance globally
-          var engineSound = new Audio("https://assets.mixkit.co/active_storage/sfx/2653/2653-84.wav");
-          engineSound.preload = "auto";
-          engineSound.volume = 0.65;
-
-          var hasPlayed = false;
-
-          window.playEngineSound = function() {
-            if (hasPlayed) return;
-            
-            var playPromise = engineSound.play();
-            if (playPromise !== undefined) {
-              playPromise.then(function() {
-                hasPlayed = true;
-                removeInteractionListeners();
-              }).catch(function(error) {
-                console.log("Autoplay was deferred by browser policy. Sound will trigger upon first organic click/tap:", error);
-              });
-            }
-          };
-
-          var onHumanInteraction = function() {
-            window.playEngineSound();
-          };
-
-          var removeInteractionListeners = function() {
-            document.removeEventListener("click", onHumanInteraction);
-            document.removeEventListener("touchstart", onHumanInteraction);
-            document.removeEventListener("keydown", onHumanInteraction);
-            document.removeEventListener("scroll", onHumanInteraction);
-          };
-
-          // Try automatic play as early as possible
-          window.playEngineSound();
-
-          // Listen globally for ANY user engagement from the very beginning (preloader or webpage)
-          document.addEventListener("click", onHumanInteraction, { once: true });
-          document.addEventListener("touchstart", onHumanInteraction, { once: true });
-          document.addEventListener("keydown", onHumanInteraction, { once: true });
-          document.addEventListener("scroll", onHumanInteraction, { once: true });
-        } catch (e) {
-          console.error("Global ignition sound player initialization crashed:", e);
-        }
-      })();
-    </script>
     <script type="module" src="/src/main.tsx"></script>
     <script>
       // Safeguard: Unregister active service workers and clear stale caches in preview mode to prevent old plain-text cached shells from loading.

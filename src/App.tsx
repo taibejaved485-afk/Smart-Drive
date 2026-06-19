@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ScrollToTop from './components/ScrollToTop';
 import WhatsAppButton from './components/WhatsAppButton';
@@ -21,18 +21,14 @@ import CarSalePage from './pages/CarSalePage';
 import QuizPage from './pages/QuizPage';
 import BackToTopButton from './components/BackToTopButton';
 import { ToastProvider } from './components/Toast';
+import AppPreloader from './components/AppPreloader';
 
 export default function App() {
-  useEffect(() => {
-    // Dynamically invoke the persistent global engine starter sound initialized in index.html
-    const globalPlayer = (window as any).playEngineSound;
-    if (globalPlayer && typeof globalPlayer === "function") {
-      globalPlayer();
-    }
-  }, []);
+  const [showPreloader, setShowPreloader] = useState(true);
 
   return (
     <ToastProvider>
+      {showPreloader && <AppPreloader onComplete={() => setShowPreloader(false)} />}
       <BrowserRouter>
         <ScrollToTop />
           <Routes>

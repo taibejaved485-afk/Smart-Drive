@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import SEO from '../components/SEO';
 import { ScrollReveal } from '../components/ScrollReveal';
-import { Trophy, AlertCircle, Lightbulb, RefreshCw, ChevronRight, CheckCircle2, Info, BookOpen, Timer, Award, ShieldCheck, Zap, Star, Heart, Check, X, CheckSquare, Sparkles } from 'lucide-react';
+import { Trophy, AlertCircle, Lightbulb, RefreshCw, ChevronRight, CheckCircle2, Info, BookOpen, Timer, Award, ShieldCheck, Zap, Star, Heart, Check, X, CheckSquare, Sparkles, Gauge, Volume2, VolumeX } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 const quizData = [
@@ -223,6 +223,169 @@ const getSavedProgress = (): QuizProgress | null => {
   }
 };
 
+// --- MULTI-THICK COATED OFFLINE V8 SIMULATOR ENGINE USING BROWSER WEB AUDIO API ---
+function createV8SynthEngine() {
+  let ctx: AudioContext | null = null;
+  let matches = false;
+  
+  // Audio Nodes
+  let osc1: OscillatorNode | null = null;
+  let osc2: OscillatorNode | null = null;
+  let subOsc: OscillatorNode | null = null;
+  let engineGain: GainNode | null = null;
+  let lowpass: BiquadFilterNode | null = null;
+  let bandpass: BiquadFilterNode | null = null;
+  let masterGain: GainNode | null = null;
+  
+  return {
+    start() {
+      if (matches) return;
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      
+      ctx = new AudioCtx();
+      matches = true;
+      
+      const now = ctx.currentTime;
+      
+      // Master output volume control
+      masterGain = ctx.createGain();
+      masterGain.gain.setValueAtTime(0, now);
+      masterGain.connect(ctx.destination);
+      
+      // V8 cylinder throbbing oscillators
+      osc1 = ctx.createOscillator();
+      osc1.type = "sawtooth";
+      osc1.frequency.setValueAtTime(22, now); // Low thrumming V8 pulse
+      
+      osc2 = ctx.createOscillator();
+      osc2.type = "triangle";
+      osc2.frequency.setValueAtTime(14, now); // Offset to produce organic sound pressure wave beats!
+      
+      // Deep sub-bass pulse representing cylinder firing strokes
+      subOsc = ctx.createOscillator();
+      subOsc.type = "sine";
+      subOsc.frequency.setValueAtTime(30, now);
+      
+      // Set up volume envelope for cylinder group
+      engineGain = ctx.createGain();
+      engineGain.gain.setValueAtTime(0.5, now);
+      
+      osc1.connect(engineGain);
+      osc2.connect(engineGain);
+      subOsc.connect(engineGain);
+      
+      // Lowpass and resonant filters representing physical engine block muffling
+      lowpass = ctx.createBiquadFilter();
+      lowpass.type = "lowpass";
+      lowpass.frequency.setValueAtTime(180, now);
+      
+      bandpass = ctx.createBiquadFilter();
+      bandpass.type = "bandpass";
+      bandpass.frequency.setValueAtTime(85, now);
+      bandpass.Q.setValueAtTime(2.5, now);
+      
+      engineGain.connect(lowpass);
+      lowpass.connect(bandpass);
+      bandpass.connect(masterGain);
+      
+      // Start the oscillators
+      osc1.start(now);
+      osc2.start(now);
+      subOsc.start(now);
+      
+      // --- Physical Ignition Flare Sequence ---
+      // 1. Starter motor high-speed cranking clicks
+      const crankOsc = ctx.createOscillator();
+      crankOsc.type = "sine";
+      crankOsc.frequency.setValueAtTime(180, now);
+      
+      const crankGain = ctx.createGain();
+      crankGain.gain.setValueAtTime(0.25, now);
+      crankGain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+      
+      crankOsc.connect(crankGain);
+      crankGain.connect(ctx.destination);
+      crankOsc.start(now);
+      crankOsc.stop(now + 0.5);
+      
+      // 2. Motor ignites and roars (Flare up)
+      osc1.frequency.setValueAtTime(22, now);
+      osc1.frequency.exponentialRampToValueAtTime(110, now + 0.5); // high pitch combustion roar!
+      osc1.frequency.exponentialRampToValueAtTime(32, now + 1.2);  // settles to smooth idle
+      
+      osc2.frequency.setValueAtTime(14, now);
+      osc2.frequency.exponentialRampToValueAtTime(80, now + 0.5);  // high pitch combustion roar!
+      osc2.frequency.exponentialRampToValueAtTime(24, now + 1.2);  // settles to smooth idle
+      
+      subOsc.frequency.setValueAtTime(30, now);
+      subOsc.frequency.linearRampToValueAtTime(95, now + 0.5);
+      subOsc.frequency.linearRampToValueAtTime(45, now + 1.2);
+      
+      // 3. Main gain spikes at ignition, then throttles back to deep rumble idle volume
+      masterGain.gain.setValueAtTime(0, now);
+      masterGain.gain.linearRampToValueAtTime(0.85, now + 0.5); // combustion loud roar!
+      masterGain.gain.linearRampToValueAtTime(0.40, now + 1.2); // settle down to safe rumble idle
+    },
+    
+    rev() {
+      if (!matches || !ctx || !osc1 || !osc2 || !subOsc || !masterGain || !bandpass) return;
+      const now = ctx.currentTime;
+      
+      // Clear previous ramps and trigger full throttle RPM sweep!
+      osc1.frequency.cancelScheduledValues(now);
+      osc1.frequency.setValueAtTime(osc1.frequency.value, now);
+      osc1.frequency.exponentialRampToValueAtTime(175, now + 0.28); // Engine screams at high rpm
+      osc1.frequency.exponentialRampToValueAtTime(32, now + 0.85); // return to cozy warm idle
+      
+      osc2.frequency.cancelScheduledValues(now);
+      osc2.frequency.setValueAtTime(osc2.frequency.value, now);
+      osc2.frequency.exponentialRampToValueAtTime(135, now + 0.28);
+      osc2.frequency.exponentialRampToValueAtTime(24, now + 0.85);
+      
+      subOsc.frequency.cancelScheduledValues(now);
+      subOsc.frequency.setValueAtTime(subOsc.frequency.value, now);
+      subOsc.frequency.linearRampToValueAtTime(185, now + 0.28);
+      subOsc.frequency.linearRampToValueAtTime(45, now + 0.85);
+      
+      // Bandpass sweeps up, venting heat and resonance
+      bandpass.frequency.cancelScheduledValues(now);
+      bandpass.frequency.setValueAtTime(bandpass.frequency.value, now);
+      bandpass.frequency.exponentialRampToValueAtTime(400, now + 0.28);
+      bandpass.frequency.exponentialRampToValueAtTime(85, now + 0.85);
+      
+      // Volume throttle boost
+      masterGain.gain.cancelScheduledValues(now);
+      masterGain.gain.setValueAtTime(masterGain.gain.value, now);
+      masterGain.gain.linearRampToValueAtTime(0.85, now + 0.28); // high volume roar
+      masterGain.gain.linearRampToValueAtTime(0.40, now + 0.85); // drop smoothly back to idle
+    },
+    
+    stop() {
+      if (!matches || !ctx || !masterGain) return;
+      const now = ctx.currentTime;
+      
+      masterGain.gain.cancelScheduledValues(now);
+      masterGain.gain.setValueAtTime(masterGain.gain.value, now);
+      masterGain.gain.linearRampToValueAtTime(0, now + 0.25); // smoothly zero volume
+      
+      setTimeout(() => {
+        try {
+          osc1?.stop();
+          osc2?.stop();
+          subOsc?.stop();
+          ctx?.close();
+        } catch (e) {}
+        osc1 = null;
+        osc2 = null;
+        subOsc = null;
+        ctx = null;
+        matches = false;
+      }, 300);
+    }
+  };
+}
+
 export default function QuizPage() {
   const [currentIdx, setCurrentIdx] = useState(() => getSavedProgress()?.currentIdx ?? 0);
   const [selectedOpt, setSelectedOpt] = useState<number | null>(() => getSavedProgress()?.selectedOpt ?? null);
@@ -282,6 +445,114 @@ export default function QuizPage() {
     history,
     selectedDifficulty,
   ]);
+
+  // --- V8 ENGINE SOUND SYNTHESIZER AND INTERACTIVE DASHBOARD STATES ---
+  const v8EngineRef = React.useRef<any>(null);
+  const [engineActive, setEngineActive] = useState(false);
+  const [engineRpm, setEngineRpm] = useState(0);
+
+  // Initialize synthesized engine reference smoothly
+  const getV8Engine = () => {
+    if (!v8EngineRef.current) {
+      v8EngineRef.current = createV8SynthEngine();
+    }
+    return v8EngineRef.current;
+  };
+
+  const startEngine = () => {
+    // Attempt standard preloaded sound first (CORS may block or defer, but it will attempt)
+    const globalPlayer = (window as any).playEngineSound;
+    if (globalPlayer && typeof globalPlayer === "function") {
+      try {
+        globalPlayer();
+      } catch (e) {
+        console.warn("Global player deferred, starting offline engine synthesizer");
+      }
+    }
+
+    try {
+      const engine = getV8Engine();
+      engine.start();
+      setEngineActive(true);
+      
+      // Ignition sequence animation for RPM Gauge
+      setEngineRpm(0);
+      let rpm = 0;
+      const ignitionInterval = setInterval(() => {
+        rpm += 160;
+        if (rpm >= 3500) { // Ignition high flare roar!
+          clearInterval(ignitionInterval);
+          // Settle down to deep throbbing idle
+          const settleInterval = setInterval(() => {
+            rpm -= 180;
+            if (rpm <= 850) {
+              rpm = 850;
+              clearInterval(settleInterval);
+            }
+            setEngineRpm(rpm);
+          }, 20);
+        }
+        setEngineRpm(rpm);
+      }, 10);
+    } catch (err) {
+      console.error("V8 startup failed", err);
+    }
+  };
+
+  const stopEngine = () => {
+    try {
+      const engine = getV8Engine();
+      engine.stop();
+      setEngineActive(false);
+      setEngineRpm(0);
+    } catch (err) {
+      console.error("V8 shutdown failed", err);
+    }
+  };
+
+  const revEngine = () => {
+    try {
+      const engine = getV8Engine();
+      if (!engineActive) {
+        // Auto start if clicked while off
+        startEngine();
+        return;
+      }
+      engine.rev();
+      
+      // RPM Gauge needle swing animation
+      let rpm = 850;
+      const revUp = setInterval(() => {
+        rpm += 450;
+        if (rpm >= 6800) { // Redline limit
+          rpm = 6800;
+          clearInterval(revUp);
+          
+          // Settle back to warm idle
+          const revDown = setInterval(() => {
+            rpm -= 350;
+            if (rpm <= 850) {
+              rpm = 850;
+              clearInterval(revDown);
+            }
+            setEngineRpm(rpm);
+          }, 15);
+        }
+        setEngineRpm(rpm);
+      }, 10);
+    } catch (err) {
+      console.error("V8 rev failed", err);
+    }
+  };
+
+  // Clean up Web Audio on unmount
+  useEffect(() => {
+    return () => {
+      if (v8EngineRef.current) {
+        v8EngineRef.current.stop();
+      }
+    };
+  }, []);
 
   const activeQuestions = React.useMemo(() => {
     if (selectedDifficulty === "all") return quizData;
@@ -346,6 +617,9 @@ export default function QuizPage() {
   }, [timeLeft, quizStarted, quizFinished, isSubmitted]);
 
   const handleStart = () => {
+    // Automatically fire up simulated V8 engine upon beginning the simulator
+    startEngine();
+
     setQuizStarted(true);
     setQuizFinished(false);
     setCurrentIdx(0);
@@ -586,6 +860,104 @@ export default function QuizPage() {
                         </button>
                       );
                     })}
+                  </div>
+                </div>
+
+                {/* 🚗 INTERACTIVE DRIVING SIMULATOR DASHBOARD CONSOLE */}
+                <div className="w-full mb-8 mt-4 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 border-4 border-slate-800 text-white p-6 sm:p-8 rounded-3xl shadow-2xl relative overflow-hidden text-center">
+                  {/* Subtle carbon texture lines or glows */}
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(99,102,241,0.15),transparent)] pointer-events-none" />
+                  <div className="absolute right-3 top-3 bg-red-400/20 text-red-400 border border-red-500/20 px-2.5 py-1 rounded-md text-[9px] font-black tracking-widest font-mono uppercase animate-pulse select-none z-10">
+                    V8 DOHC ACTIVE SIM
+                  </div>
+
+                  <h3 className="text-sm font-black uppercase text-indigo-400 tracking-widest mb-1.5 flex items-center justify-center gap-2 select-none">
+                    <Gauge className="w-4 h-4 text-[#FF7112]" /> DRIVING SIMULATION DASHBOARD & INSTRUMENTS
+                  </h3>
+                  <p className="text-slate-400 text-[11px] leading-normal mb-6 max-w-md mx-auto">
+                    Turn on the simulated car ignition below and rev the high-fidelity V8 performance block!
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    {/* Visual Tachometer Instrument Panel */}
+                    <div className="flex flex-col items-center justify-center bg-slate-950/60 border border-slate-800/60 p-4 rounded-2xl relative overflow-hidden">
+                      {/* Tachometer Arc & Needle */}
+                      <div className="w-36 h-20 relative flex items-end justify-center overflow-hidden mb-2">
+                        {/* Semi-circular gauge border track */}
+                        <div className="absolute w-36 h-36 rounded-full border-8 border-slate-800 border-t-indigo-600 border-r-rose-600 border-l-slate-700 bottom-0 left-1/2 transform -translate-x-1/2" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 50%, 0 50%)' }} />
+                        
+                        {/* Radial tick markers for tachometer */}
+                        <div className="absolute bottom-1 font-mono text-[9px] font-bold text-slate-500 left-4">0</div>
+                        <div className="absolute bottom-10 font-mono text-[9px] font-bold text-slate-500 left-3">2</div>
+                        <div className="absolute top-1.5 font-mono text-[9px] font-bold text-slate-400 left-1/2 transform -translate-x-12">4</div>
+                        <div className="absolute top-1.5 font-mono text-[9px] font-bold text-rose-500 left-1/2 transform translate-x-8">6</div>
+                        <div className="absolute bottom-1 font-mono text-[9px] font-bold text-rose-600 right-4">8</div>
+
+                        {/* Needle pin center */}
+                        <div className="absolute w-3.5 h-3.5 bg-rose-500 rounded-full z-20 bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1 py-1 px-1.5 shadow-md shadow-rose-500/40" />
+
+                        {/* Pulsing indicator redline glow line */}
+                        <div className="absolute w-12 h-12 bg-red-500/10 rounded-full filter blur-md bottom-0 left-1/2 transform -translate-x-1/2" />
+
+                        {/* Needle rotated dynamic logic */}
+                        {/* 0 RPM is -180deg (Left), 8000 RPM is 0deg (Right) */}
+                        <div 
+                          className="absolute w-14 h-1 bg-gradient-to-r from-transparent to-rose-500 bottom-0 left-1/2 origin-left z-10 transition-transform duration-75 ease-out shadow-lg"
+                          style={{ 
+                            transform: `rotate(${((engineRpm / 8000) * 180) - 180}deg)`,
+                          }}
+                        />
+                      </div>
+
+                      {/* Display readout */}
+                      <div className="mt-2 text-center select-none">
+                        <div className="font-mono text-xl font-black text-rose-400 tracking-tight leading-none">
+                          {engineRpm.toLocaleString()} <span className="text-[10px] text-slate-500 font-bold">RPM</span>
+                        </div>
+                        <div className="text-[9px] mt-1 uppercase font-bold tracking-widest text-[#FF7112] h-4">
+                          {engineActive ? (engineRpm > 1000 ? "Throttle Revved! 🏎️💨" : "Engine Idle (V8 Ready) 🚗") : "System Ignition Required 🔑"}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Cockpit Ignition Switches & Exhaust Pedals */}
+                    <div className="flex flex-col gap-4 items-stretch justify-center">
+                      <div className="flex items-center gap-3">
+                        {/* circular engine start switch */}
+                        <button
+                          key="start_stop_button"
+                          type="button"
+                          onClick={engineActive ? stopEngine : startEngine}
+                          className={`flex-1 py-4 px-4 rounded-2xl font-black uppercase text-xs tracking-wider transition-all duration-200 shadow-lg flex items-center justify-center gap-2 cursor-pointer border ${
+                            engineActive
+                              ? 'bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white border-red-500 shadow-red-950/40'
+                              : 'bg-gradient-to-r from-emerald-600 to-green-700 hover:from-emerald-500 hover:to-green-600 text-white border-green-500 shadow-green-950/40'
+                          }`}
+                        >
+                          <span className={`w-2.5 h-2.5 rounded-full ${engineActive ? 'bg-red-400 animate-ping' : 'bg-green-400 animate-pulse'}`} />
+                          {engineActive ? "🔴 stop simulation" : "🔑 Start Engine"}
+                        </button>
+                      </div>
+
+                      {/* Rev pedal button */}
+                      <button
+                        key="rev_pedal_button"
+                        type="button"
+                        onClick={revEngine}
+                        disabled={!engineActive}
+                        className={`py-4 px-6 rounded-2xl font-black uppercase text-xs tracking-widest transition-all duration-150 transform active:scale-98 cursor-pointer flex items-center justify-center gap-2 border shadow-lg ${
+                          engineActive 
+                            ? 'bg-gradient-to-r from-indigo-600 to-violet-700 hover:from-indigo-500 hover:to-violet-600 text-white border-indigo-500 shadow-indigo-950/40'
+                            : 'bg-slate-800 border-slate-700 text-slate-500 cursor-not-allowed shadow-none'
+                        }`}
+                      >
+                        <Volume2 className="w-4 h-4 text-orange-400 animate-pulse" /> Accelerator / Rev Pedal 🔥
+                      </button>
+
+                      <div className="text-[10px] text-slate-500 text-center leading-normal italic select-none">
+                        Note: Tap <b>Accelerator</b> to hear the starting roar / rev. It works immediately on all browsers without any plug-ins.
+                      </div>
+                    </div>
                   </div>
                 </div>
 
