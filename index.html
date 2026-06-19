@@ -233,6 +233,41 @@
             100% { width: 15px; }
           }
         </style>
+        <script>
+          (function() {
+            try {
+              // Preload the car ignition and revving sound effect
+              var engineSound = new Audio("https://assets.mixkit.co/active_storage/sfx/2653/2653-84.wav");
+              engineSound.preload = "auto";
+              
+              // Trigger the sound function with catch for browser autoplay block overrides
+              var playSound = function() {
+                var playPromise = engineSound.play();
+                if (playPromise !== undefined) {
+                  playPromise.catch(function(error) {
+                    console.log("Preloader auto-play engine sound was deferred/blocked by browser policies:", error);
+                  });
+                }
+              };
+
+              // Start sound playback at the start of progress bar loading
+              playSound();
+
+              // Fallback: Bind to any interactive gesture dynamically inside document context to satisfy browser policies
+              var triggerPlaybackOnGesture = function() {
+                playSound();
+                document.removeEventListener('click', triggerPlaybackOnGesture);
+                document.removeEventListener('touchstart', triggerPlaybackOnGesture);
+                document.removeEventListener('keydown', triggerPlaybackOnGesture);
+              };
+              document.addEventListener('click', triggerPlaybackOnGesture);
+              document.addEventListener('touchstart', triggerPlaybackOnGesture);
+              document.addEventListener('keydown', triggerPlaybackOnGesture);
+            } catch (e) {
+              console.error("Audio preloading / playback setup failed in preloader:", e);
+            }
+          })();
+        </script>
       </div>
     </div>
     <script type="module" src="/src/main.tsx"></script>
