@@ -36,12 +36,7 @@ export default function ServicesPage() {
   useEffect(() => {
     const video = videoRef.current;
     if (video) {
-      video.muted = true;
-      video.defaultMuted = true;
-      video.playsInline = true;
-      video.preload = "auto";
-      video.load();
-      
+      // Let browser start playing natively from preloaded buffer
       const playPromise = video.play();
       if (playPromise !== undefined) {
         playPromise.catch(err => {
@@ -295,7 +290,7 @@ export default function ServicesPage() {
                     WebkitMaskImage: 'radial-gradient(ellipse at center, black 30%, transparent 70%)'
                   }}
                 >
-                  <source src="/service page-1.mp4" type="video/mp4" />
+                  <source src="/service%20page-1.mp4" type="video/mp4" />
                 </video>
               </div>
             </div>
