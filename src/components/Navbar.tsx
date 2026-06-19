@@ -72,7 +72,7 @@ export default function Navbar() {
 
   const location = useLocation();
 
-  const navLinks = [
+   const navLinks = [
     { name: 'Services', path: '/services' },
     { name: 'Rent Car', path: '/rentals' },
     { name: 'Sale Car', path: '/car-sale' },

@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Features from './components/Features';
@@ -13,6 +13,7 @@ import AppointmentForm from './components/AppointmentForm';
 import OurProcess from './components/OurProcess';
 import Reviews from './components/Reviews';
 import RentalMarketplace from './components/RentalMarketplace';
+import TrafficSigns from './components/TrafficSigns';
 import { CarRequestsForm, CarRequestsGrid } from './components/CarRequestsDirectory';
 import Footer from './components/Footer';
 import CTABanner from './components/CTABanner';
@@ -25,6 +26,18 @@ import { ScrollReveal } from './components/ScrollReveal';
 
 export default function HomePage() {
   const [activeService, setActiveService] = useState<'learn' | 'rent' | 'requests'>('learn');
+
+  useEffect(() => {
+    if (window.location.hash === '#traffic-signs') {
+      const timer = setTimeout(() => {
+        const el = document.getElementById('traffic-signs');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 350);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const homeSchema = {
     "@context": "https://schema.org",
@@ -169,6 +182,7 @@ export default function HomePage() {
             <ScrollReveal direction="up" delay={0.1}><EnrollCTA /></ScrollReveal>
             <ScrollReveal direction="up" delay={0.1}><WhyChooseUs /></ScrollReveal>
             <ScrollReveal direction="up" delay={0.1}><AppointmentForm /></ScrollReveal>
+            <ScrollReveal direction="up" delay={0.1}><TrafficSigns /></ScrollReveal>
             <ScrollReveal direction="up" delay={0.1}><OurProcess /></ScrollReveal>
             <ScrollReveal direction="up" delay={0.1}><Reviews /></ScrollReveal>
           </motion.div>
