@@ -14,6 +14,7 @@ import OurProcess from './components/OurProcess';
 import Reviews from './components/Reviews';
 import RentalMarketplace from './components/RentalMarketplace';
 import TrafficSigns from './components/TrafficSigns';
+import CoursePlanner from './components/CoursePlanner';
 import { CarRequestsForm, CarRequestsGrid } from './components/CarRequestsDirectory';
 import Footer from './components/Footer';
 import CTABanner from './components/CTABanner';
@@ -179,6 +180,7 @@ export default function HomePage() {
             <ScrollReveal direction="up" delay={0.1}><Stats /></ScrollReveal>
             <ScrollReveal direction="up" delay={0.1}><Lessons /></ScrollReveal>
             <ScrollReveal direction="up" delay={0.1}><FeaturedCourses /></ScrollReveal>
+            <ScrollReveal direction="up" delay={0.1}><CoursePlanner /></ScrollReveal>
             <ScrollReveal direction="up" delay={0.1}><EnrollCTA /></ScrollReveal>
             <ScrollReveal direction="up" delay={0.1}><WhyChooseUs /></ScrollReveal>
             <ScrollReveal direction="up" delay={0.1}><AppointmentForm /></ScrollReveal>
