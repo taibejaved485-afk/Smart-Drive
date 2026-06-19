@@ -186,18 +186,54 @@ const quizData = [
     ],
     hint: "Kinetic energy scales quadratically with speed (v squared)."
   }
-];export default function QuizPage() {
-  const [currentIdx, setCurrentIdx] = useState(0);
-  const [selectedOpt, setSelectedOpt] = useState<number | null>(null);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [score, setScore] = useState(0);
-  const [quizStarted, setQuizStarted] = useState(false);
-  const [quizFinished, setQuizFinished] = useState(false);
+];
+
+const LOCAL_STORAGE_KEY = "godriveify_quiz_progress_v1";
+
+interface QuizProgress {
+  currentIdx: number;
+  selectedOpt: number | null;
+  isSubmitted: boolean;
+  score: number;
+  quizStarted: boolean;
+  quizFinished: boolean;
+  timeLeft: number;
+  studentName: string;
+  streak: number;
+  maxStreak: number;
+  history: Array<{
+    question: string;
+    selected: string;
+    isCorrect: boolean;
+    rationale: string;
+    correctText: string;
+  }>;
+  selectedDifficulty: "all" | "easy" | "medium" | "hard";
+}
+
+const getSavedProgress = (): QuizProgress | null => {
+  if (typeof window === "undefined") return null;
+  try {
+    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+    return saved ? JSON.parse(saved) : null;
+  } catch (e) {
+    console.error("Failed to parse quiz progress", e);
+    return null;
+  }
+};
+
+export default function QuizPage() {
+  const [currentIdx, setCurrentIdx] = useState(() => getSavedProgress()?.currentIdx ?? 0);
+  const [selectedOpt, setSelectedOpt] = useState<number | null>(() => getSavedProgress()?.selectedOpt ?? null);
+  const [isSubmitted, setIsSubmitted] = useState(() => getSavedProgress()?.isSubmitted ?? false);
+  const [score, setScore] = useState(() => getSavedProgress()?.score ?? 0);
+  const [quizStarted, setQuizStarted] = useState(() => getSavedProgress()?.quizStarted ?? false);
+  const [quizFinished, setQuizFinished] = useState(() => getSavedProgress()?.quizFinished ?? false);
   const [showHint, setShowHint] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(60);
-  const [studentName, setStudentName] = useState("");
-  const [streak, setStreak] = useState(0);
-  const [maxStreak, setMaxStreak] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(() => getSavedProgress()?.timeLeft ?? 60);
+  const [studentName, setStudentName] = useState(() => getSavedProgress()?.studentName ?? "");
+  const [streak, setStreak] = useState(() => getSavedProgress()?.streak ?? 0);
+  const [maxStreak, setMaxStreak] = useState(() => getSavedProgress()?.maxStreak ?? 0);
   const [showCertificate, setShowCertificate] = useState(false);
   const [reviewFilter, setReviewFilter] = useState<"all" | "correct" | "incorrect">("all");
   const [shareToast, setShareToast] = useState(false);
@@ -207,8 +243,44 @@ const quizData = [
     isCorrect: boolean;
     rationale: string;
     correctText: string;
-  }>>([]);
-  const [selectedDifficulty, setSelectedDifficulty] = useState<"all" | "easy" | "medium" | "hard">("all");
+  }>>(() => getSavedProgress()?.history ?? []);
+  const [selectedDifficulty, setSelectedDifficulty] = useState<"all" | "easy" | "medium" | "hard">(() => getSavedProgress()?.selectedDifficulty ?? "all");
+
+  // Synchronize state changes to localStorage
+  useEffect(() => {
+    const progress: QuizProgress = {
+      currentIdx,
+      selectedOpt,
+      isSubmitted,
+      score,
+      quizStarted,
+      quizFinished,
+      timeLeft,
+      studentName,
+      streak,
+      maxStreak,
+      history,
+      selectedDifficulty,
+    };
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(progress));
+    } catch (e) {
+      console.error("Failed to save progress to localStorage", e);
+    }
+  }, [
+    currentIdx,
+    selectedOpt,
+    isSubmitted,
+    score,
+    quizStarted,
+    quizFinished,
+    timeLeft,
+    studentName,
+    streak,
+    maxStreak,
+    history,
+    selectedDifficulty,
+  ]);
 
   const activeQuestions = React.useMemo(() => {
     if (selectedDifficulty === "all") return quizData;
@@ -896,6 +968,25 @@ const quizData = [
                     {currentIdx + 1 < activeQuestions.length ? "Next Question" : "Finish & View Score"} <ChevronRight className="w-4 h-4" />
                   </button>
                 )}
+              </div>
+
+              {/* Auto Saved Progress Indicator & Restart Option */}
+              <div className="flex items-center justify-between mt-6 pt-5 border-t border-slate-100 text-[11px] text-slate-400 select-none">
+                <span className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[10px] text-slate-400">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-[pulse_1.5s_infinite]" />
+                  Progress Auto-Saved
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (window.confirm("Are you sure you want to restart the quiz? This will reset your current score, answers, and progress.")) {
+                      handleStart();
+                    }
+                  }}
+                  className="text-red-500 hover:text-red-650 hover:underline font-extrabold uppercase tracking-wider font-sans transition-colors cursor-pointer"
+                >
+                  Reset &amp; Start Over
+                </button>
               </div>
             </div>
           )}
