@@ -410,7 +410,7 @@ export default function AboutPage() {
             {instructors
               .filter((inst) => {
                 if (selectedCategory === 'All') return true;
-                return inst.categories.includes(selectedCategory);
+                return (inst.categories || []).includes(selectedCategory);
               })
               .map((inst, index) => (
                 <ScrollReveal key={inst.id} direction="up" delay={index * 0.1}>
