@@ -80,6 +80,7 @@ export default function AboutPage() {
       rating: 4.9,
       reviews: 320,
       gender: 'Male',
+      availability: 'Available',
       hours: '3,800+',
       successRate: '99%',
       languages: ['Urdu', 'Punjabi', 'English'],
@@ -102,6 +103,7 @@ export default function AboutPage() {
       rating: 5.0,
       reviews: 245,
       gender: 'Female',
+      availability: 'Available',
       hours: '2,600+',
       successRate: '100%',
       languages: ['Urdu', 'Punjabi'],
@@ -124,6 +126,7 @@ export default function AboutPage() {
       rating: 4.8,
       reviews: 198,
       gender: 'Male',
+      availability: 'In Session',
       hours: '2,100+',
       successRate: '98%',
       languages: ['Urdu', 'Punjabi', 'English'],
@@ -146,6 +149,7 @@ export default function AboutPage() {
       rating: 4.9,
       reviews: 154,
       gender: 'Female',
+      availability: 'Available',
       hours: '1,400+',
       successRate: '99%',
       languages: ['Urdu', 'English'],
@@ -435,6 +439,24 @@ export default function AboutPage() {
                             {inst.name}
                           </h3>
                           <p className="text-xs font-semibold text-slate-400 mt-0.5">{inst.role}</p>
+                          <div className="mt-1.5">
+                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border ${
+                              inst.availability === 'In Session' 
+                                ? 'bg-amber-50 text-amber-700 border-amber-200' 
+                                : inst.availability === 'On Leave' 
+                                  ? 'bg-rose-50 text-rose-700 border-rose-200' 
+                                  : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            }`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${
+                                inst.availability === 'In Session' 
+                                  ? 'bg-amber-500 animate-pulse' 
+                                  : inst.availability === 'On Leave' 
+                                    ? 'bg-rose-500' 
+                                    : 'bg-emerald-500 animate-pulse'
+                              }`} />
+                              {inst.availability || 'Available'}
+                            </span>
+                          </div>
                         </div>
                         <div className="flex items-center gap-1 bg-yellow-50 px-2 py-0.5 rounded border border-yellow-200 flex-shrink-0">
                           <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />

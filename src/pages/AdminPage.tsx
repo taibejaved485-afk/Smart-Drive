@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import CTABanner from '../components/CTABanner';
-import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag, Bold, Italic, Underline, Link as LinkIcon, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, BookOpen, User, Calendar, Zap, UserCheck, Users, Pilcrow, Star } from 'lucide-react';
+import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag, Bold, Italic, Underline, Link as LinkIcon, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, BookOpen, User, Calendar, Zap, UserCheck, Users, Pilcrow, Star, GripVertical, ArrowUp, ArrowDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RentalCar } from '../data/inventory';
 import { 
@@ -210,6 +210,7 @@ export default function AdminPage() {
   
   // Instructors state
   const [instructors, setInstructors] = useState<any[]>([]);
+  const [draggedInstructorIndex, setDraggedInstructorIndex] = useState<number | null>(null);
   const [editingInstructorId, setEditingInstructorId] = useState<string | null>(null);
   const [instructorImageMode, setInstructorImageMode] = useState<'presets' | 'upload' | 'url'>('presets');
   const [newCertText, setNewCertText] = useState('');
@@ -229,6 +230,7 @@ export default function AdminPage() {
     rating: 5.0,
     reviews: 0,
     gender: 'Male' as 'Male' | 'Female',
+    availability: 'Available' as 'Available' | 'In Session' | 'On Leave',
     hours: '',
     successRate: '',
     languages: [] as string[],
@@ -646,6 +648,7 @@ export default function AdminPage() {
       rating: 4.8,
       reviews: 42,
       gender: 'Male',
+      availability: 'Available',
       hours: '500+',
       successRate: '98%',
       languages: ['Urdu', 'Punjabi'],
@@ -678,6 +681,7 @@ export default function AdminPage() {
       rating: inst.rating || 5.0,
       reviews: inst.reviews || 0,
       gender: inst.gender || 'Male',
+      availability: inst.availability || 'Available',
       hours: inst.hours || '',
       successRate: inst.successRate || '',
       languages: inst.languages || [],
@@ -731,6 +735,50 @@ export default function AdminPage() {
       window.dispatchEvent(new Event('storage'));
       showToast('Instructor profile deleted.', 'info');
     }
+  };
+
+  const handleMoveInstructor = (index: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= instructors.length) return;
+    
+    const updatedList = [...instructors];
+    const item = updatedList[index];
+    updatedList.splice(index, 1);
+    updatedList.splice(targetIndex, 0, item);
+    
+    localStorage.setItem('instructors', JSON.stringify(updatedList));
+    setInstructors(updatedList);
+    window.dispatchEvent(new Event('instructors_updated'));
+    window.dispatchEvent(new Event('storage'));
+    showToast(`Updated instructors order!`, 'success');
+  };
+
+  const handleDragStartInstructor = (e: React.DragEvent, index: number) => {
+    setDraggedInstructorIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', index.toString());
+  };
+
+  const handleDragOverInstructor = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+  };
+
+  const handleDropInstructor = (e: React.DragEvent, targetIndex: number) => {
+    e.preventDefault();
+    if (draggedInstructorIndex === null || draggedInstructorIndex === targetIndex) return;
+
+    const updatedList = [...instructors];
+    const draggedItem = updatedList[draggedInstructorIndex];
+    
+    updatedList.splice(draggedInstructorIndex, 1);
+    updatedList.splice(targetIndex, 0, draggedItem);
+
+    localStorage.setItem('instructors', JSON.stringify(updatedList));
+    setInstructors(updatedList);
+    window.dispatchEvent(new Event('instructors_updated'));
+    window.dispatchEvent(new Event('storage'));
+    setDraggedInstructorIndex(null);
+    showToast(`Repositioned ${draggedItem.name} successfully!`, 'success');
   };
 
   const addCertToForm = () => {
@@ -3604,6 +3652,10 @@ export default function AdminPage() {
                     <p className="text-gray-500 text-sm mt-1 font-medium">
                       Add, edit, or delete the certified driver training team. Changes here sync instantly to the public <strong className="text-[#E05A00]">About Us</strong> page!
                     </p>
+                    <p className="text-xs text-[#E05A00] font-black mt-2 flex items-center gap-1.5 bg-orange-50/70 border border-orange-100/60 px-3 py-1.5 rounded-xl w-fit">
+                      <Sparkles className="w-4 h-4 animate-pulse shrink-0" />
+                      <span><strong>Easy Prioritizing:</strong> Drag &amp; drop any card anywhere or click the <strong>Up/Down arrows</strong> to customize which instructors appear first on the website!</span>
+                    </p>
                   </div>
                 </div>
                 <button
@@ -3621,64 +3673,148 @@ export default function AdminPage() {
 
               {/* Grid of existing instructors */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {instructors.map((inst) => (
-                  <div key={inst.id} className="border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition duration-200 bg-white flex flex-col justify-between">
-                    <div>
-                      <div className="relative h-44 bg-slate-100">
-                        <img 
-                          src={inst.image || 'https://images.unsplash.com/photo-1549849171-09f624480091?auto=format&fit=crop&w=600&q=80'} 
-                          alt={inst.name}
-                          className="w-full h-full object-cover" 
-                          referrerPolicy="no-referrer"
-                        />
-                        <span className="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-sm text-white px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
-                          {inst.experience}
-                        </span>
-                        <span className="absolute bottom-3 left-3 bg-[#E05A00] text-white px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
-                          {inst.gender}
-                        </span>
-                      </div>
-                      <div className="p-4 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-lg font-black text-slate-900 leading-tight">{inst.name}</h3>
-                          <div className="flex items-center gap-1 text-amber-500 text-xs font-extrabold">
-                            <Star className="w-3.5 h-3.5 fill-current" />
-                            <span>{inst.rating}</span>
+                {instructors.map((inst, index) => {
+                  const isBeingDragged = draggedInstructorIndex === index;
+                  return (
+                    <div 
+                      key={inst.id} 
+                      draggable
+                      onDragStart={(e) => handleDragStartInstructor(e, index)}
+                      onDragOver={(e) => handleDragOverInstructor(e, index)}
+                      onDrop={(e) => handleDropInstructor(e, index)}
+                      onDragEnd={() => setDraggedInstructorIndex(null)}
+                      className={`border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 bg-white flex flex-col justify-between group select-none ${
+                        isBeingDragged 
+                          ? 'border-dashed border-2 border-orange-400 opacity-40 scale-95 shadow-lg bg-orange-50/20' 
+                          : 'border-slate-200/90'
+                      }`}
+                    >
+                      <div>
+                        {/* Interactive Reorder Handle Header */}
+                        <div className="bg-slate-50 border-b border-slate-100 px-4 py-2.5 flex items-center justify-between cursor-grab active:cursor-grabbing hover:bg-slate-100/80 transition-colors">
+                          <div className="flex items-center gap-2">
+                            <GripVertical className="w-4 h-4 text-[#E05A00] shrink-0" />
+                            <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider">
+                              Rank Priority #{index + 1}
+                            </span>
+                          </div>
+                          
+                          {/* Rank Shift Buttons */}
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMoveInstructor(index, 'up');
+                              }}
+                              disabled={index === 0}
+                              className={`p-1 rounded-md transition-colors ${
+                                index === 0 
+                                  ? 'text-slate-300 cursor-not-allowed' 
+                                  : 'text-slate-500 hover:bg-white hover:text-slate-950 border border-transparent hover:border-slate-200 shadow-sm cursor-pointer'
+                              }`}
+                              title="Move up in display priority"
+                            >
+                              <ArrowUp className="w-3.5 h-3.5 stroke-[2.5]" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMoveInstructor(index, 'down');
+                              }}
+                              disabled={index === instructors.length - 1}
+                              className={`p-1 rounded-md transition-colors ${
+                                index === instructors.length - 1 
+                                  ? 'text-slate-300 cursor-not-allowed' 
+                                  : 'text-slate-500 hover:bg-white hover:text-slate-950 border border-transparent hover:border-slate-200 shadow-sm cursor-pointer'
+                              }`}
+                              title="Move down in display priority"
+                            >
+                              <ArrowDown className="w-3.5 h-3.5 stroke-[2.5]" />
+                            </button>
                           </div>
                         </div>
-                        <p className="text-[#E05A00] text-xs font-black">{inst.role}</p>
-                        <p className="text-slate-600 text-xs line-clamp-2 leading-relaxed">{inst.description}</p>
-                        <div className="pt-2 flex flex-wrap gap-1">
-                          {inst.categories?.map((cat: string) => (
-                            <span key={cat} className="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded font-bold">
-                              {cat}
+
+                        <div className="relative h-44 bg-slate-50">
+                          <img 
+                            src={inst.image || 'https://images.unsplash.com/photo-1549849171-09f624480091?auto=format&fit=crop&w=600&q=80'} 
+                            alt={inst.name}
+                            className="w-full h-full object-cover" 
+                            referrerPolicy="no-referrer"
+                          />
+                          
+                          {/* Gender & Experience badges placed cleanly at the bottom */}
+                          <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-none">
+                            <span className="bg-[#E05A00] text-white px-2.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider shadow-sm">
+                              {inst.gender}
                             </span>
-                          ))}
+                            <span className="bg-slate-900/85 backdrop-blur-[2px] text-white px-2.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider shadow-sm">
+                              {inst.experience}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="p-4 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-black text-slate-900 leading-tight">{inst.name}</h3>
+                            <div className="flex items-center gap-1 text-amber-500 text-xs font-extrabold">
+                              <Star className="w-3.5 h-3.5 fill-current" />
+                              <span>{inst.rating}</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <p className="text-[#E05A00] text-xs font-black">{inst.role}</p>
+                            <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider border ${
+                              inst.availability === 'In Session' 
+                                ? 'bg-amber-50 text-amber-700 border-amber-200' 
+                                : inst.availability === 'On Leave' 
+                                  ? 'bg-rose-50 text-rose-700 border-rose-200' 
+                                  : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            }`}>
+                              <span className={`w-1 h-1 rounded-full ${
+                                inst.availability === 'In Session' 
+                                  ? 'bg-amber-500 animate-pulse' 
+                                  : inst.availability === 'On Leave' 
+                                    ? 'bg-rose-500' 
+                                    : 'bg-emerald-500 animate-pulse'
+                              }`} />
+                              {inst.availability || 'Available'}
+                            </span>
+                          </div>
+                          <p className="text-slate-600 text-xs line-clamp-2 leading-relaxed">{inst.description}</p>
+                          <div className="pt-2 flex flex-wrap gap-1">
+                            {inst.categories?.map((cat: string) => (
+                              <span key={cat} className="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded font-bold">
+                                {cat}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       </div>
+                      <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2.5">
+                        <button
+                          onClick={() => {
+                            handleEditInstructor(inst);
+                            const el = document.getElementById('instructor-form-section');
+                            el?.scrollIntoView({ behavior: 'smooth' });
+                          }}
+                          className="text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer flex-1 justify-center"
+                        >
+                          <Edit className="w-3.5 h-3.5" />
+                          <span>Edit</span>
+                        </button>
+                        <button
+                          onClick={() => handleDeleteInstructor(inst.id)}
+                          className="text-red-600 hover:text-white bg-white hover:bg-red-600 border border-slate-200 hover:border-red-600 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer flex-1 justify-center"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Delete</span>
+                        </button>
+                      </div>
                     </div>
-                    <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2.5">
-                      <button
-                        onClick={() => {
-                          handleEditInstructor(inst);
-                          const el = document.getElementById('instructor-form-section');
-                          el?.scrollIntoView({ behavior: 'smooth' });
-                        }}
-                        className="text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer flex-1 justify-center"
-                      >
-                        <Edit className="w-3.5 h-3.5" />
-                        <span>Edit</span>
-                      </button>
-                      <button
-                        onClick={() => handleDeleteInstructor(inst.id)}
-                        className="text-red-600 hover:text-white bg-white hover:bg-red-600 border border-slate-200 hover:border-red-600 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer flex-1 justify-center"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                        <span>Delete</span>
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
                 {instructors.length === 0 && (
                   <div className="col-span-full py-12 text-center border-2 border-dashed border-slate-200 rounded-2xl">
                     <Users className="w-10 h-10 text-slate-300 mx-auto mb-2" />
@@ -4066,6 +4202,20 @@ export default function AdminPage() {
                     >
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
+                    </select>
+                  </div>
+
+                  {/* Availability Selection */}
+                  <div className="space-y-1.5">
+                    <label className="text-slate-800 text-xs font-bold uppercase tracking-wider block">Availability Status</label>
+                    <select 
+                      value={instructorForm.availability || 'Available'}
+                      onChange={(e) => setInstructorForm({ ...instructorForm, availability: e.target.value as 'Available' | 'In Session' | 'On Leave' })}
+                      className="w-full text-sm px-4 py-2.5 rounded-xl border border-slate-200 font-semibold text-slate-900 focus:outline-[#E05A00] bg-slate-50/50"
+                    >
+                      <option value="Available">🟢 Available</option>
+                      <option value="In Session">🟡 In Session</option>
+                      <option value="On Leave">🔴 On Leave</option>
                     </select>
                   </div>
 
