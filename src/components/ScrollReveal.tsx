@@ -19,15 +19,15 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
   overflowHidden = false
 }) => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-50px' });
+  const isInView = useInView(ref, { margin: '0px' });
 
   const getVariants = () => {
     switch (direction) {
-      case 'left': return { hidden: { opacity: 0, x: -75 }, visible: { opacity: 1, x: 0 } };
-      case 'right': return { hidden: { opacity: 0, x: 75 }, visible: { opacity: 1, x: 0 } };
-      case 'down': return { hidden: { opacity: 0, y: -75 }, visible: { opacity: 1, y: 0 } };
+      case 'left': return { hidden: { opacity: 0, x: -50 }, visible: { opacity: 1, x: 0 } };
+      case 'right': return { hidden: { opacity: 0, x: 50 }, visible: { opacity: 1, x: 0 } };
+      case 'down': return { hidden: { opacity: 0, y: -50 }, visible: { opacity: 1, y: 0 } };
       case 'up':
-      default: return { hidden: { opacity: 0, y: 75 }, visible: { opacity: 1, y: 0 } };
+      default: return { hidden: { opacity: 0, y: 50 }, visible: { opacity: 1, y: 0 } };
     }
   };
 
