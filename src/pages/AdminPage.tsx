@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import CTABanner from '../components/CTABanner';
-import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag, Bold, Italic, Underline, Link as LinkIcon, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, BookOpen, User, Calendar, Zap, UserCheck, Users, Pilcrow } from 'lucide-react';
+import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag, Bold, Italic, Underline, Link as LinkIcon, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, BookOpen, User, Calendar, Zap, UserCheck, Users, Pilcrow, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RentalCar } from '../data/inventory';
 import { 
@@ -204,11 +204,41 @@ export default function AdminPage() {
   const [blogSearchQuery, setBlogSearchQuery] = useState('');
   const [editorWorkspaceTab, setEditorWorkspaceTab] = useState<'write' | 'preview'>('write');
   const [editorAuthorSelectMode, setEditorAuthorSelectMode] = useState<'dropdown' | 'custom'>('dropdown');
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'bookings' | 'blogs' | 'dns' | 'rentals' | 'requests' | 'courses' | 'car-sales'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'bookings' | 'blogs' | 'dns' | 'rentals' | 'requests' | 'courses' | 'car-sales' | 'instructors'>('dashboard');
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null);
+  
+  // Instructors state
+  const [instructors, setInstructors] = useState<any[]>([]);
+  const [editingInstructorId, setEditingInstructorId] = useState<string | null>(null);
+  const [instructorImageMode, setInstructorImageMode] = useState<'presets' | 'upload' | 'url'>('presets');
+  const [newCertText, setNewCertText] = useState('');
+  const [newCategoryText, setNewCategoryText] = useState('');
+  const [newLanguageText, setNewLanguageText] = useState('');
+  const [newReviewStudent, setNewReviewStudent] = useState('');
+  const [newReviewComment, setNewReviewComment] = useState('');
+  const [instructorForm, setInstructorForm] = useState({
+    name: '',
+    role: '',
+    experience: '',
+    image: '',
+    images: [] as string[],
+    description: '',
+    certifications: [] as string[],
+    specialty: '',
+    rating: 5.0,
+    reviews: 0,
+    gender: 'Male' as 'Male' | 'Female',
+    hours: '',
+    successRate: '',
+    languages: [] as string[],
+    categories: [] as string[],
+    detailedBio: '',
+    reviewsList: [] as { student: string; comment: string }[]
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const carFileInputRef = useRef<HTMLInputElement>(null);
+  const instructorFileInputRef = useRef<HTMLInputElement>(null);
   const blogTextareaRef = useRef<HTMLTextAreaElement>(null);
   const wysiwygEditorRef = useRef<HTMLDivElement>(null);
 
@@ -498,6 +528,23 @@ export default function AdminPage() {
       setDrivingCourses(DEFAULT_DRIVING_COURSES);
       localStorage.setItem('driving_courses_v4', JSON.stringify(DEFAULT_DRIVING_COURSES));
     }
+
+    // 7. Load instructors registry
+    const savedInstructors = localStorage.getItem('instructors');
+    if (savedInstructors) {
+      try {
+        const parsed = JSON.parse(savedInstructors);
+        if (Array.isArray(parsed)) {
+          setInstructors(parsed);
+        } else {
+          setInstructors([]);
+        }
+      } catch (err) {
+        setInstructors([]);
+      }
+    } else {
+      setInstructors([]);
+    }
   };
 
   useEffect(() => {
@@ -512,6 +559,7 @@ export default function AdminPage() {
     window.addEventListener('customer_requests_updated', loadDataAndSync);
     window.addEventListener('driving_courses_updated', loadDataAndSync);
     window.addEventListener('blog_editors_updated', loadDataAndSync);
+    window.addEventListener('instructors_updated', loadDataAndSync);
     
     // Background polling interval for extra visual reactivity safety (every 3s)
     const syncInterval = setInterval(loadDataAndSync, 3000);
@@ -525,6 +573,7 @@ export default function AdminPage() {
       window.removeEventListener('customer_requests_updated', loadDataAndSync);
       window.removeEventListener('driving_courses_updated', loadDataAndSync);
       window.removeEventListener('blog_editors_updated', loadDataAndSync);
+      window.removeEventListener('instructors_updated', loadDataAndSync);
       clearInterval(syncInterval);
     };
   }, []);
@@ -553,6 +602,203 @@ export default function AdminPage() {
       showToast('Booking record removed.', 'info');
       loadDataAndSync();
     }
+  };
+
+  // -------------------------------------------------------------------------
+  // Instructors CRUD Handlers
+  // -------------------------------------------------------------------------
+  const handleInstructorImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          const base64Str = reader.result;
+          setInstructorForm(prev => {
+            const updatedImages = [...(prev.images || [])];
+            if (!updatedImages.includes(base64Str)) {
+              updatedImages.push(base64Str);
+            }
+            return {
+              ...prev,
+              image: prev.image || base64Str,
+              images: updatedImages
+            };
+          });
+          showToast('Image uploaded and added to gallery!', 'success');
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const resetInstructorForm = () => {
+    setEditingInstructorId(null);
+    setInstructorForm({
+      name: '',
+      role: '',
+      experience: '',
+      image: 'https://images.unsplash.com/photo-1549849171-09f624480091?auto=format&fit=crop&w=600&q=80',
+      images: ['https://images.unsplash.com/photo-1549849171-09f624480091?auto=format&fit=crop&w=600&q=80'],
+      description: '',
+      certifications: ['Certified Coach'],
+      specialty: 'Automatic & Manual',
+      rating: 4.8,
+      reviews: 42,
+      gender: 'Male',
+      hours: '500+',
+      successRate: '98%',
+      languages: ['Urdu', 'Punjabi'],
+      categories: ['Defensive'],
+      detailedBio: '',
+      reviewsList: []
+    });
+    setNewCertText('');
+    setNewCategoryText('');
+    setNewLanguageText('');
+    setNewReviewStudent('');
+    setNewReviewComment('');
+  };
+
+  const handleEditInstructor = (inst: any) => {
+    setEditingInstructorId(inst.id);
+    const instImage = inst.image || '';
+    const instImages = inst.images && Array.isArray(inst.images) && inst.images.length > 0 
+      ? inst.images 
+      : (instImage ? [instImage] : []);
+    setInstructorForm({
+      name: inst.name || '',
+      role: inst.role || '',
+      experience: inst.experience || '',
+      image: instImage,
+      images: instImages,
+      description: inst.description || '',
+      certifications: inst.certifications || [],
+      specialty: inst.specialty || '',
+      rating: inst.rating || 5.0,
+      reviews: inst.reviews || 0,
+      gender: inst.gender || 'Male',
+      hours: inst.hours || '',
+      successRate: inst.successRate || '',
+      languages: inst.languages || [],
+      categories: inst.categories || [],
+      detailedBio: inst.detailedBio || '',
+      reviewsList: inst.reviewsList || []
+    });
+  };
+
+  const handleSaveInstructor = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!instructorForm.name || !instructorForm.role) {
+      showToast('Name and Role are required!', 'error');
+      return;
+    }
+
+    let updatedList = [...instructors];
+    const finalImages = instructorForm.images && instructorForm.images.length > 0
+      ? instructorForm.images
+      : (instructorForm.image ? [instructorForm.image] : []);
+    const itemToSave = {
+      ...instructorForm,
+      images: finalImages,
+      image: instructorForm.image || finalImages[0] || 'https://images.unsplash.com/photo-1549849171-09f624480091?auto=format&fit=crop&w=600&q=80',
+      id: editingInstructorId || 'inst-' + Date.now().toString(),
+      rating: Number(instructorForm.rating) || 5.0,
+      reviews: Number(instructorForm.reviews) || 0
+    };
+
+    if (editingInstructorId) {
+      updatedList = updatedList.map(item => item.id === editingInstructorId ? itemToSave : item);
+      showToast('Instructor updated successfully!', 'success');
+    } else {
+      updatedList.push(itemToSave);
+      showToast('New Instructor added successfully!', 'success');
+    }
+
+    localStorage.setItem('instructors', JSON.stringify(updatedList));
+    setInstructors(updatedList);
+    window.dispatchEvent(new Event('instructors_updated'));
+    window.dispatchEvent(new Event('storage'));
+    resetInstructorForm();
+  };
+
+  const handleDeleteInstructor = (id: string) => {
+    if (window.confirm('Are you sure you want to delete this instructor? This will immediately remove them from the public About Us page.')) {
+      const updatedList = instructors.filter(item => item.id !== id);
+      localStorage.setItem('instructors', JSON.stringify(updatedList));
+      setInstructors(updatedList);
+      window.dispatchEvent(new Event('instructors_updated'));
+      window.dispatchEvent(new Event('storage'));
+      showToast('Instructor profile deleted.', 'info');
+    }
+  };
+
+  const addCertToForm = () => {
+    if (!newCertText.trim()) return;
+    if (instructorForm.certifications.includes(newCertText.trim())) return;
+    setInstructorForm({
+      ...instructorForm,
+      certifications: [...instructorForm.certifications, newCertText.trim()]
+    });
+    setNewCertText('');
+  };
+
+  const removeCertFromForm = (cert: string) => {
+    setInstructorForm({
+      ...instructorForm,
+      certifications: instructorForm.certifications.filter(c => c !== cert)
+    });
+  };
+
+  const addCategoryToForm = () => {
+    if (!newCategoryText.trim()) return;
+    if (instructorForm.categories.includes(newCategoryText.trim())) return;
+    setInstructorForm({
+      ...instructorForm,
+      categories: [...instructorForm.categories, newCategoryText.trim()]
+    });
+    setNewCategoryText('');
+  };
+
+  const removeCategoryFromForm = (cat: string) => {
+    setInstructorForm({
+      ...instructorForm,
+      categories: instructorForm.categories.filter(c => c !== cat)
+    });
+  };
+
+  const addLanguageToForm = () => {
+    if (!newLanguageText.trim()) return;
+    if (instructorForm.languages.includes(newLanguageText.trim())) return;
+    setInstructorForm({
+      ...instructorForm,
+      languages: [...instructorForm.languages, newLanguageText.trim()]
+    });
+    setNewLanguageText('');
+  };
+
+  const removeLanguageFromForm = (lang: string) => {
+    setInstructorForm({
+      ...instructorForm,
+      languages: instructorForm.languages.filter(l => l !== lang)
+    });
+  };
+
+  const addReviewToForm = () => {
+    if (!newReviewStudent.trim() || !newReviewComment.trim()) return;
+    setInstructorForm({
+      ...instructorForm,
+      reviewsList: [...instructorForm.reviewsList, { student: newReviewStudent.trim(), comment: newReviewComment.trim() }]
+    });
+    setNewReviewStudent('');
+    setNewReviewComment('');
+  };
+
+  const removeReviewFromForm = (idx: number) => {
+    setInstructorForm({
+      ...instructorForm,
+      reviewsList: instructorForm.reviewsList.filter((_, i) => i !== idx)
+    });
   };
 
   const getStudentWhatsAppLink = (b: any) => {
@@ -2138,6 +2384,26 @@ export default function AdminPage() {
                     SSL
                   </span>
                 </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('instructors')}
+                  className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                    activeTab === 'instructors'
+                      ? 'bg-[#E05A00] text-white font-extrabold shadow-md shadow-red-700/10'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
+                    <UserCheck className="w-4 h-4" />
+                    <span>Instructors Manager</span>
+                  </div>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-md font-black min-w-5 text-center ${
+                    activeTab === 'instructors' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                  }`}>
+                    {instructors.length}
+                  </span>
+                </button>
               </div>
             </div>
           </div>
@@ -3320,6 +3586,751 @@ export default function AdminPage() {
                 <li>Enter <code className="bg-white px-1.5 py-0.5 rounded border font-mono">_dmarc</code> for the Name/Host, select TTL to Auto/Default, and paste the copied Value content there.</li>
                 <li>Click <strong>Save</strong>. In 1 to 24 hours, the record will propagate and verification tools like theHoth will show perfect 100% SEO Compliance!</li>
               </ol>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'instructors' && (
+          <div className="space-y-8 animate-fade-in">
+            {/* Header Description */}
+            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm">
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-5 mb-6">
+                <div className="flex items-center gap-2.5">
+                  <span className="p-2 bg-[#FF7112]/10 text-[#FF7112] rounded-lg">
+                    <UserCheck className="w-5 h-5" />
+                  </span>
+                  <div>
+                    <h2 className="text-2xl font-black text-gray-900 tracking-tight font-sans">Meet Our Certified Instructors</h2>
+                    <p className="text-gray-500 text-sm mt-1 font-medium">
+                      Add, edit, or delete the certified driver training team. Changes here sync instantly to the public <strong className="text-[#E05A00]">About Us</strong> page!
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    resetInstructorForm();
+                    const el = document.getElementById('instructor-form-section');
+                    el?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="bg-[#E05A00] hover:bg-[#FF7112] text-white px-5 py-2.5 rounded-xl font-black text-sm flex items-center gap-2 transition duration-200 cursor-pointer shadow-md shadow-orange-700/10"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add New Instructor</span>
+                </button>
+              </div>
+
+              {/* Grid of existing instructors */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {instructors.map((inst) => (
+                  <div key={inst.id} className="border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition duration-200 bg-white flex flex-col justify-between">
+                    <div>
+                      <div className="relative h-44 bg-slate-100">
+                        <img 
+                          src={inst.image || 'https://images.unsplash.com/photo-1549849171-09f624480091?auto=format&fit=crop&w=600&q=80'} 
+                          alt={inst.name}
+                          className="w-full h-full object-cover" 
+                          referrerPolicy="no-referrer"
+                        />
+                        <span className="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-sm text-white px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+                          {inst.experience}
+                        </span>
+                        <span className="absolute bottom-3 left-3 bg-[#E05A00] text-white px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+                          {inst.gender}
+                        </span>
+                      </div>
+                      <div className="p-4 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-black text-slate-900 leading-tight">{inst.name}</h3>
+                          <div className="flex items-center gap-1 text-amber-500 text-xs font-extrabold">
+                            <Star className="w-3.5 h-3.5 fill-current" />
+                            <span>{inst.rating}</span>
+                          </div>
+                        </div>
+                        <p className="text-[#E05A00] text-xs font-black">{inst.role}</p>
+                        <p className="text-slate-600 text-xs line-clamp-2 leading-relaxed">{inst.description}</p>
+                        <div className="pt-2 flex flex-wrap gap-1">
+                          {inst.categories?.map((cat: string) => (
+                            <span key={cat} className="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded font-bold">
+                              {cat}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2.5">
+                      <button
+                        onClick={() => {
+                          handleEditInstructor(inst);
+                          const el = document.getElementById('instructor-form-section');
+                          el?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        className="text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer flex-1 justify-center"
+                      >
+                        <Edit className="w-3.5 h-3.5" />
+                        <span>Edit</span>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteInstructor(inst.id)}
+                        className="text-red-600 hover:text-white bg-white hover:bg-red-600 border border-slate-200 hover:border-red-600 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer flex-1 justify-center"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Delete</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {instructors.length === 0 && (
+                  <div className="col-span-full py-12 text-center border-2 border-dashed border-slate-200 rounded-2xl">
+                    <Users className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+                    <p className="text-sm text-slate-500 font-bold">No certified instructors loaded in the registry.</p>
+                    <button onClick={resetInstructorForm} className="mt-3 text-xs text-[#E05A00] uppercase font-black tracking-wider cursor-pointer">
+                      Create instructor profile &rarr;
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Form Section */}
+            <div id="instructor-form-section" className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6 scroll-mt-24">
+              <div className="border-b border-gray-100 pb-4">
+                <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
+                  <UserCheck className="w-5 h-5 text-[#E05A00]" />
+                  <span>{editingInstructorId ? `Edit Profile: ${instructorForm.name || 'Instructor'}` : 'Create Certified Instructor Profile'}</span>
+                </h3>
+                <p className="text-gray-500 text-xs mt-1 font-medium">
+                  Fill in all fields below to publish a certified profile onto the school portal.
+                </p>
+              </div>
+
+              <form onSubmit={handleSaveInstructor} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {/* Name field */}
+                  <div className="space-y-1.5">
+                    <label className="text-slate-800 text-xs font-bold uppercase tracking-wider block">Full Name *</label>
+                    <input 
+                      type="text" 
+                      required
+                      placeholder="e.g. Zahid Mahmood"
+                      value={instructorForm.name}
+                      onChange={(e) => setInstructorForm({ ...instructorForm, name: e.target.value })}
+                      className="w-full text-sm px-4 py-2.5 rounded-xl border border-slate-200 font-medium text-slate-900 focus:outline-[#E05A00] bg-slate-50/50"
+                    />
+                  </div>
+
+                  {/* Role field */}
+                  <div className="space-y-1.5">
+                    <label className="text-slate-800 text-xs font-bold uppercase tracking-wider block">Role Description *</label>
+                    <input 
+                      type="text" 
+                      required
+                      placeholder="e.g. Senior Female Coach"
+                      value={instructorForm.role}
+                      onChange={(e) => setInstructorForm({ ...instructorForm, role: e.target.value })}
+                      className="w-full text-sm px-4 py-2.5 rounded-xl border border-slate-200 font-medium text-slate-900 focus:outline-[#E05A00] bg-slate-50/50"
+                    />
+                  </div>
+
+                  {/* Experience field */}
+                  <div className="space-y-1.5">
+                    <label className="text-slate-800 text-xs font-bold uppercase tracking-wider block">Experience Duration</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. 10+ Years Exp"
+                      value={instructorForm.experience}
+                      onChange={(e) => setInstructorForm({ ...instructorForm, experience: e.target.value })}
+                      className="w-full text-sm px-4 py-2.5 rounded-xl border border-slate-200 font-medium text-slate-900 focus:outline-[#E05A00] bg-slate-50/50"
+                    />
+                  </div>
+
+                  {/* Image field with multiple photos manager & preview */}
+                  <div className="lg:col-span-3 bg-slate-50/70 p-5 rounded-2xl border border-slate-100 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200/60 pb-3 gap-2">
+                      <div>
+                        <h4 className="text-slate-950 text-xs sm:text-sm font-black uppercase tracking-wider flex items-center gap-1.5">
+                          <ImageIcon className="w-4 h-4 text-[#E05A00]" />
+                          <span>Instructor Profile Picture</span>
+                        </h4>
+                        <p className="text-slate-500 text-[10px] sm:text-xs">Add one or multiple photos. Set your desired active portrait picture style.</p>
+                      </div>
+                      
+                      {/* Smooth Selector Tabs */}
+                      <div className="flex bg-slate-200/75 p-1 rounded-xl text-[11px] font-bold gap-1 shadow-inner self-start sm:self-auto">
+                        <button
+                          type="button"
+                          onClick={() => setInstructorImageMode('presets')}
+                          className={`px-3 py-1.5 rounded-lg transition-all duration-150 flex items-center gap-1 cursor-pointer ${
+                            instructorImageMode === 'presets' 
+                              ? 'bg-white text-slate-900 shadow-sm font-extrabold' 
+                              : 'text-slate-500 hover:text-slate-800'
+                          }`}
+                        >
+                          <Sparkles className="w-3.5 h-3.5" />
+                          <span>Gallery Presets</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setInstructorImageMode('upload')}
+                          className={`px-3 py-1.5 rounded-lg transition-all duration-150 flex items-center gap-1 cursor-pointer ${
+                            instructorImageMode === 'upload' 
+                              ? 'bg-white text-slate-900 shadow-sm font-extrabold' 
+                              : 'text-slate-500 hover:text-slate-800'
+                          }`}
+                        >
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>Upload File</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setInstructorImageMode('url')}
+                          className={`px-3 py-1.5 rounded-lg transition-all duration-150 flex items-center gap-1 cursor-pointer ${
+                            instructorImageMode === 'url' 
+                              ? 'bg-white text-slate-900 shadow-sm font-extrabold' 
+                              : 'text-slate-500 hover:text-slate-800'
+                          }`}
+                        >
+                          <LinkIcon className="w-3.5 h-3.5" />
+                          <span>Custom URL</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-5 items-stretch">
+                      {/* Left: Live Preview */}
+                      <div className="flex flex-col items-center justify-center shrink-0">
+                        <span className="text-[10px] text-slate-400 font-black uppercase mb-1">Active/Primary Photo</span>
+                        <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden border-2 border-[#E05A00] bg-white shadow-sm flex items-center justify-center group">
+                          {instructorForm.image ? (
+                            <img 
+                              src={instructorForm.image} 
+                              alt="Active Profile Pic" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          ) : (
+                            <div className="flex flex-col items-center justify-center text-slate-300 p-2">
+                              <User className="w-8 h-8 stroke-[1.5]" />
+                              <span className="text-[10px] font-bold text-slate-400 mt-1">No Image</span>
+                            </div>
+                          )}
+                          {instructorForm.image && (
+                            <button
+                              type="button"
+                              onClick={() => setInstructorForm({ ...instructorForm, image: '' })}
+                              className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-all duration-150 flex items-center justify-center text-white text-[11px] font-black cursor-pointer uppercase tracking-wider"
+                            >
+                              Clear Active
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Right: Workspace Options */}
+                      <div className="flex-1 bg-white p-4 rounded-xl border border-slate-200/70 flex flex-col justify-center">
+                        {instructorImageMode === 'presets' && (
+                          <div className="space-y-2">
+                            <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Curated Stock Headshots (Click to choose &amp; add)</span>
+                            <div className="grid grid-cols-6 gap-2">
+                              {[
+                                { url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=350&h=350&q=80', label: 'Female 1 (Saima)' },
+                                { url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=350&h=350&q=80', label: 'Female 2 (Ayesha)' },
+                                { url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=350&h=350&q=80', label: 'Female 3 (Maria)' },
+                                { url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=350&h=350&q=80', label: 'Male 1 (Zahid)' },
+                                { url: 'https://images.unsplash.com/photo-1549849171-09f624480091?auto=format&fit=crop&w=350&h=350&q=80', label: 'Male 2 (Instructor-2)' },
+                                { url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=350&h=350&q=80', label: 'Male 3 (Senior Coach)' }
+                              ].map((item, idx) => {
+                                const isSelected = instructorForm.image === item.url;
+                                return (
+                                  <button
+                                    key={idx}
+                                    type="button"
+                                    onClick={() => {
+                                      const updatedImages = instructorForm.images ? [...instructorForm.images] : [];
+                                      if (!updatedImages.includes(item.url)) {
+                                        updatedImages.push(item.url);
+                                      }
+                                      setInstructorForm({ 
+                                        ...instructorForm, 
+                                        image: item.url,
+                                        images: updatedImages
+                                      });
+                                      showToast(`Set primary and added to photo gallery!`, 'success');
+                                    }}
+                                    className={`relative rounded-xl overflow-hidden aspect-square border-2 transition duration-200 hover:scale-105 shadow-sm focus:outline-none cursor-pointer ${
+                                      isSelected 
+                                        ? 'border-[#E05A00] ring-2 ring-orange-100 scale-95' 
+                                        : 'border-transparent hover:border-slate-300'
+                                    }`}
+                                    title={item.label}
+                                  >
+                                    <img 
+                                      src={item.url} 
+                                      alt={item.label} 
+                                      className="w-full h-full object-cover" 
+                                      referrerPolicy="no-referrer"
+                                    />
+                                    {isSelected && (
+                                      <div className="absolute inset-0 bg-[#E05A00]/10 flex items-center justify-center">
+                                        <div className="bg-[#E05A00] text-white p-0.5 rounded-full">
+                                          <Check className="w-2.5 h-2.5" />
+                                        </div>
+                                      </div>
+                                    )}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        {instructorImageMode === 'upload' && (
+                          <div className="space-y-2">
+                            <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Browse Device / Gallery File</span>
+                            <div 
+                              onClick={() => instructorFileInputRef.current?.click()}
+                              className="border-2 border-dashed border-slate-200 hover:border-[#E05A00] bg-slate-50/50 hover:bg-slate-100/40 rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer transition duration-150"
+                            >
+                              <input 
+                                type="file" 
+                                ref={instructorFileInputRef} 
+                                accept="image/*" 
+                                className="hidden" 
+                                onChange={handleInstructorImageUpload} 
+                              />
+                              <Upload className="w-6 h-6 text-[#E05A00] mb-1.5" />
+                              <p className="text-xs font-bold text-slate-700">Select Image from Device / Gallery</p>
+                              <p className="text-[10px] text-slate-400 mt-0.5">Will automatically add to the image manager &amp; active preview</p>
+                            </div>
+                          </div>
+                        )}
+
+                        {instructorImageMode === 'url' && (
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Pasted Custom Web Image URL</span>
+                            </div>
+                            <div className="flex gap-2">
+                              <input 
+                                type="text" 
+                                id="custom-instructor-image-url"
+                                placeholder="https://images.unsplash.com/photo-..."
+                                className="flex-1 text-xs px-3.5 py-2 rounded-xl border border-slate-200 font-mono text-slate-700 focus:outline-[#E05A00] bg-slate-50/50"
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    const val = (e.target as HTMLInputElement).value;
+                                    if (val) {
+                                      const updatedImages = instructorForm.images ? [...instructorForm.images] : [];
+                                      if (!updatedImages.includes(val)) {
+                                        updatedImages.push(val);
+                                      }
+                                      setInstructorForm({ ...instructorForm, image: val, images: updatedImages });
+                                      showToast('Added custom image URL to gallery!', 'success');
+                                      (e.target as HTMLInputElement).value = '';
+                                    }
+                                  }
+                                }}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const el = document.getElementById('custom-instructor-image-url') as HTMLInputElement;
+                                  const val = el?.value;
+                                  if (val) {
+                                    const updatedImages = instructorForm.images ? [...instructorForm.images] : [];
+                                    if (!updatedImages.includes(val)) {
+                                      updatedImages.push(val);
+                                    }
+                                    setInstructorForm({ ...instructorForm, image: val, images: updatedImages });
+                                    showToast('Added custom image URL to gallery!', 'success');
+                                    el.value = '';
+                                  } else {
+                                    showToast('Please enter a valid image URL first!', 'error');
+                                  }
+                                }}
+                                className="bg-slate-900 hover:bg-[#E05A00] text-white text-xs px-3 py-2 rounded-xl font-black transition cursor-pointer"
+                              >
+                                Add URL
+                              </button>
+                            </div>
+                            <p className="text-[9px] text-slate-400 leading-normal">
+                              Tip: Type or paste any web image URL and click 'Add URL' (or press Enter) to append it immediately.
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Dynamic Image Gallery Manager & Preview Section */}
+                    <div className="mt-4 pt-4 border-t border-slate-200/60 bg-white p-4 rounded-xl border border-slate-100">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="bg-orange-50 border border-orange-100 text-[#E05A00] px-2.5 py-1 rounded-full text-xs font-black">
+                            {instructorForm.images?.length || 0} File(s)
+                          </span>
+                          <span className="text-slate-900 text-xs font-black uppercase tracking-wider block">
+                            Attached Profile Pictures
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-bold">
+                          * Star indicates the active primary thumbnail
+                        </span>
+                      </div>
+
+                      {/* Display grid of selected images */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                        {(instructorForm.images || []).map((imgUrl, imgIdx) => {
+                          const isPrimary = instructorForm.image === imgUrl;
+                          return (
+                            <div 
+                              key={imgIdx} 
+                              className={`relative group rounded-xl overflow-hidden aspect-square border bg-slate-50 flex items-center justify-center transition-all ${
+                                isPrimary ? 'border-[#E05A00] ring-2 ring-orange-100' : 'border-slate-200'
+                              }`}
+                            >
+                              <img 
+                                src={imgUrl} 
+                                alt={`Profile Pic ${imgIdx + 1}`} 
+                                className="w-full h-full object-cover" 
+                                referrerPolicy="no-referrer"
+                              />
+
+                              {/* Corner Badges */}
+                              {isPrimary && (
+                                <div className="absolute top-1.5 left-1.5 bg-[#E05A00] text-white p-1 rounded-lg shadow-sm" title="Active Display Photo">
+                                  <Star className="w-3 h-3 fill-current" />
+                                </div>
+                              )}
+                              
+                              <span className="absolute bottom-1 bg-slate-900/85 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md right-1">
+                                #{imgIdx + 1}
+                              </span>
+
+                              {/* Hover Overlay Menu */}
+                              <div className="absolute inset-0 bg-slate-950/75 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex flex-col justify-center items-center gap-1.5 p-1">
+                                {!isPrimary && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setInstructorForm({ ...instructorForm, image: imgUrl });
+                                      showToast(`Set image #${imgIdx + 1} as the active display picture.`, 'success');
+                                    }}
+                                    className="bg-[#E05A00] text-white text-[9px] font-bold px-2 py-1 rounded-md hover:bg-orange-600 transition cursor-pointer flex items-center gap-1"
+                                  >
+                                    <Star className="w-2.5 h-2.5 fill-current" />
+                                    <span>Set Main</span>
+                                  </button>
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const updatedImages = instructorForm.images.filter((_, idx) => idx !== imgIdx);
+                                    let newPrimary = instructorForm.image;
+                                    if (isPrimary) {
+                                      newPrimary = updatedImages[0] || '';
+                                    }
+                                    setInstructorForm({ 
+                                      ...instructorForm, 
+                                      image: newPrimary, 
+                                      images: updatedImages 
+                                    });
+                                    showToast('Picture removed from list.', 'info');
+                                  }}
+                                  className="bg-red-600 hover:bg-red-700 text-white text-[9px] font-bold px-2 py-1 rounded-md transition cursor-pointer flex items-center gap-1"
+                                >
+                                  <Trash2 className="w-2.5 h-2.5" />
+                                  <span>Remove</span>
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+
+                        {(!instructorForm.images || instructorForm.images.length === 0) && (
+                          <div className="col-span-full py-6 text-center border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
+                            <ImageIcon className="w-6 h-6 text-slate-300 mx-auto mb-1" />
+                            <p className="text-[10px] text-slate-500 font-bold">No images uploaded or selected for this profile yet.</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Gender Selection */}
+                  <div className="space-y-1.5">
+                    <label className="text-slate-800 text-xs font-bold uppercase tracking-wider block">Gender Profile</label>
+                    <select 
+                      value={instructorForm.gender}
+                      onChange={(e) => setInstructorForm({ ...instructorForm, gender: e.target.value as 'Male' | 'Female' })}
+                      className="w-full text-sm px-4 py-2.5 rounded-xl border border-slate-200 font-semibold text-slate-900 focus:outline-[#E05A00] bg-slate-50/50"
+                    >
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+                  </div>
+
+                  {/* Specialty field */}
+                  <div className="space-y-1.5">
+                    <label className="text-slate-800 text-xs font-bold uppercase tracking-wider block">Transmission Specialty</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. Manual & Automatic"
+                      value={instructorForm.specialty}
+                      onChange={(e) => setInstructorForm({ ...instructorForm, specialty: e.target.value })}
+                      className="w-full text-sm px-4 py-2.5 rounded-xl border border-slate-200 font-medium text-slate-900 focus:outline-[#E05A00] bg-slate-50/50"
+                    />
+                  </div>
+
+                  {/* Rating field */}
+                  <div className="space-y-1.5">
+                    <label className="text-slate-800 text-xs font-bold uppercase tracking-wider block">Rating (1.0 to 5.0)</label>
+                    <input 
+                      type="number" 
+                      step="0.1" 
+                      min="1" 
+                      max="5"
+                      value={instructorForm.rating}
+                      onChange={(e) => setInstructorForm({ ...instructorForm, rating: parseFloat(e.target.value) || 5 })}
+                      className="w-full text-sm px-4 py-2.5 rounded-xl border border-slate-200 font-medium text-slate-900 focus:outline-[#E05A00] bg-slate-50/50"
+                    />
+                  </div>
+
+                  {/* Reviews field */}
+                  <div className="space-y-1.5">
+                    <label className="text-slate-800 text-xs font-bold uppercase tracking-wider block">Reviews Count</label>
+                    <input 
+                      type="number"
+                      value={instructorForm.reviews}
+                      onChange={(e) => setInstructorForm({ ...instructorForm, reviews: parseInt(e.target.value, 15) || 0 })}
+                      className="w-full text-sm px-4 py-2.5 rounded-xl border border-slate-200 font-medium text-slate-900 focus:outline-[#E05A00] bg-slate-50/50"
+                    />
+                  </div>
+
+                  {/* Training Hours field */}
+                  <div className="space-y-1.5">
+                    <label className="text-slate-800 text-xs font-bold uppercase tracking-wider block">Hours Mentored</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. 2,400+ hours"
+                      value={instructorForm.hours}
+                      onChange={(e) => setInstructorForm({ ...instructorForm, hours: e.target.value })}
+                      className="w-full text-sm px-4 py-2.5 rounded-xl border border-slate-200 font-medium text-slate-900 focus:outline-[#E05A00] bg-slate-50/50"
+                    />
+                  </div>
+
+                  {/* Success Rate field */}
+                  <div className="space-y-1.5">
+                    <label className="text-slate-800 text-xs font-bold uppercase tracking-wider block">Success rate (%)</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. 99%"
+                      value={instructorForm.successRate}
+                      onChange={(e) => setInstructorForm({ ...instructorForm, successRate: e.target.value })}
+                      className="w-full text-sm px-4 py-2.5 rounded-xl border border-slate-200 font-medium text-slate-900 focus:outline-[#E05A00] bg-slate-50/50"
+                    />
+                  </div>
+                </div>
+
+                {/* Tag Groups (Certifications, Categories, Languages) */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                  
+                  {/* Certifications Dynamic Section */}
+                  <div className="space-y-3 border border-slate-150 rounded-xl p-4 bg-slate-50/40">
+                    <label className="text-slate-800 text-xs font-bold uppercase tracking-wider block">Certifications &amp; Badges</label>
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {instructorForm.certifications.map(cert => (
+                        <span key={cert} className="inline-flex items-center gap-1 bg-orange-50 border border-orange-200 text-[#E05A00] text-[10px] font-extrabold px-2 py-0.5 rounded-full">
+                          <span>{cert}</span>
+                          <button type="button" onClick={() => removeCertFromForm(cert)} className="text-slate-400 hover:text-[#E05A00] font-black cursor-pointer">
+                            <X className="w-2.5 h-2.5" />
+                          </button>
+                        </span>
+                      ))}
+                      {instructorForm.certifications.length === 0 && (
+                        <span className="text-[10px] text-slate-400 italic">No certifications added.</span>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <input 
+                        type="text" 
+                        placeholder="Add cert title..." 
+                        value={newCertText}
+                        onChange={(e) => setNewCertText(e.target.value)}
+                        className="flex-1 text-xs px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-[#E05A00] font-medium text-slate-900 bg-white"
+                      />
+                      <button 
+                        type="button" 
+                        onClick={addCertToForm} 
+                        className="bg-slate-900 hover:bg-[#E05A00] text-white text-xs px-3 rounded-lg font-black transition cursor-pointer"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Filter Categories Dynamic Section */}
+                  <div className="space-y-3 border border-slate-150 rounded-xl p-4 bg-slate-50/40">
+                    <label className="text-slate-800 text-xs font-bold uppercase tracking-wider block">Filter Categories (e.g. Defensive, Female Only, Manual, Automatic)</label>
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {instructorForm.categories.map(cat => (
+                        <span key={cat} className="inline-flex items-center gap-1 bg-slate-900 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                          <span>{cat}</span>
+                          <button type="button" onClick={() => removeCategoryFromForm(cat)} className="text-slate-300 hover:text-white font-black cursor-pointer">
+                            <X className="w-2.5 h-2.5" />
+                          </button>
+                        </span>
+                      ))}
+                      {instructorForm.categories.length === 0 && (
+                        <span className="text-[10px] text-slate-400 italic">No category tags added.</span>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <input 
+                        type="text" 
+                        placeholder="Add category tag..." 
+                        value={newCategoryText}
+                        onChange={(e) => setNewCategoryText(e.target.value)}
+                        className="flex-1 text-xs px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-[#E05A00] font-medium text-slate-900 bg-white"
+                      />
+                      <button 
+                        type="button" 
+                        onClick={addCategoryToForm} 
+                        className="bg-slate-900 hover:bg-[#E05A00] text-white text-xs px-3 rounded-lg font-black transition cursor-pointer"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Languages Dynamic Section */}
+                  <div className="space-y-3 border border-slate-150 rounded-xl p-4 bg-slate-50/40">
+                    <label className="text-slate-800 text-xs font-bold uppercase tracking-wider block">Spoken Languages</label>
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {instructorForm.languages.map(lang => (
+                        <span key={lang} className="inline-flex items-center gap-1 bg-blue-50 border border-blue-100 text-blue-700 text-[10px] font-extrabold px-2 py-0.5 rounded-full">
+                          <span>{lang}</span>
+                          <button type="button" onClick={() => removeLanguageFromForm(lang)} className="text-slate-400 hover:text-slate-900 font-black cursor-pointer">
+                            <X className="w-2.5 h-2.5" />
+                          </button>
+                        </span>
+                      ))}
+                      {instructorForm.languages.length === 0 && (
+                        <span className="text-[10px] text-slate-400 italic">No languages added.</span>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <input 
+                        type="text" 
+                        placeholder="Add language..." 
+                        value={newLanguageText}
+                        onChange={(e) => setNewLanguageText(e.target.value)}
+                        className="flex-1 text-xs px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-[#E05A00] font-medium text-slate-900 bg-white"
+                      />
+                      <button 
+                        type="button" 
+                        onClick={addLanguageToForm} 
+                        className="bg-slate-900 hover:bg-[#E05A00] text-white text-xs px-3 rounded-lg font-black transition cursor-pointer"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Short Description */}
+                <div className="space-y-1.5">
+                  <label className="text-slate-800 text-xs font-bold uppercase tracking-wider block">Short Introduction (Summary of 1-2 lines)</label>
+                  <textarea 
+                    rows={2}
+                    placeholder="Provide a highly friendly summary about their style..."
+                    value={instructorForm.description}
+                    onChange={(e) => setInstructorForm({ ...instructorForm, description: e.target.value })}
+                    className="w-full text-sm px-4 py-2.5 rounded-xl border border-slate-200 font-medium text-slate-900 focus:outline-[#E05A00] bg-slate-50/50"
+                  />
+                </div>
+
+                {/* Extended detailed bio description */}
+                <div className="space-y-1.5">
+                  <label className="text-slate-800 text-xs font-bold uppercase tracking-wider block">Detailed Biography / Complete Journey Bio (For Popup View details)</label>
+                  <textarea 
+                    rows={4}
+                    placeholder="Provide continuous comprehensive background, motorway details, slope holding techniques..."
+                    value={instructorForm.detailedBio}
+                    onChange={(e) => setInstructorForm({ ...instructorForm, detailedBio: e.target.value })}
+                    className="w-full text-sm px-4 py-2.5 rounded-xl border border-slate-200 font-medium text-slate-900 focus:outline-[#E05A00] bg-slate-50/50"
+                  />
+                </div>
+
+                {/* Reviews List Dynamic Setup */}
+                <div className="border border-slate-250 rounded-xl p-5 space-y-4 bg-slate-50/30">
+                  <h4 className="text-sm font-black text-slate-900 uppercase tracking-wider font-sans">Student Endorsements / Testimonials</h4>
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {instructorForm.reviewsList.map((rev, index) => (
+                      <div key={index} className="bg-white border border-slate-150 p-3 rounded-lg text-xs space-y-1 flex items-start justify-between gap-4">
+                        <div>
+                          <strong className="text-slate-900 font-extrabold">{rev.student}</strong>
+                          <p className="text-slate-600 font-medium italic">{rev.comment}</p>
+                        </div>
+                        <button type="button" onClick={() => removeReviewFromForm(index)} className="text-red-500 hover:text-red-700 font-black cursor-pointer">
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                    {instructorForm.reviewsList.length === 0 && (
+                      <p className="text-xs text-slate-400 italic font-medium">No testimonials added yet to this profile.</p>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+                    <div className="sm:col-span-4 space-y-1">
+                      <label className="text-[10px] text-slate-500 font-black uppercase">Student Name</label>
+                      <input 
+                        type="text" 
+                        placeholder="Student e.g. Saba" 
+                        value={newReviewStudent}
+                        onChange={(e) => setNewReviewStudent(e.target.value)}
+                        className="w-full text-xs px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-[#E05A00] font-medium text-slate-900 bg-white"
+                      />
+                    </div>
+                    <div className="sm:col-span-6 space-y-1">
+                      <label className="text-[10px] text-slate-500 font-black uppercase">Testimonial Comment</label>
+                      <input 
+                        type="text" 
+                        placeholder="Feedback comment left by student..." 
+                        value={newReviewComment}
+                        onChange={(e) => setNewReviewComment(e.target.value)}
+                        className="w-full text-xs px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-[#E05A00] font-medium text-slate-900 bg-white"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <button 
+                        type="button" 
+                        onClick={addReviewToForm} 
+                        className="w-full bg-slate-900 hover:bg-[#E05A00] text-white text-xs py-2 rounded-lg font-black transition cursor-pointer text-center"
+                      >
+                        Add Review
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Form Buttons */}
+                <div className="flex items-center gap-3 justify-end pt-4 border-t border-slate-100">
+                  <button 
+                    type="button" 
+                    onClick={resetInstructorForm}
+                    className="px-6 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:text-slate-950 hover:bg-slate-50 text-sm font-bold transition cursor-pointer"
+                  >
+                    Cancel / Clear
+                  </button>
+                  <button 
+                    type="submit"
+                    className="px-6 py-2.5 rounded-xl bg-[#E05A00] hover:bg-[#FF7112] text-white text-sm font-black transition cursor-pointer shadow-md shadow-orange-700/10"
+                  >
+                    {editingInstructorId ? 'Update Profile' : 'Publish Profile'}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}
