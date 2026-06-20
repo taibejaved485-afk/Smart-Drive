@@ -769,3 +769,558 @@ function normalizeDbRequest(item: any): any {
     createdAt: item.created_at
   };
 }
+
+// -------------------------------------------------------------------------
+// Helper Normalizers for Instructors, Blog Posts, and Driving Courses
+// -------------------------------------------------------------------------
+
+export interface DbInstructor {
+  id?: string;
+  name: string;
+  role: string;
+  description: string;
+  image: string;
+  certifications: string[];
+  rating: number;
+  reviews: number;
+  gender: string;
+  availability: string;
+  hours: string;
+  success_rate: string;
+  languages: string[];
+  created_at?: string;
+}
+
+export interface DbBlogPost {
+  id?: string;
+  title: string;
+  author: string;
+  image_url: string;
+  content: string;
+  date: string;
+  author_avatar?: string;
+  author_role?: string;
+  image_alt?: string;
+  meta_title?: string;
+  meta_description?: string;
+  focus_keywords?: string;
+  excerpt?: string;
+  status: string;
+  scheduled_at?: string;
+  created_at?: string;
+}
+
+export interface DbDrivingCourse {
+  id?: string;
+  custom_id?: string;
+  name: string;
+  price: string;
+  duration: string;
+  badge?: string;
+  is_popular: boolean;
+  transmission: string;
+  description?: string;
+  features: string[];
+  specifications: any[];
+  created_at?: string;
+}
+
+function normalizeDbInstructor(item: any): any {
+  return {
+    id: item.id,
+    name: item.name,
+    role: item.role,
+    description: item.description || '',
+    image: item.image || '',
+    certifications: item.certifications || [],
+    rating: parseFloat(item.rating || '5.0'),
+    reviews: parseInt(item.reviews || '0', 10),
+    gender: item.gender || 'Male',
+    availability: item.availability || 'Available',
+    hours: item.hours || '',
+    successRate: item.success_rate || '',
+    languages: item.languages || [],
+    createdAt: item.created_at
+  };
+}
+
+function normalizeDbBlogPost(item: any): any {
+  return {
+    id: item.id,
+    title: item.title,
+    author: item.author || 'GoDriveify Team',
+    imageUrl: item.image_url || '',
+    content: item.content || '',
+    date: item.date || '',
+    authorAvatar: item.author_avatar || '',
+    authorRole: item.author_role || '',
+    imageAlt: item.image_alt || '',
+    metaTitle: item.meta_title || '',
+    metaDescription: item.meta_description || '',
+    focusKeywords: item.focus_keywords || '',
+    excerpt: item.excerpt || '',
+    status: item.status || 'Draft',
+    scheduledAt: item.scheduled_at || '',
+    createdAt: item.created_at
+  };
+}
+
+function normalizeDbDrivingCourse(item: any): any {
+  return {
+    id: item.id,
+    customId: item.custom_id,
+    name: item.name,
+    price: item.price ? parseFloat(item.price.toString().replace(/,/g, '')).toLocaleString() : '0',
+    duration: item.duration || '',
+    badge: item.badge || '',
+    isPopular: item.is_popular || false,
+    transmission: item.transmission || 'Manual',
+    description: item.description || '',
+    features: item.features || [],
+    specifications: typeof item.specifications === 'string' 
+      ? JSON.parse(item.specifications) 
+      : (item.specifications || []),
+    createdAt: item.created_at
+  };
+}
+
+// -------------------------------------------------------------------------
+// 5. INSTRUCTORS LOGISTIC OPERATIONS
+// -------------------------------------------------------------------------
+
+export async function fetchInstructors(): Promise<any[]> {
+  const localSaved = localStorage.getItem('instructors');
+  let fallback = localSaved ? JSON.parse(localSaved) : [];
+
+  if (supabase) {
+    try {
+      const active = await tableExists('instructors');
+      if (active) {
+        const { data, error } = await supabase
+          .from('instructors')
+          .select('*')
+          .order('created_at', { ascending: true });
+
+        if (!error && data) {
+          const mapped = data.map(normalizeDbInstructor);
+          localStorage.setItem('instructors', JSON.stringify(mapped));
+          window.dispatchEvent(new Event('instructors_updated'));
+          return mapped;
+        }
+      }
+    } catch (e) {
+      console.error('Supabase fetchInstructors failed', e);
+    }
+  }
+  return fallback;
+}
+
+export async function insertInstructor(instructor: any): Promise<boolean> {
+  const mapped: DbInstructor = {
+    name: instructor.name,
+    role: instructor.role,
+    description: instructor.description || '',
+    image: instructor.image || '',
+    certifications: instructor.certifications || [],
+    rating: Number(instructor.rating) || 5.0,
+    reviews: Number(instructor.reviews) || 0,
+    gender: instructor.gender || 'Male',
+    availability: instructor.availability || 'Available',
+    hours: instructor.hours || '',
+    success_rate: instructor.successRate || '',
+    languages: instructor.languages || []
+  };
+
+  // Add locally first
+  const existingLocal = localStorage.getItem('instructors');
+  const localList = existingLocal ? JSON.parse(existingLocal) : [];
+  
+  // Update or insert locally
+  let updatedLocal: any[];
+  const localId = instructor.id || 'inst-' + Date.now().toString();
+  const fullObj = { ...instructor, id: localId };
+  
+  if (localList.some((item: any) => item.id === instructor.id)) {
+    updatedLocal = localList.map((item: any) => item.id === instructor.id ? fullObj : item);
+  } else {
+    updatedLocal = [...localList, fullObj];
+  }
+  localStorage.setItem('instructors', JSON.stringify(updatedLocal));
+  window.dispatchEvent(new Event('instructors_updated'));
+  window.dispatchEvent(new Event('storage'));
+
+  if (supabase) {
+    try {
+      const active = await tableExists('instructors');
+      if (active) {
+        // If the instructor has a UUID, we update, otherwise insert
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(instructor.id);
+        
+        let result;
+        if (isUuid) {
+          result = await supabase
+            .from('instructors')
+            .update(mapped)
+            .eq('id', instructor.id)
+            .select();
+        } else {
+          result = await supabase
+            .from('instructors')
+            .insert([mapped])
+            .select();
+        }
+
+        if (!result.error && result.data && result.data.length > 0) {
+          const synced = normalizeDbInstructor(result.data[0]);
+          const currentList = JSON.parse(localStorage.getItem('instructors') || '[]');
+          const filtered = currentList.filter((item: any) => item.id !== localId && item.id !== synced.id);
+          filtered.push(synced);
+          localStorage.setItem('instructors', JSON.stringify(filtered));
+          window.dispatchEvent(new Event('instructors_updated'));
+          return true;
+        }
+      }
+    } catch (e) {
+      console.error('Supabase insertInstructor failed', e);
+    }
+  }
+  return true;
+}
+
+export async function deleteInstructorBackend(id: string): Promise<boolean> {
+  // Delete locally
+  const existingLocal = localStorage.getItem('instructors');
+  if (existingLocal) {
+    const localList = JSON.parse(existingLocal);
+    const updated = localList.filter((item: any) => item.id !== id);
+    localStorage.setItem('instructors', JSON.stringify(updated));
+    window.dispatchEvent(new Event('instructors_updated'));
+    window.dispatchEvent(new Event('storage'));
+  }
+
+  if (supabase) {
+    try {
+      const active = await tableExists('instructors');
+      if (active) {
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+        if (isUuid) {
+          const { error } = await supabase
+            .from('instructors')
+            .delete()
+            .eq('id', id);
+          if (!error) return true;
+        }
+      }
+    } catch (e) {
+      console.error('deleteInstructorBackend error', e);
+    }
+  }
+  return true;
+}
+
+export async function saveInstructorsList(list: any[]): Promise<boolean> {
+  localStorage.setItem('instructors', JSON.stringify(list));
+  window.dispatchEvent(new Event('instructors_updated'));
+  window.dispatchEvent(new Event('storage'));
+
+  if (supabase) {
+    try {
+      const active = await tableExists('instructors');
+      if (active) {
+        for (const item of list) {
+          await insertInstructor(item);
+        }
+        return true;
+      }
+    } catch (e) {
+      console.error('saveInstructorsList failed', e);
+    }
+  }
+  return true;
+}
+
+// -------------------------------------------------------------------------
+// 6. BLOG POSTS OPERATIONS
+// -------------------------------------------------------------------------
+
+export async function fetchBlogPosts(): Promise<any[]> {
+  const localSaved = localStorage.getItem('blogPosts');
+  let fallback = localSaved ? JSON.parse(localSaved) : [];
+
+  if (supabase) {
+    try {
+      const active = await tableExists('blog_posts');
+      if (active) {
+        const { data, error } = await supabase
+          .from('blog_posts')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (!error && data) {
+          const mapped = data.map(normalizeDbBlogPost);
+          localStorage.setItem('blogPosts', JSON.stringify(mapped));
+          window.dispatchEvent(new Event('blog_editors_updated'));
+          return mapped;
+        }
+      }
+    } catch (e) {
+      console.error('Supabase fetchBlogPosts failed', e);
+    }
+  }
+  return fallback;
+}
+
+export async function insertBlogPost(post: any): Promise<boolean> {
+  const mapped: DbBlogPost = {
+    title: post.title,
+    author: post.author || 'GoDriveify Team',
+    image_url: post.imageUrl || '',
+    content: post.content || '',
+    date: post.date || new Date().toLocaleDateString(),
+    author_avatar: post.authorAvatar || '',
+    author_role: post.authorRole || '',
+    image_alt: post.imageAlt || '',
+    meta_title: post.metaTitle || '',
+    meta_description: post.metaDescription || '',
+    focus_keywords: post.focusKeywords || '',
+    excerpt: post.excerpt || '',
+    status: post.status || 'Draft',
+    scheduled_at: post.scheduledAt || ''
+  };
+
+  // Add locally first
+  const existingLocal = localStorage.getItem('blogPosts');
+  const localList = existingLocal ? JSON.parse(existingLocal) : [];
+  
+  let updatedLocal: any[];
+  const localId = post.id || 'blog-' + Date.now().toString();
+  const fullObj = { ...post, id: localId };
+  
+  if (localList.some((item: any) => String(item.id) === String(post.id))) {
+    updatedLocal = localList.map((item: any) => String(item.id) === String(post.id) ? fullObj : item);
+  } else {
+    updatedLocal = [fullObj, ...localList];
+  }
+  localStorage.setItem('blogPosts', JSON.stringify(updatedLocal));
+  window.dispatchEvent(new Event('blog_editors_updated'));
+  window.dispatchEvent(new Event('storage'));
+
+  if (supabase) {
+    try {
+      const active = await tableExists('blog_posts');
+      if (active) {
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(post.id);
+        
+        let result;
+        if (isUuid) {
+          result = await supabase
+            .from('blog_posts')
+            .update(mapped)
+            .eq('id', post.id)
+            .select();
+        } else {
+          result = await supabase
+            .from('blog_posts')
+            .insert([mapped])
+            .select();
+        }
+
+        if (!result.error && result.data && result.data.length > 0) {
+          const synced = normalizeDbBlogPost(result.data[0]);
+          const currentList = JSON.parse(localStorage.getItem('blogPosts') || '[]');
+          const filtered = currentList.filter((item: any) => String(item.id) !== String(localId) && String(item.id) !== String(synced.id));
+          filtered.unshift(synced);
+          localStorage.setItem('blogPosts', JSON.stringify(filtered));
+          window.dispatchEvent(new Event('blog_editors_updated'));
+          return true;
+        }
+      }
+    } catch (e) {
+      console.error('Supabase insertBlogPost failed', e);
+    }
+  }
+  return true;
+}
+
+export async function deleteBlogPostBackend(id: string): Promise<boolean> {
+  // Delete locally
+  const existingLocal = localStorage.getItem('blogPosts');
+  if (existingLocal) {
+    const localList = JSON.parse(existingLocal);
+    const updated = localList.filter((item: any) => String(item.id) !== String(id));
+    localStorage.setItem('blogPosts', JSON.stringify(updated));
+    window.dispatchEvent(new Event('blog_editors_updated'));
+    window.dispatchEvent(new Event('storage'));
+  }
+
+  if (supabase) {
+    try {
+      const active = await tableExists('blog_posts');
+      if (active) {
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+        if (isUuid) {
+          const { error } = await supabase
+            .from('blog_posts')
+            .delete()
+            .eq('id', id);
+          if (!error) return true;
+        }
+      }
+    } catch (e) {
+      console.error('deleteBlogPostBackend error', e);
+    }
+  }
+  return true;
+}
+
+// -------------------------------------------------------------------------
+// 7. DRIVING COURSES OPERATIONS
+// -------------------------------------------------------------------------
+
+export async function fetchDrivingCourses(): Promise<any[]> {
+  const localSaved = localStorage.getItem('driving_courses_v4');
+  let fallback = localSaved ? JSON.parse(localSaved) : [];
+
+  if (supabase) {
+    try {
+      const active = await tableExists('driving_courses');
+      if (active) {
+        const { data, error } = await supabase
+          .from('driving_courses')
+          .select('*')
+          .order('created_at', { ascending: true });
+
+        if (!error && data && data.length > 0) {
+          const mapped = data.map(normalizeDbDrivingCourse);
+          localStorage.setItem('driving_courses_v4', JSON.stringify(mapped));
+          window.dispatchEvent(new Event('driving_courses_updated'));
+          return mapped;
+        }
+      }
+    } catch (e) {
+      console.error('Supabase fetchDrivingCourses failed', e);
+    }
+  }
+  return fallback;
+}
+
+export async function insertDrivingCourse(course: any): Promise<boolean> {
+  const mapped: DbDrivingCourse = {
+    custom_id: course.customId || course.id || '',
+    name: course.name,
+    price: course.price ? course.price.toString().replace(/,/g, '') : '0',
+    duration: course.duration || '',
+    badge: course.badge || '',
+    is_popular: course.isPopular || false,
+    transmission: course.transmission || 'Manual',
+    description: course.description || '',
+    features: course.features || [],
+    specifications: course.specifications || []
+  };
+
+  // Add locally first
+  const existingLocal = localStorage.getItem('driving_courses_v4');
+  const localList = existingLocal ? JSON.parse(existingLocal) : [];
+  
+  let updatedLocal: any[];
+  const localId = course.id || 'course-' + Date.now().toString();
+  const fullObj = { ...course, id: localId };
+  
+  if (localList.some((item: any) => item.id === course.id)) {
+    updatedLocal = localList.map((item: any) => item.id === course.id ? fullObj : item);
+  } else {
+    updatedLocal = [...localList, fullObj];
+  }
+  localStorage.setItem('driving_courses_v4', JSON.stringify(updatedLocal));
+  window.dispatchEvent(new Event('driving_courses_updated'));
+  window.dispatchEvent(new Event('storage'));
+
+  if (supabase) {
+    try {
+      const active = await tableExists('driving_courses');
+      if (active) {
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(course.id);
+        
+        let result;
+        if (isUuid) {
+          result = await supabase
+            .from('driving_courses')
+            .update(mapped)
+            .eq('id', course.id)
+            .select();
+        } else {
+          result = await supabase
+            .from('driving_courses')
+            .insert([mapped])
+            .select();
+        }
+
+        if (!result.error && result.data && result.data.length > 0) {
+          const synced = normalizeDbDrivingCourse(result.data[0]);
+          const currentList = JSON.parse(localStorage.getItem('driving_courses_v4') || '[]');
+          const filtered = currentList.filter((item: any) => item.id !== localId && item.id !== synced.id);
+          filtered.push(synced);
+          localStorage.setItem('driving_courses_v4', JSON.stringify(filtered));
+          window.dispatchEvent(new Event('driving_courses_updated'));
+          return true;
+        }
+      }
+    } catch (e) {
+      console.error('Supabase insertDrivingCourse failed', e);
+    }
+  }
+  return true;
+}
+
+export async function deleteDrivingCourseBackend(id: string): Promise<boolean> {
+  // Delete locally
+  const existingLocal = localStorage.getItem('driving_courses_v4');
+  if (existingLocal) {
+    const localList = JSON.parse(existingLocal);
+    const updated = localList.filter((item: any) => item.id !== id);
+    localStorage.setItem('driving_courses_v4', JSON.stringify(updated));
+    window.dispatchEvent(new Event('driving_courses_updated'));
+    window.dispatchEvent(new Event('storage'));
+  }
+
+  if (supabase) {
+    try {
+      const active = await tableExists('driving_courses');
+      if (active) {
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+        if (isUuid) {
+          const { error } = await supabase
+            .from('driving_courses')
+            .delete()
+            .eq('id', id);
+          if (!error) return true;
+        }
+      }
+    } catch (e) {
+      console.error('deleteDrivingCourseBackend error', e);
+    }
+  }
+  return true;
+}
+
+export async function saveDrivingCoursesList(list: any[]): Promise<boolean> {
+  localStorage.setItem('driving_courses_v4', JSON.stringify(list));
+  window.dispatchEvent(new Event('driving_courses_updated'));
+  window.dispatchEvent(new Event('storage'));
+
+  if (supabase) {
+    try {
+      const active = await tableExists('driving_courses');
+      if (active) {
+        for (const item of list) {
+          await insertDrivingCourse(item);
+        }
+        return true;
+      }
+    } catch (e) {
+      console.error('saveDrivingCoursesList failed', e);
+    }
+  }
+  return true;
+}
+

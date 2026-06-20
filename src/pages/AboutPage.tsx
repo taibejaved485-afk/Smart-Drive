@@ -8,6 +8,7 @@ import Reviews from '../components/Reviews';
 import { CheckCircle2, Award, ShieldCheck, Star, X, Check, BookOpen, Clock, Heart, Users } from 'lucide-react';
 import SEO from '../components/SEO';
 import { ScrollReveal } from '../components/ScrollReveal';
+import { fetchInstructors } from '../lib/supabase';
 
 export default function AboutPage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -193,6 +194,14 @@ export default function AboutPage() {
     };
     window.addEventListener('storage', handleSync);
     window.addEventListener('instructors_updated', handleSync);
+    
+    // Fetch from Supabase
+    fetchInstructors().then(data => {
+      if (data && data.length > 0) {
+        setInstructorsList(data);
+      }
+    }).catch(() => {});
+
     return () => {
       window.removeEventListener('storage', handleSync);
       window.removeEventListener('instructors_updated', handleSync);

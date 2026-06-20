@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import Newsletter from '../components/Newsletter';
 import { ScrollReveal } from '../components/ScrollReveal';
-import { insertDrivingBooking } from '../lib/supabase';
+import { insertDrivingBooking, fetchDrivingCourses } from '../lib/supabase';
 
 interface DrivingCourse {
   id: string;
@@ -148,6 +148,13 @@ export default function ServicesPage() {
     syncDrivingCourses();
     window.addEventListener('storage', syncDrivingCourses);
     window.addEventListener('driving_courses_updated', syncDrivingCourses);
+
+    // Fetch from Supabase
+    fetchDrivingCourses().then(data => {
+      if (data && data.length > 0) {
+        setCourses(data);
+      }
+    }).catch(() => {});
 
     return () => {
       window.removeEventListener('storage', syncDrivingCourses);

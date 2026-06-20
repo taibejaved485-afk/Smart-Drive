@@ -126,3 +126,91 @@ create policy "Allow public select of customer_requests" on public.customer_requ
 create policy "Allow public insert of customer_requests" on public.customer_requests for insert with check (true);
 create policy "Allow public update of customer_requests" on public.customer_requests for update using (true);
 create policy "Allow public delete of customer_requests" on public.customer_requests for delete using (true);
+
+
+----------------------------------------------------
+-- 5. TABLE: instructors
+-- Stores active instructor profiles
+----------------------------------------------------
+drop table if exists public.instructors cascade;
+create table public.instructors (
+    id uuid default gen_random_uuid() primary key,
+    name text not null,
+    role text not null,
+    description text,
+    image text,
+    certifications text[] default '{}',
+    rating numeric default 5.0,
+    reviews integer default 0,
+    gender text default 'Male',
+    availability text default 'Available',
+    hours text,
+    success_rate text,
+    languages text[] default '{}',
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+alter table public.instructors enable row level security;
+create policy "Allow public select of instructors" on public.instructors for select using (true);
+create policy "Allow public insert of instructors" on public.instructors for insert with check (true);
+create policy "Allow public update of instructors" on public.instructors for update using (true);
+create policy "Allow public delete of instructors" on public.instructors for delete using (true);
+
+
+----------------------------------------------------
+-- 6. TABLE: blog_posts
+-- Stores blog post content and metadata
+----------------------------------------------------
+drop table if exists public.blog_posts cascade;
+create table public.blog_posts (
+    id uuid default gen_random_uuid() primary key,
+    title text not null,
+    author text not null default 'GoDriveify Team',
+    image_url text,
+    content text not null,
+    date text not null,
+    author_avatar text,
+    author_role text,
+    image_alt text,
+    meta_title text,
+    meta_description text,
+    focus_keywords text,
+    excerpt text,
+    status text default 'Draft',
+    scheduled_at text,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+alter table public.blog_posts enable row level security;
+create policy "Allow public select of blog_posts" on public.blog_posts for select using (true);
+create policy "Allow public insert of blog_posts" on public.blog_posts for insert with check (true);
+create policy "Allow public update of blog_posts" on public.blog_posts for update using (true);
+create policy "Allow public delete of blog_posts" on public.blog_posts for delete using (true);
+
+
+----------------------------------------------------
+-- 7. TABLE: driving_courses
+-- Stores school courses and pricing slabs
+----------------------------------------------------
+drop table if exists public.driving_courses cascade;
+create table public.driving_courses (
+    id uuid default gen_random_uuid() primary key,
+    custom_id text, -- e.g. "manual-basic"
+    name text not null,
+    price text not null,
+    duration text not null,
+    badge text,
+    is_popular boolean default false,
+    transmission text not null default 'Manual',
+    description text,
+    features text[] default '{}',
+    specifications jsonb default '[]'::jsonb,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+alter table public.driving_courses enable row level security;
+create policy "Allow public select of driving_courses" on public.driving_courses for select using (true);
+create policy "Allow public insert of driving_courses" on public.driving_courses for insert with check (true);
+create policy "Allow public update of driving_courses" on public.driving_courses for update using (true);
+create policy "Allow public delete of driving_courses" on public.driving_courses for delete using (true);
+

@@ -8,7 +8,7 @@ import Reviews from '../components/Reviews';
 import OurProcess from '../components/OurProcess';
 import SEO from '../components/SEO';
 import { ScrollReveal } from '../components/ScrollReveal';
-import { insertDrivingBooking } from '../lib/supabase';
+import { insertDrivingBooking, fetchDrivingCourses } from '../lib/supabase';
 
 interface PricingCourse {
   id: string;
@@ -184,6 +184,13 @@ export default function PricingPage() {
     syncPricingCourses();
     window.addEventListener('storage', syncPricingCourses);
     window.addEventListener('driving_courses_updated', syncPricingCourses);
+
+    // Fetch from Supabase
+    fetchDrivingCourses().then(data => {
+      if (data && data.length > 0) {
+        setCourses(data);
+      }
+    }).catch(() => {});
 
     return () => {
       window.removeEventListener('storage', syncPricingCourses);
