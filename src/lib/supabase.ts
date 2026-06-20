@@ -952,9 +952,100 @@ function normalizeDbDrivingCourse(item: any): any {
 // 5. INSTRUCTORS LOGISTIC OPERATIONS
 // -------------------------------------------------------------------------
 
+const DEFAULT_SEEDED_INSTRUCTORS = [
+  {
+    name: 'Zahid Mahmood',
+    role: 'Chief Instructor & Training Lead',
+    experience: '15+ Years Exp',
+    image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80',
+    description: 'Zahid is our head instructor with countless hours of on-road mentoring. He specializes in advanced clutch control, route planning, and defensive road strategies.',
+    certifications: ['NHA Certified Lead', 'Advanced Defensive Driving', 'Dual-Pedal Coach'],
+    specialty: 'Manual & Automatic',
+    rating: 4.9,
+    reviews: 320,
+    gender: 'Male',
+    availability: 'Available',
+    hours: '3,800+',
+    successRate: '99%',
+    languages: ['Urdu', 'Punjabi', 'English'],
+    categories: ['Defensive', 'Manual', 'Automatic'],
+    detailedBio: 'Zahid Mahmood has served as an elite trainer for over a decade. Formerly a consultant on road discipline, his modules cover tricky situations like heavy motorway traffic, parking in compressed spaces, and slope maintenance without handbrakes.',
+    reviewsList: [
+      { student: 'Haris Munir', comment: 'Zahid sir made manual driving feel incredibly logical. No stress, highly professional methods!' },
+      { student: 'Usman Ghani', comment: 'The highway training is unbeatable. His control tips worked miracles for my confidence.' }
+    ]
+  },
+  {
+    name: 'Ayesha Khan',
+    role: 'Senior Instructor - Female Training',
+    experience: '8+ Years Exp',
+    image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80',
+    description: 'Dedicated to providing a relaxed, secure environment for women. Ayesha is known for her extreme patience, constructive feedback, and mastery of automatic vehicles.',
+    certifications: ['Female Safety Lead', 'Automatic Specialist', 'First-Aid Certified'],
+    specialty: 'Automatic Transmission Only',
+    rating: 5.0,
+    reviews: 245,
+    gender: 'Female',
+    availability: 'Available',
+    hours: '2,600+',
+    successRate: '100%',
+    languages: ['Urdu', 'Punjabi'],
+    categories: ['Female Only', 'Automatic'],
+    detailedBio: 'Ayesha is leading our female-only training program in Faisalabad. She is highly celebrated for her micro-adjustments techniques, safety prioritization, and structured feedback that leaves no room for nervousness.',
+    reviewsList: [
+      { student: 'Saba Fatima', comment: 'Ayesha apa is the best instructor ever! Zero panic, she explains every tiny detail so sweetly.' },
+      { student: 'Zainab Bibi', comment: 'Loved my 10-day class. I went from never touching a steering wheel to driving to office alone.' }
+    ]
+  },
+  {
+    name: 'Muhammad Bilal',
+    role: 'Senior Defensive Coach',
+    experience: '10+ Years Exp',
+    image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=600&q=80',
+    description: 'Muhammad is an expert on local traffic laws and highway navigation. He excels at preparing students for tough test routes, ensuring high first-time success rates.',
+    certifications: ['License Test Expert', 'Highway Protocol Certified', 'Elite Defensive Coach'],
+    specialty: 'Commercial & Light Vehicles',
+    rating: 4.8,
+    reviews: 198,
+    gender: 'Male',
+    availability: 'In Session',
+    hours: '2,100+',
+    successRate: '98%',
+    languages: ['Urdu', 'Punjabi', 'English'],
+    categories: ['Defensive', 'Manual'],
+    detailedBio: 'Bilal focuses deeply on defensive driving theories. His training covers active hazards, brake reaction times under rainfall, and local regulatory protocols to make sure you clear your driving licensing exam with sheer ease.',
+    reviewsList: [
+      { student: 'Ahmad Raza', comment: 'He knows exactly what testing officers look for. Passed my test in the first attempt!' },
+      { student: 'Kamran Shah', comment: 'Professional, punctual, and highly skilled. His highway hazard awareness tips are gold.' }
+    ]
+  },
+  {
+    name: 'Sania Malik',
+    role: 'Defensive Driving Specialist',
+    experience: '5+ Years Exp',
+    image: 'https://images.unsplash.com/photo-1580894732444-8fecef2271da?auto=format&fit=crop&w=600&q=80',
+    description: 'An expert in slow-speed lane navigation, heavy-congestion lane splits, parallel parking mechanics, and active hazard observation.',
+    certifications: ['License Prep Specialist', 'Dual-Control Coach', 'Safe Driver Faisalabad Award'],
+    specialty: 'Automatic & Manual Dual-Wing',
+    rating: 4.7,
+    reviews: 132,
+    gender: 'Female',
+    availability: 'Available',
+    hours: '1,400+',
+    successRate: '97%',
+    languages: ['Urdu', 'English'],
+    categories: ['Female Only', 'Automatic', 'Manual'],
+    detailedBio: 'Sania combines mental coaching with steering mechanics to support students struggling with driving anxiety. She uses low-stress lanes and steady exposure to build confidence block by block.',
+    reviewsList: [
+      { student: 'Areeba Jamil', comment: 'I had terrible driving phobia. Sania completely cured it. Highly recommended for beginners!' },
+      { student: 'Maria Butt', comment: 'So appreciative of her gentle, repetitive teaching style. She made parallel parking feel like child play.' }
+    ]
+  }
+];
+
 export async function fetchInstructors(): Promise<any[]> {
   const localSaved = localStorage.getItem('instructors');
-  let fallback = localSaved ? JSON.parse(localSaved) : [];
+  let fallback = localSaved ? JSON.parse(localSaved) : DEFAULT_SEEDED_INSTRUCTORS;
 
   if (supabase) {
     try {
@@ -972,6 +1063,40 @@ export async function fetchInstructors(): Promise<any[]> {
             window.dispatchEvent(new Event('instructors_updated'));
             return mapped;
           } else {
+            console.log("Seeding default instructors to database...");
+            for (const inst of DEFAULT_SEEDED_INSTRUCTORS) {
+              const mappedInst = {
+                name: inst.name,
+                role: inst.role,
+                description: inst.description || '',
+                image: inst.image || '',
+                certifications: inst.certifications || [],
+                rating: Number(inst.rating) || 5.0,
+                reviews: Number(inst.reviews) || 0,
+                gender: inst.gender || 'Male',
+                availability: inst.availability || 'Available',
+                hours: inst.hours || '',
+                success_rate: inst.successRate || '',
+                languages: inst.languages || [],
+                experience: inst.experience || '5+ Years Exp',
+                specialty: inst.specialty || 'Automatic & Manual',
+                categories: inst.categories || [],
+                detailed_bio: inst.detailedBio || '',
+                reviews_list: inst.reviewsList || []
+              };
+              await supabase.from('instructors').insert([mappedInst]);
+            }
+            // Refetch
+            const { data: refetched } = await supabase
+              .from('instructors')
+              .select('*')
+              .order('created_at', { ascending: true });
+            if (refetched && refetched.length > 0) {
+              const mapped = refetched.map(normalizeDbInstructor);
+              localStorage.setItem('instructors', JSON.stringify(mapped));
+              window.dispatchEvent(new Event('instructors_updated'));
+              return mapped;
+            }
             return fallback;
           }
         }
@@ -1026,15 +1151,30 @@ export async function insertInstructor(instructor: any): Promise<boolean> {
     try {
       const active = await tableExists('instructors');
       if (active) {
-        // If the instructor has a UUID, we update, otherwise insert
+        // Look up if an instructor with the same name or ID exists in the database
         const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(instructor.id);
         
-        let result;
+        let existingId: string | null = null;
         if (isUuid) {
+          existingId = instructor.id;
+        } else {
+          // Query by name to see if we already have this instructor in Supabase
+          const { data: dbMatched } = await supabase
+            .from('instructors')
+            .select('id')
+            .eq('name', instructor.name)
+            .limit(1);
+          if (dbMatched && dbMatched.length > 0) {
+            existingId = dbMatched[0].id;
+          }
+        }
+
+        let result;
+        if (existingId) {
           result = await supabase
             .from('instructors')
             .update(mapped)
-            .eq('id', instructor.id)
+            .eq('id', existingId)
             .select();
         } else {
           result = await supabase
@@ -1188,12 +1328,26 @@ export async function insertBlogPost(post: any): Promise<boolean> {
       if (active) {
         const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(post.id);
         
-        let result;
+        let existingId: string | null = null;
         if (isUuid) {
+          existingId = post.id;
+        } else {
+          const { data: dbMatched } = await supabase
+            .from('blog_posts')
+            .select('id')
+            .eq('title', post.title)
+            .limit(1);
+          if (dbMatched && dbMatched.length > 0) {
+            existingId = dbMatched[0].id;
+          }
+        }
+
+        let result;
+        if (existingId) {
           result = await supabase
             .from('blog_posts')
             .update(mapped)
-            .eq('id', post.id)
+            .eq('id', existingId)
             .select();
         } else {
           result = await supabase
@@ -1318,12 +1472,26 @@ export async function insertDrivingCourse(course: any): Promise<boolean> {
       if (active) {
         const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(course.id);
         
-        let result;
+        let existingId: string | null = null;
         if (isUuid) {
+          existingId = course.id;
+        } else {
+          const { data: dbMatched } = await supabase
+            .from('driving_courses')
+            .select('id')
+            .eq('name', course.name)
+            .limit(1);
+          if (dbMatched && dbMatched.length > 0) {
+            existingId = dbMatched[0].id;
+          }
+        }
+
+        let result;
+        if (existingId) {
           result = await supabase
             .from('driving_courses')
             .update(mapped)
-            .eq('id', course.id)
+            .eq('id', existingId)
             .select();
         } else {
           result = await supabase
