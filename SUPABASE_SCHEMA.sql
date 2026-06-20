@@ -147,6 +147,11 @@ create table public.instructors (
     hours text,
     success_rate text,
     languages text[] default '{}',
+    experience text default '5+ Years Exp',
+    specialty text default 'Automatic & Manual',
+    categories text[] default '{}',
+    detailed_bio text,
+    reviews_list jsonb default '[]'::jsonb,
     created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 

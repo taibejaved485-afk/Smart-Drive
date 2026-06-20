@@ -788,6 +788,11 @@ export interface DbInstructor {
   hours: string;
   success_rate: string;
   languages: string[];
+  experience?: string;
+  specialty?: string;
+  categories?: string[];
+  detailed_bio?: string;
+  reviews_list?: any;
   created_at?: string;
 }
 
@@ -826,6 +831,57 @@ export interface DbDrivingCourse {
 }
 
 function normalizeDbInstructor(item: any): any {
+  const defaultMapping: Record<string, any> = {
+    'Zahid Mahmood': {
+      experience: '12+ Years Exp',
+      specialty: 'Manual & Automatic',
+      categories: ['Defensive', 'Manual', 'Automatic'],
+      detailedBio: 'Zahid Mahmood has served as an elite trainer for over a decade. Formerly a consultant on road discipline, his modules cover tricky situations like heavy motorway traffic, parking in compressed spaces, and slope maintenance without handbrakes.',
+      reviewsList: [
+        { student: 'Haris Munir', comment: 'Zahid sir made manual driving feel incredibly logical. No stress, highly professional methods!' },
+        { student: 'Usman Ghani', comment: 'The highway training is unbeatable. His control tips worked miracles for my confidence.' }
+      ]
+    },
+    'Ayesha Khan': {
+      experience: '8+ Years Exp',
+      specialty: 'Automatic Transmission Only',
+      categories: ['Female Only', 'Automatic'],
+      detailedBio: 'Ayesha is leading our female-only training program in Faisalabad. She is highly celebrated for her micro-adjustments techniques, safety prioritization, and structured feedback that leaves no room for nervousness.',
+      reviewsList: [
+        { student: 'Saba Fatima', comment: 'Ayesha apa is the best instructor ever! Zero panic, she explains every tiny detail so sweetly.' },
+        { student: 'Zainab Bibi', comment: 'Loved my 10-day class. I went from never touching a steering wheel to driving to office alone.' }
+      ]
+    },
+    'Muhammad Bilal': {
+      experience: '10+ Years Exp',
+      specialty: 'Commercial & Light Vehicles',
+      categories: ['Defensive', 'Manual'],
+      detailedBio: 'Bilal focuses deeply on defensive driving theories. His training covers active hazards, brake reaction times under rainfall, and local regulatory protocols to make sure you can clear your driving licensing exam with sheer ease.',
+      reviewsList: [
+        { student: 'Ahmad Raza', comment: 'He knows exactly what testing officers look for. Passed my test in the first attempt!' },
+        { student: 'Kamran Shah', comment: 'Professional, punctual, and highly skilled. His highway hazard awareness tips are gold.' }
+      ]
+    },
+    'Sania Malik': {
+      experience: '5+ Years Exp',
+      specialty: 'Automatic & Manual Dual-Wing',
+      categories: ['Female Only', 'Automatic', 'Manual'],
+      detailedBio: 'Sania combines mental coaching with steering mechanics to support students struggling with driving anxiety. She uses low-stress lanes and steady exposure to build confidence block by block.',
+      reviewsList: [
+        { student: 'Areeba Jamil', comment: 'I had terrible driving phobia. Sania completely cured it. Highly recommended for beginners!' },
+        { student: 'Maria Butt', comment: 'So appreciative of her gentle, repetitive teaching style. She made parallel parking feel like child play.' }
+      ]
+    }
+  };
+
+  const fallbacks = defaultMapping[item.name] || {
+    experience: '5+ Years Exp',
+    specialty: 'Automatic & Manual',
+    categories: ['Manual', 'Automatic'],
+    detailedBio: item.description || '',
+    reviewsList: []
+  };
+
   return {
     id: item.id,
     name: item.name,
@@ -840,7 +896,15 @@ function normalizeDbInstructor(item: any): any {
     hours: item.hours || '',
     successRate: item.success_rate || '',
     languages: item.languages || [],
-    createdAt: item.created_at
+    createdAt: item.created_at,
+    
+    experience: item.experience || fallbacks.experience,
+    specialty: item.specialty || fallbacks.specialty,
+    categories: item.categories || item.categories_list || fallbacks.categories,
+    detailedBio: item.detailed_bio || item.detailedBio || fallbacks.detailedBio,
+    reviewsList: typeof item.reviews_list === 'string' 
+      ? JSON.parse(item.reviews_list) 
+      : (item.reviews_list || item.reviewsList || fallbacks.reviewsList)
   };
 }
 
@@ -902,10 +966,14 @@ export async function fetchInstructors(): Promise<any[]> {
           .order('created_at', { ascending: true });
 
         if (!error && data) {
-          const mapped = data.map(normalizeDbInstructor);
-          localStorage.setItem('instructors', JSON.stringify(mapped));
-          window.dispatchEvent(new Event('instructors_updated'));
-          return mapped;
+          if (data.length > 0) {
+            const mapped = data.map(normalizeDbInstructor);
+            localStorage.setItem('instructors', JSON.stringify(mapped));
+            window.dispatchEvent(new Event('instructors_updated'));
+            return mapped;
+          } else {
+            return fallback;
+          }
         }
       }
     } catch (e) {
@@ -928,7 +996,12 @@ export async function insertInstructor(instructor: any): Promise<boolean> {
     availability: instructor.availability || 'Available',
     hours: instructor.hours || '',
     success_rate: instructor.successRate || '',
-    languages: instructor.languages || []
+    languages: instructor.languages || [],
+    experience: instructor.experience || '5+ Years Exp',
+    specialty: instructor.specialty || 'Automatic & Manual',
+    categories: instructor.categories || [],
+    detailed_bio: instructor.detailedBio || '',
+    reviews_list: instructor.reviewsList || []
   };
 
   // Add locally first
@@ -1057,10 +1130,14 @@ export async function fetchBlogPosts(): Promise<any[]> {
           .order('created_at', { ascending: false });
 
         if (!error && data) {
-          const mapped = data.map(normalizeDbBlogPost);
-          localStorage.setItem('blogPosts', JSON.stringify(mapped));
-          window.dispatchEvent(new Event('blog_editors_updated'));
-          return mapped;
+          if (data.length > 0) {
+            const mapped = data.map(normalizeDbBlogPost);
+            localStorage.setItem('blogPosts', JSON.stringify(mapped));
+            window.dispatchEvent(new Event('blog_editors_updated'));
+            return mapped;
+          } else {
+            return fallback;
+          }
         }
       }
     } catch (e) {
