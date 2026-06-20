@@ -16,6 +16,7 @@ import {
   deleteSaleCarBackend,
   approveRentalCarBackend,
   deleteRentalCarBackend,
+  updateRentalCarStatusBackend,
   updateDrivingBookingStatus,
   deleteDrivingBooking,
   updateCustomerRequestStatus,
@@ -950,6 +951,18 @@ export default function AdminPage() {
   };
 
   const toggleCarStatus = (id: string, newStatusOverride?: 'Available' | 'Rented Out') => {
+    // Update backend (if table is connected)
+    if (newStatusOverride) {
+      updateRentalCarStatusBackend(id, newStatusOverride);
+    } else {
+      const currentCar = rentalCars.find(c => String(c.id) === String(id));
+      if (currentCar) {
+        const isCurrentlyAvailable = (currentCar.availabilityStatus || currentCar.status) === 'Available';
+        const nextStatus = isCurrentlyAvailable ? 'Rented Out' : 'Available';
+        updateRentalCarStatusBackend(id, nextStatus as 'Available' | 'Rented Out');
+      }
+    }
+
     // Helper to toggle in a specific storage key
     const toggleInStorage = (key: string) => {
       const saved = localStorage.getItem(key);
@@ -2181,7 +2194,7 @@ export default function AdminPage() {
                     <h3 className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Fleet Availability</h3>
                     <div className="flex items-baseline gap-2">
                        <p className="text-4xl font-black text-slate-950 tracking-tighter">
-                         {rentalCars.filter(c => c.availabilityStatus === 'Available').length}/{rentalCars.length}
+                         {rentalCars.filter(c => (c.availabilityStatus || (c.status === 'Booked' || c.status === 'Rented Out' ? 'Rented Out' : 'Available')) === 'Available').length}/{rentalCars.length}
                        </p>
                        <span className="text-xs font-bold text-slate-400">Cars Ready</span>
                     </div>
@@ -3748,7 +3761,7 @@ export default function AdminPage() {
                       return (
                         <div 
                           key={car.id} 
-                          className="p-3.5 rounded-2xl border border-gray-200 hover:border-gray-250 bg-white transition flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                          className="p-3.5 rounded-2xl border border-gray-200 hover:border-gray-250 bg-white transition flex flex-col md:flex-row lg:flex-col xl:flex-row md:items-center lg:items-start xl:items-center justify-between gap-3.5"
                         >
                           <div className="flex items-center gap-3.5">
                             <img 
@@ -3773,7 +3786,7 @@ export default function AdminPage() {
                             </div>
                           </div>
 
-                          <div className="flex items-center sm:self-center justify-between w-full sm:w-auto gap-3.5 border-t sm:border-0 pt-2.5 sm:pt-0">
+                          <div className="flex items-center justify-between w-full md:w-auto lg:w-full xl:w-auto gap-3 border-t md:border-t-0 lg:border-t xl:border-t-0 pt-2.5 md:pt-0 lg:pt-2.5 xl:pt-0 mt-1 md:mt-0 lg:mt-1 xl:mt-0">
                             {/* Toggle availability status dropdown */}
                             <div className="relative group/select">
                               <select 

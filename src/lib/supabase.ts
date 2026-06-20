@@ -447,6 +447,28 @@ export async function deleteRentalCarBackend(carId: string): Promise<boolean> {
   return false;
 }
 
+export async function updateRentalCarStatusBackend(carId: string, status: 'Available' | 'Rented Out'): Promise<boolean> {
+  if (supabase) {
+    try {
+      const active = await tableExists('rental_cars');
+      if (active) {
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (uuidRegex.test(carId)) {
+          const dbStatus = status === 'Rented Out' ? 'Booked' : 'Available';
+          const { error } = await supabase
+            .from('rental_cars')
+            .update({ status: dbStatus })
+            .eq('id', carId);
+          if (!error) return true;
+        }
+      }
+    } catch (e) {
+      console.error('updateRentalCarStatusBackend error', e);
+    }
+  }
+  return false;
+}
+
 // -------------------------------------------------------------------------
 // 3. DRIVING LESSONS BOOKINGS
 // -------------------------------------------------------------------------
@@ -693,6 +715,7 @@ export async function deleteCustomerRequest(id: string): Promise<boolean> {
 // -------------------------------------------------------------------------
 
 function normalizeDbCar(item: any): any {
+  const isBooked = item.status === 'Booked' || item.status === 'Rented Out';
   return {
     id: item.id,
     name: item.name,
@@ -711,6 +734,7 @@ function normalizeDbCar(item: any): any {
     cnicDoc: item.cnic_doc,
     registrationDoc: item.registration_doc,
     status: item.status || 'Available',
+    availabilityStatus: isBooked ? 'Rented Out' : 'Available',
     approved: item.approved || false,
     createdAt: item.created_at
   };
