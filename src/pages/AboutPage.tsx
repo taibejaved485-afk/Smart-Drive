@@ -505,7 +505,7 @@ export default function AboutPage() {
           <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={() => setSelectedInstructor(null)} />
           
           {/* Modal Container */}
-          <div className="relative bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-gray-150 overflow-hidden z-10 animate-in fade-in zoom-in-95 duration-200">
+          <div className="relative bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-gray-150 overflow-y-auto md:overflow-visible max-h-[88vh] md:max-h-none z-10 animate-in fade-in zoom-in-95 duration-200">
             {/* Close Button */}
             <button 
               onClick={() => setSelectedInstructor(null)}
