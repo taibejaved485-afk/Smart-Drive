@@ -5,7 +5,7 @@ import BrandLogo from './BrandLogo';
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-950 text-slate-400 pt-20 pb-12 relative overflow-hidden border-t border-white/5">
+    <footer className="bg-slate-950 text-slate-400 pt-20 pb-28 md:pb-12 relative overflow-hidden border-t border-white/5">
       {/* Background looping video with mask */}
       <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
         <video
@@ -176,7 +176,7 @@ export default function Footer() {
         {/* Lower Footer: Copyrights & Trust Architecture */}
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500 gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left w-full sm:w-auto">
-            <p className="font-medium">&copy; 2026 GoDriveify. All rights reserved.</p>
+            <p className="font-medium">&copy; {new Date().getFullYear()} GoDriveify. All rights reserved.</p>
             <span className="hidden sm:inline text-white/10">|</span>
             <div className="flex items-center gap-1.5 text-xs text-slate-400 bg-white/5 py-1 px-3 rounded-full border border-white/5 shadow-inner">
               <ShieldCheck className="w-3.5 h-3.5 text-[#FF7112]/90" />
@@ -184,10 +184,18 @@ export default function Footer() {
             </div>
           </div>
           
-          <div className="flex items-center gap-4 font-mono text-[10px] tracking-widest text-slate-600 bg-black/30 py-1.5 px-4 rounded-xl border border-white/5">
-            <Link to="/admin" className="hover:text-[#FF7112]/90 transition-colors uppercase font-bold">Admin Portal</Link>
-            <span>•</span>
-            <span className="text-[9px] uppercase font-bold text-emerald-500 animate-pulse">SYSTEM_V1.2.0_LIVE</span>
+          <div className="flex items-center gap-3 font-mono text-[10px] tracking-widest text-slate-500 bg-slate-900 border border-slate-800 py-1.5 px-4 rounded-full mr-0 md:mr-20 xl:mr-20 2xl:mr-0 shadow-md">
+            <Link to="/admin" className="hover:text-white transition-colors uppercase font-bold flex items-center gap-1.5">
+              Admin Portal
+            </Link>
+            <div className="w-px h-3 bg-slate-700"></div>
+            <span className="text-[9px] uppercase font-bold text-emerald-400/90 flex items-center gap-1.5">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+              </span>
+              SYS_V1.2.0
+            </span>
           </div>
         </div>
 

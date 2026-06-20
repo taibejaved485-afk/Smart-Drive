@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
-import { fetchDrivingCourses } from '../lib/supabase';
 
 interface StoredCourse {
   id: string;
@@ -96,25 +95,6 @@ export default function FeaturedCourses() {
     loadCourses();
     window.addEventListener('storage', loadCourses);
     window.addEventListener('driving_courses_updated', loadCourses);
-
-    // Fetch from Supabase
-    fetchDrivingCourses().then(data => {
-      if (data && data.length > 0) {
-        const mapped = data.map((c, i) => {
-          const inst = INSTRUCTORS[i % INSTRUCTORS.length];
-          return {
-            id: c.id,
-            title: c.name,
-            desc: c.description || c.courseDescription,
-            price: c.price || c.courseFee,
-            image: c.carImage || "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=600",
-            instructorName: inst.name,
-            instructorImage: inst.img
-          };
-        });
-        setCourses(mapped);
-      }
-    }).catch(() => {});
 
     return () => {
       window.removeEventListener('storage', loadCourses);

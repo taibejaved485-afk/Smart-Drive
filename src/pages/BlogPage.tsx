@@ -7,7 +7,6 @@ import SEO from '../components/SEO';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Calendar, User, BookOpen, Sparkles, Clock, Layers, Globe } from 'lucide-react';
-import { fetchBlogPosts } from '../lib/supabase';
 
 interface BlogPost {
   id: string;
@@ -221,15 +220,8 @@ export default function BlogPage() {
   useEffect(() => {
     const savedPosts = localStorage.getItem('blogPosts');
     if (savedPosts) {
-      try {
-        setPosts(JSON.parse(savedPosts));
-      } catch (e) {}
+      setPosts(JSON.parse(savedPosts));
     }
-    fetchBlogPosts().then(data => {
-      if (data && data.length > 0) {
-        setPosts(data);
-      }
-    }).catch(() => {});
   }, []);
 
   // Check if posts exist

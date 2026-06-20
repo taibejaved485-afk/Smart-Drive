@@ -20,18 +20,7 @@ import {
   updateDrivingBookingStatus,
   deleteDrivingBooking,
   updateCustomerRequestStatus,
-  deleteCustomerRequest,
-  fetchInstructors,
-  insertInstructor,
-  deleteInstructorBackend,
-  saveInstructorsList,
-  fetchBlogPosts,
-  insertBlogPost,
-  deleteBlogPostBackend,
-  fetchDrivingCourses,
-  insertDrivingCourse,
-  deleteDrivingCourseBackend,
-  saveDrivingCoursesList
+  deleteCustomerRequest
 } from '../lib/supabase';
 
 interface BlogPost {
@@ -343,11 +332,6 @@ export default function AdminPage() {
         setPosts([]);
       }
     }
-    fetchBlogPosts().then(data => {
-      if (data && data.length > 0) {
-        setPosts(data);
-      }
-    }).catch(() => {});
 
     // 2. Load Driving School Bookings
     const savedBookings = localStorage.getItem('driving_bookings');
@@ -546,30 +530,14 @@ export default function AdminPage() {
       setDrivingCourses(DEFAULT_DRIVING_COURSES);
       localStorage.setItem('driving_courses_v4', JSON.stringify(DEFAULT_DRIVING_COURSES));
     }
-    fetchDrivingCourses().then(data => {
-      if (data && data.length > 0) {
-        setDrivingCourses(data);
-      }
-    }).catch(() => {});
 
     // 7. Load instructors registry
     const savedInstructors = localStorage.getItem('instructors');
-    const deDupInstructors = (list: any[]) => {
-      const seen = new Set();
-      return list.filter(item => {
-        if (!item || !item.name) return false;
-        const nameKey = item.name.toLowerCase().trim();
-        if (seen.has(nameKey)) return false;
-        seen.add(nameKey);
-        return true;
-      });
-    };
-
     if (savedInstructors) {
       try {
         const parsed = JSON.parse(savedInstructors);
         if (Array.isArray(parsed)) {
-          setInstructors(deDupInstructors(parsed));
+          setInstructors(parsed);
         } else {
           setInstructors([]);
         }
@@ -579,11 +547,6 @@ export default function AdminPage() {
     } else {
       setInstructors([]);
     }
-    fetchInstructors().then(data => {
-      if (data && data.length > 0) {
-        setInstructors(deDupInstructors(data));
-      }
-    }).catch(() => {});
   };
 
   useEffect(() => {
@@ -750,27 +713,14 @@ export default function AdminPage() {
 
     if (editingInstructorId) {
       updatedList = updatedList.map(item => item.id === editingInstructorId ? itemToSave : item);
-      insertInstructor(itemToSave).catch(() => {});
       showToast('Instructor updated successfully!', 'success');
     } else {
       updatedList.push(itemToSave);
-      insertInstructor(itemToSave).catch(() => {});
       showToast('New Instructor added successfully!', 'success');
     }
 
-    const deDupInstructors = (list: any[]) => {
-      const seen = new Set();
-      return list.filter(item => {
-        if (!item || !item.name) return false;
-        const nameKey = item.name.toLowerCase().trim();
-        if (seen.has(nameKey)) return false;
-        seen.add(nameKey);
-        return true;
-      });
-    };
-
-    localStorage.setItem('instructors', JSON.stringify(deDupInstructors(updatedList)));
-    setInstructors(deDupInstructors(updatedList));
+    localStorage.setItem('instructors', JSON.stringify(updatedList));
+    setInstructors(updatedList);
     window.dispatchEvent(new Event('instructors_updated'));
     window.dispatchEvent(new Event('storage'));
     resetInstructorForm();
@@ -779,7 +729,6 @@ export default function AdminPage() {
   const handleDeleteInstructor = (id: string) => {
     if (window.confirm('Are you sure you want to delete this instructor? This will immediately remove them from the public About Us page.')) {
       const updatedList = instructors.filter(item => item.id !== id);
-      deleteInstructorBackend(id).catch(() => {});
       localStorage.setItem('instructors', JSON.stringify(updatedList));
       setInstructors(updatedList);
       window.dispatchEvent(new Event('instructors_updated'));
@@ -797,7 +746,10 @@ export default function AdminPage() {
     updatedList.splice(index, 1);
     updatedList.splice(targetIndex, 0, item);
     
-    saveInstructorsList(updatedList).catch(() => {});
+    localStorage.setItem('instructors', JSON.stringify(updatedList));
+    setInstructors(updatedList);
+    window.dispatchEvent(new Event('instructors_updated'));
+    window.dispatchEvent(new Event('storage'));
     showToast(`Updated instructors order!`, 'success');
   };
 
@@ -821,7 +773,10 @@ export default function AdminPage() {
     updatedList.splice(draggedInstructorIndex, 1);
     updatedList.splice(targetIndex, 0, draggedItem);
 
-    saveInstructorsList(updatedList).catch(() => {});
+    localStorage.setItem('instructors', JSON.stringify(updatedList));
+    setInstructors(updatedList);
+    window.dispatchEvent(new Event('instructors_updated'));
+    window.dispatchEvent(new Event('storage'));
     setDraggedInstructorIndex(null);
     showToast(`Repositioned ${draggedItem.name} successfully!`, 'success');
   };
@@ -1968,7 +1923,7 @@ export default function AdminPage() {
       setPosts(prevPosts => {
         const updatedPosts = prevPosts.map(p => {
           if (String(p.id) === String(editingPostId)) {
-            const item = {
+            return {
               ...p,
               title: newPost.title,
               author: newPost.author || 'GoDriveify Team',
@@ -1984,8 +1939,6 @@ export default function AdminPage() {
               status: finalStatus,
               scheduledAt: finalStatus === 'Scheduled' ? newPost.scheduledAt : ''
             };
-            insertBlogPost(item).catch(() => {});
-            return item;
           }
           return p;
         });
@@ -2012,7 +1965,6 @@ export default function AdminPage() {
         status: finalStatus,
         scheduledAt: finalStatus === 'Scheduled' ? newPost.scheduledAt : ''
       };
-      insertBlogPost(post).catch(() => {});
       setPosts(prevPosts => {
         const updatedPosts = [post, ...prevPosts];
         localStorage.setItem('blogPosts', JSON.stringify(updatedPosts));
@@ -2113,7 +2065,6 @@ export default function AdminPage() {
 
   // Blog Editor Operations
   const deletePost = (id: string) => {
-    deleteBlogPostBackend(id).catch(() => {});
     setPosts(prevPosts => {
       const updatedPosts = prevPosts.filter(p => String(p.id) !== String(id));
       localStorage.setItem('blogPosts', JSON.stringify(updatedPosts));
@@ -5387,7 +5338,8 @@ export default function AdminPage() {
                     }
                     if (editingCourseId) {
                       const updated = drivingCourses.map(c => c.id === editingCourseId ? { ...newCourse, id: editingCourseId } : c);
-                      saveDrivingCoursesList(updated).catch(() => {});
+                      setDrivingCourses(updated);
+                      localStorage.setItem('driving_courses_v4', JSON.stringify(updated));
                       setEditingCourseId(null);
                       setNewCourse({
                         courseTitle: '',
@@ -5405,7 +5357,8 @@ export default function AdminPage() {
                       const courseId = 'course-' + Date.now().toString();
                       const finalCourse = { ...newCourse, id: courseId };
                       const updated = [finalCourse, ...drivingCourses];
-                      saveDrivingCoursesList(updated).catch(() => {});
+                      setDrivingCourses(updated);
+                      localStorage.setItem('driving_courses_v4', JSON.stringify(updated));
                       setNewCourse({
                         courseTitle: '',
                         courseDescription: '',
@@ -5679,8 +5632,12 @@ export default function AdminPage() {
                               type="button"
                               onClick={() => {
                                 if (window.confirm(`Delete "${course.courseTitle}" course template?`)) {
-                                  deleteDrivingCourseBackend(course.id).catch(() => {});
+                                  const updated = drivingCourses.filter(c => c.id !== course.id);
+                                  setDrivingCourses(updated);
+                                  localStorage.setItem('driving_courses_v4', JSON.stringify(updated));
                                   showToast('Course package deleted.', 'info');
+                                  window.dispatchEvent(new Event('driving_courses_updated'));
+                                  window.dispatchEvent(new Event('storage'));
                                 }
                               }}
                               className="bg-white hover:bg-[#FF7112]/10 text-[#FF7112] border border-[#FF7112]/30 hover:border-red-300 font-bold text-xs p-2 rounded-xl transition cursor-pointer"
