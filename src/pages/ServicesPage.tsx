@@ -30,6 +30,7 @@ export default function ServicesPage() {
   const [courses, setCourses] = useState<DrivingCourse[]>([]);
   const contactFormRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoLoaded, setVideoLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState<'driving' | 'rent' | 'sale'>('driving');
 
   // Ensure high performance instant playback of services video
@@ -276,7 +277,24 @@ export default function ServicesPage() {
             </div>
           
             <div className="hidden lg:flex justify-center items-center relative">
-              <div className="w-full max-w-lg aspect-video z-10 relative bg-white overflow-hidden">
+              <div className="w-full max-w-lg aspect-video z-10 relative bg-white overflow-hidden flex items-center justify-center rounded-2xl border border-slate-100 shadow-sm">
+                
+                {/* Fallback image + dynamic shimmering loader shown instantly */}
+                {!videoLoaded && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-white z-20">
+                    <img 
+                      src="https://i.pinimg.com/736x/e0/17/dc/e017dc0d6404b25d6cdfcd53ed0146b6.jpg"
+                      alt="Starting GoDriveify preview"
+                      className="absolute inset-0 w-full h-full object-cover opacity-20 filter blur-xs select-none pointer-events-none mix-blend-multiply"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="relative flex flex-col items-center gap-3">
+                      <div className="w-9 h-9 border-2 border-slate-100 border-t-[#E05A00] rounded-full animate-spin" />
+                      <span className="text-[10px] font-black uppercase text-[#E05A00]/80 tracking-widest animate-pulse">Initializing Hub Preview...</span>
+                    </div>
+                  </div>
+                )}
+                
                 <video 
                   ref={videoRef}
                   autoPlay={true} 
@@ -284,7 +302,9 @@ export default function ServicesPage() {
                   muted={true} 
                   playsInline={true} 
                   preload="auto"
-                  className="w-full h-full object-cover select-none pointer-events-none rounded-none mix-blend-multiply"
+                  onCanPlay={() => setVideoLoaded(true)}
+                  onLoadedData={() => setVideoLoaded(true)}
+                  className={`w-full h-full object-cover select-none pointer-events-none rounded-none mix-blend-multiply transition-opacity duration-700 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
                   style={{
                     maskImage: 'radial-gradient(ellipse at center, black 30%, transparent 70%)',
                     WebkitMaskImage: 'radial-gradient(ellipse at center, black 30%, transparent 70%)'
