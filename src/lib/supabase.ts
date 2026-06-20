@@ -1045,7 +1045,18 @@ const DEFAULT_SEEDED_INSTRUCTORS = [
 
 export async function fetchInstructors(): Promise<any[]> {
   const localSaved = localStorage.getItem('instructors');
-  let fallback = localSaved ? JSON.parse(localSaved) : DEFAULT_SEEDED_INSTRUCTORS;
+  const deDuplicate = (list: any[]) => {
+    const seen = new Set();
+    return list.filter(item => {
+      if (!item || !item.name) return false;
+      const key = item.name.toLowerCase().trim();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  };
+
+  let fallback = localSaved ? deDuplicate(JSON.parse(localSaved)) : deDuplicate(DEFAULT_SEEDED_INSTRUCTORS);
 
   if (supabase) {
     try {
@@ -1058,7 +1069,7 @@ export async function fetchInstructors(): Promise<any[]> {
 
         if (!error && data) {
           if (data.length > 0) {
-            const mapped = data.map(normalizeDbInstructor);
+            const mapped = deDuplicate(data.map(normalizeDbInstructor));
             localStorage.setItem('instructors', JSON.stringify(mapped));
             window.dispatchEvent(new Event('instructors_updated'));
             return mapped;
@@ -1092,7 +1103,7 @@ export async function fetchInstructors(): Promise<any[]> {
               .select('*')
               .order('created_at', { ascending: true });
             if (refetched && refetched.length > 0) {
-              const mapped = refetched.map(normalizeDbInstructor);
+              const mapped = deDuplicate(refetched.map(normalizeDbInstructor));
               localStorage.setItem('instructors', JSON.stringify(mapped));
               window.dispatchEvent(new Event('instructors_updated'));
               return mapped;

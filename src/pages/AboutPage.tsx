@@ -163,13 +163,28 @@ export default function AboutPage() {
     }
   ];
 
+  const deDuplicate = (list: any[]) => {
+    const seen = new Set();
+    const unique: any[] = [];
+    for (const item of list) {
+      if (item && item.name) {
+        const nameKey = item.name.toLowerCase().trim();
+        if (!seen.has(nameKey)) {
+          seen.add(nameKey);
+          unique.push(item);
+        }
+      }
+    }
+    return unique;
+  };
+
   const [instructorsList, setInstructorsList] = useState<any[]>(() => {
     const saved = localStorage.getItem('instructors');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+          return deDuplicate(parsed);
         }
       } catch (e) {
         console.error(e);
@@ -187,7 +202,7 @@ export default function AboutPage() {
         try {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed)) {
-            setInstructorsList(parsed);
+            setInstructorsList(deDuplicate(parsed));
           }
         } catch (e) {}
       }
@@ -198,7 +213,7 @@ export default function AboutPage() {
     // Fetch from Supabase
     fetchInstructors().then(data => {
       if (data && data.length > 0) {
-        setInstructorsList(data);
+        setInstructorsList(deDuplicate(data));
       }
     }).catch(() => {});
 
@@ -208,7 +223,7 @@ export default function AboutPage() {
     };
   }, []);
 
-  const instructors = instructorsList;
+  const instructors = deDuplicate(instructorsList);
 
   return (
     <div className="font-sans text-gray-900 bg-white">
@@ -257,6 +272,7 @@ export default function AboutPage() {
               <img 
                 src="https://i.pinimg.com/736x/a1/63/96/a1639624eb25cd6c5e373b87f7245cd5.jpg" 
                 alt="Driving Lesson portrait" 
+                referrerPolicy="no-referrer"
                 className="rounded-3xl shadow-xl w-full h-80 sm:h-[480px] object-cover"
               />
             </ScrollReveal>
@@ -264,6 +280,7 @@ export default function AboutPage() {
               <img 
                 src="https://i.pinimg.com/736x/a1/1a/e5/a11ae5071f90d92c3531cb1db6894d54.jpg" 
                 alt="Instructor and student checklist" 
+                referrerPolicy="no-referrer"
                 className="rounded-3xl shadow-xl w-full h-80 sm:h-[480px] object-cover mt-8" 
               />
             </ScrollReveal>

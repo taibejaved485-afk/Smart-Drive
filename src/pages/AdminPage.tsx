@@ -554,11 +554,22 @@ export default function AdminPage() {
 
     // 7. Load instructors registry
     const savedInstructors = localStorage.getItem('instructors');
+    const deDupInstructors = (list: any[]) => {
+      const seen = new Set();
+      return list.filter(item => {
+        if (!item || !item.name) return false;
+        const nameKey = item.name.toLowerCase().trim();
+        if (seen.has(nameKey)) return false;
+        seen.add(nameKey);
+        return true;
+      });
+    };
+
     if (savedInstructors) {
       try {
         const parsed = JSON.parse(savedInstructors);
         if (Array.isArray(parsed)) {
-          setInstructors(parsed);
+          setInstructors(deDupInstructors(parsed));
         } else {
           setInstructors([]);
         }
@@ -570,7 +581,7 @@ export default function AdminPage() {
     }
     fetchInstructors().then(data => {
       if (data && data.length > 0) {
-        setInstructors(data);
+        setInstructors(deDupInstructors(data));
       }
     }).catch(() => {});
   };
@@ -747,8 +758,19 @@ export default function AdminPage() {
       showToast('New Instructor added successfully!', 'success');
     }
 
-    localStorage.setItem('instructors', JSON.stringify(updatedList));
-    setInstructors(updatedList);
+    const deDupInstructors = (list: any[]) => {
+      const seen = new Set();
+      return list.filter(item => {
+        if (!item || !item.name) return false;
+        const nameKey = item.name.toLowerCase().trim();
+        if (seen.has(nameKey)) return false;
+        seen.add(nameKey);
+        return true;
+      });
+    };
+
+    localStorage.setItem('instructors', JSON.stringify(deDupInstructors(updatedList)));
+    setInstructors(deDupInstructors(updatedList));
     window.dispatchEvent(new Event('instructors_updated'));
     window.dispatchEvent(new Event('storage'));
     resetInstructorForm();
