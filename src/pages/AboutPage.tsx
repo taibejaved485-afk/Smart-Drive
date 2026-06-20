@@ -4,7 +4,7 @@ import CTABanner from '../components/CTABanner';
 import Stats from '../components/Stats';
 import WhyChooseUs from '../components/WhyChooseUs';
 import Reviews from '../components/Reviews';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Award, ShieldCheck, Star } from 'lucide-react';
 import SEO from '../components/SEO';
 import { ScrollReveal } from '../components/ScrollReveal';
 
@@ -60,6 +60,57 @@ export default function AboutPage() {
     {
       title: 'Refresher Course',
       desc: 'Already know how to drive? Improve your skills with professional coaching.'
+    }
+  ];
+
+  const instructors = [
+    {
+      id: 'inst-1',
+      name: 'Zahid Mahmood',
+      role: 'Chief Instructor & Training Lead',
+      experience: '15+ Years Exp',
+      image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80',
+      description: 'Zahid is our head instructor with countless hours of on-road mentoring. He specializes in advanced clutch control, route planning, and defensive road strategies.',
+      certifications: ['NHA Certified Lead', 'Advanced Defensive Driving', 'Dual-Pedal Coach'],
+      specialty: 'Manual & Automatic',
+      rating: 4.9,
+      reviews: 320
+    },
+    {
+      id: 'inst-2',
+      name: 'Ayesha Khan',
+      role: 'Senior Instructor - Female Training',
+      experience: '8+ Years Exp',
+      image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80',
+      description: 'Dedicated to providing a relaxed, secure environment for women. Ayesha is known for her extreme patience, constructive feedback, and mastery of automatic vehicles.',
+      certifications: ['Female Safety Lead', 'Automatic Specialist', 'First-Aid Certified'],
+      specialty: 'Automatic Transmission Only',
+      rating: 5.0,
+      reviews: 245
+    },
+    {
+      id: 'inst-3',
+      name: 'Muhammad Bilal',
+      role: 'Senior Defensive Coach',
+      experience: '10+ Years Exp',
+      image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=600&q=80',
+      description: 'Muhammad is an expert on local traffic laws and highway navigation. He excels at preparing students for tough test routes, ensuring high first-time success rates.',
+      certifications: ['License Test Expert', 'Highway Protocol Certified', 'Elite Defensive Coach'],
+      specialty: 'Commercial & Light Vehicles',
+      rating: 4.8,
+      reviews: 198
+    },
+    {
+      id: 'inst-4',
+      name: 'Sania Malik',
+      role: 'Patience & Anxiety Coach',
+      experience: '5+ Years Exp',
+      image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=600&q=80',
+      description: 'Sania specializes in training highly anxious beginners. She implements friendly, high-reassurance techniques to build rapid highway confidence from scratch.',
+      certifications: ['Anxiety-Free Certified', 'City General Licensing', 'Beginner Care Coach'],
+      specialty: 'Automatic & Manual Dual-Wing',
+      rating: 4.9,
+      reviews: 154
     }
   ];
 
@@ -225,6 +276,92 @@ export default function AboutPage() {
       <Stats />
       <WhyChooseUs />
       <Reviews />
+
+      {/* Meet Our Instructors Section */}
+      <section className="py-20 sm:py-28 bg-gray-50 border-t border-b border-gray-150">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16 max-w-3xl mx-auto">
+            <ScrollReveal direction="down">
+              <span className="text-[#FF7112] font-black tracking-[0.2em] uppercase text-xs px-3 py-1 bg-orange-50 rounded-full border border-orange-100">Our Team</span>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-black text-gray-950 mt-4 tracking-tight">
+                Meet Our Certified Instructors
+              </h2>
+              <div className="w-16 h-1 bg-[#FF7112] mx-auto my-5 rounded" />
+              <p className="text-gray-600 leading-relaxed text-base sm:text-lg">
+                Learn from Faisalabad's most patient, highly qualified, and dual-certified driving educators, completely dedicated to building healthy safe driving habits.
+              </p>
+            </ScrollReveal>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {instructors.map((inst, index) => (
+              <ScrollReveal key={inst.id} direction="up" delay={index * 0.15}>
+                <div className="bg-white rounded-3xl overflow-hidden shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-300 group flex flex-col h-full">
+                  {/* Image and Floating Badges */}
+                  <div className="relative aspect-square w-full bg-slate-100 overflow-hidden">
+                    <img 
+                      src={inst.image} 
+                      alt={inst.name} 
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                      <p className="text-xs text-white/90 font-medium">
+                        {inst.specialty}
+                      </p>
+                    </div>
+                    {/* Floating Exp Badge */}
+                    <div className="absolute top-4 left-4 bg-[#FF7112] text-white text-[10px] uppercase font-black tracking-widest px-2.5 py-1.5 rounded-full shadow-md">
+                      {inst.experience}
+                    </div>
+                  </div>
+
+                  {/* Body Content */}
+                  <div className="p-6 flex flex-col flex-grow">
+                    {/* Header: Name & Rating */}
+                    <div className="flex justify-between items-start gap-2 mb-2">
+                      <div>
+                        <h3 className="font-display font-black text-gray-950 text-base sm:text-lg leading-tight group-hover:text-[#FF7112] transition-colors">
+                          {inst.name}
+                        </h3>
+                        <p className="text-xs font-semibold text-slate-400 mt-0.5">{inst.role}</p>
+                      </div>
+                      <div className="flex items-center gap-1 bg-yellow-50 px-2 py-0.5 rounded border border-yellow-200 flex-shrink-0">
+                        <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                        <span className="text-[10px] font-black text-yellow-700">{inst.rating}</span>
+                      </div>
+                    </div>
+
+                    {/* Bio */}
+                    <p className="text-sm text-gray-600 leading-relaxed mb-5 mt-2 flex-grow">
+                      {inst.description}
+                    </p>
+
+                    {/* Certifications Check / Badges */}
+                    <div className="space-y-2 border-t border-gray-100 pt-4 mt-auto">
+                      <div className="flex items-center gap-1.5 text-xs font-black text-gray-950 uppercase tracking-widest mb-2.5">
+                        <Award className="w-3.5 h-3.5 text-[#FF7112]" />
+                        <span>Badges & Certs</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {inst.certifications.map((cert) => (
+                          <span 
+                            key={cert} 
+                            className="inline-flex items-center gap-1 text-[10px] font-bold bg-orange-50/70 border border-orange-100 text-orange-700 px-2.5 py-1 rounded-full"
+                          >
+                            <ShieldCheck className="w-3 h-3 text-[#FF7112] flex-shrink-0" />
+                            {cert}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Our History Section */}
       <section className="py-16 sm:py-24 bg-white border-t border-gray-100">
