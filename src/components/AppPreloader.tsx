@@ -19,34 +19,34 @@ function playSynthesizedV8Startup() {
     masterGain.gain.setValueAtTime(0, now);
     masterGain.connect(ctx.destination);
 
-    // Deep V8 Cylinder 1 Thrum
+    // Deep V8 Cylinder 1 Thrum (Frequencies tuned for phone/laptop speaker audibility)
     const osc1 = ctx.createOscillator();
     osc1.type = "sawtooth";
-    osc1.frequency.setValueAtTime(22, now); // Low thrumming V8 pulse
+    osc1.frequency.setValueAtTime(45, now); // Raised from 22 to be audible
 
     // Offset frequency oscillator to produce organic beating effect of multiple cylinders
     const osc2 = ctx.createOscillator();
     osc2.type = "triangle";
-    osc2.frequency.setValueAtTime(14, now);
+    osc2.frequency.setValueAtTime(35, now);
 
-    // Dynamic thumping sub-bass
+    // Dynamic thumping sub-bass (Square wave provides more audible harmonics than sine)
     const subOsc = ctx.createOscillator();
-    subOsc.type = "sine";
-    subOsc.frequency.setValueAtTime(30, now);
+    subOsc.type = "square";
+    subOsc.frequency.setValueAtTime(50, now);
 
     // Resonant filters to shape the exhaust and block sound
     const lowpass = ctx.createBiquadFilter();
     lowpass.type = "lowpass";
-    lowpass.frequency.setValueAtTime(200, now);
+    lowpass.frequency.setValueAtTime(800, now); // Allow mid-range growl through
 
     const bandpass = ctx.createBiquadFilter();
     bandpass.type = "bandpass";
-    bandpass.frequency.setValueAtTime(90, now);
-    bandpass.Q.setValueAtTime(3.0, now);
+    bandpass.frequency.setValueAtTime(150, now);
+    bandpass.Q.setValueAtTime(2.0, now);
 
     // Connect nodes
     const engineGain = ctx.createGain();
-    engineGain.gain.setValueAtTime(0.6, now);
+    engineGain.gain.setValueAtTime(0.7, now); // Slightly louder
 
     osc1.connect(engineGain);
     osc2.connect(engineGain);
@@ -63,11 +63,11 @@ function playSynthesizedV8Startup() {
 
     // 1. Starter motor high-speed cranking sound (clicks)
     const crankOsc = ctx.createOscillator();
-    crankOsc.type = "sine";
-    crankOsc.frequency.setValueAtTime(190, now);
+    crankOsc.type = "square"; // Changed to square for more metallic click
+    crankOsc.frequency.setValueAtTime(250, now);
 
     const crankGain = ctx.createGain();
-    crankGain.gain.setValueAtTime(0.3, now);
+    crankGain.gain.setValueAtTime(0.4, now);
     crankGain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
 
     crankOsc.connect(crankGain);
@@ -76,30 +76,30 @@ function playSynthesizedV8Startup() {
     crankOsc.stop(now + 0.45);
 
     // 2. Engine Ignites and Roars (Flare Up)
-    osc1.frequency.setValueAtTime(22, now);
-    osc1.frequency.exponentialRampToValueAtTime(125, now + 0.4); 
-    osc1.frequency.exponentialRampToValueAtTime(34, now + 1.1);  // settles to idle
+    osc1.frequency.setValueAtTime(45, now);
+    osc1.frequency.exponentialRampToValueAtTime(180, now + 0.4); 
+    osc1.frequency.exponentialRampToValueAtTime(65, now + 1.1);  // settles to idle
 
-    osc2.frequency.setValueAtTime(14, now);
-    osc2.frequency.exponentialRampToValueAtTime(95, now + 0.4); 
-    osc2.frequency.exponentialRampToValueAtTime(25, now + 1.1);  // settles to idle
+    osc2.frequency.setValueAtTime(35, now);
+    osc2.frequency.exponentialRampToValueAtTime(140, now + 0.4); 
+    osc2.frequency.exponentialRampToValueAtTime(55, now + 1.1);  // settles to idle
 
-    subOsc.frequency.setValueAtTime(30, now);
-    subOsc.frequency.linearRampToValueAtTime(110, now + 0.4);
-    subOsc.frequency.linearRampToValueAtTime(45, now + 1.1);
+    subOsc.frequency.setValueAtTime(50, now);
+    subOsc.frequency.linearRampToValueAtTime(160, now + 0.4);
+    subOsc.frequency.linearRampToValueAtTime(70, now + 1.1);
 
     // Bandpass sweep to make the combustion exhaust flare up sound real
-    bandpass.frequency.setValueAtTime(90, now);
-    bandpass.frequency.exponentialRampToValueAtTime(380, now + 0.4);
-    bandpass.frequency.exponentialRampToValueAtTime(95, now + 1.1);
+    bandpass.frequency.setValueAtTime(150, now);
+    bandpass.frequency.exponentialRampToValueAtTime(800, now + 0.4);
+    bandpass.frequency.exponentialRampToValueAtTime(180, now + 1.1);
 
     // 3. Volume spike at combustion flare, then settling down to rumble idle
     masterGain.gain.setValueAtTime(0, now);
     masterGain.gain.linearRampToValueAtTime(1.0, now + 0.4); // Ignite flare loudness
-    masterGain.gain.exponentialRampToValueAtTime(0.45, now + 1.1); // Idle rumble volume
+    masterGain.gain.exponentialRampToValueAtTime(0.6, now + 1.1); // Idle rumble volume
 
     // Settle further and smoothly fade out after 3.2 seconds
-    masterGain.gain.setValueAtTime(0.45, now + 2.5);
+    masterGain.gain.setValueAtTime(0.6, now + 2.5);
     masterGain.gain.linearRampToValueAtTime(0, now + 3.2);
 
     setTimeout(() => {
