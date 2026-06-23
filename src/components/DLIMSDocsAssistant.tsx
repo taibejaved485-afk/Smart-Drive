@@ -3,6 +3,7 @@ import { ShieldCheck, FileText, CheckCircle2, AlertTriangle, Stethoscope, Downlo
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { format } from 'date-fns';
+import QRCode from 'qrcode';
 
 const LICENSE_TYPES = [
   { id: 'learner', name: 'Learner Permit', urduName: 'لرنر پرمٹ', desc: 'Required first step before regular license.' },
@@ -154,13 +155,30 @@ export default function DLIMSDocsAssistant() {
   const completedCount = Object.values(checkedDocs).filter(Boolean).length;
   const progressPercent = currentDocs.length > 0 ? Math.round((completedCount / currentDocs.length) * 100) : 0;
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     const doc = new jsPDF();
     
     // Theme colors
     const navyBlue: [number, number, number] = [0, 32, 96]; // #002060
     const accentOrange: [number, number, number] = [255, 113, 18]; // #FF7112
     const slateLight: [number, number, number] = [245, 247, 250]; // #f5f7fa
+
+    // Generate QR Code for GoDriveify
+    const websiteUrl = "https://godriveify.com"; // Default to your actual domain
+    let qrCodeDataUrl = '';
+    try {
+      qrCodeDataUrl = await QRCode.toDataURL(websiteUrl, {
+        color: {
+          dark: '#002060',  // Navy Blue
+          light: '#00000000' // Transparent
+        },
+        margin: 0,
+        width: 100
+      });
+    } catch (err) {
+      console.error("Failed to generate QR Code", err);
+    }
+
     
     // ==========================================
     // 1. BRANDED HEADER
@@ -316,8 +334,17 @@ export default function DLIMSDocsAssistant() {
         doc.setDrawColor(230, 230, 230);
         doc.line(14, 280, 196, 280);
         
-        doc.text(`Page ${i} of ${pageCount}`, 14, 285);
-        doc.text(`Official Document strictly for GoDriveify Customers`, 196, 285, { align: 'right' });
+        doc.text(`Page ${i} of ${pageCount}`, 14, 288);
+        
+        // Add QR Code if available
+        let textOffset = 196;
+        if (qrCodeDataUrl) {
+          // Add it right above or next to the footer text, maybe aligned to the right
+          doc.addImage(qrCodeDataUrl, 'PNG', 184, 282, 12, 12);
+          textOffset = 180;
+        }
+        
+        doc.text(`Official Document strictly for GoDriveify Customers`, textOffset, 288, { align: 'right' });
     }
 
     doc.save(`DLIMS_Checklist_${format(new Date(), 'yyyyMMdd')}.pdf`);
