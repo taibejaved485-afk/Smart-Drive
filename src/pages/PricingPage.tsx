@@ -338,10 +338,11 @@ export default function PricingPage() {
                     ))}
                 </div>
             </div>
-            <ScrollReveal direction="up" delay={0.1}><Reviews /></ScrollReveal>
-            <ScrollReveal direction="up" delay={0.2}><OurProcess /></ScrollReveal>
         </div>
       </section>
+
+      <ScrollReveal direction="up" delay={0.1}><Reviews /></ScrollReveal>
+      <ScrollReveal direction="up" delay={0.2}><OurProcess /></ScrollReveal>
 
       {/* BOTTOM INQUIRY FORM */}
       <section id="contact" ref={contactFormRef} className="py-24 bg-slate-50 border-t border-slate-100">
