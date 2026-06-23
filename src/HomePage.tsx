@@ -13,6 +13,7 @@ import OurProcess from './components/OurProcess';
 import Reviews from './components/Reviews';
 import RentalMarketplace from './components/RentalMarketplace';
 import TrafficSigns from './components/TrafficSigns';
+import DLIMSDocsAssistant from './components/DLIMSDocsAssistant';
 import CoursePlanner from './components/CoursePlanner';
 import { CarRequestsForm, CarRequestsGrid } from './components/CarRequestsDirectory';
 import Footer from './components/Footer';
@@ -183,6 +184,7 @@ export default function HomePage() {
             <ScrollReveal direction="up" delay={0.1}><EnrollCTA /></ScrollReveal>
             <ScrollReveal direction="up" delay={0.1}><WhyChooseUs /></ScrollReveal>
             <ScrollReveal direction="up" delay={0.1}><TrafficSigns /></ScrollReveal>
+            <ScrollReveal direction="up" delay={0.1}><DLIMSDocsAssistant /></ScrollReveal>
             <ScrollReveal direction="up" delay={0.1}><OurProcess /></ScrollReveal>
             <ScrollReveal direction="up" delay={0.1}><Reviews /></ScrollReveal>
           </motion.div>
