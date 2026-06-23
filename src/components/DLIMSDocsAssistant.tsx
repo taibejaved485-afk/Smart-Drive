@@ -160,111 +160,167 @@ export default function DLIMSDocsAssistant() {
     // Theme colors
     const navyBlue: [number, number, number] = [0, 32, 96]; // #002060
     const accentOrange: [number, number, number] = [255, 113, 18]; // #FF7112
+    const slateLight: [number, number, number] = [245, 247, 250]; // #f5f7fa
     
-    // Header
+    // ==========================================
+    // 1. BRANDED HEADER
+    // ==========================================
     doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2]);
-    doc.rect(0, 0, 210, 40, 'F');
+    doc.rect(0, 0, 210, 45, 'F');
     
+    // Geometric accent 
+    doc.setFillColor(accentOrange[0], accentOrange[1], accentOrange[2]);
+    doc.triangle(170, 0, 210, 0, 210, 40, 'F');
+    
+    // Title
     doc.setTextColor(255, 255, 255);
-    doc.setFontSize(20);
+    doc.setFontSize(22);
     doc.setFont("helvetica", "bold");
-    doc.text("DLIMS Punjab - Assessment Summary", 14, 22);
+    doc.text("DLIMS Assessment", 14, 24);
     
+    // Subtitle
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
-    doc.text(`Generated on: ${format(new Date(), 'MMM dd, yyyy - hh:mm a')}`, 14, 30);
+    doc.setTextColor(200, 210, 230);
+    doc.text("Official Fee & Required Documents Summary", 14, 32);
 
-    doc.setTextColor(0, 0, 0);
-    
-    // 1. Application Details
+    // GoDriveify Logo Text
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(accentOrange[0], accentOrange[1], accentOrange[2]);
+    doc.text("GoDriveify", 196, 20, { align: 'right' });
+    doc.setFontSize(8);
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "normal");
+    doc.text("Driving School", 196, 25, { align: 'right' });
+
+    // Generation Stamp
+    doc.setTextColor(150, 150, 150);
+    doc.setFontSize(9);
+    doc.text(`Generated: ${format(new Date(), 'MMM dd, yyyy - hh:mm a')}`, 14, 55);
+
+    // ==========================================
+    // 2. APPLICATION DETAILS TABLE
+    // ==========================================
+    doc.setTextColor(navyBlue[0], navyBlue[1], navyBlue[2]);
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
-    doc.text("Application Details", 14, 55);
+    doc.text("Applicant Profile", 14, 68);
     
     const typeObj = LICENSE_TYPES.find(t => t.id === selectedType);
     const catObj = VEHICLE_CATEGORIES.find(c => c.id === selectedCat);
     
     autoTable(doc, {
-      startY: 60,
+      startY: 74,
       head: [['Category', 'Selection']],
       body: [
         ['License Type', typeObj?.name || ''],
-        ['Vehicle Category', catObj?.name || ''],
-        ['Applicant Age', `${userAge} Years`]
+        ['Vehicle Object', catObj?.name || ''],
+        ['Applicant Age', `${userAge} Years Old`]
       ],
-      headStyles: { fillColor: navyBlue, textColor: 255 },
-      alternateRowStyles: { fillColor: [245, 247, 250] },
+      headStyles: { fillColor: slateLight, textColor: navyBlue, fontStyle: 'bold' },
+      bodyStyles: { textColor: [50, 50, 50] },
+      alternateRowStyles: { fillColor: [252, 253, 255] },
       theme: 'grid',
+      styles: { cellPadding: 4, fontSize: 10, lineColor: [230, 230, 230], lineWidth: 0.1 },
       margin: { left: 14, right: 14 }
     });
 
-    // 2. Fee Breakdown
-    const currentY = (doc as any).lastAutoTable.finalY + 15;
+    // ==========================================
+    // 3. FEE BREAKDOWN TABLE
+    // ==========================================
+    const currentY = (doc as any).lastAutoTable.finalY + 16;
+    doc.setTextColor(navyBlue[0], navyBlue[1], navyBlue[2]);
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
-    doc.text("Fee Assessment", 14, currentY);
+    doc.text("Official Fee Assessment", 14, currentY);
 
     const feeBody = [];
-    if (fees.govt > 0) feeBody.push(['Govt License Fee', `Rs. ${fees.govt.toLocaleString()}`]);
-    if (fees.courier > 0) feeBody.push(['Govt Delivery/Courier Fee', `Rs. ${fees.courier.toLocaleString()}`]);
-    if (fees.test > 0) feeBody.push(['Sign & Road Test Ticket', `Rs. ${fees.test.toLocaleString()}`]);
-    feeBody.push(['Total Amount', `Rs. ${fees.total.toLocaleString()} /-`]);
+    if (fees.govt > 0) feeBody.push(['Govt License Form Fee', `Rs. ${fees.govt.toLocaleString()}`]);
+    if (fees.courier > 0) feeBody.push(['Govt Delivery & Courier Fee', `Rs. ${fees.courier.toLocaleString()}`]);
+    if (fees.test > 0) feeBody.push(['Sign & Road Test Processing', `Rs. ${fees.test.toLocaleString()}`]);
+    
+    // Add bold total row at bottom
+    feeBody.push(['Total Estimated Cost', `Rs. ${fees.total.toLocaleString()} /-`]);
 
     autoTable(doc, {
-      startY: currentY + 5,
-      head: [['Fee Description', 'Amount']],
+      startY: currentY + 6,
+      head: [['Fee Breakdown', 'Amount (PKR)']],
       body: feeBody,
-      headStyles: { fillColor: accentOrange, textColor: 255 },
-      alternateRowStyles: { fillColor: [255, 245, 235] },
+      headStyles: { fillColor: slateLight, textColor: navyBlue, fontStyle: 'bold' },
+      bodyStyles: { textColor: [50, 50, 50] },
+      alternateRowStyles: { fillColor: [252, 253, 255] },
       theme: 'grid',
+      styles: { cellPadding: 5, fontSize: 10, lineColor: [230, 230, 230], lineWidth: 0.1 },
       margin: { left: 14, right: 14 },
       didParseCell: function (data) {
         if (data.row.index === feeBody.length - 1) {
+          data.cell.styles.fillColor = [255, 245, 235]; // Light Orange
           data.cell.styles.fontStyle = 'bold';
-          data.cell.styles.textColor = [0, 128, 0];
+          data.cell.styles.textColor = navyBlue;
         }
       }
     });
 
-    // 3. Required Documents
-    const docsY = (doc as any).lastAutoTable.finalY + 15;
+    // ==========================================
+    // 4. REQUIRED DOCUMENTS
+    // ==========================================
+    const docsY = (doc as any).lastAutoTable.finalY + 16;
+    doc.setTextColor(navyBlue[0], navyBlue[1], navyBlue[2]);
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(0, 0, 0);
-    doc.text("Required Documents Checklist", 14, docsY);
+    doc.text("Mandatory Documents Checklist", 14, docsY);
 
     const docsBody = currentDocs.map((d, index) => {
       const isReady = !!checkedDocs[index];
-      const status = isReady ? '[ Ready ]' : '[ Pending ]';
+      const status = isReady ? 'Yes ✓' : 'Pending';
       return [
-        { content: status, styles: { fontStyle: 'bold', textColor: isReady ? [0, 128, 0] : [200, 0, 0] } },
+        { 
+          content: status, 
+          styles: { 
+            fontStyle: 'bold', 
+            textColor: isReady ? [0, 150, 50] : [200, 50, 50],
+            halign: 'center'
+          } 
+        },
         d.text
       ];
     });
 
     autoTable(doc, {
-      startY: docsY + 5,
-      head: [['Status', 'Document Requirement']],
+      startY: docsY + 6,
+      head: [['Prepared', 'Document Requirement']],
       body: docsBody,
-      headStyles: { fillColor: navyBlue, textColor: 255 },
-      alternateRowStyles: { fillColor: [245, 247, 250] },
+      headStyles: { fillColor: slateLight, textColor: navyBlue, fontStyle: 'bold' },
+      bodyStyles: { textColor: [50, 50, 50] },
+      alternateRowStyles: { fillColor: [252, 253, 255] },
       theme: 'grid',
+      styles: { cellPadding: 5, fontSize: 10, lineColor: [230, 230, 230], lineWidth: 0.1 },
       margin: { left: 14, right: 14 },
       columnStyles: {
-        0: { cellWidth: 35 }
+        0: { cellWidth: 30 }
       }
     });
 
-    // Footer
+    // ==========================================
+    // 5. FOOTER & PAGINATION
+    // ==========================================
     const pageCount = (doc.internal as any).getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i);
         doc.setFontSize(9);
         doc.setTextColor(150, 150, 150);
-        doc.text(`Page ${i} of ${pageCount} | Generated by GoDriveify`, 14, 285);
+        doc.setFont("helvetica", "normal");
+        
+        // Divider line
+        doc.setDrawColor(230, 230, 230);
+        doc.line(14, 280, 196, 280);
+        
+        doc.text(`Page ${i} of ${pageCount}`, 14, 285);
+        doc.text(`Official Document strictly for GoDriveify Customers`, 196, 285, { align: 'right' });
     }
 
-    doc.save(`DLIMS_Summary_${format(new Date(), 'yyyyMMdd')}.pdf`);
+    doc.save(`DLIMS_Checklist_${format(new Date(), 'yyyyMMdd')}.pdf`);
   };
 
   return (
