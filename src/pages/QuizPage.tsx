@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import { motion } from 'motion/react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import SEO from '../components/SEO';
 import { ScrollReveal } from '../components/ScrollReveal';
-import { Trophy, AlertCircle, Lightbulb, RefreshCw, ChevronRight, CheckCircle2, Info, BookOpen, Timer, Award, ShieldCheck, Zap, Star, Heart, Check, X, CheckSquare, Sparkles, Gauge, Volume2, VolumeX } from 'lucide-react';
+import { Trophy, AlertCircle, Lightbulb, RefreshCw, ChevronRight, CheckCircle2, Info, BookOpen, Timer, Award, ShieldCheck, Zap, Star, Heart, Check, X, CheckSquare, Sparkles, Gauge, Volume2, VolumeX, Download } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 const quizData = [
@@ -1188,7 +1190,21 @@ export default function QuizPage() {
   const [timeLeft, setTimeLeft] = useState(() => getSavedProgress()?.timeLeft ?? 60);
   const [studentName, setStudentName] = useState(() => getSavedProgress()?.studentName ?? "");
   const [streak, setStreak] = useState(() => getSavedProgress()?.streak ?? 0);
+  const certRef = useRef<HTMLDivElement>(null);
   const [maxStreak, setMaxStreak] = useState(() => getSavedProgress()?.maxStreak ?? 0);
+
+  const handleDownloadCertificate = async () => {
+    if (certRef.current) {
+      const canvas = await html2canvas(certRef.current);
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save('certificate.pdf');
+    }
+  };
   const [showCertificate, setShowCertificate] = useState(false);
   const [reviewFilter, setReviewFilter] = useState<"all" | "correct" | "incorrect">("all");
   const [shareToast, setShareToast] = useState(false);
@@ -1847,16 +1863,25 @@ export default function QuizPage() {
                     <button
                       type="button"
                       onClick={() => setShowCertificate(!showCertificate)}
-                      className="w-full bg-amber-400 hover:bg-amber-300 text-[#002060] font-black py-3 rounded-xl text-xs uppercase tracking-widest cursor-pointer transition-all active:scale-98 flex items-center justify-center gap-2 shadow-lg hover:shadow-amber-500/10"
+                      className="w-full bg-amber-400 hover:bg-amber-300 text-[#002060] font-black py-3 rounded-xl text-xs uppercase tracking-widest cursor-pointer transition-all active:scale-98 flex items-center justify-center gap-2 shadow-lg hover:shadow-amber-500/10 mb-2"
                     >
                       {showCertificate ? "Close Certificate View" : "View Safe Driver Certificate"}
                     </button>
+                    {showCertificate && (
+                       <button
+                         type="button"
+                         onClick={handleDownloadCertificate}
+                         className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black py-3 rounded-xl text-xs uppercase tracking-widest cursor-pointer transition-all active:scale-98 flex items-center justify-center gap-2 shadow-lg hover:shadow-emerald-500/10"
+                       >
+                         <Download className="w-4 h-4" /> Download Certificate
+                       </button>
+                    )}
                   </div>
                 )}
 
                 {/* The Live Certificate View element */}
                 {showCertificate && isPassing && (
-                  <div className="w-full border-4 border-double border-amber-500 bg-amber-50/10 p-4 sm:p-8 rounded-2xl my-6 relative bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white to-amber-50/40 text-slate-900 shadow-2xl">
+                  <div ref={certRef} className="w-full border-4 border-double border-amber-500 bg-amber-50/10 p-4 sm:p-8 rounded-2xl my-6 relative bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white to-amber-50/40 text-slate-900 shadow-2xl">
                     <div className="border border-amber-600/30 p-6 rounded-xl flex flex-col items-center">
                       <div className="flex justify-between items-center w-full mb-6">
                         <div className="text-left">
@@ -2000,14 +2025,14 @@ export default function QuizPage() {
               <div className="flex flex-wrap justify-between items-center gap-3 mb-4 text-xs font-bold text-slate-500 uppercase tracking-widest pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2">
                   <span>QUESTION {currentIdx + 1} OF {activeQuestions.length}</span>
-                  <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black border uppercase tracking-wider ${
+                  <span className={`px-3 py-1 rounded-full text-[10px] font-black border uppercase tracking-wider ${
                     activeQuestions[currentIdx]?.difficulty === 'easy' 
-                      ? 'bg-emerald-50 border-emerald-250 text-emerald-700' 
+                      ? 'bg-emerald-100 border-emerald-300 text-emerald-800' 
                       : activeQuestions[currentIdx]?.difficulty === 'medium'
-                        ? 'bg-amber-50 border-amber-250 text-amber-700'
-                        : 'bg-rose-50 border-rose-250 text-rose-700'
+                        ? 'bg-amber-100 border-amber-300 text-amber-800'
+                        : 'bg-rose-100 border-rose-300 text-rose-800'
                   }`}>
-                    {activeQuestions[currentIdx]?.difficulty}
+                    LEVEL: {activeQuestions[currentIdx]?.difficulty}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
@@ -2021,10 +2046,12 @@ export default function QuizPage() {
               </div>
 
               {/* Progress bar with glowing handle */}
-              <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden mb-8 relative">
-                <div
-                  className="bg-gradient-to-r from-[#002060] to-[#FF7112] h-full transition-all duration-300 rounded-full"
-                  style={{ width: `${progressPct}%` }}
+              <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden mb-8 relative shadow-inner">
+                <motion.div
+                  className="bg-gradient-to-r from-[#002060] to-[#FF7112] h-full transition-all duration-500 rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progressPct}%` }}
+                  transition={{ type: "spring", stiffness: 50, damping: 20 }}
                 />
               </div>
 
