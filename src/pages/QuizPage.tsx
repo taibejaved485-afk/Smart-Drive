@@ -1199,7 +1199,15 @@ export default function QuizPage() {
     rationale: string;
     correctText: string;
   }>>(() => getSavedProgress()?.history ?? []);
-  const [selectedDifficulty, setSelectedDifficulty] = useState<"all" | "easy" | "medium" | "hard">(() => getSavedProgress()?.selectedDifficulty ?? "all");
+  const [selectedDifficulty, setSelectedDifficulty] = useState<"all" | "easy" | "medium" | "hard">(() => getSavedProgress()?.selectedDifficulty ?? "easy");
+  const [passedLevels, setPassedLevels] = useState<string[]>(() => {
+    const saved = localStorage.getItem('passedLevels');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('passedLevels', JSON.stringify(passedLevels));
+  }, [passedLevels]);
 
   // Synchronize state changes to localStorage
   useEffect(() => {
@@ -1452,6 +1460,16 @@ export default function QuizPage() {
   const isPassing = score >= Math.ceil(activeQuestions.length * 0.7);
   const finalPercent = Math.round((score / activeQuestions.length) * 100);
 
+  useEffect(() => {
+    if (quizFinished && isPassing) {
+      if (selectedDifficulty === 'easy') {
+        setPassedLevels(prev => [...new Set([...prev, 'easy'])]);
+      } else if (selectedDifficulty === 'medium') {
+        setPassedLevels(prev => [...new Set([...prev, 'medium'])]);
+      }
+    }
+  }, [quizFinished, isPassing, selectedDifficulty]);
+
   // Trigger modern canvas-confetti on successful quiz completion
   useEffect(() => {
     if (quizFinished && isPassing) {
@@ -1624,18 +1642,25 @@ export default function QuizPage() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {[
                       { id: "all", label: "Full Test (All)", desc: "15 Random Qs", icon: Star, color: "text-[#002060]", activeColor: "border-[#002060] bg-[#002060]/5 text-[#002060]" },
-                      { id: "easy", label: "Easy Tier", desc: "Basic signs", icon: BadgeCheckPlaceholder, color: "text-emerald-600", activeColor: "border-emerald-500 bg-emerald-50/40 text-emerald-950" },
+                      { id: "easy", label: "Easy Tier", desc: "Basic signs", icon: CheckCircle2, color: "text-emerald-600", activeColor: "border-emerald-500 bg-emerald-50/40 text-emerald-950" },
                       { id: "medium", label: "Medium Tier", desc: "Right of way", icon: ShieldCheck, color: "text-amber-600", activeColor: "border-amber-500 bg-amber-50/40 text-amber-950" },
                       { id: "hard", label: "Hard Tier", desc: "Blowouts & ABS", icon: Zap, color: "text-rose-600", activeColor: "border-rose-500 bg-rose-50/40 text-rose-950" }
                     ].map((tier) => {
                       const isSelected = selectedDifficulty === tier.id;
-                      const IconComponent = tier.id === "easy" ? CheckCircle2 : tier.icon;
+                      const IconComponent = tier.icon;
+                      
+                      // Check if tier is locked
+                      const isLocked = tier.id !== 'all' && tier.id !== 'easy' && !passedLevels.includes(tier.id === 'hard' ? 'medium' : 'easy');
+
                       return (
                         <button
                           key={tier.id}
                           type="button"
-                          onClick={() => setSelectedDifficulty(tier.id as any)}
+                          onClick={() => !isLocked && setSelectedDifficulty(tier.id as any)}
+                          disabled={isLocked}
                           className={`p-4 rounded-2xl border text-center transition-all duration-150 cursor-pointer flex flex-col items-center group relative overflow-hidden ${
+                            isLocked ? "opacity-50 cursor-not-allowed bg-slate-100" : ""
+                          } ${
                             isSelected 
                               ? `${tier.activeColor} ring-2 ring-orange-500/30 font-extrabold shadow-sm` 
                               : "border-slate-200 bg-slate-50/20 hover:bg-slate-50 text-slate-705 text-slate-700"
@@ -1958,10 +1983,13 @@ export default function QuizPage() {
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   type="button"
-                  onClick={handleStart}
+                  onClick={() => {
+                    handleStart();
+                    setQuizStarted(false);
+                  }}
                   className="flex-1 bg-[#002060] hover:bg-opacity-95 text-white font-extrabold py-4 px-6 rounded-2xl transition cursor-pointer flex items-center justify-center gap-2 text-xs uppercase tracking-wider shadow-lg active:scale-98"
                 >
-                  <RefreshCw className="w-4 h-4 animate-spin-reverse" /> Retake Test Simulator
+                  <RefreshCw className="w-4 h-4 animate-spin-reverse" /> Retake Test or Change Level
                 </button>
               </div>
             </div>
