@@ -59,7 +59,7 @@ const courses = [
       "Interactive quizzes",
       "Exam-readiness training"
     ],
-    image: 'https://i.pinimg.com/736x/e4/f7/8f/e4f78f8c6e26de167b7d64c2bf241eaf.jpg',
+    image: 'https://i.pinimg.com/736x/88/5d/5c/885d5cfef7f27cf8ddaf7593671e9f3d.jpg',
     badgeBg: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
     link: '/pricing'
   }

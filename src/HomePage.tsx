@@ -153,7 +153,7 @@ export default function HomePage() {
               onClick={() => setActiveService('requests')}
               className={`flex-1 sm:flex-initial flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider transition-all cursor-pointer ${
                 activeService === 'requests' 
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' 
+                  ? 'bg-[#FF7112] text-white shadow-lg shadow-orange-500/20' 
                   : 'text-gray-500 hover:text-gray-800 hover:bg-gray-200/50'
               }`}
               type="button"

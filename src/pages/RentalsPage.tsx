@@ -585,7 +585,7 @@ export default function RentalsPage() {
                 onClick={() => setViewMode('requests')}
                 className={`flex items-center gap-2 px-6 py-3 rounded-xl font-extrabold text-sm sm:text-base tracking-tight transition-all ${
                   viewMode === 'requests' 
-                    ? 'bg-white text-indigo-700 shadow-sm border border-gray-150' 
+                    ? 'bg-white text-[#FF7112] shadow-sm border border-gray-150' 
                     : 'text-gray-500 hover:text-gray-800'
                 }`}
               >
@@ -771,7 +771,7 @@ export default function RentalsPage() {
                 <div className="mt-10 flex flex-col sm:flex-row gap-4">
                   <button 
                     onClick={() => setViewMode('requests')}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs uppercase tracking-widest px-8 py-4 rounded-xl transition-all shadow-lg shadow-indigo-100 cursor-pointer"
+                    className="bg-[#FF7112] hover:bg-[#E05A00] text-white font-black text-xs uppercase tracking-widest px-8 py-4 rounded-xl transition-all shadow-lg shadow-orange-100 cursor-pointer"
                   >
                     Post a Request
                   </button>

@@ -308,7 +308,7 @@ export default function CarSalePage() {
                       
                       <div className="bg-slate-50/70 border border-slate-100/80 rounded-xl p-3 flex items-center gap-3">
                         <div className="p-2 bg-white rounded-lg border border-slate-100 shadow-sm shrink-0">
-                          <MapPin className="w-4 h-4 text-indigo-600" />
+                          <MapPin className="w-4 h-4 text-[#FF7112]" />
                         </div>
                         <div className="truncate">
                           <p className="text-[9px] font-black uppercase text-slate-400 tracking-wider">Listed From</p>
@@ -346,7 +346,7 @@ export default function CarSalePage() {
                           setInquiryCNIC('');
                           setInquirySuccess(false);
                         }}
-                        className="w-full inline-flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl py-3.5 font-bold transition-all duration-200 text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-indigo-100 hover:shadow-xl hover:shadow-indigo-200/50 cursor-pointer transform active:scale-98 relative overflow-hidden group/btn border-none outline-none"
+                        className="w-full inline-flex items-center justify-center gap-3 bg-[#FF7112] hover:bg-[#E05A00] text-white rounded-xl py-3.5 font-bold transition-all duration-200 text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-orange-100 hover:shadow-xl hover:shadow-orange-200/50 cursor-pointer transform active:scale-98 relative overflow-hidden group/btn border-none outline-none"
                       >
                         {/* Shimmer effect inside button */}
                         <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000 ease-in-out pointer-events-none"></div>
@@ -427,7 +427,7 @@ export default function CarSalePage() {
                   <X className="w-4 h-4" />
                 </button>
                 <div className="absolute bottom-4 left-6 text-white">
-                  <span className="text-[9px] uppercase font-black bg-indigo-600 px-2 py-0.5 rounded tracking-widest">In-App Purchase Inquiry</span>
+                  <span className="text-[9px] uppercase font-black bg-[#FF7112] px-2 py-0.5 rounded tracking-widest">In-App Purchase Inquiry</span>
                   <h3 className="font-extrabold text-xl mt-1 tracking-tight">{selectedInquiryCar.name}</h3>
                 </div>
               </div>
@@ -445,13 +445,13 @@ export default function CarSalePage() {
                     </div>
                     <h4 className="text-2xl font-black text-gray-900 tracking-tight">Inquiry Logged!</h4>
                     <p className="text-xs sm:text-sm text-gray-500 max-w-sm mx-auto leading-relaxed">
-                      Your purchase inquiry for <strong className="text-indigo-600">{selectedInquiryCar.name}</strong> has been securely logged in our database. Tap below to send your structured buyer interest card to the owner on WhatsApp and negotiate.
+                      Your purchase inquiry for <strong className="text-[#FF7112]">{selectedInquiryCar.name}</strong> has been securely logged in our database. Tap below to send your structured buyer interest card to the owner on WhatsApp and negotiate.
                     </p>
                     
                     <div className="text-xs text-gray-400 bg-gray-50 p-3.5 rounded-xl border max-w-sm mx-auto text-left space-y-1">
                       <div>Buyer: <strong className="text-gray-800">{inquiryName}</strong></div>
                       <div>Buyer CNIC: <strong className="text-gray-800 font-mono">{inquiryCNIC}</strong></div>
-                      <div>Car Price Rate: <strong className="text-indigo-600 font-mono font-bold">PKR {selectedInquiryCar.rentPrice}</strong></div>
+                      <div>Car Price Rate: <strong className="text-[#FF7112] font-mono font-bold">PKR {selectedInquiryCar.rentPrice}</strong></div>
                     </div>
 
                     <div className="pt-2">
@@ -473,7 +473,7 @@ export default function CarSalePage() {
                     {/* Price rates bar */}
                     <div className="bg-slate-50 p-3 rounded-xl border flex items-center justify-between text-xs sm:text-sm">
                       <span className="font-bold text-slate-650">Vehicle Value:</span>
-                      <span className="font-black text-indigo-650">
+                      <span className="font-black text-[#FF7112]">
                         PKR {selectedInquiryCar.rentPrice}
                       </span>
                     </div>
@@ -486,7 +486,7 @@ export default function CarSalePage() {
                         placeholder="e.g. Hammad Javed"
                         value={inquiryName}
                         onChange={e => setInquiryName(e.target.value)}
-                        className="w-full border border-slate-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                        className="w-full border border-slate-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition"
                       />
                     </div>
 
@@ -498,7 +498,7 @@ export default function CarSalePage() {
                         placeholder="e.g. 0300-1234567"
                         value={inquiryPhone}
                         onChange={e => setInquiryPhone(e.target.value)}
-                        className="w-full border border-slate-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition font-mono"
+                        className="w-full border border-slate-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition font-mono"
                       />
                     </div>
 
@@ -510,13 +510,13 @@ export default function CarSalePage() {
                         placeholder="e.g. 33100-1234567-1"
                         value={inquiryCNIC}
                         onChange={e => setInquiryCNIC(e.target.value)}
-                        className="w-full border border-slate-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition font-mono"
+                        className="w-full border border-slate-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition font-mono"
                       />
                     </div>
 
                     <button 
                       type="submit"
-                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs uppercase tracking-widest py-3.5 rounded-xl transition shadow-lg shadow-indigo-100 cursor-pointer active:scale-95 border-none outline-none"
+                      className="w-full bg-[#FF7112] hover:bg-[#E05A00] text-white font-extrabold text-xs uppercase tracking-widest py-3.5 rounded-xl transition shadow-lg shadow-orange-100 cursor-pointer active:scale-95 border-none outline-none"
                     >
                       Log Inquiry Draft
                     </button>

@@ -299,7 +299,7 @@ function MarketplaceCarCard({ car, onReserve }: { car: RentalCar; onReserve: (ca
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowMapModal(true); }}
               className="flex items-center gap-1 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[9px] font-bold text-gray-800 shadow-sm border border-gray-200/50 hover:bg-white transition"
             >
-              <MapPin className="w-2.5 h-2.5 text-indigo-500" />
+              <MapPin className="w-2.5 h-2.5 text-[#FF7112]" />
               <span>{car.area || 'Downtown Area'}</span>
             </button>
           )}
@@ -323,7 +323,7 @@ function MarketplaceCarCard({ car, onReserve }: { car: RentalCar; onReserve: (ca
             {car.fuelType || 'Petrol'}
           </span>
           {car.withDriver && (
-            <span className="bg-indigo-50 border border-indigo-100 text-indigo-700 text-[10px] uppercase font-bold px-2.5 py-1 rounded-lg">
+            <span className="bg-[#FF7112]/10 border border-[#FF7112]/20 text-[#FF7112] text-[10px] uppercase font-bold px-2.5 py-1 rounded-lg">
               With Driver
             </span>
           )}
@@ -393,7 +393,7 @@ function MarketplaceCarCard({ car, onReserve }: { car: RentalCar; onReserve: (ca
             className={`px-4.5 py-2.5 rounded-xl font-extrabold text-xs uppercase tracking-wider flex items-center gap-1.5 transition shadow-lg cursor-pointer transform hover:scale-105 active:scale-95 ${
               isTodayBooked 
                 ? 'bg-gray-200 text-gray-400 shadow-none cursor-not-allowed hidden' 
-                : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-100'
+                : 'bg-[#FF7112] hover:bg-[#E05A00] text-white shadow-orange-100'
             }`}
             style={isTodayBooked ? { display: 'none' } : {}}
             title={isTodayBooked ? 'Currently Booked' : 'Reserve this vehicle now'}
@@ -421,7 +421,7 @@ function MarketplaceCarCard({ car, onReserve }: { car: RentalCar; onReserve: (ca
           <div className="bg-white rounded-3xl overflow-hidden shadow-2xl relative w-full max-w-2xl flex flex-col z-10 animate-fade-in" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-gray-50/50">
               <h3 className="font-black text-gray-900 tracking-tight flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-indigo-600" />
+                <MapPin className="w-5 h-5 text-[#FF7112]" />
                 Vicinity View: {car.area || 'Downtown Area'}, {car.city}
               </h3>
               <button 
@@ -438,13 +438,13 @@ function MarketplaceCarCard({ car, onReserve }: { car: RentalCar; onReserve: (ca
                 
                 {/* Radar Ripple Effect */}
                 <span className="absolute flex h-24 w-24">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-20"></span>
-                  <span className="relative inline-flex rounded-full h-24 w-24 bg-indigo-500/10 border border-indigo-500/30"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-20"></span>
+                  <span className="relative inline-flex rounded-full h-24 w-24 bg-[#FF7112]/10 border border-[#FF7112]/30"></span>
                 </span>
                 
                 <div className="relative z-10 flex flex-col items-center">
-                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(79,70,229,0.5)] mb-2">
-                    <MapPin className="w-6 h-6 text-indigo-600" />
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(255,113,18,0.5)] mb-2">
+                    <MapPin className="w-6 h-6 text-[#FF7112]" />
                   </div>
                   <div className="bg-white/90 backdrop-blur px-4 py-2 rounded-xl text-center shadow-lg border border-gray-200/50">
                     <p className="text-xs font-black uppercase tracking-wider text-gray-900">{car.area || 'Downtown Area'}</p>
@@ -970,7 +970,7 @@ export default function RentalMarketplace() {
                   <X className="w-4 h-4" />
                 </button>
                 <div className="absolute bottom-4 left-6 text-white">
-                  <span className="text-[9px] uppercase font-black bg-indigo-600 px-2 py-0.5 rounded tracking-widest">In-App Reservation</span>
+                  <span className="text-[9px] uppercase font-black bg-[#FF7112] px-2 py-0.5 rounded tracking-widest">In-App Reservation</span>
                   <h3 className="font-extrabold text-xl mt-1 tracking-tight">{selectedBookingCar.name}</h3>
                 </div>
               </div>
@@ -988,12 +988,12 @@ export default function RentalMarketplace() {
                     </div>
                     <h4 className="text-2xl font-black text-gray-900 tracking-tight">Booking Draft Logged!</h4>
                     <p className="text-xs sm:text-sm text-gray-500 max-w-sm mx-auto leading-relaxed">
-                      Your booking request for <strong className="text-indigo-650">{selectedBookingCar.name}</strong> has been securely logged in our database. Tap below to send your structured ticket invoice to our branch officer via WhatsApp and finalize your slots.
+                      Your booking request for <strong className="text-[#FF7112]">{selectedBookingCar.name}</strong> has been securely logged in our database. Tap below to send your structured ticket invoice to our branch officer via WhatsApp and finalize your slots.
                     </p>
                     
                     <div className="text-xs text-gray-400 bg-gray-50 p-3.5 rounded-xl border max-w-sm mx-auto text-left space-y-1">
                       <div>Customer CNIC: <strong className="text-gray-800 font-mono">{bookingCNIC}</strong></div>
-                      <div>Total Price Estimate: <strong className="text-indigo-600 font-mono font-bold">PKR {((parseInt(String(selectedBookingCar.rentPrice || '0').replace(/,/g, '')) || 0) * bookingDuration).toLocaleString()}</strong></div>
+                      <div>Total Price Estimate: <strong className="text-[#FF7112] font-mono font-bold">PKR {((parseInt(String(selectedBookingCar.rentPrice || '0').replace(/,/g, '')) || 0) * bookingDuration).toLocaleString()}</strong></div>
                     </div>
 
                     <div className="pt-2">
@@ -1015,7 +1015,7 @@ export default function RentalMarketplace() {
                     {/* Price rates bar */}
                     <div className="bg-gray-50 p-3 rounded-xl border flex items-center justify-between text-xs sm:text-sm">
                       <span className="font-bold text-gray-650">Rate:</span>
-                      <span className="font-black text-indigo-650">
+                      <span className="font-black text-[#FF7112]">
                         PKR {selectedBookingCar.rentPrice} / {selectedBookingCar.rentUnit || 'Day'}
                       </span>
                     </div>
@@ -1028,7 +1028,7 @@ export default function RentalMarketplace() {
                         placeholder="e.g. Ali Ahmed"
                         value={bookingName}
                         onChange={e => setBookingName(e.target.value)}
-                        className="w-full border border-gray-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                        className="w-full border border-gray-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition"
                       />
                     </div>
 
@@ -1040,7 +1040,7 @@ export default function RentalMarketplace() {
                         placeholder="e.g. 0300-1234567"
                         value={bookingPhone}
                         onChange={e => setBookingPhone(e.target.value)}
-                        className="w-full border border-gray-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition font-mono"
+                        className="w-full border border-gray-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition font-mono"
                       />
                     </div>
 
@@ -1052,7 +1052,7 @@ export default function RentalMarketplace() {
                         placeholder="e.g. 33100-1234567-1"
                         value={bookingCNIC}
                         onChange={e => setBookingCNIC(e.target.value)}
-                        className="w-full border border-gray-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition font-mono"
+                        className="w-full border border-gray-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition font-mono"
                       />
                     </div>
 
@@ -1064,7 +1064,7 @@ export default function RentalMarketplace() {
                           type="date"
                           value={bookingDate}
                           onChange={e => setBookingDate(e.target.value)}
-                          className="w-full border border-gray-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition font-mono"
+                          className="w-full border border-gray-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition font-mono"
                         />
                       </div>
                       <div>
@@ -1076,14 +1076,14 @@ export default function RentalMarketplace() {
                           max="90"
                           value={bookingDuration}
                           onChange={e => setBookingDuration(parseInt(e.target.value) || 1)}
-                          className="w-full border border-gray-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition font-mono"
+                          className="w-full border border-gray-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition font-mono"
                         />
                       </div>
                     </div>
 
                     <button 
                       type="submit"
-                      className="w-full bg-indigo-650 hover:bg-indigo-700 text-white font-extrabold text-xs uppercase tracking-widest py-3.5 rounded-xl transition shadow-lg shadow-indigo-100 cursor-pointer active:scale-95 border-none outline-none"
+                      className="w-full bg-[#FF7112] hover:bg-[#E05A00] text-white font-extrabold text-xs uppercase tracking-widest py-3.5 rounded-xl transition shadow-lg shadow-orange-100 cursor-pointer active:scale-95 border-none outline-none"
                     >
                       Log Booking Draft
                     </button>
