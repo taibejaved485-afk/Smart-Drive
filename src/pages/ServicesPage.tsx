@@ -297,7 +297,7 @@ export default function ServicesPage() {
             </div>
           
             <div className="hidden lg:flex justify-center items-center relative">
-              <div className="w-full max-w-2xl sm:max-w-3xl aspect-video z-10 relative bg-white overflow-hidden flex items-center justify-center rounded-2xl">
+              <div className="w-full max-w-2xl sm:max-w-3xl aspect-video z-10 relative bg-white overflow-hidden flex items-center justify-center rounded-none">
                 
                 {/* Fallback image + dynamic shimmering loader shown instantly */}
                 {!videoLoaded && (
