@@ -126,7 +126,59 @@ const quizData = [
       { text: "Check rearview mirror, side mirrors, signal, and perform a shoulder check.", isCorrect: true, rationale: "This sequence ensures you look behind, alongside, warn others, and then check the blind spot physically before turning." },
       { text: "Check side mirrors, honk your horn, and switch lanes rapidly.", isCorrect: false, rationale: "Honking is for emergencies, and mirror checks alone are insufficient without looking over your shoulder." }
     ],
-    hint: "Start from the inside mirror and move your focus outward before physically turning your head."
+    hint: "Start from the inside mirror and move your focus outward before physically turning your head.",
+    graphic: (
+      <svg viewBox="0 0 120 100" className="w-28 h-28 mx-auto drop-shadow-md rounded-xl" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="laneAsphalt" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#1e293b" />
+            <stop offset="100%" stopColor="#0f172a" />
+          </linearGradient>
+          <linearGradient id="carGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#0ea5e9" />
+            <stop offset="100%" stopColor="#1d4ed8" />
+          </linearGradient>
+          <linearGradient id="glassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#e0f2fe" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#bae6fd" stopOpacity="0.5" />
+          </linearGradient>
+        </defs>
+        {/* Asphalt Background */}
+        <rect x="10" y="5" width="100" height="90" fill="url(#laneAsphalt)" rx="8" />
+        <line x1="60" y1="5" x2="60" y2="95" stroke="#475569" strokeWidth="1.5" strokeDasharray="5,4" />
+        
+        {/* Car icon top down */}
+        <g transform="translate(48, 45)">
+          <rect x="0" y="0" width="24" height="42" fill="url(#carGrad2)" rx="4" />
+          <rect x="3.5" y="10" width="17" height="18" fill="url(#glassGrad)" rx="1.5" />
+          {/* Side rearview mirrors */}
+          <rect x="-3" y="13" width="3" height="2" fill="#1d4ed8" />
+          <rect x="24" y="13" width="3" height="2" fill="#1d4ed8" />
+        </g>
+
+        {/* Visual checking sequence steps overlay */}
+        {/* 1. Inside rearview mirror check cone */}
+        <path d="M 60,55 L 45,95 L 75,95 Z" fill="#e0f2fe" opacity="0.15" />
+        <circle cx="60" cy="75" r="5" fill="#0284c7" />
+        <text x="60" y="77.5" fill="white" fontSize="7.5" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">1</text>
+        
+        {/* 2. Side mirror check cones */}
+        <path d="M 46,58 L 15,75 L 20,85 Z" fill="#e0f2fe" opacity="0.15" />
+        <circle cx="28" cy="70" r="5" fill="#f59e0b" />
+        <text x="28" y="72.5" fill="white" fontSize="7.5" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">2</text>
+
+        {/* 3. Signal indicators flashing */}
+        <circle cx="49" cy="46" r="2.5" fill="#fbbf24" className="animate-pulse" />
+        <circle cx="71" cy="46" r="2.5" fill="#fbbf24" className="animate-pulse" />
+        <text x="92" y="50" fill="#fbbf24" fontSize="7" fontWeight="black" textAnchor="middle" fontFamily="sans-serif">3 SIGNAL</text>
+
+        {/* 4. Shoulder check warning arrow */}
+        <path d="M 52,48 Q 20,40 15,20" fill="none" stroke="#ef4444" strokeWidth="1.8" strokeDasharray="3,2" />
+        <polygon points="15,20 12,27 19,25" fill="#ef4444" />
+        <circle cx="34" cy="31" r="5" fill="#ef4444" />
+        <text x="34" y="33.5" fill="white" fontSize="7.5" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">4</text>
+      </svg>
+    )
   },
   {
     id: 3,
@@ -323,7 +375,52 @@ const quizData = [
       { text: "Turn the steering wheel sharply in the direction of the slide.", isCorrect: false, rationale: "Sharp steering inputs during zero-traction events will cause oversteer and roll risks." },
       { text: "Accelerate to push through the water patch.", isCorrect: false, rationale: "Increasing speed lifts the vehicle further off the road, worsening the loss of control." }
     ],
-    hint: "Avoid sudden inputs like braking or steering; let friction do the work gently."
+    hint: "Avoid sudden inputs like braking or steering; let friction do the work gently.",
+    graphic: (
+      <svg viewBox="0 0 120 100" className="w-28 h-28 mx-auto drop-shadow-md rounded-xl" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="waterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#38bdf8" />
+            <stop offset="50%" stopColor="#0284c7" />
+            <stop offset="100%" stopColor="#0369a1" />
+          </linearGradient>
+          <linearGradient id="tireGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#475569" />
+            <stop offset="40%" stopColor="#1e293b" />
+            <stop offset="100%" stopColor="#0f172a" />
+          </linearGradient>
+        </defs>
+        {/* Dark Asphalt road at the bottom */}
+        <rect x="5" y="70" width="110" height="20" fill="#1e293b" rx="4" />
+        
+        {/* Thick Layer of Water on Road */}
+        <rect x="5" y="65" width="110" height="8" fill="url(#waterGrad)" rx="2" />
+        <path d="M 5,66 Q 30,62 60,66 Q 90,62 115,66" fill="none" stroke="#7dd3fc" strokeWidth="1.5" />
+        
+        {/* Large detailed vehicle tire lifted above asphalt by water wedge */}
+        <g transform="translate(60, 42)">
+          {/* Outer tire ring with treads */}
+          <circle cx="0" cy="0" r="28" fill="url(#tireGrad)" />
+          {/* Treads marks around tire */}
+          <path d="M -28,0 L -24,0 M 24,0 L 28,0 M 0,-28 L 0,-24 M 0,24 L 0,28 M -20,-20 L -17,-17 M 20,-20 L 17,-17 M -20,20 L -17,17 M 20,20 L 17,17" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round" />
+          
+          {/* Metallic Wheel rim core */}
+          <circle cx="0" cy="0" r="16" fill="#cbd5e1" stroke="#475569" strokeWidth="2" />
+          {/* Rim spokes */}
+          <circle cx="0" cy="0" r="6" fill="#64748b" />
+          <line x1="-16" y1="0" x2="16" y2="0" stroke="#475569" strokeWidth="2" />
+          <line x1="0" y1="-16" x2="0" y2="16" stroke="#475569" strokeWidth="2" />
+        </g>
+
+        {/* Water wedge splashing forward/under tire */}
+        <path d="M 28,66 C 35,66 40,64 45,58 C 42,65 35,68 28,68 Z" fill="#e0f2fe" />
+        <path d="M 85,65 C 92,67 98,62 104,56 C 100,62 92,66 85,65 Z" fill="#e0f2fe" />
+
+        {/* Warning Label "NO CONTACT" */}
+        <rect x="25" y="10" width="70" height="15" fill="#7f1d1d" rx="4" />
+        <text x="60" y="20.5" fill="#fca5a5" fontSize="7.5" fontWeight="black" textAnchor="middle" fontFamily="sans-serif" letterSpacing="0.8">WATER WEDGE</text>
+      </svg>
+    )
   },
   {
     id: 7,
@@ -335,7 +432,62 @@ const quizData = [
       { text: "Pull over to the left side and maintain your speed.", isCorrect: false, rationale: "Standard emergency vehicle passing lanes expect you to pull right and come to a complete stop." },
       { text: "Pull over to the right edge of the road and stop.", isCorrect: true, rationale: "Drivers must clear the pathway by moving safely to the right side (or appropriate shoulder) and bringing the car to a halt." }
     ],
-    hint: "Clear the way safely and remain completely stationary until they have gone by."
+    hint: "Clear the way safely and remain completely stationary until they have gone by.",
+    graphic: (
+      <svg viewBox="0 0 120 100" className="w-28 h-28 mx-auto drop-shadow-md rounded-xl" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="emergencyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#ef4444" />
+            <stop offset="100%" stopColor="#dc2626" />
+          </linearGradient>
+          <linearGradient id="blueCarGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#0284c7" />
+            <stop offset="40%" stopColor="#0ea5e9" />
+            <stop offset="100%" stopColor="#0369a1" />
+          </linearGradient>
+          <linearGradient id="glassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#e0f2fe" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#bae6fd" stopOpacity="0.5" />
+          </linearGradient>
+        </defs>
+        {/* Multi-lane Road */}
+        <rect x="5" y="5" width="110" height="90" fill="#1e293b" rx="8" />
+        <line x1="42" y1="5" x2="42" y2="95" stroke="#475569" strokeWidth="1.2" strokeDasharray="4,4" />
+        <line x1="80" y1="5" x2="80" y2="95" stroke="#475569" strokeWidth="1.2" strokeDasharray="4,4" />
+        {/* Solid yellow right-hand margin boundary line */}
+        <line x1="104" y1="5" x2="104" y2="95" stroke="#f59e0b" strokeWidth="1.5" />
+
+        {/* Sirens/Flashing visual rays from emergency car */}
+        <circle cx="24" cy="74" r="22" fill="#ef4444" opacity="0.15" />
+        <circle cx="24" cy="74" r="14" fill="#3b82f6" opacity="0.2" />
+
+        {/* Emergency Vehicle (Ambulance/Police back view) */}
+        <g transform="translate(13, 62)">
+          <rect x="0" y="0" width="22" height="25" fill="#ffffff" rx="3" stroke="#cbd5e1" strokeWidth="1" />
+          {/* Red stripes */}
+          <rect x="0" y="8" width="22" height="4" fill="#ef4444" />
+          {/* Back Glass */}
+          <rect x="3" y="2" width="16" height="5" fill="#475569" rx="1" />
+          {/* Highly active sirens flashing */}
+          <rect x="4" y="-3.5" width="6" height="3" fill="#ef4444" rx="1" />
+          <rect x="12" y="-3.5" width="6" height="3" fill="#3b82f6" rx="1" />
+          <circle cx="7" cy="-2" r="3" fill="#fca5a5" className="animate-ping" opacity="0.7" />
+          <circle cx="15" cy="-2" r="3" fill="#93c5fd" className="animate-ping" opacity="0.7" />
+        </g>
+
+        {/* Standard car safely pulled over to the right and stopped */}
+        <g transform="translate(86, 25) rotate(10)">
+          <rect x="0" y="0" width="18" height="30" fill="url(#blueCarGrad)" rx="3" />
+          <rect x="2.5" y="8" width="13" height="12" fill="url(#glassGrad)" rx="1" />
+          {/* Right blinker flashing safely */}
+          <circle cx="1" cy="3" r="1.5" fill="#f59e0b" className="animate-pulse" />
+        </g>
+
+        {/* Arrow indicating path of normal car pulling right */}
+        <path d="M 60,45 Q 85,42 90,34" fill="none" stroke="#10b981" strokeWidth="2" strokeDasharray="3,2" />
+        <polygon points="91,30 85,35 90,38" fill="#10b981" />
+      </svg>
+    )
   },
   {
     id: 8,
@@ -411,7 +563,46 @@ const quizData = [
       { text: "Apply firm, steady pressure and do not let go.", isCorrect: true, rationale: "ABS rapidly pumps the brakes automatically; your job is to keep pressure constant and steer." },
       { text: "Pull the handbrake while tapping the foot brake.", isCorrect: false, rationale: "Using the handbrake at speed locks the rear tires, triggering a spinout." }
     ],
-    hint: "Let the computer pump the brakes for you while you press down hard."
+    hint: "Let the computer pump the brakes for you while you press down hard.",
+    graphic: (
+      <svg viewBox="0 0 120 100" className="w-28 h-28 mx-auto drop-shadow-md rounded-xl" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="pedalMetal" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#cbd5e1" />
+            <stop offset="50%" stopColor="#94a3b8" />
+            <stop offset="100%" stopColor="#475569" />
+          </linearGradient>
+        </defs>
+        {/* Dark background inside floorbox */}
+        <rect x="5" y="5" width="110" height="90" fill="#0f172a" rx="8" />
+        
+        {/* Foot accelerator pedal on the right (Unpressed, slim) */}
+        <rect x="85" y="25" width="12" height="50" fill="#1e293b" rx="2" stroke="#334155" />
+        
+        {/* Broad heavy brake pedal (Pressed hard down) */}
+        <g transform="translate(35, 30)">
+          {/* Pedal arm */}
+          <rect x="11" y="-20" width="8" height="35" fill="url(#pedalMetal)" />
+          {/* Pedal pad */}
+          <rect x="0" y="10" width="30" height="22" fill="#1e293b" rx="3" stroke="#cbd5e1" strokeWidth="2.5" />
+          {/* Rubber anti-slip grips on brake pedal */}
+          <rect x="4" y="14" width="4" height="14" fill="#0f172a" />
+          <rect x="13" y="14" width="4" height="14" fill="#0f172a" />
+          <rect x="22" y="14" width="4" height="14" fill="#0f172a" />
+        </g>
+
+        {/* Stepping shoe outline (pressing hard) */}
+        <path d="M 12,5 L 35,45 L 60,45 L 45,15 Z" fill="#475569" opacity="0.45" stroke="#94a3b8" strokeWidth="1.5" />
+
+        {/* ABS Pulse Rings radiating from brake pedal */}
+        <circle cx="50" cy="46" r="22" fill="none" stroke="#fbbf24" strokeWidth="1.5" strokeDasharray="4,3" className="animate-ping" opacity="0.6" />
+        <circle cx="50" cy="46" r="14" fill="none" stroke="#fbbf24" strokeWidth="1" strokeDasharray="3,2" />
+
+        {/* ABS Glowing dash symbol in top left corner */}
+        <rect x="12" y="12" width="28" height="13" fill="#78350f" rx="3" stroke="#d97706" strokeWidth="1" />
+        <text x="26" y="21.5" fill="#fbbf24" fontSize="7.5" fontWeight="black" textAnchor="middle" fontFamily="monospace">ABS</text>
+      </svg>
+    )
   },
   {
     id: 10,
@@ -443,6 +634,10 @@ const quizData = [
           <linearGradient id="clearViewGreen" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor="#10b981" stopOpacity="0.25" />
             <stop offset="100%" stopColor="#064e3b" stopOpacity="0.02" />
+          </linearGradient>
+          <linearGradient id="glassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#e0f2fe" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#bae6fd" stopOpacity="0.5" />
           </linearGradient>
         </defs>
 
@@ -499,7 +694,71 @@ const quizData = [
       { text: "A gap of 1 car length for every 50 km/h of speed.", isCorrect: false, rationale: "Using car lengths is highly inaccurate at modern speeds and rain conditions." },
       { text: "Flicker high beams frequently to warn the driver in front.", isCorrect: false, rationale: "Flickering high beams blurs mirrors, blinding the leading driver and increasing risk." }
     ],
-    hint: "Rainwater cuts brake competence in half. Double your normal stopping gap."
+    hint: "Rainwater cuts brake competence in half. Double your normal stopping gap.",
+    graphic: (
+      <svg viewBox="0 0 120 100" className="w-28 h-28 mx-auto drop-shadow-md rounded-xl" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="wetRoad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#0f172a" />
+            <stop offset="50%" stopColor="#1e293b" />
+            <stop offset="100%" stopColor="#0f172a" />
+          </linearGradient>
+          <linearGradient id="blueCarGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#0284c7" />
+            <stop offset="40%" stopColor="#0ea5e9" />
+            <stop offset="100%" stopColor="#0369a1" />
+          </linearGradient>
+          <linearGradient id="redCarGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#dc2626" />
+            <stop offset="40%" stopColor="#ef4444" />
+            <stop offset="100%" stopColor="#991b1b" />
+          </linearGradient>
+          <linearGradient id="glassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#e0f2fe" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#bae6fd" stopOpacity="0.5" />
+          </linearGradient>
+        </defs>
+        {/* Road surface */}
+        <rect x="10" y="5" width="100" height="90" fill="url(#wetRoad)" rx="8" />
+        <line x1="60" y1="5" x2="60" y2="95" stroke="#334155" strokeWidth="1.5" strokeDasharray="5,4" />
+
+        {/* Water drops representing rainfall (slant lines) */}
+        <line x1="20" y1="10" x2="15" y2="25" stroke="#38bdf8" strokeWidth="1" opacity="0.5" />
+        <line x1="50" y1="15" x2="45" y2="30" stroke="#38bdf8" strokeWidth="1" opacity="0.5" />
+        <line x1="90" y1="8" x2="85" y2="23" stroke="#38bdf8" strokeWidth="1" opacity="0.5" />
+        <line x1="30" y1="50" x2="25" y2="65" stroke="#38bdf8" strokeWidth="1" opacity="0.5" />
+        <line x1="100" y1="60" x2="95" y2="75" stroke="#38bdf8" strokeWidth="1" opacity="0.5" />
+        <line x1="75" y1="35" x2="70" y2="50" stroke="#38bdf8" strokeWidth="1" opacity="0.5" />
+
+        {/* Lead car top down (Red sedan) */}
+        <g transform="translate(49, 12)">
+          <rect x="0" y="0" width="22" height="34" fill="url(#redCarGrad)" rx="3.5" />
+          <rect x="3" y="8" width="16" height="15" fill="url(#glassGrad)" rx="1" />
+          <circle cx="3" cy="34" r="1.5" fill="#ef4444" />
+          <circle cx="19" cy="34" r="1.5" fill="#ef4444" />
+        </g>
+
+        {/* Following car top down (Blue sedan) */}
+        <g transform="translate(49, 64)">
+          <rect x="0" y="0" width="22" height="34" fill="url(#blueCarGrad)" rx="3.5" />
+          <rect x="3" y="8" width="16" height="15" fill="url(#glassGrad)" rx="1" />
+          {/* Beam headlamps illuminating rain spray */}
+          <path d="M 3,0 L -8,-15 L 12,-15 L 3,0 Z" fill="#fef08a" opacity="0.12" />
+          <path d="M 19,0 L 8,-15 L 28,-15 L 19,0 Z" fill="#fef08a" opacity="0.12" />
+        </g>
+
+        {/* Safety measurement lines */}
+        <g>
+          <line x1="40" y1="48" x2="40" y2="62" stroke="#fbbf24" strokeWidth="1.5" />
+          <polygon points="40,48 37,53 43,53" fill="#fbbf24" />
+          <polygon points="40,62 37,57 43,57" fill="#fbbf24" />
+          
+          {/* 4s Badge */}
+          <rect x="15" y="49" width="22" height="11" fill="#78350f" rx="3" stroke="#d97706" strokeWidth="1" />
+          <text x="26" y="58" fill="#fbbf24" fontSize="7" fontWeight="black" textAnchor="middle" fontFamily="monospace">4s+</text>
+        </g>
+      </svg>
+    )
   },
   {
     id: 12,
@@ -511,7 +770,45 @@ const quizData = [
       { text: "Shift immediately into reverse or park to force a lockup.", isCorrect: false, rationale: "This will shred your transmission and lock wheels, triggering an uncontrollable roll." },
       { text: "Turn the wheel rapidly towards the direction of the blown tyre.", isCorrect: false, rationale: "Abrupt steering inputs at high speed during tyre blowouts lead to severe rollover crashes." }
     ],
-    hint: "Prioritize keeping the vehicle straight and avoiding any abrupt control inputs."
+    hint: "Prioritize keeping the vehicle straight and avoiding any abrupt control inputs.",
+    graphic: (
+      <svg viewBox="0 0 120 100" className="w-28 h-28 mx-auto drop-shadow-md rounded-xl" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="wheelRubber" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#334155" />
+            <stop offset="100%" stopColor="#0f172a" />
+          </linearGradient>
+        </defs>
+        {/* Asphalt backdrop */}
+        <rect x="5" y="5" width="110" height="90" fill="#1e293b" rx="8" />
+
+        {/* Tire showing rupture at bottom right */}
+        <g transform="translate(60, 42)">
+          {/* Flattened/burst tire outline */}
+          <path d="M -24,-12 C -10,-28 10,-28 24,-12 C 30,-2 28,14 18,22 C 10,24 -10,24 -18,22 C -28,14 -30,-2 -24,-12 Z" fill="url(#wheelRubber)" stroke="#0f172a" strokeWidth="2" />
+          {/* Tear mark where air escapes */}
+          <path d="M 18,12 L 28,18 L 20,20" stroke="#ef4444" strokeWidth="2" fill="none" />
+          
+          {/* Steel alloy Rim */}
+          <circle cx="0" cy="0" r="14" fill="#94a3b8" stroke="#475569" strokeWidth="2" />
+          <circle cx="0" cy="0" r="4" fill="#cbd5e1" />
+        </g>
+
+        {/* Deflation sparks / air escape streams */}
+        <path d="M 78,60 L 92,68 M 80,55 L 94,57 M 76,64 L 88,74" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
+        <path d="M 78,60 L 86,63" stroke="#ef4444" strokeWidth="1.5" />
+
+        {/* Warning Badge "STEER STRAIGHT" */}
+        <rect x="25" y="74" width="70" height="15" fill="#065f46" rx="4" />
+        <text x="60" y="84.5" fill="#34d399" fontSize="7.2" fontWeight="black" textAnchor="middle" fontFamily="sans-serif" letterSpacing="0.4">HOLD FIRM STRAIGHT</text>
+        
+        {/* Straight arrows pointing up to represent keeping control */}
+        <path d="M 22,35 L 22,15" fill="none" stroke="#10b981" strokeWidth="2" />
+        <polygon points="22,12 18,19 26,19" fill="#10b981" />
+        <path d="M 98,35 L 98,15" fill="none" stroke="#10b981" strokeWidth="2" />
+        <polygon points="98,12 94,19 102,19" fill="#10b981" />
+      </svg>
+    )
   },
   {
     id: 13,
@@ -530,6 +827,20 @@ const quizData = [
           <linearGradient id="roadAsphalt" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor="#1e293b" />
             <stop offset="100%" stopColor="#0f172a" />
+          </linearGradient>
+          <linearGradient id="blueCarGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#0284c7" />
+            <stop offset="40%" stopColor="#0ea5e9" />
+            <stop offset="100%" stopColor="#0369a1" />
+          </linearGradient>
+          <linearGradient id="redCarGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#dc2626" />
+            <stop offset="40%" stopColor="#ef4444" />
+            <stop offset="100%" stopColor="#991b1b" />
+          </linearGradient>
+          <linearGradient id="glassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#e0f2fe" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#bae6fd" stopOpacity="0.5" />
           </linearGradient>
         </defs>
 
@@ -584,6 +895,16 @@ const quizData = [
             <stop offset="0%" stopColor="#ef4444" />
             <stop offset="100%" stopColor="#991b1b" />
           </linearGradient>
+          <linearGradient id="poleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#94a3b8" />
+            <stop offset="50%" stopColor="#cbd5e1" />
+            <stop offset="100%" stopColor="#64748b" />
+          </linearGradient>
+          <linearGradient id="rimGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#ffffff" />
+            <stop offset="40%" stopColor="#cbd5e1" />
+            <stop offset="100%" stopColor="#64748b" />
+          </linearGradient>
         </defs>
 
         {/* Physical steel sign post */}
@@ -626,7 +947,35 @@ const quizData = [
       { text: "It increases by approximately four times (quadruples).", isCorrect: true, rationale: "Deceleration kinetic energy equation is (E = 1/2 * m * v²). When velocity (v) doubles, kinetic energy (and slide distance) increases by four." },
       { text: "It increases tenfold due to aerodynamic vacuum drag.", isCorrect: false, rationale: "Aerodynamic resistance helps decelerate vehicles slightly, but the kinetic stopping distance increases four times based on tire physics." }
     ],
-    hint: "Kinetic energy scales quadratically with speed (v squared)."
+    hint: "Kinetic energy scales quadratically with speed (v squared).",
+    graphic: (
+      <svg viewBox="0 0 120 100" className="w-28 h-28 mx-auto drop-shadow-md rounded-xl" xmlns="http://www.w3.org/2000/svg">
+        {/* Clean graph background */}
+        <rect x="5" y="5" width="110" height="90" fill="#0f172a" rx="8" />
+        
+        {/* Formula Display */}
+        <text x="60" y="20" fill="#94a3b8" fontSize="8" fontWeight="bold" textAnchor="middle" fontFamily="monospace">E_k = 1/2 * m * v²</text>
+
+        {/* Track 1: 40 km/h */}
+        <text x="12" y="38" fill="#cbd5e1" fontSize="7" fontWeight="bold" fontFamily="sans-serif">40 km/h</text>
+        {/* Track bar background */}
+        <rect x="12" y="42" width="96" height="6" fill="#1e293b" rx="2" />
+        {/* Track bar active (short stopping distance) */}
+        <rect x="12" y="42" width="20" height="6" fill="#10b981" rx="2" />
+        <text x="36" y="47.5" fill="#34d399" fontSize="6.5" fontWeight="extrabold" fontFamily="sans-serif">1X DIST</text>
+
+        {/* Track 2: 80 km/h */}
+        <text x="12" y="64" fill="#cbd5e1" fontSize="7" fontWeight="bold" fontFamily="sans-serif">80 km/h (2x Speed)</text>
+        {/* Track bar background */}
+        <rect x="12" y="68" width="96" height="6" fill="#1e293b" rx="2" />
+        {/* Track bar active (4x stopping distance!) */}
+        <rect x="12" y="68" width="80" height="6" fill="#ef4444" rx="2" />
+        <text x="96" y="73.5" fill="#fca5a5" fontSize="6.5" fontWeight="extrabold" fontFamily="sans-serif">4X DIST</text>
+
+        {/* Kinetic warning notice */}
+        <text x="60" y="88" fill="#fbbf24" fontSize="7" fontWeight="black" textAnchor="middle" fontFamily="sans-serif" letterSpacing="0.2">QUADRUPLED STOPPING RISK</text>
+      </svg>
+    )
   }
 ];
 
