@@ -17,7 +17,30 @@ const quizData = [
       { text: "To improve your vehicle's fuel efficiency.", isCorrect: false, rationale: "Following too closely actually causes frequent braking and acceleration, decreasing fuel efficiency." },
       { text: "To ensure the driver behind you can pass more easily.", isCorrect: false, rationale: "While lane courtesy is good, highway safe distance is primarily about your own stopping geometry and survival gap." }
     ],
-    hint: "Think about physical stopping distance and reaction time at high speeds."
+    hint: "Think about physical stopping distance and reaction time at high speeds.",
+    graphic: (
+      <svg viewBox="0 0 160 80" className="w-full h-24 max-w-[200px] mx-auto drop-shadow-sm" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="25" width="160" height="30" fill="#334155" />
+        <line x1="0" y1="40" x2="160" y2="40" stroke="#fef08a" strokeWidth="1.5" strokeDasharray="5,5" />
+        {/* Leading car */}
+        <g transform="translate(100, 30)">
+          <rect x="0" y="0" width="22" height="12" fill="#002060" rx="2" />
+          <rect x="14" y="2" width="6" height="8" fill="#bae6fd" />
+          <circle cx="4" cy="1" r="1.5" fill="#fecaca" />
+          <circle cx="4" cy="11" r="1.5" fill="#fecaca" />
+        </g>
+        {/* Following car */}
+        <g transform="translate(15, 30)">
+          <rect x="0" y="0" width="22" height="12" fill="#dc2626" rx="2" />
+          <rect x="14" y="2" width="6" height="8" fill="#bae6fd" />
+          <circle cx="19" cy="1" r="1.5" fill="#fef08a" />
+          <circle cx="19" cy="11" r="1.5" fill="#fef08a" />
+        </g>
+        {/* Safe distance bracket indicator */}
+        <path d="M 40,48 L 40,54 L 98,54 L 98,48" fill="none" stroke="#22c55e" strokeWidth="1.5" />
+        <text x="69" y="65" fill="#22c55e" fontSize="9" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">SAFE GAP</text>
+      </svg>
+    )
   },
   {
     id: 2,
@@ -41,7 +64,19 @@ const quizData = [
       { text: "Slow down and proceed with caution, yielding to hazards.", isCorrect: true, rationale: "A flashing yellow means caution; you do not have to stop completely unless cross-traffic or hazards are present." },
       { text: "Speed up to clear the intersection before it turns red.", isCorrect: false, rationale: "Speeding up increases risk at an intersection with warning lights." }
     ],
-    hint: "Yellow light signifies warning. You must reduce speed and stay alert without halting unnecessarily."
+    hint: "Yellow light signifies warning. You must reduce speed and stay alert without halting unnecessarily.",
+    graphic: (
+      <svg viewBox="0 0 100 100" className="w-20 h-20 mx-auto drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
+        <rect x="35" y="10" width="30" height="80" fill="#1e293b" rx="10" />
+        {/* Red light */}
+        <circle cx="50" cy="25" r="8" fill="#475569" />
+        {/* Flashing yellow */}
+        <circle cx="50" cy="50" r="10" fill="#f59e0b" className="animate-pulse" />
+        <circle cx="50" cy="50" r="10" fill="none" stroke="#fef08a" strokeWidth="2" className="animate-ping" />
+        {/* Green light */}
+        <circle cx="50" cy="75" r="8" fill="#475569" />
+      </svg>
+    )
   },
   {
     id: 4,
@@ -53,7 +88,33 @@ const quizData = [
       { text: "The vehicle on the left.", isCorrect: false, rationale: "The vehicle on the left is legally required to yield to the vehicle on its right." },
       { text: "The larger vehicle with more mass.", isCorrect: false, rationale: "Vehicle size does not give legal priority over right-of-way rules." }
     ],
-    hint: "Think of the right-hand rule used universally in driving theory."
+    hint: "Think of the right-hand rule used universally in driving theory.",
+    graphic: (
+      <svg viewBox="0 0 120 120" className="w-28 h-28 mx-auto drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="40" width="120" height="40" fill="#334155" />
+        <rect x="40" y="0" width="40" height="120" fill="#334155" />
+        {/* Dotted lines */}
+        <line x1="0" y1="60" x2="35" y2="60" stroke="#fef08a" strokeWidth="1" strokeDasharray="3,3" />
+        <line x1="85" y1="60" x2="120" y2="60" stroke="#fef08a" strokeWidth="1" strokeDasharray="3,3" />
+        <line x1="60" y1="0" x2="60" y2="35" stroke="#fef08a" strokeWidth="1" strokeDasharray="3,3" />
+        <line x1="60" y1="85" x2="60" y2="120" stroke="#fef08a" strokeWidth="1" strokeDasharray="3,3" />
+        {/* Vehicle A (bottom, going straight) */}
+        <g transform="translate(48, 90)">
+          <rect x="0" y="0" width="12" height="20" fill="#002060" rx="2" />
+          <rect x="2" y="3" width="8" height="5" fill="#bae6fd" />
+          <text x="6" y="14" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">A</text>
+        </g>
+        {/* Vehicle B (right side, going straight) */}
+        <g transform="translate(90, 48) rotate(270 6 10)">
+          <rect x="0" y="0" width="12" height="20" fill="#dc2626" rx="2" />
+          <rect x="2" y="3" width="8" height="5" fill="#fecaca" />
+          <text x="6" y="14" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">B</text>
+        </g>
+        {/* Arrow representing right of way B going first */}
+        <path d="M 60,75 Q 75,75 80,62" fill="none" stroke="#22c55e" strokeWidth="1.5" strokeDasharray="2,2" />
+        <polygon points="80,59 77,64 83,63" fill="#22c55e" />
+      </svg>
+    )
   },
   {
     id: 5,
@@ -65,7 +126,14 @@ const quizData = [
       { text: "They have identical legal meanings and can be used interchangeably.", isCorrect: false, rationale: "They are legally distinct; Stop demands a complete halt, Yield demands prioritization of other traffic." },
       { text: "You must slow down and be prepared to stop if traffic is approaching.", isCorrect: true, rationale: "A Yield sign requires stopping only when other vehicles are already using or approaching the lane." }
     ],
-    hint: "Yielding means giving priority to others, only stopping if they are present."
+    hint: "Yielding means giving priority to others, only stopping if they are present.",
+    graphic: (
+      <svg viewBox="0 0 100 100" className="w-20 h-20 mx-auto drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="50,90 5,15 95,15" fill="white" stroke="#dc2626" strokeWidth="8" strokeLinejoin="round" />
+        <polygon points="50,72 16,20 84,20" fill="none" stroke="white" strokeWidth="1.5" />
+        <text x="50" y="38" fill="#dc2626" fontSize="13" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">YIELD</text>
+      </svg>
+    )
   },
   {
     id: 6,
@@ -101,7 +169,21 @@ const quizData = [
       { text: "You can move in both clockwise and counter-clockwise directions.", isCorrect: false, rationale: "Roundabouts are strictly unidirectional systems designed to avoid head-on traffic." },
       { text: "Always stop completely before entering the circular intersection.", isCorrect: false, rationale: "You only yield; if the circle is empty, you can merge smoothly without stopping." }
     ],
-    hint: "Drivers inside have the priority. Always turn left to enter the circle."
+    hint: "Drivers inside have the priority. Always turn left to enter the circle.",
+    graphic: (
+      <svg viewBox="0 0 100 100" className="w-20 h-20 mx-auto drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" fill="#002060" stroke="white" strokeWidth="2" />
+        <g transform="translate(50,50)">
+          {/* Circular arrows */}
+          <path d="M -15,15 A 21,21 0 0,1 -15,-15" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" />
+          <polygon points="-15,-15 -21,-10 -11,-10" fill="white" transform="rotate(-15 -15 -15)" />
+          <path d="M -10,-18 A 21,21 0 0,1 18,-8" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" />
+          <polygon points="18,-8 15,-15 11,-9" fill="white" transform="rotate(35 18 -8)" />
+          <path d="M 18,8 A 21,21 0 0,1 -5,20" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" />
+          <polygon points="-5,20 -2,14 -9,15" fill="white" transform="rotate(85 -5 20)" />
+        </g>
+      </svg>
+    )
   },
   {
     id: 9,
@@ -125,7 +207,23 @@ const quizData = [
       { text: "It is only present when driving large commercial semi-trucks.", isCorrect: false, rationale: "Every passenger car, SUV, and motorcycle has blind spots that need checking." },
       { text: "It can be completely eliminated by adjusting your rearview mirror upwards.", isCorrect: false, rationale: "No mirror adjustment can completely eliminate the need for head shoulder checks." }
     ],
-    hint: "It requires a physical head turn to see."
+    hint: "It requires a physical head turn to see.",
+    graphic: (
+      <svg viewBox="0 0 120 120" className="w-24 h-24 mx-auto drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
+        <g transform="translate(48, 40)">
+          <rect x="0" y="0" width="24" height="45" fill="#475569" rx="4" />
+          <rect x="2" y="10" width="20" height="10" fill="#bae6fd" />
+          <rect x="-4" y="12" width="4" height="2" fill="#94a3b8" />
+          <rect x="24" y="12" width="4" height="2" fill="#94a3b8" />
+        </g>
+        <path d="M 44,52 L 15,75 L 15,95 Z" fill="#dc2626" fillOpacity="0.25" stroke="#dc2626" strokeWidth="1" strokeDasharray="2,2" />
+        <text x="24" y="82" fill="#b91c1c" fontSize="7" fontWeight="bold" fontFamily="sans-serif">BLIND SPOT</text>
+        <path d="M 76,52 L 105,75 L 105,95 Z" fill="#dc2626" fillOpacity="0.25" stroke="#dc2626" strokeWidth="1" strokeDasharray="2,2" />
+        <text x="78" y="82" fill="#b91c1c" fontSize="7" fontWeight="bold" fontFamily="sans-serif">BLIND SPOT</text>
+        <path d="M 48,40 L 10,10 L 110,10 L 72,40 Z" fill="#22c55e" fillOpacity="0.1" />
+        <text x="60" y="25" fill="#15803d" fontSize="7" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">CLEAR VIEW</text>
+      </svg>
+    )
   },
   {
     id: 11,
@@ -161,7 +259,18 @@ const quizData = [
       { text: "It marks a designated pathway only for slow-moving trucks.", isCorrect: false, rationale: "Solid white lines partition standard lanes, they do not denote specific vehicles." },
       { text: "This line is only active as a marker during nighttime operations.", isCorrect: false, rationale: "Lane markings are active constantly, regardless of ambient lighting." }
     ],
-    hint: "Solid borders are visual blockades. They indicate you must stick to your present lane."
+    hint: "Solid borders are visual blockades. They indicate you must stick to your present lane.",
+    graphic: (
+      <svg viewBox="0 0 120 70" className="w-24 h-24 mx-auto drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="10" width="120" height="50" fill="#334155" />
+        <line x1="0" y1="35" x2="120" y2="35" stroke="white" strokeWidth="3" />
+        <line x1="0" y1="15" x2="120" y2="15" stroke="#eab308" strokeWidth="1" strokeDasharray="4,4" />
+        <line x1="0" y1="55" x2="120" y2="55" stroke="#eab308" strokeWidth="1" strokeDasharray="4,4" />
+        <rect x="15" y="20" width="16" height="8" fill="#002060" rx="1.5" />
+        <rect x="85" y="42" width="16" height="8" fill="#dc2626" rx="1.5" />
+        <path d="M 50,22 L 70,48 M 70,22 L 50,48" stroke="#ef4444" strokeWidth="3.5" strokeLinecap="round" />
+      </svg>
+    )
   },
   {
     id: 14,
@@ -173,7 +282,15 @@ const quizData = [
       { text: "Anytime there is no law enforcement vehicle actively watching.", isCorrect: false, rationale: "Safety rules are structural and legal constants, not conditional upon enforcement presence." },
       { text: "Whenever you are driving with a full fuel tank.", isCorrect: false, rationale: "Fuel level has no impact on driving maneuver legality." }
     ],
-    hint: "Think about whether oncoming traffic can see you from a safe distance."
+    hint: "Think about whether oncoming traffic can see you from a safe distance.",
+    graphic: (
+      <svg viewBox="0 0 100 100" className="w-20 h-20 mx-auto drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" fill="white" stroke="#dc2626" strokeWidth="8" />
+        <path d="M 65,65 L 65,45 A 15,15 0 0,0 35,45 L 35,62" fill="none" stroke="black" strokeWidth="6" strokeLinecap="round" />
+        <polygon points="35,68 29,58 41,58" fill="black" />
+        <line x1="18" y1="18" x2="82" y2="82" stroke="#dc2626" strokeWidth="8" />
+      </svg>
+    )
   },
   {
     id: 15,
@@ -735,7 +852,7 @@ export default function QuizPage() {
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#FF7112]/10 rounded-full blur-3xl pointer-events-none z-1 transform translate-x-1/3 -translate-y-1/3" />
         <div className="absolute -bottom-10 -left-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none z-1" />
 
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+        <div className="relative z-10 text-center px-4 max-w-2xl mx-auto">
           <ScrollReveal direction="down">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-[#FF7112] text-white tracking-widest uppercase mb-4 shadow-md shadow-orange-500/20 select-none animate-pulse">
               <Sparkles className="w-3.5 h-3.5" /> Theory Exam Simulator
@@ -755,7 +872,7 @@ export default function QuizPage() {
       </section>
 
       {/* Quiz Area Container */}
-      <main className="flex-grow py-8 sm:py-12 px-4 max-w-4xl mx-auto w-full relative z-10">
+      <main className="flex-grow py-8 sm:py-12 px-4 max-w-2xl mx-auto w-full relative z-10">
         <ScrollReveal>
           {!quizStarted ? (
             /* LANDING VIEW */
@@ -1261,6 +1378,13 @@ export default function QuizPage() {
               <h3 className="text-base sm:text-lg font-extrabold text-[#002060] mb-6 leading-relaxed">
                 {activeQuestions[currentIdx]?.question}
               </h3>
+
+              {/* Graphic Frame for visual questions (traffic signs, lights, lanes, etc.) */}
+              {activeQuestions[currentIdx]?.graphic && (
+                <div className="flex justify-center items-center p-4 sm:p-6 mb-6 bg-slate-50 border border-slate-150 rounded-2xl max-w-sm mx-auto shadow-inner">
+                  {activeQuestions[currentIdx].graphic}
+                </div>
+              )}
 
               {/* Options list structured identically to driver tests */}
               <div className="space-y-3 mb-6">

@@ -277,7 +277,7 @@ export default function ServicesPage() {
             </div>
           
             <div className="hidden lg:flex justify-center items-center relative">
-              <div className="w-full max-w-lg aspect-video z-10 relative bg-white overflow-hidden flex items-center justify-center rounded-2xl border border-slate-100 shadow-sm">
+              <div className="w-full max-w-2xl sm:max-w-3xl aspect-video z-10 relative bg-white overflow-hidden flex items-center justify-center rounded-2xl">
                 
                 {/* Fallback image + dynamic shimmering loader shown instantly */}
                 {!videoLoaded && (
@@ -306,8 +306,8 @@ export default function ServicesPage() {
                   onLoadedData={() => setVideoLoaded(true)}
                   className={`w-full h-full object-cover select-none pointer-events-none rounded-none mix-blend-multiply transition-opacity duration-700 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
                   style={{
-                    maskImage: 'radial-gradient(ellipse at center, black 30%, transparent 70%)',
-                    WebkitMaskImage: 'radial-gradient(ellipse at center, black 30%, transparent 70%)'
+                    maskImage: 'radial-gradient(ellipse 95% 85% at 50% 45%, black 65%, transparent 95%)',
+                    WebkitMaskImage: 'radial-gradient(ellipse 95% 85% at 50% 45%, black 65%, transparent 95%)'
                   }}
                 >
                   <source src="/service%20page-1.mp4" type="video/mp4" />

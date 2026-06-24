@@ -14,7 +14,7 @@ const courses = [
       "One-on-one private lessons",
       "Free pickup & drop-off service"
     ],
-    image: 'https://trainingdrivingschool.pk/wp-content/uploads/2025/02/download-2.jpeg',
+    image: 'https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=800',
     badgeBg: 'bg-[#FF7112]/100/10 text-[#FF7112]/70 border border-[#FF7112]/20',
     link: '/pricing'
   },
@@ -29,7 +29,7 @@ const courses = [
       "Overcoming driving anxiety",
       "Customized roadmap focus"
     ],
-    image: 'https://trainingdrivingschool.pk/wp-content/uploads/2025/02/download.jpeg',
+    image: 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=800',
     badgeBg: 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20',
     link: '/pricing'
   },
@@ -44,7 +44,7 @@ const courses = [
       "Immediate mistake diagnostic",
       "School-certified vehicle use"
     ],
-    image: 'https://trainingdrivingschool.pk/wp-content/uploads/2025/02/download-1-1.jpeg',
+    image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=800',
     badgeBg: 'bg-green-500/10 text-green-400 border border-green-500/20',
     link: '/pricing'
   },
@@ -59,7 +59,7 @@ const courses = [
       "Interactive quizzes",
       "Exam-readiness training"
     ],
-    image: 'https://i.pinimg.com/736x/25/e7/a2/25e7a288c9fd2d3dd83056fa2ea0b8aa.jpg',
+    image: 'https://images.unsplash.com/photo-1562618085-c024b4ad31d2?auto=format&fit=crop&q=80&w=800',
     badgeBg: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
     link: '/pricing'
   }
@@ -120,11 +120,11 @@ export default function Lessons() {
               className="group relative bg-[#0f1115]/90 border border-white/5 rounded-3xl p-6 flex flex-col justify-between hover:border-[#FF7112]/30 transition-all duration-300 hover:shadow-[0_20px_50px_rgba(239,68,68,0.15)] overflow-hidden"
             >
               {/* Image Frame Container */}
-              <div className="relative aspect-[16/10] bg-white rounded-2xl p-4 overflow-hidden mb-6 flex items-center justify-center border border-white/10 shadow-md">
+              <div className="relative aspect-[16/10] rounded-2xl overflow-hidden mb-6 w-full">
                 <img 
                   src={course.image} 
                   alt={course.title} 
-                  className="max-h-full max-w-full object-contain relative z-10 transition-transform duration-500 group-hover:scale-105" 
+                  className="w-full h-full object-cover relative z-10 transition-transform duration-500 group-hover:scale-110" 
                   referrerPolicy="no-referrer"
                 />
               </div>
