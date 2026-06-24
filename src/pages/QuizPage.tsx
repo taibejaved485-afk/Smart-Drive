@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import SEO from '../components/SEO';
@@ -2054,9 +2055,13 @@ export default function QuizPage() {
 
               {/* Graphic Frame for visual questions (traffic signs, lights, lanes, etc.) */}
               {activeQuestions[currentIdx]?.graphic && (
-                <div className="flex justify-center items-center p-4 sm:p-6 mb-6 bg-slate-50 border border-slate-150 rounded-2xl max-w-sm mx-auto shadow-inner">
+                <motion.div 
+                  whileHover={{ scale: 1.02, rotate: 1 }}
+                  whileTap={{ scale: 0.98, rotate: -1 }}
+                  className="flex justify-center items-center p-4 sm:p-6 mb-6 bg-slate-50 border border-slate-150 rounded-2xl max-w-sm mx-auto shadow-inner cursor-pointer"
+                >
                   {activeQuestions[currentIdx].graphic}
-                </div>
+                </motion.div>
               )}
 
               {/* Options list structured identically to driver tests */}
