@@ -126,3 +126,32 @@ create policy "Allow public select of customer_requests" on public.customer_requ
 create policy "Allow public insert of customer_requests" on public.customer_requests for insert with check (true);
 create policy "Allow public update of customer_requests" on public.customer_requests for update using (true);
 create policy "Allow public delete of customer_requests" on public.customer_requests for delete using (true);
+
+
+----------------------------------------------------
+-- 5. TABLE: system_metadata
+-- Stores centralized system metrics/metadata stats to eliminate contradictions
+----------------------------------------------------
+drop table if exists public.system_metadata cascade;
+
+create table public.system_metadata (
+    key text primary key,
+    value text not null,
+    updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Enable RLS and insert open access policy
+alter table public.system_metadata enable row level security;
+create policy "Allow public select of system_metadata" on public.system_metadata for select using (true);
+create policy "Allow public insert of system_metadata" on public.system_metadata for insert with check (true);
+create policy "Allow public update of system_metadata" on public.system_metadata for update using (true);
+create policy "Allow public delete of system_metadata" on public.system_metadata for delete using (true);
+
+-- Insert initial values matching 2018 (8 years) as the single source of truth
+insert into public.system_metadata (key, value) values
+('years_active', '8'),
+('students_trained', '4500+'),
+('certified_instructors', '25'),
+('happy_reviews', '150+')
+on conflict (key) do update set value = excluded.value;
+

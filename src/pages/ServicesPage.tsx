@@ -87,13 +87,33 @@ export default function ServicesPage() {
   const [submissionTicketId, setSubmissionTicketId] = useState('');
 
   useEffect(() => {
+    const resolveCarImage = (url: string, title?: string) => {
+      if (!url) return "/src/assets/images/basic_driving_course_1782284625178.jpg";
+      const lowerUrl = url.toLowerCase();
+      const lowerTitle = (title || "").toLowerCase();
+      if (lowerUrl.includes("photo-1549317661-bd32c8ce0db2") || lowerTitle.includes("basic")) {
+        return "/src/assets/images/basic_driving_course_1782284625178.jpg";
+      }
+      if (lowerUrl.includes("photo-1542282088-fe8426682b8f") || lowerTitle.includes("standard")) {
+        return "/src/assets/images/standard_driving_course_1782284602847.jpg";
+      }
+      if (lowerUrl.includes("photo-1449965408869-eaa3f722e40d") || lowerTitle.includes("premium")) {
+        return "/src/assets/images/premium_driving_course_1782284580290.jpg";
+      }
+      return url;
+    };
+
     const syncDrivingCourses = () => {
       const saved = localStorage.getItem('driving_courses_v4');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            setCourses(parsed);
+            const resolved = parsed.map((c: any) => ({
+              ...c,
+              carImage: resolveCarImage(c.carImage, c.courseTitle)
+            }));
+            setCourses(resolved);
           } else {
             setCourses(DEFAULT_PRICING_COURSES);
           }
@@ -112,7 +132,7 @@ export default function ServicesPage() {
         courseTitle: "Basic Driving Course",
         courseDescription: "Excellent foundational course covering vital steering control, brake safety, and real-world road signals.",
         courseFee: "15000",
-        carImage: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=600",
+        carImage: "/src/assets/images/basic_driving_course_1782284625178.jpg",
         lessonDuration: "10 Driving Classes Included",
         dailyTime: "1,500 PKR Per Class Rate",
         theoryDuration: "35 Mins Practice Lesson",
@@ -124,7 +144,7 @@ export default function ServicesPage() {
         courseTitle: "Standard Driving Course",
         courseDescription: "Our most popular training track covering parallel parking, reverse controls, and highway driving confidence.",
         courseFee: "20000",
-        carImage: "https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600",
+        carImage: "/src/assets/images/standard_driving_course_1782284602847.jpg",
         lessonDuration: "15 Driving Classes Included",
         dailyTime: "1,333 PKR Per Class Rate",
         theoryDuration: "35 Mins Practice Lesson",
@@ -136,7 +156,7 @@ export default function ServicesPage() {
         courseTitle: "Premium Driving Course",
         courseDescription: "Complete masterclass including city grid navigation, night driving safety, and expert-level license exam preparation.",
         courseFee: "25000",
-        carImage: "https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600",
+        carImage: "/src/assets/images/premium_driving_course_1782284580290.jpg",
         lessonDuration: "20 Driving Classes Included",
         dailyTime: "1,250 PKR Per Class Rate",
         theoryDuration: "35 Mins Practice Lesson",
@@ -184,7 +204,7 @@ export default function ServicesPage() {
   // Handle inquiry submit
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.fullName || !formData.fatherName || !formData.whatsappNumber) {
+    if (!formData.fullName || !formData.whatsappNumber) {
       alert('Please fill out all mandatory fields registered with the asterisk *');
       return;
     }
@@ -215,7 +235,7 @@ export default function ServicesPage() {
         phone: formData.whatsappNumber,
         email: formData.email || '',
         startingDate: new Date().toLocaleDateString(),
-        preferredSlot: `Father's Name: ${formData.fatherName}. Message: ${formData.message || 'No additional remarks.'}. Service Ticket ID: ${ticketId}`,
+        preferredSlot: `Message: ${formData.message || 'No additional remarks.'}. Service Ticket ID: ${ticketId}`,
         status: 'Pending'
       });
     } catch (err) {
@@ -242,7 +262,7 @@ export default function ServicesPage() {
   const handleWhatsAppRedirect = () => {
     const textStr = `*GoDriveify Service Ticket: ${submissionTicketId}*\n\n` + 
                     `*Name:* ${formData.fullName}\n` +
-                    `*Father's Name:* ${formData.fatherName}\n` +
+                    (formData.fatherName ? `*Father's Name:* ${formData.fatherName}\n` : '') +
                     `*Inquiry:* ${formData.inquiryType}\n` +
                     `*WhatsApp:* ${formData.whatsappNumber}\n` +
                     `*Message:* ${formData.message}`;
@@ -716,11 +736,16 @@ export default function ServicesPage() {
       <section ref={contactFormRef} className="py-8 bg-slate-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-6">
-            <span className="inline-flex items-center gap-1.5 bg-[#FF7112]/10 border border-[#FF7112]/20 text-[#E05A00] px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
-              <MessageSquare className="w-3.5 h-3.5 text-[#E05A00]" /> Corporate Inquiry Desk
-            </span>
+            <div className="flex flex-wrap justify-center gap-2 mb-3">
+              <span className="inline-flex items-center gap-1.5 bg-[#FF7112]/10 border border-[#FF7112]/20 text-[#E05A00] px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider">
+                <MessageSquare className="w-3.5 h-3.5 text-[#E05A00]" /> Secure Your Training Slot
+              </span>
+              <span className="inline-flex items-center gap-1 bg-green-50 border border-green-200 text-green-700 px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider">
+                ⚡ Instantly processed over WhatsApp
+              </span>
+            </div>
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 leading-none mb-4">
-              Select Your Service Interest
+              Get Enrolled Today
             </h2>
             <p className="text-slate-500 font-medium text-sm sm:text-base leading-relaxed">
               Fill in the form below. Our customer concierge matches your intent within 30 minutes to route you directly into our secure pipeline.
@@ -740,34 +765,18 @@ export default function ServicesPage() {
                   onSubmit={handleFormSubmit}
                   className="space-y-6"
                 >
-                  <div className="grid sm:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-2">
-                        Full Name *
-                      </label>
-                      <input 
-                        required
-                        type="text" 
-                        placeholder="e.g. Muhammad Raza" 
-                        className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-medium"
-                        value={formData.fullName}
-                        onChange={e => setFormData({ ...formData, fullName: e.target.value })}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-2">
-                        Father's Name *
-                      </label>
-                      <input 
-                        required
-                        type="text" 
-                        placeholder="e.g. Malik Muhammad Ilyas" 
-                        className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-medium"
-                        value={formData.fatherName}
-                        onChange={e => setFormData({ ...formData, fatherName: e.target.value })}
-                      />
-                    </div>
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-2">
+                      Full Name *
+                    </label>
+                    <input 
+                      required
+                      type="text" 
+                      placeholder="e.g. Muhammad Raza" 
+                      className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-medium"
+                      value={formData.fullName}
+                      onChange={e => setFormData({ ...formData, fullName: e.target.value })}
+                    />
                   </div>
 
                   <div className="grid sm:grid-cols-2 gap-6">
@@ -851,7 +860,7 @@ export default function ServicesPage() {
                     type="submit"
                     className="w-full bg-[#E05A00] hover:bg-red-800 text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors cursor-pointer shadow-md"
                   >
-                    Submit Corporate Inquiry
+                    Secure My Training Slot
                   </button>
                 </motion.form>
               ) : (
@@ -865,7 +874,7 @@ export default function ServicesPage() {
                     <Check className="w-8 h-8 stroke-[3]" />
                   </div>
                   
-                  <h3 className="text-2xl font-black text-slate-900 tracking-tight">Inquiry Registered Successfully!</h3>
+                  <h3 className="text-2xl font-black text-slate-900 tracking-tight">Slot Reserved Successfully!</h3>
                   <p className="text-xs text-slate-500 mt-2 font-bold uppercase tracking-widest">
                     Your Ticket ID is: <span className="text-[#E05A00] font-mono font-extrabold">{submissionTicketId}</span>
                   </p>
@@ -873,6 +882,19 @@ export default function ServicesPage() {
                   <p className="text-slate-650 text-xs sm:text-sm font-semibold max-w-md mx-auto mt-4 leading-relaxed bg-slate-50 p-4 border rounded-2xl">
                     We have logged your request under <strong className="text-slate-900 font-black">"{formData.inquiryType}"</strong>. Our Faisalabad support agents are prepping custom schedules or evaluations for you.
                   </p>
+
+                  <div className="w-full max-w-sm mx-auto mt-4 text-left bg-slate-50 border border-slate-200/80 p-4 rounded-2xl">
+                    <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-1.5">
+                      Father's Name (Required for license paperwork)
+                    </label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. Malik Muhammad Ilyas" 
+                      className="w-full p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-xs font-medium bg-white text-slate-800"
+                      value={formData.fatherName}
+                      onChange={e => setFormData({ ...formData, fatherName: e.target.value })}
+                    />
+                  </div>
 
                   <div className="mt-8 flex flex-wrap gap-4 justify-center">
                     <button 

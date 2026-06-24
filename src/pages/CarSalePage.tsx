@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { ScrollReveal } from '../components/ScrollReveal';
-import { ShieldCheck, Tag, Car, MapPin, Gauge, Search, Fuel, Calendar, Phone, CheckCircle, HelpCircle } from 'lucide-react';
+import { ShieldCheck, Tag, Car, MapPin, Gauge, Search, Fuel, Calendar, Phone, CheckCircle, HelpCircle, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { fetchSaleCars } from '../lib/supabase';
+import { fetchSaleCars, insertCustomerRequest } from '../lib/supabase';
+import { INITIAL_SALE_FLEET, isCarComplete } from '../data/inventory';
 
 export default function CarSalePage() {
   const [saleCars, setSaleCars] = useState<any[]>([]);
@@ -16,8 +17,10 @@ export default function CarSalePage() {
     // Initial fetch using Supabase synced fetching
     const loadSaleCars = async () => {
       const data = await fetchSaleCars();
-      if (data) {
+      if (data && data.length > 0) {
         setSaleCars(data);
+      } else {
+        setSaleCars(INITIAL_SALE_FLEET);
       }
     };
     
@@ -34,17 +37,61 @@ export default function CarSalePage() {
     };
   }, []);
 
-  const getWhatsAppLink = (car: any) => {
-    const text = `Assalam-o-Alaikum, I am highly interested in buying your ${car.name} (Price: PKR ${car.rentPrice}) that I saw listed on GoDriveify. Is this vehicle still available for purchase? Please share more details.`;
-    return `https://wa.me/${car.ownerPhone}?text=${encodeURIComponent(text)}`;
+  // Purchase inquiry states
+  const [selectedInquiryCar, setSelectedInquiryCar] = useState<any | null>(null);
+  const [inquiryName, setInquiryName] = useState('');
+  const [inquiryPhone, setInquiryPhone] = useState('');
+  const [inquiryCNIC, setInquiryCNIC] = useState('');
+  const [inquirySuccess, setInquirySuccess] = useState(false);
+
+  const handleInquirySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedInquiryCar) return;
+
+    if (!inquiryName || !inquiryPhone || !inquiryCNIC) {
+      alert('Please fill out all required fields.');
+      return;
+    }
+
+    const reqId = 'sl-' + Date.now();
+    try {
+      await insertCustomerRequest({
+        id: reqId,
+        carId: selectedInquiryCar.id,
+        carName: selectedInquiryCar.name,
+        customerName: inquiryName,
+        phone: inquiryPhone,
+        days: '0', // 0 indicates sale inquiry
+        totalPrice: selectedInquiryCar.rentPrice || '0',
+        status: 'pending'
+      });
+      setInquirySuccess(true);
+    } catch (error) {
+      console.error('Failed to log purchase inquiry draft', error);
+      alert('Failed to log your inquiry draft. Please check your internet connection.');
+    }
   };
 
+  const getInquiryWhatsAppUrl = () => {
+    if (!selectedInquiryCar) return '';
+    const text = `Assalam-o-Alaikum, I am highly interested in buying your ${selectedInquiryCar.name} (Price: PKR ${selectedInquiryCar.rentPrice}) listed on GoDriveify.\n\n` +
+                 `*Buyer Information:*\n` +
+                 `• Name: ${inquiryName}\n` +
+                 `• Phone: ${inquiryPhone}\n` +
+                 `• CNIC: ${inquiryCNIC}\n\n` +
+                 `Inquiry draft registered in GoDriveify database. Please guide me on inspecting the vehicle.`;
+    return `https://wa.me/${selectedInquiryCar.ownerPhone}?text=${encodeURIComponent(text)}`;
+  };
+
+  // Filter out any incomplete or draft listings first to protect user trust
+  const activeCars = saleCars.filter(isCarComplete);
+
   // Get unique lists for filters
-  const cities = ['All', ...Array.from(new Set(saleCars.map(car => car.city || 'Faisalabad')))];
-  const transmissions = ['All', ...Array.from(new Set(saleCars.map(car => car.transmission || 'Automatic')))];
+  const cities = ['All', ...Array.from(new Set(activeCars.map(car => car.city || 'Faisalabad')))];
+  const transmissions = ['All', ...Array.from(new Set(activeCars.map(car => car.transmission || 'Automatic')))];
 
   // Filtering Logic
-  const filteredCars = saleCars.filter(car => {
+  const filteredCars = activeCars.filter(car => {
     const matchesSearch = car.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           car.description?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCity = selectedCity === 'All' || car.city === selectedCity;
@@ -65,11 +112,11 @@ export default function CarSalePage() {
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <ScrollReveal direction="down">
-            <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#FF7112]/100/10 border border-[#FF7112]/30 text-[#FF7112]/70 text-xs font-black uppercase tracking-widest mb-6">
+            <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#FF7112]/10 border border-[#FF7112]/30 text-orange-400 text-xs font-black uppercase tracking-widest mb-6">
               <ShieldCheck className="w-3.5 h-3.5" /> 100% Direct Owner Marketplace
             </span>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-black mb-6 tracking-tight leading-tight">
-              Premium Verified <span className="text-[#FF7112]/90 bg-clip-text">Cars For Sale</span>
+              Premium Verified <span className="text-[#FF7112] bg-clip-text">Cars For Sale</span>
             </h1>
             <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto font-medium mb-10 leading-relaxed">
               Buy your next vehicle directly from trusted local owners. ZERO commission, transparent listings, and immediate WhatsApp response.
@@ -84,9 +131,9 @@ export default function CarSalePage() {
           <div className="grid gap-4 md:grid-cols-4 items-end">
             {/* Search Input */}
             <div className="md:col-span-2">
-              <label className="block text-[11px] font-black uppercase tracking-wider text-slate-400 mb-2">Search Car Model</label>
+              <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-2">Search Car Model</label>
               <div className="relative">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4" />
                 <input 
                   type="text" 
                   placeholder="e.g. Honda Civic, Toyota Corolla..." 
@@ -99,7 +146,7 @@ export default function CarSalePage() {
 
             {/* City Dropdown */}
             <div>
-              <label className="block text-[11px] font-black uppercase tracking-wider text-slate-400 mb-2">Filter by City</label>
+              <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-2">Filter by City</label>
               <select 
                 value={selectedCity}
                 onChange={(e) => setSelectedCity(e.target.value)}
@@ -113,7 +160,7 @@ export default function CarSalePage() {
 
             {/* Transmission Dropdown */}
             <div>
-              <label className="block text-[11px] font-black uppercase tracking-wider text-slate-400 mb-2">Transmission</label>
+              <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-2">Transmission</label>
               <select 
                 value={selectedTransmission}
                 onChange={(e) => setSelectedTransmission(e.target.value)}
@@ -170,13 +217,33 @@ export default function CarSalePage() {
                   <div className="absolute inset-0 bg-gradient-to-br from-red-500/[0.02] via-transparent to-emerald-500/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-3xl"></div>
 
                   {/* Photo Area with modern overlays */}
-                  <div className="relative h-64 sm:h-72 overflow-hidden bg-slate-950 shrink-0">
-                    <img 
-                      src={car.images && car.images.length > 0 ? car.images[0] : car.imageUrl} 
-                      alt={car.name || 'Car Image'} 
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
-                    />
+                  <div className="relative h-64 sm:h-72 overflow-hidden bg-slate-950 shrink-0 flex items-center justify-center">
+                    {(car.hasRealPhoto || 
+                      (car.images && car.images.length > 0 && !car.images[0].includes('unsplash.com')) || 
+                      (car.imageUrl && !car.imageUrl.includes('unsplash.com') && !car.imageUrl.includes('stock'))
+                    ) ? (
+                      <img 
+                        src={car.images && car.images.length > 0 ? car.images[0] : car.imageUrl} 
+                        alt={car.name || 'Car Image'} 
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-slate-100 flex flex-col items-center justify-center p-6 text-center select-none">
+                        <div className="w-16 h-16 rounded-full bg-slate-200/80 flex items-center justify-center text-slate-400 mb-3 border border-slate-300/50">
+                          <svg className="w-9 h-9 text-slate-500 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                            <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <circle cx="7" cy="17" r="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M9 17h6" strokeLinecap="round" strokeLinejoin="round"/>
+                            <circle cx="17" cy="17" r="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </div>
+                        <span className="text-[11px] font-black uppercase tracking-wider text-slate-700 px-3 py-1 bg-slate-200/50 border border-slate-300/30 rounded-full">
+                          Real Image Pending Verification
+                        </span>
+                        <p className="text-[10px] text-slate-500 font-semibold mt-1.5 leading-tight">Physical Inspection & Biometric Checks in Progress</p>
+                      </div>
+                    )}
                     
                     {/* Corner badge actions */}
                     <div className="absolute top-4 left-4 flex flex-col gap-1.5 z-10">
@@ -270,17 +337,22 @@ export default function CarSalePage() {
 
                     {/* CTA Button section */}
                     <div className="mt-auto pt-4 border-t border-slate-100/60">
-                      <a 
-                        href={getWhatsAppLink(car)} 
-                        target="_blank" 
-                        rel="noreferrer"
-                        className="w-full inline-flex items-center justify-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-3.5 font-bold transition-all duration-200 text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-emerald-100 hover:shadow-xl hover:shadow-emerald-200/50 cursor-pointer transform active:scale-98 relative overflow-hidden group/btn"
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          setSelectedInquiryCar(car);
+                          setInquiryName('');
+                          setInquiryPhone('');
+                          setInquiryCNIC('');
+                          setInquirySuccess(false);
+                        }}
+                        className="w-full inline-flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl py-3.5 font-bold transition-all duration-200 text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-indigo-100 hover:shadow-xl hover:shadow-indigo-200/50 cursor-pointer transform active:scale-98 relative overflow-hidden group/btn border-none outline-none"
                       >
                         {/* Shimmer effect inside button */}
                         <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000 ease-in-out pointer-events-none"></div>
                         <Phone className="w-4 h-4 fill-white animate-bounce" />
-                        Contact Seller via WhatsApp
-                      </a>
+                        Contact Seller
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -318,6 +390,143 @@ export default function CarSalePage() {
           </div>
         </div>
       </section>
+
+      {/* Dynamic Sale Inquiry Dialog Modal */}
+      <AnimatePresence>
+        {selectedInquiryCar && (
+          <div className="fixed inset-0 z-[1000] overflow-y-auto flex items-center justify-center p-4">
+            {/* Overlay backdrop */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedInquiryCar(null)}
+              className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm"
+            />
+            
+            {/* Modal Body container */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              className="bg-white rounded-3xl overflow-hidden shadow-2xl max-w-lg w-full relative z-10 border border-slate-100"
+            >
+              {/* Image Banner Header */}
+              <div className="relative aspect-[21/9] bg-slate-900">
+                <img 
+                  src={selectedInquiryCar.imageUrl || "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&q=80&w=600"} 
+                  alt={selectedInquiryCar.name} 
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover brightness-75"
+                />
+                <button 
+                  onClick={() => setSelectedInquiryCar(null)}
+                  type="button"
+                  className="absolute top-4 right-4 bg-black/50 hover:bg-black/80 text-white rounded-full p-1.5 transition cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+                <div className="absolute bottom-4 left-6 text-white">
+                  <span className="text-[9px] uppercase font-black bg-indigo-600 px-2 py-0.5 rounded tracking-widest">In-App Purchase Inquiry</span>
+                  <h3 className="font-extrabold text-xl mt-1 tracking-tight">{selectedInquiryCar.name}</h3>
+                </div>
+              </div>
+
+              {/* Form Content */}
+              <div className="p-6 font-sans">
+                {inquirySuccess ? (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-center py-6 space-y-4"
+                  >
+                    <div className="w-16 h-16 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto shadow-inner border border-green-100">
+                      <CheckCircle className="w-10 h-10" />
+                    </div>
+                    <h4 className="text-2xl font-black text-gray-900 tracking-tight">Inquiry Logged!</h4>
+                    <p className="text-xs sm:text-sm text-gray-500 max-w-sm mx-auto leading-relaxed">
+                      Your purchase inquiry for <strong className="text-indigo-600">{selectedInquiryCar.name}</strong> has been securely logged in our database. Tap below to send your structured buyer interest card to the owner on WhatsApp and negotiate.
+                    </p>
+                    
+                    <div className="text-xs text-gray-400 bg-gray-50 p-3.5 rounded-xl border max-w-sm mx-auto text-left space-y-1">
+                      <div>Buyer: <strong className="text-gray-800">{inquiryName}</strong></div>
+                      <div>Buyer CNIC: <strong className="text-gray-800 font-mono">{inquiryCNIC}</strong></div>
+                      <div>Car Price Rate: <strong className="text-indigo-600 font-mono font-bold">PKR {selectedInquiryCar.rentPrice}</strong></div>
+                    </div>
+
+                    <div className="pt-2">
+                      <a 
+                        href={getInquiryWhatsAppUrl()}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex w-full items-center justify-center gap-2 bg-[#25D366] hover:bg-[#128C7E] text-white py-3.5 px-6 rounded-2xl font-extrabold text-sm uppercase tracking-wide transition shadow-lg shadow-green-100 cursor-pointer"
+                      >
+                        <svg className="w-5 h-5 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.455 5.703 1.455h.008c6.56 0 11.895-5.335 11.898-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                        </svg>
+                        <span>Chat with Seller</span>
+                      </a>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <form onSubmit={handleInquirySubmit} className="space-y-4">
+                    {/* Price rates bar */}
+                    <div className="bg-slate-50 p-3 rounded-xl border flex items-center justify-between text-xs sm:text-sm">
+                      <span className="font-bold text-slate-650">Vehicle Value:</span>
+                      <span className="font-black text-indigo-650">
+                        PKR {selectedInquiryCar.rentPrice}
+                      </span>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black uppercase text-slate-500 tracking-wider mb-1">Full Name *</label>
+                      <input 
+                        required
+                        type="text"
+                        placeholder="e.g. Hammad Javed"
+                        value={inquiryName}
+                        onChange={e => setInquiryName(e.target.value)}
+                        className="w-full border border-slate-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black uppercase text-slate-500 tracking-wider mb-1">WhatsApp / Phone *</label>
+                      <input 
+                        required
+                        type="tel"
+                        placeholder="e.g. 0300-1234567"
+                        value={inquiryPhone}
+                        onChange={e => setInquiryPhone(e.target.value)}
+                        className="w-full border border-slate-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition font-mono"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black uppercase text-slate-500 tracking-wider mb-1">CNIC Number * (شناختی کارڈ نمبر)</label>
+                      <input 
+                        required
+                        type="text"
+                        placeholder="e.g. 33100-1234567-1"
+                        value={inquiryCNIC}
+                        onChange={e => setInquiryCNIC(e.target.value)}
+                        className="w-full border border-slate-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition font-mono"
+                      />
+                    </div>
+
+                    <button 
+                      type="submit"
+                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs uppercase tracking-widest py-3.5 rounded-xl transition shadow-lg shadow-indigo-100 cursor-pointer active:scale-95 border-none outline-none"
+                    >
+                      Log Inquiry Draft
+                    </button>
+                  </form>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <Footer />
     </div>

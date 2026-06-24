@@ -4,7 +4,7 @@ import { Menu, X, Phone, Car, Plus, Check, ChevronRight, User, ShieldCheck, Mail
 import { motion, AnimatePresence } from 'motion/react';
 import { useToast } from './Toast';
 import BrandLogo from './BrandLogo';
-import { insertSaleCar, insertRentalCar } from '../lib/supabase';
+import { insertSaleCar, insertRentalCar, uploadCarImage } from '../lib/supabase';
 
 
 const PRESET_CAR_IMAGE_OPTIONS = [
@@ -156,7 +156,8 @@ export default function Navbar() {
       registrationDoc: formData.registrationDoc,
       status: 'Available' as 'Available' | 'Booked',
       createdAt: new Date().toISOString(),
-      approved: false
+      approved: false,
+      hasRealPhoto: true
     };
 
     // Store in Supabase / LocalStorage
@@ -205,7 +206,9 @@ export default function Navbar() {
     });
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
 
@@ -216,34 +219,50 @@ export default function Navbar() {
     }
 
     const filesToProcess = Array.from(files as FileList).slice(0, remainingSlots);
+    setIsUploading(true);
+    const uploadingToastId = toast.info('Uploading vehicle photos to Supabase Storage...', 'Uploading Images');
 
-    filesToProcess.forEach(file => {
+    try {
+      for (const file of filesToProcess) {
+        if (file.size > 5 * 1024 * 1024) {
+          toast.error(`${file.name} exceeds the 5MB size limit.`, 'File Too Large');
+          continue;
+        }
+        
+        const fileUrl = await uploadCarImage(file);
+        setFormData(prev => ({
+          ...prev,
+          imageUrls: [...prev.imageUrls, fileUrl]
+        }));
+      }
+      toast.success('Vehicle photos successfully uploaded to Supabase Storage!', 'Upload Complete');
+    } catch (err: any) {
+      console.error('Upload failed:', err);
+      toast.error('Failed to upload some vehicle photos. Please try again.', 'Upload Error');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleDocFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'cnic' | 'registration') => {
+    const file = e.target.files?.[0];
+    if (file) {
       if (file.size > 5 * 1024 * 1024) {
         toast.error(`${file.name} exceeds the 5MB size limit.`, 'File Too Large');
         return;
       }
-      const reader = new FileReader();
-      reader.onloadend = () => {
+      toast.info('Uploading document to secure storage...', 'Uploading Doc');
+      try {
+        const fileUrl = await uploadCarImage(file);
         setFormData(prev => ({
           ...prev,
-          imageUrls: [...prev.imageUrls, reader.result as string]
+          [type === 'cnic' ? 'cnicDoc' : 'registrationDoc']: fileUrl
         }));
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const handleDocFileUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'cnic' | 'registration') => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData(prev => ({
-          ...prev,
-          [type === 'cnic' ? 'cnicDoc' : 'registrationDoc']: reader.result as string
-        }));
-      };
-      reader.readAsDataURL(file);
+        toast.success('Document uploaded successfully!', 'Document Synced');
+      } catch (err: any) {
+        console.error('Doc upload failed:', err);
+        toast.error('Document upload failed. Please try again.', 'Upload Error');
+      }
     }
   };
 

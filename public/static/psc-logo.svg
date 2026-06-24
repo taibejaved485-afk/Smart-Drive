@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <!-- Inner White Circle Base -->
+  <circle cx="100" cy="100" r="95" fill="#ffffff" />
+
+  <!-- Outer Green Circle (Filled Green Band) -->
+  <circle cx="100" cy="100" r="95" fill="#005A36" />
+  
+  <!-- Inner White Circle (Creating the Green Ring of width 24px) -->
+  <circle cx="100" cy="100" r="71" fill="#ffffff" />
+
+  <!-- Text paths for circular text inside the green band (centered at radius 83) -->
+  <defs>
+    <!-- Top arc: Clockwise from left to right -->
+    <path id="text-path-top" d="M 23 100 A 77 77 0 0 1 177 100" fill="none" />
+    <!-- Bottom arc: Clockwise from right to left (renders upright at the bottom) -->
+    <path id="text-path-bottom" d="M 177 100 A 77 77 0 0 1 23 100" fill="none" />
+    
+    <!-- Star symbol definition -->
+    <g id="white-star">
+      <polygon points="0,-5.5 1.6,-1.6 5.8,-1.6 2.4,0.8 3.7,4.9 0,2.5 -3.7,4.9 -2.4,0.8 -5.8,-1.6 -1.6,-1.6" fill="#ffffff" />
+    </g>
+  </defs>
+  
+  <!-- "PAKISTAN SAFETY" text -->
+  <text font-family="'Inter', 'Segoe UI', -apple-system, sans-serif" font-size="11" font-weight="900" fill="#ffffff" letter-spacing="1.8">
+    <textPath href="#text-path-top" startOffset="50%" text-anchor="middle">PAKISTAN SAFETY</textPath>
+  </text>
+  
+  <!-- "COUNCIL" text -->
+  <text font-family="'Inter', 'Segoe UI', -apple-system, sans-serif" font-size="11" font-weight="900" fill="#ffffff" letter-spacing="1.8">
+    <textPath href="#text-path-bottom" startOffset="50%" text-anchor="middle">COUNCIL</textPath>
+  </text>
+
+  <!-- Three white stars at the bottom of the green ring -->
+  <use href="#white-star" x="83" y="181" />
+  <use href="#white-star" x="100" y="185" />
+  <use href="#white-star" x="117" y="181" />
+
+  <!-- Registered trademark (R) at top right -->
+  <g transform="translate(176, 30)">
+    <circle cx="0" cy="0" r="5" fill="none" stroke="#005A36" stroke-width="1.2" />
+    <text x="0" y="2.5" font-family="'Inter', sans-serif" font-size="7" font-weight="bold" fill="#005A36" text-anchor="middle">R</text>
+  </g>
+
+  <!-- Inner dividing cross lines inside the white circle -->
+  <circle cx="100" cy="100" r="62" fill="none" stroke="#005A36" stroke-width="1.5" />
+  <line x1="100" y1="38" x2="100" y2="162" stroke="#005A36" stroke-width="1" />
+  <line x1="38" y1="100" x2="162" y2="100" stroke="#005A36" stroke-width="1" />
+
+  <!-- Four quadrants icons (Colored in Official Green) -->
+  <!-- Top-left: First Aid Cross (+) -->
+  <path d="M 61 70 h 6 v -6 h 6 v 6 h 6 v 6 h -6 v 6 h -6 v -6 h -6 z" fill="#005A36" />
+  
+  <!-- Top-right: Apple -->
+  <g transform="translate(122, 57)">
+    <path d="M 8 5 C 12 1, 15 5, 15 9 C 15 15, 1 15, 1 9 C 1 5, 4 1, 8 5 Z" fill="none" stroke="#005A36" stroke-width="1.8" />
+    <!-- Apple stem and leaf -->
+    <path d="M 8 5 C 8 2, 10 2, 10 2" fill="none" stroke="#005A36" stroke-width="1.2" />
+  </g>
+
+  <!-- Bottom-left: Safety Helmet -->
+  <g transform="translate(56, 120)">
+    <path d="M 2 10 Q 14 -2 26 10 Z" fill="none" stroke="#005A36" stroke-width="1.8" />
+    <path d="M 0 10 L 28 10 Q 28 13 14 13 Q 0 13 0 10 Z" fill="#005A36" stroke="#005A36" stroke-width="1" fill-rule="evenodd" />
+    <!-- Helmet rib lines -->
+    <path d="M 14 1 L 14 10" stroke="#005A36" stroke-width="1.2" />
+  </g>
+
+  <!-- Bottom-right: Leaf -->
+  <g transform="translate(122, 115)">
+    <path d="M 2 12 C 12 12, 14 3, 14 1 C 12 1, 3 3, 2 12 Z" fill="none" stroke="#005A36" stroke-width="1.8" />
+    <path d="M 2 12 L 10 4" stroke="#005A36" stroke-width="1.2" />
+  </g>
+
+  <!-- Center PSC Banner (Overlaying the divider lines) -->
+  <rect x="74" y="90" width="52" height="20" rx="4" fill="#ffffff" stroke="#005A36" stroke-width="2" />
+  <text x="100" y="104" font-family="'Inter', 'Segoe UI', sans-serif" font-size="10.5" font-weight="900" fill="#005A36" letter-spacing="0.5" text-anchor="middle">PSC</text>
+</svg>

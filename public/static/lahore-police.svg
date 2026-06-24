@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <!-- Crest path - classic shield shape -->
+  <path d="M 40 10 C 100 -5, 100 -5, 160 10 C 160 80, 160 110, 100 185 C 40 110, 40 80, 40 10 Z" fill="#245173" stroke="#F4C430" stroke-width="4" stroke-linejoin="round" />
+  <path d="M 45 14 C 100 1, 100 1, 155 14 C 155 81, 155 109, 100 180 C 45 109, 45 81, 45 14 Z" fill="none" stroke="#F4C430" stroke-width="1.5" />
+
+  <!-- Center Circle -->
+  <circle cx="100" cy="98" r="45" fill="#1e3e5c" stroke="#F4C430" stroke-width="3" />
+
+  <!-- Wreath around center -->
+  <g transform="translate(100, 98)" fill="none" stroke="#F4C430" stroke-width="2.5" stroke-linecap="round">
+    <!-- Left wreath branch -->
+    <path d="M -35 15 C -45 -10, -35 -30, -10 -38" />
+    <path d="M -35 15 L -30 18 M -40 2 L -33 7 M -42 -10 L -34 -6 M -38 -22 L -30 -17 M -28 -32 L -21 -26" />
+    <!-- Right wreath branch -->
+    <path d="M 35 15 C 45 -10, 35 -30, 10 -38" />
+    <path d="M 35 15 L 30 18 M 40 2 L 33 7 M 42 -10 L 34 -6 M 38 -22 L 30 -17 M 28 -32 L 21 -26" />
+  </g>
+
+  <!-- Torch in center -->
+  <g transform="translate(100, 98)">
+    <!-- Torch base/handle -->
+    <path d="M -3 30 L 3 30 L 5 5 L -5 5 Z" fill="#B38600" stroke="#F4C430" stroke-width="1" />
+    <!-- Torch bowl -->
+    <path d="M -8 5 L 8 5 L 12 -5 L -12 -5 Z" fill="#F4C430" />
+    <!-- Flame -->
+    <path d="M -10 -5 C -15 -18, -2 -32, 0 -35 C 2 -32, 15 -18, 10 -5 C 10 -5, -10 -5, -10 -5 Z" fill="#E63946" />
+    <path d="M -5 -5 C -8 -13, -1 -24, 0 -26 C 1 -24, 8 -13, 5 -5 C 5 -5, -5 -5, -5 -5 Z" fill="#FFB703" />
+  </g>
+
+  <!-- Circular text path for CITY TRAFFIC POLICE inside the crest -->
+  <defs>
+    <path id="police-text-path" d="M 54 110 A 50 50 0 1 1 146 110" fill="none" />
+  </defs>
+
+  <text font-family="'Inter', sans-serif" font-size="10.5" font-weight="900" fill="#F4C430" letter-spacing="1">
+    <textPath href="#police-text-path" startOffset="50%" text-anchor="middle">CITY TRAFFIC POLICE</textPath>
+  </text>
+
+  <!-- LAHORE text banner at the bottom -->
+  <rect x="65" y="142" width="70" height="20" rx="3" fill="#1e3e5c" stroke="#F4C430" stroke-width="1.5" />
+  <text x="100" y="156" font-family="'Inter', sans-serif" font-size="11" font-weight="900" fill="white" letter-spacing="1.5" text-anchor="middle">LAHORE</text>
+</svg>

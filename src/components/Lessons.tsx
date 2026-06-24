@@ -14,7 +14,7 @@ const courses = [
       "One-on-one private lessons",
       "Free pickup & drop-off service"
     ],
-    image: 'https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=80&w=600',
     badgeBg: 'bg-[#FF7112]/100/10 text-[#FF7112]/70 border border-[#FF7112]/20',
     link: '/pricing'
   },
@@ -29,7 +29,7 @@ const courses = [
       "Overcoming driving anxiety",
       "Customized roadmap focus"
     ],
-    image: 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=800',
+    image: 'https://i.pinimg.com/236x/e6/11/9d/e6119d1f14663d1a36b257d18f4a164e.jpg',
     badgeBg: 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20',
     link: '/pricing'
   },
@@ -44,7 +44,7 @@ const courses = [
       "Immediate mistake diagnostic",
       "School-certified vehicle use"
     ],
-    image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=800',
+    image: 'https://i.pinimg.com/webp87/1200x/9e/1e/7c/9e1e7c7983352dc78b81a3dd53fc4013.webp',
     badgeBg: 'bg-green-500/10 text-green-400 border border-green-500/20',
     link: '/pricing'
   },
@@ -59,7 +59,7 @@ const courses = [
       "Interactive quizzes",
       "Exam-readiness training"
     ],
-    image: 'https://images.unsplash.com/photo-1562618085-c024b4ad31d2?auto=format&fit=crop&q=80&w=800',
+    image: 'https://i.pinimg.com/736x/e4/f7/8f/e4f78f8c6e26de167b7d64c2bf241eaf.jpg',
     badgeBg: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
     link: '/pricing'
   }
@@ -119,8 +119,8 @@ export default function Lessons() {
               whileHover={{ y: -8 }}
               className="group relative bg-[#0f1115]/90 border border-white/5 rounded-3xl p-6 flex flex-col justify-between hover:border-[#FF7112]/30 transition-all duration-300 hover:shadow-[0_20px_50px_rgba(239,68,68,0.15)] overflow-hidden"
             >
-              {/* Image Frame Container */}
-              <div className="relative aspect-[16/10] rounded-2xl overflow-hidden mb-6 w-full">
+              {/* Image Frame Container with realistic full-bleed display */}
+              <div className="relative aspect-[16/10] rounded-2xl overflow-hidden mb-6 w-full bg-[#181a20]">
                 <img 
                   src={course.image} 
                   alt={course.title} 

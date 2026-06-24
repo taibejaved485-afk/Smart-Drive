@@ -12,6 +12,7 @@ export interface RentalCar {
   availabilityStatus?: 'Available' | 'Rented Out';
   type: 'Economy' | 'Sedan' | 'Luxury';
   isVerified?: boolean;
+  hasRealPhoto?: boolean;
   registrationNumber?: string;
   ownerName?: string;
   ownerPhone?: string;
@@ -24,6 +25,38 @@ export interface RentalCar {
   landlordRating?: number;
 }
 
+export const isCarComplete = (car: any): boolean => {
+  if (!car) return false;
+  if (!car.id) return false;
+  if (!car.name || car.name.trim() === '') return false;
+  
+  // Name shouldn't contain dummy skeleton text
+  const nameLower = car.name.toLowerCase();
+  if (nameLower.includes('placeholder') || nameLower.includes('skeleton') || nameLower.includes('draft')) {
+    return false;
+  }
+  
+  // Rent price must exist, not be empty or 0, and be a valid number
+  const priceStr = car.rentPrice ? String(car.rentPrice).trim() : '';
+  if (!priceStr || priceStr === '0' || priceStr.toLowerCase().includes('tbd') || priceStr.toLowerCase().includes('n/a')) {
+    return false;
+  }
+  const priceNum = parseInt(priceStr.replace(/[^0-9]/g, ''), 10) || 0;
+  if (priceNum <= 0) return false;
+
+  // City must be valid
+  if (!car.city || car.city.trim() === '') return false;
+
+  // Contact info is essential for booking to be functional
+  if (!car.ownerPhone || car.ownerPhone.trim() === '') return false;
+
+  // Image must be valid
+  const hasImg = (car.images && car.images.length > 0 && !!car.images[0]) || (car.imageUrl && car.imageUrl.trim() !== '');
+  if (!hasImg) return false;
+
+  return true;
+};
+
 export const INITIAL_RENTAL_FLEET: RentalCar[] = [
   {
     id: 'rc-1',
@@ -31,9 +64,9 @@ export const INITIAL_RENTAL_FLEET: RentalCar[] = [
     transmission: 'Automatic',
     rentPrice: '12,000',
     rentUnit: 'Day',
-    imageUrl: 'https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600',
+    imageUrl: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&q=80&w=600',
     images: [
-      'https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600',
+      'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&q=80&w=600',
       'https://images.unsplash.com/photo-1590362891991-f70281b373ee?auto=format&fit=crop&q=80&w=600',
       'https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&q=80&w=600',
       'https://images.unsplash.com/photo-1549314488-87cc9c3bc89a?auto=format&fit=crop&q=80&w=600'
@@ -209,3 +242,99 @@ export const INITIAL_RENTAL_FLEET: RentalCar[] = [
     landlordRating: 4.88
   }
 ];
+
+export const INITIAL_SALE_FLEET: RentalCar[] = [
+  {
+    id: 'sc-1',
+    name: 'Toyota Corolla GLi 1.3',
+    transmission: 'Manual',
+    rentPrice: '3,250,000',
+    rentUnit: 'Day', // Dummy unit required by interface, will be ignored for sales
+    imageUrl: 'https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600',
+    images: [
+      'https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600'
+    ],
+    city: 'Faisalabad',
+    status: 'Available',
+    type: 'Sedan',
+    isVerified: true,
+    registrationNumber: 'FSD-18-4231',
+    ownerName: 'Zahid Mehmood',
+    ownerPhone: '923097666928',
+    fuelType: 'Petrol',
+    description: 'First hand family used car, bumper-to-bumper genuine condition. Excellent fuel average.',
+    rentalsCompleted: 0,
+    rating: 5.0,
+    landlordRating: 5.0
+  },
+  {
+    id: 'sc-2',
+    name: 'Suzuki Alto VXL',
+    transmission: 'Automatic',
+    rentPrice: '2,650,000',
+    rentUnit: 'Day',
+    imageUrl: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?auto=format&fit=crop&q=80&w=600',
+    images: [
+      'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?auto=format&fit=crop&q=80&w=600'
+    ],
+    city: 'Lahore',
+    status: 'Available',
+    type: 'Economy',
+    isVerified: true,
+    registrationNumber: 'LEC-22-1150',
+    ownerName: 'Amjad Ali',
+    ownerPhone: '923015467812',
+    fuelType: 'Petrol',
+    description: 'Perfect daily runner, AGs automatic transmission, chilled AC, minor scratches on back bumper.',
+    rentalsCompleted: 0,
+    rating: 4.8,
+    landlordRating: 4.8
+  },
+  {
+    id: 'sc-3',
+    name: 'Honda Civic Oriel 1.8 i-VTEC',
+    transmission: 'Automatic',
+    rentPrice: '5,800,000',
+    rentUnit: 'Day',
+    imageUrl: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=600',
+    images: [
+      'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=600'
+    ],
+    city: 'Islamabad',
+    status: 'Available',
+    type: 'Sedan',
+    isVerified: true,
+    registrationNumber: 'ICT-20-8891',
+    ownerName: 'Muhammad Salman',
+    ownerPhone: '923214567890',
+    fuelType: 'Petrol',
+    description: 'Sunroof, cruise control, leather seats, entirely maintained by Honda dealership. Immaculate body line.',
+    rentalsCompleted: 0,
+    rating: 4.9,
+    landlordRating: 4.9
+  },
+  {
+    id: 'sc-4',
+    name: 'Toyota Prado TX 3.0D',
+    transmission: 'Automatic',
+    rentPrice: '14,500,000',
+    rentUnit: 'Day',
+    imageUrl: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=600',
+    images: [
+      'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=600'
+    ],
+    city: 'Karachi',
+    status: 'Available',
+    type: 'Luxury',
+    isVerified: true,
+    registrationNumber: 'BC-9954',
+    ownerName: 'Sardar Khosa',
+    ownerPhone: '923331234567',
+    fuelType: 'Diesel',
+    description: 'TZ G-Frontier model, 7-seater, adjustable suspension, dual AC, perfect sunroof, completely loaded.',
+    rentalsCompleted: 0,
+    rating: 4.95,
+    landlordRating: 4.95
+  }
+];
+

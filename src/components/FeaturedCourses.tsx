@@ -22,7 +22,7 @@ const DEFAULT_FEATURED = [
     courseTitle: "Basic Driving Course",
     courseDescription: "Excellent foundational course covering vital steering control, brake safety, and real-world road signals.",
     courseFee: "15000",
-    carImage: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=600",
+    carImage: "/src/assets/images/basic_driving_course_1782284625178.jpg",
     instructorName: "Mr Shahzad",
     instructorImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200&h=200"
   },
@@ -31,7 +31,7 @@ const DEFAULT_FEATURED = [
     courseTitle: "Standard Driving Course",
     courseDescription: "Our most popular training track covering parallel parking, reverse controls, and highway driving confidence.",
     courseFee: "20000",
-    carImage: "https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600",
+    carImage: "/src/assets/images/standard_driving_course_1782284602847.jpg",
     instructorName: "Ms Alina",
     instructorImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200&h=200"
   },
@@ -40,7 +40,7 @@ const DEFAULT_FEATURED = [
     courseTitle: "Premium Driving Course",
     courseDescription: "Complete masterclass including city grid navigation, night driving safety, and expert-level license exam preparation.",
     courseFee: "25000",
-    carImage: "https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600",
+    carImage: "/src/assets/images/premium_driving_course_1782284580290.jpg",
     instructorName: "Mr Ahmed",
     instructorImage: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=200&h=200"
   }
@@ -51,6 +51,23 @@ const INSTRUCTORS = [
   { name: "Ms Alina", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200&h=200" },
   { name: "Mr Ahmed", img: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=200&h=200" }
 ];
+
+const resolveCarImage = (url: string, title?: string) => {
+  if (!url) return "/src/assets/images/basic_driving_course_1782284625178.jpg";
+  const lowerUrl = url.toLowerCase();
+  const lowerTitle = (title || "").toLowerCase();
+  
+  if (lowerUrl.includes("photo-1549317661-bd32c8ce0db2") || lowerTitle.includes("basic")) {
+    return "/src/assets/images/basic_driving_course_1782284625178.jpg";
+  }
+  if (lowerUrl.includes("photo-1542282088-fe8426682b8f") || lowerTitle.includes("standard")) {
+    return "/src/assets/images/standard_driving_course_1782284602847.jpg";
+  }
+  if (lowerUrl.includes("photo-1449965408869-eaa3f722e40d") || lowerTitle.includes("premium")) {
+    return "/src/assets/images/premium_driving_course_1782284580290.jpg";
+  }
+  return url;
+};
 
 export default function FeaturedCourses() {
   const [courses, setCourses] = useState<any[]>([]);
@@ -71,7 +88,7 @@ export default function FeaturedCourses() {
                 title: c.courseTitle,
                 desc: c.courseDescription,
                 price: c.courseFee,
-                image: c.carImage || "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=600",
+                image: resolveCarImage(c.carImage, c.courseTitle),
                 instructorName: inst.name,
                 instructorImage: inst.img
               };

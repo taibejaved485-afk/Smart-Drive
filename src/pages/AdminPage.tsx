@@ -20,7 +20,9 @@ import {
   updateDrivingBookingStatus,
   deleteDrivingBooking,
   updateCustomerRequestStatus,
-  deleteCustomerRequest
+  deleteCustomerRequest,
+  fetchSystemMetadata,
+  updateSystemMetadata
 } from '../lib/supabase';
 
 interface BlogPost {
@@ -145,7 +147,7 @@ const DEFAULT_DRIVING_COURSES: DrivingCourse[] = [
     courseTitle: "Basic Driving Course",
     courseDescription: "Excellent foundational course covering vital steering control, brake safety, and real-world road signals.",
     courseFee: "15000",
-    carImage: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=600",
+    carImage: "/src/assets/images/basic_driving_course_1782284625178.jpg",
     lessonDuration: "10 Driving Classes Included",
     dailyTime: "1,500 PKR Per Class Rate",
     theoryDuration: "35 Mins Practice Lesson",
@@ -157,7 +159,7 @@ const DEFAULT_DRIVING_COURSES: DrivingCourse[] = [
     courseTitle: "Standard Driving Course",
     courseDescription: "Our most popular training track covering parallel parking, reverse controls, and highway driving confidence.",
     courseFee: "20000",
-    carImage: "https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&q=80&w=600",
+    carImage: "/src/assets/images/standard_driving_course_1782284602847.jpg",
     lessonDuration: "15 Driving Classes Included",
     dailyTime: "1,333 PKR Per Class Rate",
     theoryDuration: "35 Mins Practice Lesson",
@@ -169,7 +171,7 @@ const DEFAULT_DRIVING_COURSES: DrivingCourse[] = [
     courseTitle: "Premium Driving Course",
     courseDescription: "Complete masterclass including city grid navigation, night driving safety, and expert-level license exam preparation.",
     courseFee: "25000",
-    carImage: "https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=600",
+    carImage: "/src/assets/images/premium_driving_course_1782284580290.jpg",
     lessonDuration: "20 Driving Classes Included",
     dailyTime: "1,250 PKR Per Class Rate",
     theoryDuration: "35 Mins Practice Lesson",
@@ -177,6 +179,22 @@ const DEFAULT_DRIVING_COURSES: DrivingCourse[] = [
     additionalTime: "Full License Test Preparation"
   }
 ];
+
+const resolveCarImage = (url: string, title?: string) => {
+  if (!url) return "/src/assets/images/basic_driving_course_1782284625178.jpg";
+  const lowerUrl = url.toLowerCase();
+  const lowerTitle = (title || "").toLowerCase();
+  if (lowerUrl.includes("photo-1549317661-bd32c8ce0db2") || lowerTitle.includes("basic")) {
+    return "/src/assets/images/basic_driving_course_1782284625178.jpg";
+  }
+  if (lowerUrl.includes("photo-1542282088-fe8426682b8f") || lowerTitle.includes("standard")) {
+    return "/src/assets/images/standard_driving_course_1782284602847.jpg";
+  }
+  if (lowerUrl.includes("photo-1449965408869-eaa3f722e40d") || lowerTitle.includes("premium")) {
+    return "/src/assets/images/premium_driving_course_1782284580290.jpg";
+  }
+  return url;
+};
 
 export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -205,6 +223,12 @@ export default function AdminPage() {
   const [editorWorkspaceTab, setEditorWorkspaceTab] = useState<'write' | 'preview'>('write');
   const [editorAuthorSelectMode, setEditorAuthorSelectMode] = useState<'dropdown' | 'custom'>('dropdown');
   const [activeTab, setActiveTab] = useState<'dashboard' | 'bookings' | 'blogs' | 'dns' | 'rentals' | 'requests' | 'courses' | 'car-sales' | 'instructors'>('dashboard');
+  const [systemMetadata, setSystemMetadata] = useState<Record<string, string>>({
+    years_active: '8',
+    students_trained: '4500+',
+    certified_instructors: '25',
+    happy_reviews: '150+'
+  });
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null);
   
@@ -519,7 +543,11 @@ export default function AdminPage() {
       try {
         const parsed = JSON.parse(savedCourses);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setDrivingCourses(parsed);
+          const resolved = parsed.map((c: any) => ({
+            ...c,
+            carImage: resolveCarImage(c.carImage, c.courseTitle)
+          }));
+          setDrivingCourses(resolved);
         } else {
           setDrivingCourses(DEFAULT_DRIVING_COURSES);
         }
@@ -547,6 +575,22 @@ export default function AdminPage() {
     } else {
       setInstructors([]);
     }
+
+    // 8. Load System Metadata Metrics
+    const savedMeta = localStorage.getItem('system_metadata');
+    if (savedMeta) {
+      try {
+        const parsed = JSON.parse(savedMeta);
+        if (parsed && typeof parsed === 'object') {
+          setSystemMetadata(parsed);
+        }
+      } catch (e) {}
+    }
+    fetchSystemMetadata().then(data => {
+      if (data) {
+        setSystemMetadata(data);
+      }
+    }).catch(() => {});
   };
 
   useEffect(() => {
@@ -562,6 +606,7 @@ export default function AdminPage() {
     window.addEventListener('driving_courses_updated', loadDataAndSync);
     window.addEventListener('blog_editors_updated', loadDataAndSync);
     window.addEventListener('instructors_updated', loadDataAndSync);
+    window.addEventListener('system_metadata_updated', loadDataAndSync);
     
     // Background polling interval for extra visual reactivity safety (every 3s)
     const syncInterval = setInterval(loadDataAndSync, 3000);
@@ -576,6 +621,7 @@ export default function AdminPage() {
       window.removeEventListener('driving_courses_updated', loadDataAndSync);
       window.removeEventListener('blog_editors_updated', loadDataAndSync);
       window.removeEventListener('instructors_updated', loadDataAndSync);
+      window.removeEventListener('system_metadata_updated', loadDataAndSync);
       clearInterval(syncInterval);
     };
   }, []);
@@ -2570,6 +2616,96 @@ export default function AdminPage() {
                         <Edit className="w-5 h-5" />
                       </div>
                       <span className="text-xs font-bold text-slate-600 group-hover:text-amber-700">Draft Tutorial</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* System Statistics & Metadata Editor */}
+                <div className="bg-white rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50 p-8 space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-black text-slate-950 tracking-tight">Centralized Statistics (Single Source of Truth)</h3>
+                      <p className="text-slate-500 text-xs mt-1">Updates made here will propagate instantly across the Home, About, and Footer metrics.</p>
+                    </div>
+                    <span className="text-[10px] bg-[#FF7112]/10 border border-[#FF7112]/20 text-[#E05A00] font-black uppercase px-2.5 py-1 rounded-full shrink-0">
+                      Supabase Sync
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div>
+                      <label className="block text-xs font-black text-slate-600 uppercase tracking-wider mb-2">Years of Active Experience</label>
+                      <input 
+                        type="text" 
+                        value={systemMetadata.years_active || ''} 
+                        onChange={async (e) => {
+                          const val = e.target.value;
+                          setSystemMetadata(prev => ({ ...prev, years_active: val }));
+                          await updateSystemMetadata('years_active', val);
+                        }}
+                        className="w-full px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-900 font-bold focus:outline-none focus:border-[#FF7112] text-sm"
+                        placeholder="e.g. 8"
+                      />
+                      <span className="text-[10px] text-slate-400 mt-1.5 block leading-tight">Renders starting year as {2026 - (parseInt(systemMetadata.years_active, 10) || 8)}</span>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-slate-600 uppercase tracking-wider mb-2">Students Trained</label>
+                      <input 
+                        type="text" 
+                        value={systemMetadata.students_trained || ''} 
+                        onChange={async (e) => {
+                          const val = e.target.value;
+                          setSystemMetadata(prev => ({ ...prev, students_trained: val }));
+                          await updateSystemMetadata('students_trained', val);
+                        }}
+                        className="w-full px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-900 font-bold focus:outline-none focus:border-[#FF7112] text-sm"
+                        placeholder="e.g. 4500+"
+                      />
+                      <span className="text-[10px] text-slate-400 mt-1.5 block leading-tight">Renders student body count with micro-animations</span>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-slate-600 uppercase tracking-wider mb-2">Certified Instructors</label>
+                      <input 
+                        type="text" 
+                        value={systemMetadata.certified_instructors || ''} 
+                        onChange={async (e) => {
+                          const val = e.target.value;
+                          setSystemMetadata(prev => ({ ...prev, certified_instructors: val }));
+                          await updateSystemMetadata('certified_instructors', val);
+                        }}
+                        className="w-full px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-900 font-bold focus:outline-none focus:border-[#FF7112] text-sm"
+                        placeholder="e.g. 25"
+                      />
+                      <span className="text-[10px] text-slate-400 mt-1.5 block leading-tight">Syncs registry numbers with active roster metrics</span>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-slate-600 uppercase tracking-wider mb-2">Happy Reviews</label>
+                      <input 
+                        type="text" 
+                        value={systemMetadata.happy_reviews || ''} 
+                        onChange={async (e) => {
+                          const val = e.target.value;
+                          setSystemMetadata(prev => ({ ...prev, happy_reviews: val }));
+                          await updateSystemMetadata('happy_reviews', val);
+                        }}
+                        className="w-full px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-900 font-bold focus:outline-none focus:border-[#FF7112] text-sm"
+                        placeholder="e.g. 150+"
+                      />
+                      <span className="text-[10px] text-slate-400 mt-1.5 block leading-tight">Dynamic rating and feedback validation metrics</span>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100 flex justify-end">
+                    <button 
+                      onClick={() => {
+                        setToastMessage({ text: 'Centralized statistics synchronized successfully across all site components!', type: 'success' });
+                      }}
+                      className="bg-slate-950 text-white hover:bg-[#FF7112] px-6 py-3 rounded-2xl font-black text-xs transition-colors flex items-center gap-2 cursor-pointer"
+                    >
+                      <Check className="w-4 h-4" /> Verify & Synchronize Stats
                     </button>
                   </div>
                 </div>
@@ -5594,7 +5730,7 @@ export default function AdminPage() {
                           <div>
                             <div className="aspect-video w-full rounded-xl overflow-hidden bg-gray-200 border border-gray-200/50 mb-3 relative">
                               <img 
-                                src={course.carImage || 'https://images.unsplash.com/photo-1617469767053-d3b508a0d825?auto=format&fit=crop&q=80&w=300'} 
+                                src={course.carImage || 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=80&w=300'} 
                                 alt={course.courseTitle} 
                                 className="w-full h-full object-cover" 
                                 referrerPolicy="no-referrer"

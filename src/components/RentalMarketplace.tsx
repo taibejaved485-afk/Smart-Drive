@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Car, MapPin, CheckCircle, Smartphone, SlidersHorizontal, MessageSquare, ChevronRight, HelpCircle, RefreshCw, Key, ShieldCheck, Search, ChevronDown, X, ChevronLeft, Star, Maximize2 } from 'lucide-react';
+import { Car, MapPin, CheckCircle, Smartphone, SlidersHorizontal, MessageSquare, ChevronRight, HelpCircle, RefreshCw, Key, ShieldCheck, Search, ChevronDown, X, ChevronLeft, Star, Maximize2, Calendar } from 'lucide-react';
 
-import { INITIAL_RENTAL_FLEET, RentalCar } from '../data/inventory';
+import { INITIAL_RENTAL_FLEET, RentalCar, isCarComplete } from '../data/inventory';
+import { fetchRentalCars, insertCustomerRequest } from '../lib/supabase';
 
 interface MarketplaceImageLightboxProps {
   images: string[];
@@ -101,7 +102,58 @@ function MarketplaceImageLightbox({ images, initialIndex, carName, onClose }: Ma
   );
 }
 
-function MarketplaceCarCard({ car, waUrl }: { car: RentalCar; waUrl: string; key?: any }) {
+function RentalMarketplaceSkeleton() {
+  return (
+    <div className="bg-white rounded-[2rem] overflow-hidden border border-gray-200/90 shadow-sm flex flex-col justify-between animate-pulse">
+      {/* Media Aspect Ratio Wrapper */}
+      <div className="relative aspect-[16/10] bg-gray-200/80 flex items-center justify-center">
+        {/* Left top badges */}
+        <div className="absolute top-4 left-4 flex flex-col gap-1.5 items-start">
+          <div className="w-24 h-5 bg-gray-300 rounded-lg"></div>
+          <div className="w-20 h-5 bg-gray-300 rounded-lg"></div>
+        </div>
+        {/* Center icon placeholder */}
+        <div className="w-12 h-12 rounded-full bg-gray-300/40 flex items-center justify-center">
+          <Car className="w-6 h-6 text-gray-400" />
+        </div>
+      </div>
+
+      {/* Card Info Skeleton Content */}
+      <div className="p-6 flex-grow flex flex-col justify-between">
+        <div>
+          {/* Title Placeholder */}
+          <div className="w-3/4 h-5 bg-gray-300 rounded-lg mb-3"></div>
+          
+          {/* Tag Badges */}
+          <div className="flex gap-2 mb-3">
+            <div className="w-16 h-4 bg-gray-200 rounded-md"></div>
+            <div className="w-14 h-4 bg-gray-200 rounded-md"></div>
+          </div>
+
+          {/* Vetted Landlord Panel */}
+          <div className="bg-gray-50 border border-gray-100 rounded-xl p-3 flex flex-col gap-2">
+            <div className="flex justify-between">
+              <div className="w-20 h-3 bg-gray-200 rounded"></div>
+              <div className="w-24 h-3 bg-gray-200 rounded"></div>
+            </div>
+            <div className="w-full h-6 bg-gray-200 rounded mt-1"></div>
+          </div>
+        </div>
+
+        {/* Price Tag & Action CTAs Skeletons */}
+        <div className="pt-3 border-t border-gray-100 mt-3 flex items-center justify-between gap-3">
+          <div>
+            <div className="w-12 h-3 bg-gray-200 rounded mb-1"></div>
+            <div className="w-20 h-5 bg-gray-300 rounded-lg"></div>
+          </div>
+          <div className="w-24 h-8 bg-gray-300 rounded-xl"></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MarketplaceCarCard({ car, onReserve }: { car: RentalCar; onReserve: (car: RentalCar) => void; key?: any }) {
   const images = car.images && car.images.length > 0 ? car.images : [car.imageUrl];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -109,6 +161,9 @@ function MarketplaceCarCard({ car, waUrl }: { car: RentalCar; waUrl: string; key
   const [showLightbox, setShowLightbox] = useState(false);
 
   const isTodayBooked = car.status === 'Booked';
+  const isReal = car.hasRealPhoto || 
+                 (car.images && car.images.length > 0 && !car.images[0].includes('unsplash.com')) || 
+                 (car.imageUrl && !car.imageUrl.includes('unsplash.com') && !car.imageUrl.includes('stock'));
 
   const nextImage = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -131,78 +186,97 @@ function MarketplaceCarCard({ car, waUrl }: { car: RentalCar; waUrl: string; key
       >
         {/* Visual Media Header - CAROUSEL */}
         <div 
-          className="relative h-48 sm:h-52 overflow-hidden bg-gray-100 cursor-zoom-in"
-          onClick={() => setShowLightbox(true)}
+          className={`relative h-48 sm:h-52 overflow-hidden bg-gray-100 ${isReal ? 'cursor-zoom-in' : 'select-none'}`}
+          onClick={() => isReal && setShowLightbox(true)}
         >
-          <AnimatePresence initial={false}>
-            {images.map((img, index) => (
-              index === currentImageIndex && (
-                <motion.img
-                  key={`${car.id}-img-${index}`}
-                  src={img}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  alt={`${car.name} - ${index + 1}`}
-                  referrerPolicy="no-referrer"
-                />
-              )
-            ))}
-          </AnimatePresence>
-
-          {/* Floating View Full Pic Icon Badge */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowLightbox(true);
-            }}
-            className="absolute bottom-3 right-3 z-30 bg-black/60 shadow-lg hover:bg-amber-600 text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-lg backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center gap-1.5 cursor-pointer"
-          >
-            <Maximize2 className="w-3.5 h-3.5 text-white" />
-            View Full Pic
-          </button>
-
-          {/* Carousel Navigation (Hidden until hover on Desktop, visible on Mobile swipe theoretically) */}
-          {images.length > 1 && (
+          {isReal ? (
             <>
-              <div className={`absolute inset-0 flex items-center justify-between px-2 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-                <button
-                  onClick={prevImage}
-                  className="bg-black/40 hover:bg-black/60 text-white p-1.5 rounded-full backdrop-blur-sm transition-all transform hover:scale-110 z-10"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={nextImage}
-                  className="bg-black/40 hover:bg-black/60 text-white p-1.5 rounded-full backdrop-blur-sm transition-all transform hover:scale-110 z-10"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Pagination Dots */}
-              <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-20">
-                {images.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setCurrentImageIndex(idx);
-                    }}
-                    className={`h-1.5 rounded-full transition-all duration-300 ${
-                      idx === currentImageIndex 
-                        ? 'w-4 bg-amber-500 shadow-sm' 
-                        : 'w-1.5 bg-white/60 hover:bg-white'
-                    }`}
-                    aria-label={`Go to slide ${idx + 1}`}
-                  />
+              <AnimatePresence initial={false}>
+                {images.map((img, index) => (
+                  index === currentImageIndex && (
+                    <motion.img
+                      key={`${car.id}-img-${index}`}
+                      src={img}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      alt={`${car.name} - ${index + 1}`}
+                      referrerPolicy="no-referrer"
+                    />
+                  )
                 ))}
-              </div>
+              </AnimatePresence>
+
+              {/* Floating View Full Pic Icon Badge */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowLightbox(true);
+                }}
+                className="absolute bottom-3 right-3 z-30 bg-black/60 shadow-lg hover:bg-amber-600 text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-lg backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center gap-1.5 cursor-pointer"
+              >
+                <Maximize2 className="w-3.5 h-3.5 text-white" />
+                View Full Pic
+              </button>
+
+              {/* Carousel Navigation (Hidden until hover on Desktop, visible on Mobile swipe theoretically) */}
+              {images.length > 1 && (
+                <>
+                  <div className={`absolute inset-0 flex items-center justify-between px-2 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+                    <button
+                      onClick={prevImage}
+                      className="bg-black/40 hover:bg-black/60 text-white p-1.5 rounded-full backdrop-blur-sm transition-all transform hover:scale-110 z-10"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={nextImage}
+                      className="bg-black/40 hover:bg-black/60 text-white p-1.5 rounded-full backdrop-blur-sm transition-all transform hover:scale-110 z-10"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  {/* Pagination Dots */}
+                  <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-20">
+                    {images.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setCurrentImageIndex(idx);
+                        }}
+                        className={`h-1.5 rounded-full transition-all duration-300 ${
+                          idx === currentImageIndex 
+                            ? 'w-4 bg-amber-500 shadow-sm' 
+                            : 'w-1.5 bg-white/60 hover:bg-white'
+                        }`}
+                        aria-label={`Go to slide ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
             </>
+          ) : (
+            <div className="w-full h-full bg-slate-100 flex flex-col items-center justify-center p-5 text-center select-none">
+              <div className="w-12 h-12 rounded-full bg-slate-200/80 flex items-center justify-center text-slate-400 mb-2 border border-slate-300/40">
+                <svg className="w-7 h-7 text-slate-500 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <circle cx="7" cy="17" r="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M9 17h6" strokeLinecap="round" strokeLinejoin="round"/>
+                  <circle cx="17" cy="17" r="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-700 px-2.5 py-1 bg-slate-200/60 border border-slate-300/30 rounded-full">
+                Real Image Pending Verification
+              </span>
+              <p className="text-[9px] text-slate-500 font-semibold mt-1 leading-tight">Physical Inspection & Biometric Checks in Progress</p>
+            </div>
           )}
         
         {/* Availability Label Tag */}
@@ -306,33 +380,31 @@ function MarketplaceCarCard({ car, waUrl }: { car: RentalCar; waUrl: string; key
             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mt-1.5">Per {car.rentUnit.toUpperCase()}</span>
           </div>
 
-          <a 
-            href={isTodayBooked ? '#' : waUrl} 
-            target={isTodayBooked ? '_self' : '_blank'} 
-            rel="noopener noreferrer"
+          <button 
+            type="button"
             onClick={(e) => {
+              e.preventDefault();
               if (isTodayBooked) {
-                e.preventDefault();
                 alert('This car is marked as BOOKED for today. Please wait for an available slot to initiate booking.');
+                return;
               }
+              onReserve(car);
             }}
             className={`px-4.5 py-2.5 rounded-xl font-extrabold text-xs uppercase tracking-wider flex items-center gap-1.5 transition shadow-lg cursor-pointer transform hover:scale-105 active:scale-95 ${
               isTodayBooked 
                 ? 'bg-gray-200 text-gray-400 shadow-none cursor-not-allowed hidden' 
-                : 'bg-[#25D366] hover:bg-[#128C7E] text-white shadow-green-100'
+                : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-100'
             }`}
             style={isTodayBooked ? { display: 'none' } : {}}
-            title={isTodayBooked ? 'Currently Booked' : 'Contact owner on WhatsApp'}
+            title={isTodayBooked ? 'Currently Booked' : 'Reserve this vehicle now'}
           >
             {isTodayBooked ? <span className="opacity-0 w-0 h-0 inline-block overflow-hidden absolute">Booked</span> : (
               <>
-            <svg className="w-4 h-4 fill-white text-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.455 5.703 1.455h.008c6.56 0 11.895-5.335 11.898-11.893a11.821 11.821 0 00-3.48-8.413z" />
-            </svg>
-            <span>WhatsApp</span>
-            </>
+                <Car className="w-4 h-4 text-white" />
+                <span>Reserve</span>
+              </>
             )}
-          </a>
+          </button>
           
           {isTodayBooked && (
             <span className="bg-[#FF7112]/10 text-[#FF7112] px-4 py-2.5 rounded-xl font-extrabold text-[10px] sm:text-xs uppercase tracking-wider flex items-center justify-center border border-[#FF7112]/20 flex-1 ml-2 text-center">
@@ -418,7 +490,83 @@ export default function RentalMarketplace() {
   const [driverPreference, setDriverPreference] = useState<string>('Any');
 
   const [cars, setCars] = useState<RentalCar[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Booking reservation states
+  const [selectedBookingCar, setSelectedBookingCar] = useState<RentalCar | null>(null);
+  const [bookingName, setBookingName] = useState('');
+  const [bookingPhone, setBookingPhone] = useState('');
+  const [bookingCNIC, setBookingCNIC] = useState('');
+  const [bookingDate, setBookingDate] = useState('');
+  const [bookingDuration, setBookingDuration] = useState(3);
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+
   const cities = ['All Cities', 'Faisalabad', 'Lahore', 'Islamabad', 'Karachi'];
+
+  const handleBookingSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedBookingCar) return;
+
+    if (!bookingName || !bookingPhone || !bookingCNIC || !bookingDate) {
+      alert('Please fill out all required fields.');
+      return;
+    }
+
+    const reqId = 'bk-' + Date.now();
+    try {
+      const parsedPrice = parseInt(String(selectedBookingCar.rentPrice || '0').replace(/,/g, '')) || 0;
+      await insertCustomerRequest({
+        id: reqId,
+        carId: selectedBookingCar.id,
+        carName: selectedBookingCar.name,
+        customerName: bookingName,
+        phone: bookingPhone,
+        days: String(bookingDuration),
+        totalPrice: String(parsedPrice * bookingDuration),
+        status: 'pending'
+      });
+      setBookingSuccess(true);
+    } catch (error) {
+      console.error('Failed to insert booking draft in database', error);
+      alert('Failed to save booking draft. Please check your connection.');
+    }
+  };
+
+  const getBookingWhatsAppUrl = () => {
+    if (!selectedBookingCar) return '';
+    const defaultPhone = '923097666928';
+    const ownerPhone = selectedBookingCar.ownerPhone ? selectedBookingCar.ownerPhone.replace(/[^0-9]/g, '') : defaultPhone;
+    const parsedPrice = parseInt(String(selectedBookingCar.rentPrice || '0').replace(/,/g, '')) || 0;
+
+    const invoiceParts = [
+      "=============================",
+      "    📄 GODRIVEIFY RENTAL INVOICE   ",
+      "=============================",
+      "👤 CLIENT DETAILS:",
+      `• Name: ${bookingName}`,
+      `• Phone/WhatsApp: ${bookingPhone}`,
+      `• CNIC: ${bookingCNIC}`,
+      "",
+      "🚗 VEHICLE DETAILS:",
+      `• Model: ${selectedBookingCar.name}`,
+      `• Type: ${selectedBookingCar.isVerified ? 'Verified Fleet' : 'General Classified'}`,
+      `• Transmission: ${selectedBookingCar.transmission}`,
+      `• City Hub: ${selectedBookingCar.city} Office Hub`,
+      "",
+      "📅 TRIP SCHEDULE:",
+      `• Start Date: ${bookingDate}`,
+      `• Duration: ${bookingDuration} ${selectedBookingCar.rentUnit || 'Day'}(s)`,
+      `• Rate: PKR ${selectedBookingCar.rentPrice} / ${selectedBookingCar.rentUnit || 'Day'}`,
+      "",
+      "💰 FINANCIAL SUMMARY:",
+      `• Total Estimated Rent: PKR ${(parsedPrice * bookingDuration).toLocaleString()}`,
+      "=============================",
+      "Generated via GoDriveify Marketplace",
+      "Draft logged in Database. Please confirm reservation slot!"
+    ];
+
+    return `https://wa.me/${ownerPhone}?text=${encodeURIComponent(invoiceParts.join("\n"))}`;
+  };
 
   const CITY_AREAS: Record<string, string[]> = {
     'Faisalabad': ['Millat Town', 'D-Ground', 'Canal Road', 'Peoples Colony', 'Sargodha Road'],
@@ -427,7 +575,19 @@ export default function RentalMarketplace() {
     'Karachi': ['Clifton', 'DHA', 'Gulshan-e-Iqbal', 'North Nazimabad']
   };
 
-  const reloadInventory = () => {
+  const reloadInventory = async (forceFetch = false) => {
+    if (forceFetch) {
+      setIsLoading(true);
+    }
+
+    if (forceFetch) {
+      try {
+        await fetchRentalCars();
+      } catch (err) {
+        console.error('Failed to pre-fetch from Supabase in Home Marketplace:', err);
+      }
+    }
+
     let approvedList: RentalCar[] = [];
     const savedApproved = localStorage.getItem('approved_cars');
     if (savedApproved) {
@@ -476,19 +636,24 @@ export default function RentalMarketplace() {
       }
     }
 
-    setCars(uniqueCars);
+    // Active Conditional Rendering: exclude incomplete listings
+    const completeCars = uniqueCars.filter(isCarComplete);
+
+    setCars(completeCars);
+    setIsLoading(false);
   };
 
   useEffect(() => {
-    reloadInventory();
+    reloadInventory(true);
 
+    const handleStorageUpdate = () => reloadInventory(false);
     // Listen for storage changes in the browser (cross tabs, modal submissions or admin approvals)
-    window.addEventListener('storage', reloadInventory);
-    window.addEventListener('pending_cars_updated', reloadInventory);
+    window.addEventListener('storage', handleStorageUpdate);
+    window.addEventListener('pending_cars_updated', handleStorageUpdate);
     
     return () => {
-      window.removeEventListener('storage', reloadInventory);
-      window.removeEventListener('pending_cars_updated', reloadInventory);
+      window.removeEventListener('storage', handleStorageUpdate);
+      window.removeEventListener('pending_cars_updated', handleStorageUpdate);
     };
   }, []);
 
@@ -731,7 +896,13 @@ export default function RentalMarketplace() {
 
         {/* Marketplace Dynamic Grid */}
         <div>
-          {filteredCars.length === 0 ? (
+          {isLoading ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+              {Array.from({ length: 6 }).map((_, idx) => (
+                <RentalMarketplaceSkeleton key={`skeleton-${idx}`} />
+              ))}
+            </div>
+          ) : filteredCars.length === 0 ? (
             <div className="text-center py-20 bg-white rounded-3xl border border-gray-200 p-8 shadow-sm flex flex-col items-center justify-center max-w-lg mx-auto">
               <div className="w-16 h-16 bg-gray-50 text-gray-400 rounded-full flex items-center justify-center mb-4">
                 <Car className="w-8 h-8" />
@@ -744,12 +915,185 @@ export default function RentalMarketplace() {
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {filteredCars.map(car => (
-                <MarketplaceCarCard key={car.id} car={car} waUrl={getWhatsAppLink(car)} />
+                <MarketplaceCarCard 
+                  key={car.id} 
+                  car={car} 
+                  onReserve={(selected) => {
+                    setSelectedBookingCar(selected);
+                    setBookingName('');
+                    setBookingPhone('');
+                    setBookingCNIC('');
+                    setBookingDate(new Date().toISOString().split('T')[0]);
+                    setBookingDuration(3);
+                    setBookingSuccess(false);
+                  }} 
+                />
               ))}
             </div>
           )}
         </div>
       </div>
+
+      {/* Dynamic Booking Dialog Modal */}
+      <AnimatePresence>
+        {selectedBookingCar && (
+          <div className="fixed inset-0 z-[1000] overflow-y-auto flex items-center justify-center p-4">
+            {/* Overlay backdrop */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedBookingCar(null)}
+              className="fixed inset-0 bg-gray-950/70 backdrop-blur-sm"
+            />
+            
+            {/* Modal Body container */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              className="bg-white rounded-3xl overflow-hidden shadow-2xl max-w-lg w-full relative z-10 border border-gray-100"
+            >
+              {/* Image Banner Header */}
+              <div className="relative aspect-[21/9] bg-gray-900">
+                <img 
+                  src={selectedBookingCar.imageUrl} 
+                  alt={selectedBookingCar.name} 
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover brightness-75"
+                />
+                <button 
+                  onClick={() => setSelectedBookingCar(null)}
+                  type="button"
+                  className="absolute top-4 right-4 bg-black/50 hover:bg-black/80 text-white rounded-full p-1.5 transition cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+                <div className="absolute bottom-4 left-6 text-white">
+                  <span className="text-[9px] uppercase font-black bg-indigo-600 px-2 py-0.5 rounded tracking-widest">In-App Reservation</span>
+                  <h3 className="font-extrabold text-xl mt-1 tracking-tight">{selectedBookingCar.name}</h3>
+                </div>
+              </div>
+
+              {/* Form Content */}
+              <div className="p-6 font-sans">
+                {bookingSuccess ? (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-center py-6 space-y-4"
+                  >
+                    <div className="w-16 h-16 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto shadow-inner border border-green-100">
+                      <CheckCircle className="w-10 h-10" />
+                    </div>
+                    <h4 className="text-2xl font-black text-gray-900 tracking-tight">Booking Draft Logged!</h4>
+                    <p className="text-xs sm:text-sm text-gray-500 max-w-sm mx-auto leading-relaxed">
+                      Your booking request for <strong className="text-indigo-650">{selectedBookingCar.name}</strong> has been securely logged in our database. Tap below to send your structured ticket invoice to our branch officer via WhatsApp and finalize your slots.
+                    </p>
+                    
+                    <div className="text-xs text-gray-400 bg-gray-50 p-3.5 rounded-xl border max-w-sm mx-auto text-left space-y-1">
+                      <div>Customer CNIC: <strong className="text-gray-800 font-mono">{bookingCNIC}</strong></div>
+                      <div>Total Price Estimate: <strong className="text-indigo-600 font-mono font-bold">PKR {((parseInt(String(selectedBookingCar.rentPrice || '0').replace(/,/g, '')) || 0) * bookingDuration).toLocaleString()}</strong></div>
+                    </div>
+
+                    <div className="pt-2">
+                      <a 
+                        href={getBookingWhatsAppUrl()}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex w-full items-center justify-center gap-2 bg-[#25D366] hover:bg-[#128C7E] text-white py-3.5 px-6 rounded-2xl font-extrabold text-sm uppercase tracking-wide transition shadow-lg shadow-green-100 cursor-pointer"
+                      >
+                        <svg className="w-5 h-5 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.455 5.703 1.455h.008c6.56 0 11.895-5.335 11.898-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                        </svg>
+                        <span>Send Executive Message</span>
+                      </a>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <form onSubmit={handleBookingSubmit} className="space-y-4">
+                    {/* Price rates bar */}
+                    <div className="bg-gray-50 p-3 rounded-xl border flex items-center justify-between text-xs sm:text-sm">
+                      <span className="font-bold text-gray-650">Rate:</span>
+                      <span className="font-black text-indigo-650">
+                        PKR {selectedBookingCar.rentPrice} / {selectedBookingCar.rentUnit || 'Day'}
+                      </span>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black uppercase text-gray-500 tracking-wider mb-1">Full Name *</label>
+                      <input 
+                        required
+                        type="text"
+                        placeholder="e.g. Ali Ahmed"
+                        value={bookingName}
+                        onChange={e => setBookingName(e.target.value)}
+                        className="w-full border border-gray-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black uppercase text-gray-500 tracking-wider mb-1">WhatsApp / Phone *</label>
+                      <input 
+                        required
+                        type="tel"
+                        placeholder="e.g. 0300-1234567"
+                        value={bookingPhone}
+                        onChange={e => setBookingPhone(e.target.value)}
+                        className="w-full border border-gray-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition font-mono"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black uppercase text-gray-500 tracking-wider mb-1">CNIC Number * (شناختی کارڈ نمبر)</label>
+                      <input 
+                        required
+                        type="text"
+                        placeholder="e.g. 33100-1234567-1"
+                        value={bookingCNIC}
+                        onChange={e => setBookingCNIC(e.target.value)}
+                        className="w-full border border-gray-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition font-mono"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-black uppercase text-gray-500 tracking-wider mb-1">Start Date *</label>
+                        <input 
+                          required
+                          type="date"
+                          value={bookingDate}
+                          onChange={e => setBookingDate(e.target.value)}
+                          className="w-full border border-gray-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition font-mono"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-black uppercase text-gray-500 tracking-wider mb-1">Duration (No. of days) *</label>
+                        <input 
+                          required
+                          type="number"
+                          min="1"
+                          max="90"
+                          value={bookingDuration}
+                          onChange={e => setBookingDuration(parseInt(e.target.value) || 1)}
+                          className="w-full border border-gray-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition font-mono"
+                        />
+                      </div>
+                    </div>
+
+                    <button 
+                      type="submit"
+                      className="w-full bg-indigo-650 hover:bg-indigo-700 text-white font-extrabold text-xs uppercase tracking-widest py-3.5 rounded-xl transition shadow-lg shadow-indigo-100 cursor-pointer active:scale-95 border-none outline-none"
+                    >
+                      Log Booking Draft
+                    </button>
+                  </form>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

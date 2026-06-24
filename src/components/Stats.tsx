@@ -1,6 +1,7 @@
 import { Award, Car, Users, Gauge, LucideIcon } from 'lucide-react';
 import { motion, useMotionValue, useTransform, animate, useInView } from 'motion/react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { fetchSystemMetadata } from '../lib/supabase';
 
 const StatCard = (props: any) => {
   const Icon = props.icon;
@@ -48,11 +49,57 @@ const StatCard = (props: any) => {
 };
 
 export default function Stats() {
+  const [metadata, setMetadata] = useState<Record<string, string>>({
+    years_active: '8',
+    students_trained: '4500+',
+    certified_instructors: '25',
+    happy_reviews: '150+'
+  });
+
+  useEffect(() => {
+    let active = true;
+    
+    // Fetch system metadata on mount
+    fetchSystemMetadata().then(data => {
+      if (active) {
+        setMetadata(data);
+      }
+    });
+
+    const handleUpdate = () => {
+      fetchSystemMetadata().then(data => {
+        if (active) {
+          setMetadata(data);
+        }
+      });
+    };
+
+    window.addEventListener('system_metadata_updated', handleUpdate);
+    return () => {
+      active = false;
+      window.removeEventListener('system_metadata_updated', handleUpdate);
+    };
+  }, []);
+
+  // Helper to parse integer count and character suffix from a string (e.g. "4500+" -> count: 4500, suffix: "+")
+  const parseStat = (value: string) => {
+    if (!value) return { count: 0, suffix: '' };
+    const cleanValue = value.toString();
+    const numberPart = parseInt(cleanValue.replace(/[^0-9]/g, ''), 10) || 0;
+    const suffixPart = cleanValue.replace(/[0-9]/g, '');
+    return { count: numberPart, suffix: suffixPart };
+  };
+
+  const yearsStat = parseStat(metadata.years_active);
+  const instructorsStat = parseStat(metadata.certified_instructors);
+  const reviewsStat = parseStat(metadata.happy_reviews);
+  const studentsStat = parseStat(metadata.students_trained);
+
   const stats = [
-    { icon: Award, label: 'Years Experience', count: 16 },
-    { icon: Car, label: 'Professional Instructor', count: 25 },
-    { icon: Users, label: 'Happy Reviews', count: 150, suffix: '+' },
-    { icon: Gauge, label: 'Students Trained', count: 125, suffix: '+' },
+    { icon: Award, label: 'Years Experience', count: yearsStat.count, suffix: yearsStat.suffix },
+    { icon: Car, label: 'Professional Instructors', count: instructorsStat.count, suffix: instructorsStat.suffix },
+    { icon: Users, label: 'Happy Reviews', count: reviewsStat.count, suffix: reviewsStat.suffix },
+    { icon: Gauge, label: 'Students Trained', count: studentsStat.count, suffix: studentsStat.suffix },
   ];
 
   return (
@@ -73,3 +120,4 @@ export default function Stats() {
     </section>
   );
 }
+

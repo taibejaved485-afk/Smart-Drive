@@ -1,11 +1,46 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin, Clock, ArrowRight, ShieldCheck, Sparkles, MessageSquare, Award, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import BrandLogo from './BrandLogo';
+import { fetchSystemMetadata } from '../lib/supabase';
 
 export default function Footer() {
+  const [metadata, setMetadata] = useState<Record<string, string>>({
+    years_active: '8',
+    students_trained: '4500+',
+    certified_instructors: '25',
+    happy_reviews: '150+'
+  });
+
+  useEffect(() => {
+    let active = true;
+    fetchSystemMetadata().then(data => {
+      if (active) {
+        setMetadata(data);
+      }
+    });
+
+    const handleUpdate = () => {
+      fetchSystemMetadata().then(data => {
+        if (active) {
+          setMetadata(data);
+        }
+      });
+    };
+
+    window.addEventListener('system_metadata_updated', handleUpdate);
+    return () => {
+      active = false;
+      window.removeEventListener('system_metadata_updated', handleUpdate);
+    };
+  }, []);
+
+  const yearsNum = parseInt(metadata.years_active, 10) || 8;
+  const startYear = 2026 - yearsNum; // Relative to the platform's current year timeline of 2026
+
   return (
     <footer className="bg-slate-950 text-slate-400 pt-20 pb-28 md:pb-12 relative overflow-hidden border-t border-white/5">
+
       {/* Background looping video with mask */}
       <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
         <video
@@ -13,13 +48,13 @@ export default function Footer() {
           loop
           muted
           playsInline
-          className="w-full h-full object-cover opacity-75"
+          className="w-full h-full object-cover opacity-20"
         >
           <source src="/footer-section.mp4" type="video/mp4" />
         </video>
         {/* Ambient Dark Gradients to keep edge boundaries soft while leaving the main visual area highly clear */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 via-transparent to-slate-950/95" />
-        <div className="absolute inset-0 bg-radial-gradient from-transparent via-slate-950/50 to-slate-950/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/95 via-transparent to-slate-950/95" />
+        <div className="absolute inset-0 bg-radial-gradient from-transparent via-slate-950/60 to-slate-950/95" />
       </div>
 
       {/* Premium Ambient Lights & Glassy Grid Overlays */}
@@ -44,8 +79,8 @@ export default function Footer() {
               </Link>
             </div>
             
-            <p className="text-xs sm:text-sm leading-relaxed text-slate-400 font-medium">
-              Transforming raw beginners into defensive, fully certified champions across Punjab since 2018. Over 4,500+ licensed graduates.
+            <p className="text-xs sm:text-sm leading-relaxed text-slate-300 font-medium">
+              Transforming raw beginners into defensive, fully certified champions across Punjab since {startYear}. Over {metadata.students_trained} licensed graduates.
             </p>
 
             <div className="flex items-center gap-2.5 bg-white/5 border border-white/5 p-3 rounded-2xl">
@@ -92,8 +127,8 @@ export default function Footer() {
                 { title: "Automatic Sedan Training" }
               ].map((item, idx) => (
                 <li key={idx} className="group">
-                  <Link to="/pricing" className="text-slate-400 hover:text-[#FF7112] transition-colors duration-300 flex items-center gap-2 pointer-events-auto">
-                    <ArrowRight className="w-3 h-3 text-slate-605 group-hover:text-[#FF7112] group-hover:translate-x-0.5 transition-all duration-300 shrink-0" />
+                  <Link to="/pricing" className="text-slate-300 hover:text-orange-400 transition-colors duration-300 flex items-center gap-2 pointer-events-auto">
+                    <ArrowRight className="w-3 h-3 text-slate-500 group-hover:text-orange-400 group-hover:translate-x-0.5 transition-all duration-300 shrink-0" />
                     <span className="font-semibold">
                       {item.title}
                     </span>
@@ -118,8 +153,8 @@ export default function Footer() {
                 { title: "FAQ Guidance", path: "/faq" }
               ].map((link, idx) => (
                 <li key={idx}>
-                  <Link to={link.path} className="text-slate-400 hover:text-[#FF7112]/90 transition-colors duration-300 flex items-center gap-2 font-semibold">
-                    <ArrowRight className="w-3 h-3 text-[#E05A00]" /> {link.title}
+                  <Link to={link.path} className="text-slate-300 hover:text-orange-400 transition-colors duration-300 flex items-center gap-2 font-semibold">
+                    <ArrowRight className="w-3 h-3 text-orange-500" /> {link.title}
                   </Link>
                 </li>
               ))}
@@ -163,7 +198,7 @@ export default function Footer() {
                 </div>
                 <div>
                   <span className="text-[9px] uppercase tracking-wider font-extrabold text-slate-500 block mb-0.5">Primary Campus</span>
-                  <address className="text-slate-400 not-italic font-bold text-xs leading-relaxed">
+                  <address className="text-slate-300 not-italic font-bold text-xs leading-relaxed">
                     Millat Road, Millat Town, Faisalabad
                   </address>
                 </div>
@@ -174,17 +209,17 @@ export default function Footer() {
         </div>
 
         {/* Lower Footer: Copyrights & Trust Architecture */}
-        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500 gap-6">
+        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-xs text-slate-400 gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left w-full sm:w-auto">
             <p className="font-medium">&copy; {new Date().getFullYear()} GoDriveify. All rights reserved.</p>
             <span className="hidden sm:inline text-white/10">|</span>
-            <div className="flex items-center gap-1.5 text-xs text-slate-400 bg-white/5 py-1 px-3 rounded-full border border-white/5 shadow-inner">
+            <div className="flex items-center gap-1.5 text-xs text-slate-300 bg-white/5 py-1 px-3 rounded-full border border-white/5 shadow-inner">
               <ShieldCheck className="w-3.5 h-3.5 text-[#FF7112]/90" />
               <span className="font-bold">Accredited Driving Academy</span>
             </div>
           </div>
           
-          <div className="flex items-center gap-3 font-mono text-[10px] tracking-widest text-slate-500 bg-slate-900 border border-slate-800 py-1.5 px-4 rounded-full mr-0 md:mr-20 xl:mr-20 2xl:mr-0 shadow-md">
+          <div className="flex items-center gap-3 font-mono text-[10px] tracking-widest text-slate-400 bg-slate-900 border border-slate-800 py-1.5 px-4 rounded-full mr-0 md:mr-20 xl:mr-20 2xl:mr-0 shadow-md">
             <Link to="/admin" className="hover:text-white transition-colors uppercase font-bold flex items-center gap-1.5">
               Admin Portal
             </Link>

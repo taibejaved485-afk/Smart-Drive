@@ -8,7 +8,8 @@ import SEO from '../components/SEO';
 import EarningsCalculator from '../components/EarningsCalculator';
 import { CarRequestsForm, CarRequestsGrid } from '../components/CarRequestsDirectory';
 import { ScrollReveal } from '../components/ScrollReveal';
-import { INITIAL_RENTAL_FLEET, RentalCar } from '../data/inventory';
+import { INITIAL_RENTAL_FLEET, RentalCar, isCarComplete } from '../data/inventory';
+import { fetchRentalCars } from '../lib/supabase';
 import { Car, MapPin, Calendar, Sliders, CheckCircle2, ShieldCheck, X, Phone, DollarSign, Clock, HelpCircle, Filter, Sparkles, ChevronLeft, ChevronRight, Search, ChevronDown, Check, Users, Maximize2 } from 'lucide-react';
 
 interface ImageLightboxProps {
@@ -108,6 +109,10 @@ function ImageLightbox({ images, initialIndex, carName, onClose }: ImageLightbox
 }
 
 function CarImageCarousel({ car }: { car: RentalCar }) {
+  const isReal = car.hasRealPhoto || 
+                 (car.images && car.images.length > 0 && !car.images[0].includes('unsplash.com')) || 
+                 (car.imageUrl && !car.imageUrl.includes('unsplash.com') && !car.imageUrl.includes('stock'));
+
   const images = car.images && car.images.length > 0 ? car.images : [car.imageUrl];
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showLightbox, setShowLightbox] = useState(false);
@@ -121,6 +126,25 @@ function CarImageCarousel({ car }: { car: RentalCar }) {
     e.stopPropagation();
     setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
   };
+
+  if (!isReal) {
+    return (
+      <div className="w-full h-full bg-slate-100 flex flex-col items-center justify-center p-6 text-center select-none relative">
+        <div className="w-14 h-14 rounded-full bg-slate-200/85 flex items-center justify-center text-slate-400 mb-2.5 border border-slate-300/40">
+          <svg className="w-8 h-8 text-slate-500 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" strokeLinecap="round" strokeLinejoin="round"/>
+            <circle cx="7" cy="17" r="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M9 17h6" strokeLinecap="round" strokeLinejoin="round"/>
+            <circle cx="17" cy="17" r="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+        <span className="text-[10px] font-black uppercase tracking-wider text-slate-700 px-2.5 py-1 bg-slate-200/60 border border-slate-300/30 rounded-full">
+          Real Image Pending Verification
+        </span>
+        <p className="text-[9px] text-slate-500 font-semibold mt-1 leading-tight">Physical Inspection & Biometric Checks in Progress</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -190,6 +214,69 @@ function CarImageCarousel({ car }: { car: RentalCar }) {
   );
 }
 
+function RentalCarSkeleton() {
+  return (
+    <div className="bg-white rounded-[2.5rem] overflow-hidden border border-gray-200 shadow-sm flex flex-col justify-between animate-pulse">
+      {/* Media Aspect Ratio Wrapper */}
+      <div className="relative aspect-[16/10] bg-gray-200/80 flex items-center justify-center">
+        {/* Left top badges */}
+        <div className="absolute top-4 left-4 flex flex-col gap-1.5 items-start">
+          <div className="w-24 h-6 bg-gray-300 rounded-lg"></div>
+          <div className="w-20 h-6 bg-gray-300 rounded-lg"></div>
+        </div>
+        {/* Right top status */}
+        <div className="absolute top-4 right-4">
+          <div className="w-20 h-6 bg-gray-300 rounded-lg"></div>
+        </div>
+        {/* Center icon placeholder */}
+        <div className="w-12 h-12 rounded-full bg-gray-300/40 flex items-center justify-center">
+          <Car className="w-6 h-6 text-gray-400" />
+        </div>
+      </div>
+
+      {/* Card Info Skeleton Content */}
+      <div className="p-6 flex-grow flex flex-col justify-between">
+        <div>
+          {/* Title Placeholder */}
+          <div className="w-3/4 h-6 bg-gray-300 rounded-lg mb-4"></div>
+          
+          {/* Tag Badges */}
+          <div className="flex gap-2 mb-4">
+            <div className="w-16 h-5 bg-gray-200 rounded-md"></div>
+            <div className="w-14 h-5 bg-gray-200 rounded-md"></div>
+            <div className="w-20 h-5 bg-gray-200 rounded-md"></div>
+          </div>
+
+          {/* Vetted Landlord Panel */}
+          <div className="bg-gray-50 border border-gray-100 rounded-2xl p-3.5 my-3 flex flex-col gap-2">
+            <div className="flex justify-between">
+              <div className="w-24 h-4 bg-gray-200 rounded"></div>
+              <div className="w-32 h-4 bg-gray-200 rounded"></div>
+            </div>
+            <div className="flex justify-between">
+              <div className="w-20 h-4 bg-gray-200 rounded"></div>
+              <div className="w-28 h-4 bg-gray-200 rounded"></div>
+            </div>
+            <div className="w-full h-8 bg-gray-200 rounded mt-1"></div>
+          </div>
+        </div>
+
+        {/* Price Tag & Action CTAs Skeletons */}
+        <div className="pt-4 border-t border-gray-100 mt-4 flex items-center justify-between gap-3">
+          <div>
+            <div className="w-16 h-3 bg-gray-200 rounded mb-1"></div>
+            <div className="w-24 h-6 bg-gray-300 rounded-lg"></div>
+          </div>
+          <div className="flex gap-2">
+            <div className="w-10 h-9 bg-gray-200 rounded-xl"></div>
+            <div className="w-24 h-9 bg-gray-300 rounded-xl"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function RentalsPage() {
   const [viewMode, setViewMode] = useState<'fleet' | 'requests'>('fleet');
   const [cars, setCars] = useState<RentalCar[]>([]);
@@ -200,6 +287,8 @@ export default function RentalsPage() {
   const [driverPreference, setDriverPreference] = useState<string>('Any');
   const [selectedTransmission, setSelectedTransmission] = useState<string>('All');
   
+  const [isLoading, setIsLoading] = useState(true);
+  
   // Booking modal state
   const [selectedCar, setSelectedCar] = useState<RentalCar | null>(null);
   const [bookingName, setBookingName] = useState<string>('');
@@ -209,7 +298,19 @@ export default function RentalsPage() {
   const [bookingSuccess, setBookingSuccess] = useState<boolean>(false);
 
   // Load inventory of cars combining base cars and custom admin-approved cars
-  const loadInventory = () => {
+  const loadInventory = async (forceFetch = false) => {
+    if (forceFetch) {
+      setIsLoading(true);
+    }
+
+    if (forceFetch) {
+      try {
+        await fetchRentalCars();
+      } catch (err) {
+        console.error('Failed to pre-fetch from Supabase:', err);
+      }
+    }
+
     // 1. Get specifically approved custom owner cars
     let approvedList: RentalCar[] = [];
     const savedApproved = localStorage.getItem('approved_cars');
@@ -254,22 +355,27 @@ export default function RentalsPage() {
       }
     }
 
-    setCars(uniqueCars);
+    // Active Conditional Rendering: exclude incomplete listings
+    const completeCars = uniqueCars.filter(isCarComplete);
+
+    setCars(completeCars);
+    setIsLoading(false);
   };
 
   // Load cars on mount
   useEffect(() => {
-    loadInventory();
+    loadInventory(true);
   }, []);
 
   // Listen for storage changes & custom events in case admin updates cars in same SPA thread or background
   useEffect(() => {
-    window.addEventListener('storage', loadInventory);
-    window.addEventListener('pending_cars_updated', loadInventory);
+    const handleStorageUpdate = () => loadInventory(false);
+    window.addEventListener('storage', handleStorageUpdate);
+    window.addEventListener('pending_cars_updated', handleStorageUpdate);
     
     return () => {
-      window.removeEventListener('storage', loadInventory);
-      window.removeEventListener('pending_cars_updated', loadInventory);
+      window.removeEventListener('storage', handleStorageUpdate);
+      window.removeEventListener('pending_cars_updated', handleStorageUpdate);
     };
   }, []);
 
@@ -426,12 +532,12 @@ export default function RentalsPage() {
         className="relative py-24 text-white overflow-hidden bg-cover bg-center"
         style={{ backgroundImage: "url('https://i.pinimg.com/1200x/aa/8c/59/aa8c59af08030bf767a16f053cb78d1c.jpg')" }}
       >
-        <div className="absolute inset-0 bg-gray-900/40"></div>
+        <div className="absolute inset-0 bg-slate-950/75"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <motion.p 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-[#FF7112]/90 font-extrabold tracking-widest text-xs uppercase mb-3"
+            className="text-orange-400 font-extrabold tracking-widest text-xs uppercase mb-3"
           >
             Premium Transport Fleet
           </motion.p>
@@ -446,7 +552,7 @@ export default function RentalsPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.1 }}
-            className="text-gray-400 max-w-xl mx-auto text-sm sm:text-base leading-relaxed"
+            className="text-slate-200 max-w-xl mx-auto text-sm sm:text-base leading-relaxed font-medium"
           >
             Learn to drive on public roads, pass your driver's licensing test, or enjoy comfortable weekend rentals in major Pakistani cities.
           </motion.p>
@@ -647,7 +753,13 @@ export default function RentalsPage() {
 
           {/* Cars Grid */}
           <div>
-            {filteredCars.length === 0 ? (
+            {isLoading ? (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {Array.from({ length: 6 }).map((_, idx) => (
+                  <RentalCarSkeleton key={`skeleton-${idx}`} />
+                ))}
+              </div>
+            ) : filteredCars.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-24 bg-white rounded-[2.5rem] border border-gray-200 text-center animate-fade-in shadow-sm px-6 max-w-2xl mx-auto my-8">
                 <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-6 text-gray-300">
                   <Car className="w-8 h-8" />

@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, FileText, CheckCircle2, AlertTriangle, Stethoscope, Download, ArrowRight, CreditCard, ChevronRight, FileBadge2, FileDown } from 'lucide-react';
+import { ShieldCheck, FileText, CheckCircle2, AlertTriangle, Stethoscope, Download, ArrowRight, CreditCard, ChevronRight, FileBadge2, FileDown, Printer, Share2 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { format } from 'date-fns';
 import QRCode from 'qrcode';
 
 const LICENSE_TYPES = [
-  { id: 'learner', name: 'Learner Permit', urduName: 'لرنر پرمٹ', desc: 'Required first step before regular license.' },
-  { id: 'regular', name: 'Fresh Regular License', urduName: 'نیا ریگولر لائسنس', desc: 'Permanent driving license (requires road test).' },
-  { id: 'renewal', name: 'License Renewal', urduName: 'لائسنس کی تجدید', desc: 'For renewing expired or close-to-expiry licenses.' },
-  { id: 'duplicate', name: 'Duplicate License', urduName: 'ڈپلیکیٹ لائسنس', desc: 'In case original license is lost or damaged.' },
-  { id: 'international', name: 'International License', urduName: 'بین الاقوامی لائسنس', desc: 'For driving outside Pakistan legally.' }
+  { id: 'learner', name: 'Learner Permit', urduName: 'لرنر پرمٹ', desc: 'Required first step before regular license.', urduDesc: 'ریگولر لائسنس حاصل کرنے سے پہلے ضروری پہلا مرحلہ۔' },
+  { id: 'regular', name: 'Fresh Regular License', urduName: 'نیا ریگولر لائسنس', desc: 'Permanent driving license (requires road test).', urduDesc: 'مستقل ڈرائیونگ لائسنس (روڈ ٹیسٹ پاس کرنا لازمی ہے)۔' },
+  { id: 'renewal', name: 'License Renewal', urduName: 'لائسنس کی تجدید', desc: 'For renewing expired or close-to-expiry licenses.', urduDesc: 'میعاد ختم شدہ یا جلد ختم ہونے والے لائسنس کی تجدید کے لیے۔' },
+  { id: 'duplicate', name: 'Duplicate License', urduName: 'ڈپلیکیٹ لائسنس', desc: 'In case original license is lost or damaged.', urduDesc: 'اصل لائسنس گم ہونے یا خراب ہونے کی صورت میں۔' },
+  { id: 'international', name: 'International License', urduName: 'بین الاقوامی لائسنس', desc: 'For driving outside Pakistan legally.', urduDesc: 'پاکستان سے باہر قانونی طور پر گاڑی چلانے کے لیے۔' }
 ];
 
 const VEHICLE_CATEGORIES = [
@@ -52,11 +52,81 @@ const DOC_TEMPLATES: Record<string, any[]>  = {
 };
 
 export default function DLIMSDocsAssistant() {
+  const [language, setLanguage] = useState<'en' | 'ur'>('en');
   const [selectedType, setSelectedType] = useState('learner');
   const [selectedCat, setSelectedCat] = useState('car_jeep');
   const [userAge, setUserAge] = useState(24);
   const [checkedDocs, setCheckedDocs] = useState<Record<number, boolean>>({});
   const [showMedicalModal, setShowMedicalModal] = useState(false);
+
+  const DICTIONARY = {
+    en: {
+      portalBadge: "DLIMS Punjab License Portal",
+      title: "DLIMS Document & Fee Assistant",
+      subtitle: "Select your requirements below to calculate exact DLIMS fees and prepare a custom, interactive document checklist before visiting your local licensing center.",
+      step1: "What Type of License Do You Need?",
+      step2: "Vehicle Category",
+      step3: "Applicant Age",
+      step4: "Interactive Document Checklist",
+      prepared: "Prepared",
+      yearsOld: "Years Old",
+      underageTitle: "Underage Alert:",
+      underageDesc: "Minimal age eligibility is 18 years for Cars/Motorcycles under Punjab traffic laws.",
+      medicalTitle: "Medical Required:",
+      medicalDesc: "Applicants over 50 years are legally required to submit a verified Doctor Fitness Form-B.",
+      htvTitle: "HTV Alert:",
+      htvDesc: "Candidates must be at least 22 years of age and hold a regular LTV for 3 years to apply for heavy commercial classes.",
+      downloadBlank: "Download Blank Form-B",
+      assessmentTitle: "Official Fee Assessment",
+      govtFee: "Govt License Fee",
+      courierFee: "Govt Delivery/Courier",
+      testFee: "Sign & Road Test Ticket",
+      totalAmount: "Estimated Total Amount",
+      disclaimer: "This estimate reflects the revised DLIMS Punjab 2.0 schedule. Keep matching tickets ready.",
+      downloadPdf: "Download PDF Summary",
+      verifyWebsite: "Verify On DLIMS Website",
+      shareWhatsapp: "Share on WhatsApp",
+      printChecklist: "Print Checklist",
+      feeNotes: "*Fee structures are automatically sourced from the official DLIMS Punjab schedule. Keep your original CNIC on hand.",
+      profileTitle: "Applicant Profile",
+      feeAssessment: "Official Fee Assessment",
+      mandatoryDocs: "Mandatory Documents Checklist"
+    },
+    ur: {
+      portalBadge: "ڈی ایل آئی ایم ایس پنجاب لائسنس پورٹل",
+      title: "ڈی ایل آئی ایم ایس دستاویزات اور فیس اسسٹنٹ",
+      subtitle: "سرکاری فیس کا حساب لگانے اور اپنے لائسنسنگ سنٹر جانے سے پہلے شناختی دستاویزات کی لسٹ تیار کرنے کے لیے نیچے دیے گئے آپشنز منتخب کریں۔",
+      step1: "آپ کو کس قسم کا لائسنس چاہیے؟",
+      step2: "گاڑی کی کیٹیگری",
+      step3: "امیدوار کی عمر",
+      step4: "انٹرایکٹو شناختی دستاویزات کی لسٹ",
+      prepared: "تیار شدہ",
+      yearsOld: "سال",
+      underageTitle: "کم عمر الرٹ:",
+      underageDesc: "پنجاب ٹریفک قوانین کے تحت کار یا موٹر سائیکل کے لیے کم از کم عمر 18 سال ہونا لازمی ہے۔",
+      medicalTitle: "میڈیکل فٹنس لازمی:",
+      medicalDesc: "50 سال سے زائد عمر کے امیدواروں کے لیے تصدیق شدہ میڈیکل فٹنس فارم-بی جمع کروانا قانونی طور پر لازمی ہے۔",
+      htvTitle: "ایچ ٹی وی (ہیوی) الرٹ:",
+      htvDesc: "ہیوی کمرشل لائسنس کے لیے امیدوار کی عمر کم از کم 22 سال ہونی چاہیے اور 3 سال پرانا ایل ٹی وی لائسنس ہونا لازمی ہے۔",
+      downloadBlank: "میڈیکل فارم-بی ڈاؤن لوڈ کریں",
+      assessmentTitle: "سرکاری فیس کا حساب",
+      govtFee: "سرکاری لائسنس فیس",
+      courierFee: "ڈلیوری اور کورئیر فیس",
+      testFee: "سائن اور روڈ ٹیسٹ چارجز",
+      totalAmount: "کل تخمینہ شدہ رقم",
+      disclaimer: "یہ تخمینہ نئے ڈی ایل آئی ایم ایس شیڈول کے مطابق ہے۔ اصل دستاویزات ساتھ رکھیں۔",
+      downloadPdf: "پی ڈی ایف خلاصہ ڈاؤن لوڈ کریں",
+      verifyWebsite: "سرکاری ویب سائٹ پر تصدیق کریں",
+      shareWhatsapp: "واٹس ایپ پر شیئر کریں",
+      printChecklist: "فہرست پرنٹ کریں",
+      feeNotes: "*فیس کا ڈھانچہ سرکاری طور پر ڈی ایل آئی ایم ایس پنجاب شیڈول سے لیا گیا ہے۔ اپنا اصل شناختی کارڈ ساتھ رکھیں۔",
+      profileTitle: "امیدوار کا پروفائل",
+      feeAssessment: "سرکاری فیس کی تفصیلات",
+      mandatoryDocs: "ضروری دستاویزات کی فہرست"
+    }
+  };
+
+  const t = DICTIONARY[language];
 
   // DLIMS Punjab Fixed Delivery/Courier & Processing Fee
   const COURIER_FEE = 480;
@@ -154,6 +224,36 @@ export default function DLIMSDocsAssistant() {
 
   const completedCount = Object.values(checkedDocs).filter(Boolean).length;
   const progressPercent = currentDocs.length > 0 ? Math.round((completedCount / currentDocs.length) * 100) : 0;
+
+  const getWhatsAppShareLink = () => {
+    const typeObj = LICENSE_TYPES.find(t => t.id === selectedType);
+    const catObj = VEHICLE_CATEGORIES.find(c => c.id === selectedCat);
+    
+    const docBullets = currentDocs.map((d, index) => {
+      const isChecked = !!checkedDocs[index];
+      const checkMarker = isChecked ? '✅ [READY]' : '⬜ [PENDING]';
+      const detail = `${d.text} / ${d.urduText}`;
+      return `${checkMarker} ${detail}`;
+    }).join('\n');
+
+    const totalStr = `Rs. ${fees.total.toLocaleString()}/-`;
+    const message = `*📋 GoDriveify DLIMS CHECKLIST*\n` +
+                    `-----------------------------\n` +
+                    `👤 *Applicant Profile:*\n` +
+                    `• License Type: ${typeObj?.name} (${typeObj?.urduName})\n` +
+                    `• Vehicle: ${catObj?.name} (${catObj?.urduName})\n` +
+                    `• Age: ${userAge} ${language === 'ur' ? 'سال' : 'Years'}\n\n` +
+                    `💰 *Fee Breakdown (PKR):*\n` +
+                    `• Govt License Fee: Rs. ${fees.govt.toLocaleString()}\n` +
+                    (fees.courier > 0 ? `• Courier/Delivery: Rs. ${fees.courier.toLocaleString()}\n` : '') +
+                    (fees.test > 0 ? `• Sign/Road Test Fee: Rs. ${fees.test.toLocaleString()}\n` : '') +
+                    `• *Total Estimated: Rs. ${fees.total.toLocaleString()} /-*\n\n` +
+                    `📄 *Documents Checklist:*\n` +
+                    `${docBullets}\n\n` +
+                    `Generated via GoDriveify Marketplace Document Assistant. Join GoDriveify Driving School to pass your DLIMS road tests flawlessly!`;
+                    
+    return `https://wa.me/?text=${encodeURIComponent(message)}`;
+  };
 
   const handleDownloadPDF = async () => {
     const doc = new jsPDF();
@@ -351,24 +451,75 @@ export default function DLIMSDocsAssistant() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto my-16 px-6" id="dlims-assistant">
+    <div className="max-w-6xl mx-auto my-16 px-6 relative" id="dlims-assistant">
+      {/* Printable visibility style override */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @media print {
+          body * {
+            visibility: hidden;
+          }
+          #printable-checklist, #printable-checklist * {
+            visibility: visible;
+          }
+          #printable-checklist {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            background: white !important;
+            color: black !important;
+            padding: 24px !important;
+          }
+          .no-print {
+            display: none !important;
+          }
+        }
+      `}} />
+
+      {/* Language Toggle */}
+      <div className="flex justify-center mb-6 no-print">
+        <div className="inline-flex p-1 bg-slate-100 rounded-2xl border border-slate-200/60 shadow-inner">
+          <button
+            type="button"
+            onClick={() => setLanguage('en')}
+            className={`px-4.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+              language === 'en'
+                ? 'bg-[#002060] text-white shadow-md'
+                : 'text-slate-600 hover:text-[#002060]'
+            }`}
+          >
+            English
+          </button>
+          <button
+            type="button"
+            onClick={() => setLanguage('ur')}
+            className={`px-4.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+              language === 'ur'
+                ? 'bg-[#002060] text-white shadow-md'
+                : 'text-slate-600 hover:text-[#002060]'
+            }`}
+          >
+            اردو (Urdu)
+          </button>
+        </div>
+      </div>
       
       {/* Header Block */}
       <div className="text-center mb-12">
         <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-[#FF7112] bg-[#FF7112]/10 px-4 py-2 rounded-full border border-[#FF7112]/20 mb-4 shadow-sm">
           <ShieldCheck className="w-3.5 h-3.5" />
-          DLIMS Punjab License Portal
+          {t.portalBadge}
         </span>
         <h2 className="text-3xl lg:text-5xl font-black text-[#002060] mt-3 leading-tight tracking-tight">
-          DLIMS Document & Fee Assistant
+          {t.title}
         </h2>
         <p className="text-slate-500 max-w-2xl mx-auto mt-4 text-sm leading-relaxed font-medium">
-          Select your requirements below to calculate exact DLIMS fees and prepare a custom, interactive document checklist before visiting your local licensing center.
+          {t.subtitle}
         </p>
       </div>
 
       {/* Main Interactive Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 bg-gradient-to-br from-white via-slate-50/50 to-slate-100/50 border border-slate-200/60 rounded-[2.5rem] p-6 lg:p-10 shadow-2xl relative">
+      <div id="printable-checklist" className="grid grid-cols-1 lg:grid-cols-12 gap-8 bg-gradient-to-br from-white via-slate-50/50 to-slate-100/50 border border-slate-200/60 rounded-[2.5rem] p-6 lg:p-10 shadow-2xl relative">
         
         {/* Left Interactive Selection Panel (col-span-7) */}
         <div className="lg:col-span-7 space-y-8">
@@ -377,14 +528,14 @@ export default function DLIMSDocsAssistant() {
           <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
             <label className="flex items-center gap-2 text-xs font-black text-[#002060] uppercase tracking-widest mb-4">
               <span className="bg-[#002060] text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">1</span>
-              What Type of License Do You Need? <span className="text-[#FF7112] font-bold text-[10px] bg-[#FF7112]/10 px-2 py-0.5 rounded-md">(لائسنس کی قسم)</span>
+              {t.step1}
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {LICENSE_TYPES.map((type) => (
                 <button
                   key={type.id}
                   onClick={() => setSelectedType(type.id)}
-                  className={`p-4 rounded-2xl border text-left transition-all duration-300 relative overflow-hidden group ${
+                  className={`p-4 rounded-2xl border text-left transition-all duration-300 relative overflow-hidden group cursor-pointer ${
                     selectedType === type.id
                       ? 'border-[#002060] bg-[#002060] text-white shadow-lg scale-[1.02]'
                       : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 hover:shadow-md'
@@ -393,14 +544,14 @@ export default function DLIMSDocsAssistant() {
                   <div className="flex justify-between items-center mb-1.5 relative z-10">
                     <span className="font-extrabold text-sm flex items-center gap-2">
                        {selectedType === type.id && <CheckCircle2 className="w-4 h-4 text-[#FF7112]" />}
-                       {type.name}
+                       {language === 'ur' ? type.urduName : type.name}
                     </span>
                     <span className={`text-[11px] font-bold ${selectedType === type.id ? 'text-orange-400' : 'text-slate-400'}`}>
-                      {type.urduName}
+                      {language === 'ur' ? type.name : type.urduName}
                     </span>
                   </div>
                   <p className={`text-[11px] leading-relaxed relative z-10 ${selectedType === type.id ? 'text-slate-200' : 'text-slate-500'}`}>
-                    {type.desc}
+                    {language === 'ur' ? type.urduDesc : type.desc}
                   </p>
                   
                   {/* Active background subtle glow */}
@@ -419,14 +570,14 @@ export default function DLIMSDocsAssistant() {
             <div>
               <label className="flex items-center gap-2 text-xs font-black text-[#002060] uppercase tracking-widest mb-4">
                 <span className="bg-[#002060] text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">2</span>
-                Vehicle Category <span className="text-[#FF7112] font-bold text-[10px] bg-[#FF7112]/10 px-2 py-0.5 rounded-md">(کیٹیگری)</span>
+                {t.step2}
               </label>
               <div className="space-y-2.5">
                 {VEHICLE_CATEGORIES.map((cat) => (
                   <button
                     key={cat.id}
                     onClick={() => setSelectedCat(cat.id)}
-                    className={`w-full p-4 rounded-2xl border flex justify-between items-center transition-all duration-300 ${
+                    className={`w-full p-4 rounded-2xl border flex justify-between items-center transition-all duration-300 cursor-pointer ${
                       selectedCat === cat.id
                         ? 'border-[#FF7112] bg-[#FF7112]/10 text-[#FF7112] font-bold shadow-md scale-[1.02]'
                         : 'border-slate-200 bg-slate-50/50 text-slate-700 hover:bg-slate-100 hover:border-slate-300'
@@ -434,9 +585,9 @@ export default function DLIMSDocsAssistant() {
                   >
                     <span className="text-sm font-extrabold flex items-center gap-2">
                        {selectedCat === cat.id && <ChevronRight className="w-4 h-4 text-[#FF7112]" />}
-                       {cat.name}
+                       {language === 'ur' ? cat.urduName : cat.name}
                     </span>
-                    <span className={`text-[11px] font-bold ${selectedCat === cat.id ? 'text-[#FF7112]' : 'text-slate-400'}`}>{cat.urduName}</span>
+                    <span className={`text-[11px] font-bold ${selectedCat === cat.id ? 'text-[#FF7112]' : 'text-slate-400'}`}>{language === 'ur' ? cat.name : cat.urduName}</span>
                   </button>
                 ))}
               </div>
@@ -447,9 +598,9 @@ export default function DLIMSDocsAssistant() {
               <div className="relative z-10">
                 <label className="flex items-center gap-2 text-xs font-black text-[#002060] uppercase tracking-widest mb-4">
                   <span className="bg-[#002060] text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">3</span>
-                  Applicant Age <span className="text-[#FF7112] font-bold text-[10px] bg-[#FF7112]/10 px-2 py-0.5 rounded-md">(عمر)</span>
+                  {t.step3} <span className="text-[#FF7112] font-bold text-[10px] bg-[#FF7112]/10 px-2 py-0.5 rounded-md">({userAge} {t.yearsOld})</span>
                 </label>
-                <div className="flex items-center gap-4 bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
+                <div className="flex items-center gap-4 bg-white p-3 rounded-2xl border border-slate-200 shadow-sm no-print">
                   <input
                     type="number"
                     min="15"
@@ -477,8 +628,8 @@ export default function DLIMSDocsAssistant() {
                   <div className="p-4 bg-red-50 border-l-4 border-red-500 rounded-r-xl rounded-l-sm text-red-900 text-xs leading-relaxed flex gap-3 shadow-sm">
                     <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
                     <p>
-                      <strong className="block mb-1 text-red-800">Underage Alert:</strong>
-                      Minimal age eligibility is 18 years for Cars/Motorcycles under Punjab traffic laws.
+                      <strong className="block mb-1 text-red-800">{t.underageTitle}</strong>
+                      {t.underageDesc}
                     </p>
                   </div>
                 )}
@@ -486,8 +637,8 @@ export default function DLIMSDocsAssistant() {
                   <div className="p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-xl rounded-l-sm text-amber-900 text-xs leading-relaxed flex gap-3 shadow-sm animate-in fade-in slide-in-from-bottom-2">
                     <Stethoscope className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                     <p>
-                      <strong className="block mb-1 text-amber-800">Medical Required:</strong>
-                      Applicants over 50 years are legally required to submit a verified Doctor Fitness Form-B.
+                      <strong className="block mb-1 text-amber-800">{t.medicalTitle}</strong>
+                      {t.medicalDesc}
                     </p>
                   </div>
                 )}
@@ -495,8 +646,8 @@ export default function DLIMSDocsAssistant() {
                   <div className="p-4 bg-red-50 border-l-4 border-red-500 rounded-r-xl rounded-l-sm text-red-900 text-xs leading-relaxed flex gap-3 shadow-sm animate-in fade-in slide-in-from-bottom-2">
                     <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
                     <p>
-                      <strong className="block mb-1 text-red-800">HTV Alert:</strong>
-                      Candidates must be at least 22 years of age and hold a regular LTV for 3 years to apply for heavy commercial classes.
+                      <strong className="block mb-1 text-red-800">{t.htvTitle}</strong>
+                      {t.htvDesc}
                     </p>
                   </div>
                 )}
@@ -509,12 +660,12 @@ export default function DLIMSDocsAssistant() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-5 gap-4">
               <label className="flex items-center gap-2 text-xs font-black text-[#002060] uppercase tracking-widest">
                 <span className="bg-[#002060] text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">4</span>
-                Interactive Document Checklist <span className="text-[#FF7112] font-bold text-[10px] bg-[#FF7112]/10 px-2 py-0.5 rounded-md">(دستاویزات کی لسٹ)</span>
+                {t.step4}
               </label>
               <div className="bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100 flex items-center gap-2">
                  <FileBadge2 className="w-4 h-4 text-emerald-600" />
                  <span className="text-xs font-black text-emerald-700">
-                  Prepared: {completedCount} / {currentDocs.length}
+                  {t.prepared}: {completedCount} / {currentDocs.length}
                  </span>
               </div>
             </div>
@@ -554,8 +705,12 @@ export default function DLIMSDocsAssistant() {
                     {/* Checklist details */}
                     <div className="flex-1">
                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-                        <span className={`text-sm font-bold transition-colors ${isChecked ? 'text-emerald-900' : 'text-slate-800'}`}>{doc.text}</span>
-                        <span className="text-[11px] text-slate-500 font-bold bg-white/50 px-2 py-1 rounded border border-slate-100">{doc.urduText}</span>
+                        <span className={`text-sm font-bold transition-colors ${isChecked ? 'text-emerald-900' : 'text-slate-800'}`}>
+                          {language === 'ur' ? doc.urduText : doc.text}
+                        </span>
+                        <span className="text-[11px] text-slate-500 font-bold bg-white/50 px-2 py-1 rounded border border-slate-100">
+                          {language === 'ur' ? doc.text : doc.urduText}
+                        </span>
                       </div>
                       
                       {/* Special Action downloads for Form B */}
@@ -569,7 +724,7 @@ export default function DLIMSDocsAssistant() {
                           className="inline-flex items-center gap-2 mt-3 text-[11px] font-black uppercase text-orange-700 bg-orange-100 hover:bg-[#FF7112] hover:text-white px-3 py-1.5 rounded-lg transition-colors shadow-sm"
                         >
                           <Download className="w-3.5 h-3.5" />
-                          Download Blank Form-B
+                          {t.downloadBlank}
                         </button>
                       )}
                     </div>
@@ -592,7 +747,7 @@ export default function DLIMSDocsAssistant() {
               <div className="bg-white/10 p-2 rounded-xl backdrop-blur-sm">
                 <CreditCard className="w-6 h-6 text-emerald-400" />
               </div>
-              Official Fee Assessment
+              {t.assessmentTitle}
             </h3>
 
             {/* Fee itemization breakdowns */}
@@ -601,7 +756,7 @@ export default function DLIMSDocsAssistant() {
               {/* Govt License Processing Fee */}
               <div className="flex justify-between items-center text-sm border-b border-white/5 pb-3">
                 <div>
-                  <span className="block text-slate-300 font-bold">Govt License Fee</span>
+                  <span className="block text-slate-300 font-bold">{t.govtFee}</span>
                   <span className="text-[11px] text-slate-400 font-medium">سرکاری لائسنس فیس</span>
                 </div>
                 <span className="font-black tracking-wider text-slate-100 text-lg">Rs. {fees.govt.toLocaleString()}</span>
@@ -611,7 +766,7 @@ export default function DLIMSDocsAssistant() {
               {fees.courier > 0 && (
                 <div className="flex justify-between items-center text-sm border-b border-white/5 pb-3">
                   <div>
-                    <span className="block text-slate-300 font-bold">Govt Delivery/Courier</span>
+                    <span className="block text-slate-300 font-bold">{t.courierFee}</span>
                     <span className="text-[11px] text-slate-400 font-medium">ڈلیوری اور کورئیر فیس</span>
                   </div>
                   <span className="font-black tracking-wider text-slate-100 text-lg">Rs. {fees.courier.toLocaleString()}</span>
@@ -622,7 +777,7 @@ export default function DLIMSDocsAssistant() {
               {fees.test > 0 && (
                 <div className="flex justify-between items-center text-sm border-b border-white/5 pb-3">
                   <div>
-                    <span className="block text-slate-300 font-bold">Sign & Road Test Ticket</span>
+                    <span className="block text-slate-300 font-bold">{t.testFee}</span>
                     <span className="text-[11px] text-slate-400 font-medium">ٹیسٹ فائل ٹکٹ چارجز</span>
                   </div>
                   <span className="font-black tracking-wider text-slate-100 text-lg">Rs. {fees.test.toLocaleString()}</span>
@@ -635,14 +790,14 @@ export default function DLIMSDocsAssistant() {
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center my-8 backdrop-blur-md relative group">
               <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl pointer-events-none" />
               <span className="text-xs text-[#FF7112] font-black tracking-widest uppercase block mb-2">
-                Estimated Total Amount
+                {t.totalAmount}
               </span>
               <span className="text-4xl lg:text-5xl font-black text-emerald-400 tracking-tighter drop-shadow-lg">
                 Rs. {fees.total.toLocaleString()}
               </span>
               <span className="text-xl text-emerald-400/80 font-bold ml-1">/-</span>
               <p className="text-[11px] text-slate-400 font-medium leading-relaxed mt-4">
-                This estimate reflects the revised DLIMS Punjab 2.0 schedule. Keep matching tickets ready.
+                {t.disclaimer}
               </p>
             </div>
 
@@ -652,23 +807,39 @@ export default function DLIMSDocsAssistant() {
           <div className="mt-4 pt-6 border-t border-white/10 text-center z-10 flex flex-col gap-3">
              <button
               onClick={handleDownloadPDF}
-              className="group inline-flex w-full items-center justify-center gap-3 bg-white text-[#002060] font-black py-4 rounded-xl shadow-xl transition-all duration-300 text-sm uppercase tracking-wider relative overflow-hidden hover:-translate-y-1 hover:bg-slate-50"
+              className="group inline-flex w-full items-center justify-center gap-3 bg-white text-[#002060] font-black py-4 rounded-xl shadow-xl transition-all duration-300 text-sm uppercase tracking-wider relative overflow-hidden hover:-translate-y-1 hover:bg-slate-50 cursor-pointer no-print"
             >
               <FileDown className="w-5 h-5 text-[#FF7112] bg-[#FF7112]/10 p-1 rounded-md" />
-              Download PDF Summary
+              {t.downloadPdf}
+            </button>
+            <a
+              href={getWhatsAppShareLink()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex w-full items-center justify-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-xl shadow-xl shadow-emerald-600/20 transition-all duration-300 text-sm uppercase tracking-wider relative overflow-hidden hover:-translate-y-1 cursor-pointer no-print"
+            >
+              <Share2 className="w-5 h-5" />
+              {t.shareWhatsapp}
+            </a>
+            <button
+              onClick={() => window.print()}
+              className="group inline-flex w-full items-center justify-center gap-3 bg-slate-800 hover:bg-slate-700 text-white font-black py-4 rounded-xl shadow-xl transition-all duration-300 text-sm uppercase tracking-wider relative overflow-hidden hover:-translate-y-1 cursor-pointer no-print"
+            >
+              <Printer className="w-5 h-5" />
+              {t.printChecklist}
             </button>
             <a
               href="https://dlims.punjab.gov.pk"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex w-full items-center justify-center gap-3 bg-[#FF7112] hover:bg-orange-500 text-white font-black py-4 rounded-xl shadow-xl shadow-[#FF7112]/20 transition-all duration-300 text-sm uppercase tracking-wider relative overflow-hidden hover:-translate-y-1"
+              className="group inline-flex w-full items-center justify-center gap-3 bg-[#FF7112] hover:bg-orange-500 text-white font-black py-4 rounded-xl shadow-xl shadow-[#FF7112]/20 transition-all duration-300 text-sm uppercase tracking-wider relative overflow-hidden hover:-translate-y-1 cursor-pointer no-print"
             >
-              Verify On DLIMS Website
+              {t.verifyWebsite}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
             </a>
             <span className="text-[10px] text-slate-400 block mt-4 leading-relaxed max-w-xs mx-auto">
-              *Fee structures are automatically sourced from the official DLIMS Punjab schedule. Keep your original CNIC on hand.
+              {t.feeNotes}
             </span>
           </div>
 
@@ -686,7 +857,7 @@ export default function DLIMSDocsAssistant() {
               </div>
               <button
                 onClick={() => setShowMedicalModal(false)}
-                className="text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 w-8 h-8 rounded-full flex items-center justify-center font-black transition-colors"
+                className="text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 w-8 h-8 rounded-full flex items-center justify-center font-black transition-colors cursor-pointer"
                 aria-label="Close modal"
               >
                 &times;
@@ -694,21 +865,23 @@ export default function DLIMSDocsAssistant() {
             </div>
 
             <h3 className="text-xl font-black text-[#002060] mb-3">
-              Download Fitness Form-B
+              {language === 'ur' ? "میڈیکل فٹنس فارم-بی حاصل کریں" : "Download Fitness Form-B"}
             </h3>
 
             <p className="text-sm text-slate-600 leading-relaxed mb-6 font-medium">
-              To proceed with DLIMS regular applications (above 50 years of age) or commercial HTV classes, please download, print, and get this physical assessment form stamped by a registered medical practitioner (PMDC).
+              {language === 'ur' 
+                ? "50 سال سے زائد عمر کے امیدواروں یا ایچ ٹی وی ہیوی لائسنس کے لیے ضروری ہے کہ وہ اس فارم کو ڈاؤن لوڈ اور پرنٹ کر کے کسی رجسٹرڈ میڈیکل ڈاکٹر سے تصدیق کروائیں۔"
+                : "To proceed with DLIMS regular applications (above 50 years of age) or commercial HTV classes, please download, print, and get this physical assessment form stamped by a registered medical practitioner (PMDC)."}
             </p>
 
             <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-3 text-sm text-slate-700 mb-8 shadow-inner">
               <p className="flex justify-between items-center border-b border-slate-200 pb-3">
-                <span className="font-medium">1. Primary checkups:</span>
-                <strong className="text-slate-900 bg-white px-2 py-1 rounded shadow-sm">Eye-sight & Colorblindness</strong>
+                <span className="font-medium">{language === 'ur' ? "1. بنیادی معائنہ:" : "1. Primary checkups:"}</span>
+                <strong className="text-slate-900 bg-white px-2 py-1 rounded shadow-sm">{language === 'ur' ? "نظر اور کلر بلائنڈنیس" : "Eye-sight & Colorblindness"}</strong>
               </p>
               <p className="flex justify-between items-center pt-1">
-                <span className="font-medium">2. Authorized Doctors:</span>
-                <strong className="text-slate-900 bg-white px-2 py-1 rounded shadow-sm">Govt / PMDC Doctor</strong>
+                <span className="font-medium">{language === 'ur' ? "2. مجاز ڈاکٹرز:" : "2. Authorized Doctors:"}</span>
+                <strong className="text-slate-900 bg-white px-2 py-1 rounded shadow-sm">{language === 'ur' ? "سرکاری یا رجسٹرڈ ڈاکٹر" : "Govt / PMDC Doctor"}</strong>
               </p>
             </div>
 
@@ -717,16 +890,16 @@ export default function DLIMSDocsAssistant() {
                 href="https://dlims.punjab.gov.pk/assets/form/Form_B.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex w-full items-center justify-center gap-2 bg-[#FF7112] hover:bg-[#E05A00] text-white font-bold py-3.5 rounded-xl text-sm transition-colors shadow-lg shadow-orange-500/20"
+                className="flex w-full items-center justify-center gap-2 bg-[#FF7112] hover:bg-[#E05A00] text-white font-bold py-3.5 rounded-xl text-sm transition-colors shadow-lg shadow-orange-500/20 cursor-pointer"
               >
                 <Download className="w-4 h-4" />
-                Get Official PDF Link
+                {language === 'ur' ? "سرکاری لنک کھولیں" : "Get Official PDF Link"}
               </a>
               <button
                 onClick={() => setShowMedicalModal(false)}
-                className="flex w-full items-center justify-center bg-white border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-3 rounded-xl text-sm transition-colors"
+                className="flex w-full items-center justify-center bg-white border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-3 rounded-xl text-sm transition-colors cursor-pointer"
               >
-                Cancel and close
+                {language === 'ur' ? "منسوخ کریں" : "Cancel and close"}
               </button>
             </div>
           </div>

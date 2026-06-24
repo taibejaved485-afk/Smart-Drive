@@ -97,7 +97,7 @@ export interface DbCustomerRequest {
 async function tableExists(tableName: string): Promise<boolean> {
   if (!supabase) return false;
   try {
-    const { error } = await supabase.from(tableName).select('id').limit(1);
+    const { error } = await supabase.from(tableName).select('*').limit(1);
     if (error) {
       if (error.code === 'P0001') {
         console.warn(`[Supabase] Table "${tableName}" does not exist or has SQL error (P0001).`);
@@ -108,6 +108,7 @@ async function tableExists(tableName: string): Promise<boolean> {
         return false;
       }
       console.error(`[Supabase] Unexpected error checking table "${tableName}":`, error);
+      return false; // Safely return false if table access fails for any reason
     }
     return true;
   } catch (err) {
@@ -769,3 +770,145 @@ function normalizeDbRequest(item: any): any {
     createdAt: item.created_at
   };
 }
+
+// -------------------------------------------------------------------------
+// 5. SYSTEM METADATA STATS OPERATIONS
+// -------------------------------------------------------------------------
+
+export interface DbSystemMetadata {
+  key: string;
+  value: string;
+  updated_at?: string;
+}
+
+const DEFAULT_METADATA: Record<string, string> = {
+  years_active: '8',
+  students_trained: '4500+',
+  certified_instructors: '25',
+  happy_reviews: '150+'
+};
+
+export async function fetchSystemMetadata(): Promise<Record<string, string>> {
+  // Load local cache or default first
+  const localSaved = localStorage.getItem('system_metadata');
+  let currentMetadata = localSaved ? JSON.parse(localSaved) : { ...DEFAULT_METADATA };
+
+  if (supabase) {
+    try {
+      const active = await tableExists('system_metadata');
+      if (active) {
+        const { data, error } = await supabase
+          .from('system_metadata')
+          .select('key, value');
+
+        if (!error && data) {
+          const dbMetadata: Record<string, string> = {};
+          // Initialize with default values, override with database values
+          Object.assign(dbMetadata, DEFAULT_METADATA);
+          data.forEach((row: { key: string; value: string }) => {
+            dbMetadata[row.key] = row.value;
+          });
+          
+          localStorage.setItem('system_metadata', JSON.stringify(dbMetadata));
+          window.dispatchEvent(new Event('system_metadata_updated'));
+          return dbMetadata;
+        }
+      }
+    } catch (e) {
+      console.error('Supabase fetchSystemMetadata failed, using cached / default metrics', e);
+    }
+  }
+
+  return currentMetadata;
+}
+
+export async function updateSystemMetadata(key: string, value: string): Promise<boolean> {
+  const localSaved = localStorage.getItem('system_metadata');
+  const currentMetadata = localSaved ? JSON.parse(localSaved) : { ...DEFAULT_METADATA };
+  currentMetadata[key] = value;
+  
+  localStorage.setItem('system_metadata', JSON.stringify(currentMetadata));
+  window.dispatchEvent(new Event('system_metadata_updated'));
+  window.dispatchEvent(new Event('storage'));
+
+  if (supabase) {
+    try {
+      const active = await tableExists('system_metadata');
+      if (active) {
+        const { error } = await supabase
+          .from('system_metadata')
+          .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+        
+        if (!error) {
+          return true;
+        } else {
+          console.warn('Supabase upsert system_metadata error, fallback is active:', error.message);
+        }
+      }
+    } catch (e) {
+      console.error('Supabase updateSystemMetadata failed, saved to LocalStorage', e);
+    }
+  }
+  return true;
+}
+
+// -------------------------------------------------------------------------
+// 6. STORAGE BUCKET OPERATIONS FOR CAR LISTING IMAGES
+// -------------------------------------------------------------------------
+
+/**
+ * Uploads a file to the 'car-listings' Supabase storage bucket.
+ * Automatically handles bucket creation if needed, and falls back to base64 if Supabase is offline.
+ */
+export async function uploadCarImage(file: File): Promise<string> {
+  if (supabase) {
+    try {
+      // 1. Attempt to ensure 'car-listings' bucket exists
+      try {
+        await supabase.storage.createBucket('car-listings', {
+          public: true,
+          fileSizeLimit: 5242880, // 5MB
+          allowedMimeTypes: ['image/*']
+        });
+      } catch (bucketErr) {
+        // Bucket might already exist, safe to ignore
+      }
+
+      // 2. Upload file with unique path
+      const uniqueName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+      const { data, error } = await supabase.storage
+        .from('car-listings')
+        .upload(uniqueName, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (!error && data) {
+        // 3. Retrieve public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('car-listings')
+          .getPublicUrl(uniqueName);
+        
+        return publicUrl;
+      } else {
+        console.warn('Supabase storage upload error, falling back to base64 reader:', error?.message);
+      }
+    } catch (e) {
+      console.error('Supabase storage upload failed:', e);
+    }
+  }
+
+  // Fallback: Read file as Base64 DataURL (so it works perfectly in local mode too)
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      resolve(reader.result as string);
+    };
+    reader.onerror = () => {
+      reject(new Error('Failed to read file as base64 fallback'));
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+
