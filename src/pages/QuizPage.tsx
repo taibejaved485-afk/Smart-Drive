@@ -19,26 +19,100 @@ const quizData = [
     ],
     hint: "Think about physical stopping distance and reaction time at high speeds.",
     graphic: (
-      <svg viewBox="0 0 160 80" className="w-full h-24 max-w-[200px] mx-auto drop-shadow-sm" xmlns="http://www.w3.org/2000/svg">
-        <rect x="0" y="25" width="160" height="30" fill="#334155" />
-        <line x1="0" y1="40" x2="160" y2="40" stroke="#fef08a" strokeWidth="1.5" strokeDasharray="5,5" />
-        {/* Leading car */}
-        <g transform="translate(100, 30)">
-          <rect x="0" y="0" width="22" height="12" fill="#002060" rx="2" />
-          <rect x="14" y="2" width="6" height="8" fill="#bae6fd" />
-          <circle cx="4" cy="1" r="1.5" fill="#fecaca" />
-          <circle cx="4" cy="11" r="1.5" fill="#fecaca" />
+      <svg viewBox="0 0 160 85" className="w-full h-28 max-w-[220px] mx-auto drop-shadow-md rounded-xl" xmlns="http://www.w3.org/2000/svg">
+        {/* Definition for gradients to create glossy/realistic car paint and road textures */}
+        <defs>
+          <linearGradient id="roadGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#1e293b" />
+            <stop offset="50%" stopColor="#111827" />
+            <stop offset="100%" stopColor="#0f172a" />
+          </linearGradient>
+          <linearGradient id="blueCarGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#0284c7" />
+            <stop offset="40%" stopColor="#0ea5e9" />
+            <stop offset="100%" stopColor="#0369a1" />
+          </linearGradient>
+          <linearGradient id="redCarGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#dc2626" />
+            <stop offset="40%" stopColor="#ef4444" />
+            <stop offset="100%" stopColor="#991b1b" />
+          </linearGradient>
+          <linearGradient id="glassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#e0f2fe" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#bae6fd" stopOpacity="0.5" />
+          </linearGradient>
+        </defs>
+
+        {/* Realistic textured asphalt road */}
+        <rect x="0" y="22" width="160" height="36" fill="url(#roadGrad)" />
+        <rect x="0" y="20" width="160" height="2" fill="#475569" /> {/* Shoulder border */}
+        <rect x="0" y="58" width="160" height="2" fill="#475569" /> {/* Shoulder border */}
+        <line x1="0" y1="40" x2="160" y2="40" stroke="#fef08a" strokeWidth="2" strokeDasharray="6,4" />
+
+        {/* Leading car (Blue Sedan) - Detailed realistic top-down */}
+        <g transform="translate(105, 29)">
+          {/* Shadow */}
+          <rect x="-1" y="1" width="28" height="15" fill="#020617" opacity="0.4" rx="3.5" />
+          {/* Main Body */}
+          <rect x="0" y="0" width="28" height="15" fill="url(#blueCarGrad)" rx="3" />
+          {/* Glossy Windshield */}
+          <path d="M 18,2 L 23,4 L 23,11 L 18,13 Z" fill="url(#glassGrad)" />
+          {/* Rear Window */}
+          <path d="M 4,2 L 8,3 L 8,12 L 4,13 Z" fill="url(#glassGrad)" />
+          {/* Side Mirrors */}
+          <rect x="17" y="-2" width="2" height="2" fill="#0369a1" rx="0.5" />
+          <rect x="17" y="15" width="2" height="2" fill="#0369a1" rx="0.5" />
+          {/* Tyres (Rubber black with alloy rims) */}
+          <rect x="3" y="-1.5" width="5" height="1.5" fill="#1e293b" rx="0.5" />
+          <rect x="19" y="-1.5" width="5" height="1.5" fill="#1e293b" rx="0.5" />
+          <rect x="3" y="15" width="5" height="1.5" fill="#1e293b" rx="0.5" />
+          <rect x="19" y="15" width="5" height="1.5" fill="#1e293b" rx="0.5" />
+          {/* Glowing Red Brake Lights */}
+          <circle cx="0.5" cy="2" r="1.2" fill="#ef4444" />
+          <circle cx="0.5" cy="13" r="1.2" fill="#ef4444" />
+          <circle cx="0.5" cy="2" r="3" fill="#ef4444" opacity="0.4" />
+          <circle cx="0.5" cy="13" r="3" fill="#ef4444" opacity="0.4" />
         </g>
-        {/* Following car */}
-        <g transform="translate(15, 30)">
-          <rect x="0" y="0" width="22" height="12" fill="#dc2626" rx="2" />
-          <rect x="14" y="2" width="6" height="8" fill="#bae6fd" />
-          <circle cx="19" cy="1" r="1.5" fill="#fef08a" />
-          <circle cx="19" cy="11" r="1.5" fill="#fef08a" />
+
+        {/* Following car (Red Sports Car) - Detailed realistic top-down */}
+        <g transform="translate(15, 29)">
+          {/* Shadow */}
+          <rect x="-1" y="1" width="28" height="15" fill="#020617" opacity="0.4" rx="3.5" />
+          {/* Main Body */}
+          <rect x="0" y="0" width="28" height="15" fill="url(#redCarGrad)" rx="3" />
+          {/* Glossy Windshield */}
+          <path d="M 18,2 L 23,4 L 23,11 L 18,13 Z" fill="url(#glassGrad)" />
+          {/* Rear Window */}
+          <path d="M 4,2 L 8,3 L 8,12 L 4,13 Z" fill="url(#glassGrad)" />
+          {/* Side Mirrors */}
+          <rect x="17" y="-2" width="2" height="2" fill="#991b1b" rx="0.5" />
+          <rect x="17" y="15" width="2" height="2" fill="#991b1b" rx="0.5" />
+          {/* Tyres */}
+          <rect x="3" y="-1.5" width="5" height="1.5" fill="#1e293b" rx="0.5" />
+          <rect x="19" y="-1.5" width="5" height="1.5" fill="#1e293b" rx="0.5" />
+          <rect x="3" y="15" width="5" height="1.5" fill="#1e293b" rx="0.5" />
+          <rect x="19" y="15" width="5" height="1.5" fill="#1e293b" rx="0.5" />
+          {/* Glowing Headlights with light beam throwing forward */}
+          <path d="M 28,3 L 42,-1 L 42,16 L 28,12 Z" fill="#fef08a" opacity="0.15" />
+          <circle cx="27.5" cy="3" r="1" fill="#fef08a" />
+          <circle cx="27.5" cy="12" r="1" fill="#fef08a" />
         </g>
-        {/* Safe distance bracket indicator */}
-        <path d="M 40,48 L 40,54 L 98,54 L 98,48" fill="none" stroke="#22c55e" strokeWidth="1.5" />
-        <text x="69" y="65" fill="#22c55e" fontSize="9" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">SAFE GAP</text>
+
+        {/* Highly polished Safe Distance Indicator bracket and dimension arrows */}
+        <g>
+          {/* Connecting line */}
+          <line x1="47" y1="48" x2="101" y2="48" stroke="#10b981" strokeWidth="2" />
+          {/* End bars */}
+          <line x1="47" y1="44" x2="47" y2="52" stroke="#10b981" strokeWidth="2" />
+          <line x1="101" y1="44" x2="101" y2="52" stroke="#10b981" strokeWidth="2" />
+          {/* Glowing Arrowheads */}
+          <polygon points="47,48 53,44 53,52" fill="#10b981" />
+          <polygon points="101,48 95,44 95,52" fill="#10b981" />
+          
+          {/* Gorgeous premium label badge */}
+          <rect x="52" y="55" width="56" height="14" fill="#065f46" rx="4" />
+          <text x="80" y="65" fill="#34d399" fontSize="8" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif" letterSpacing="0.5">SAFE GAP</text>
+        </g>
       </svg>
     )
   },
@@ -66,15 +140,51 @@ const quizData = [
     ],
     hint: "Yellow light signifies warning. You must reduce speed and stay alert without halting unnecessarily.",
     graphic: (
-      <svg viewBox="0 0 100 100" className="w-20 h-20 mx-auto drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
-        <rect x="35" y="10" width="30" height="80" fill="#1e293b" rx="10" />
-        {/* Red light */}
-        <circle cx="50" cy="25" r="8" fill="#475569" />
-        {/* Flashing yellow */}
-        <circle cx="50" cy="50" r="10" fill="#f59e0b" className="animate-pulse" />
-        <circle cx="50" cy="50" r="10" fill="none" stroke="#fef08a" strokeWidth="2" className="animate-ping" />
-        {/* Green light */}
-        <circle cx="50" cy="75" r="8" fill="#475569" />
+      <svg viewBox="0 0 100 100" className="w-24 h-24 mx-auto drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="housingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#334155" />
+            <stop offset="50%" stopColor="#1e293b" />
+            <stop offset="100%" stopColor="#0f172a" />
+          </linearGradient>
+          <radialGradient id="yellowGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#fef08a" />
+            <stop offset="30%" stopColor="#f59e0b" />
+            <stop offset="70%" stopColor="#b45309" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#78350f" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+
+        {/* Traffic Light Metallic Housing */}
+        <rect x="32" y="5" width="36" height="90" fill="url(#housingGrad)" rx="10" stroke="#475569" strokeWidth="2.5" />
+        
+        {/* Hoods / visors over each bulb casting realistic dark shadows */}
+        {/* Top hood */}
+        <path d="M 32,22 Q 50,11 68,22" fill="none" stroke="#0f172a" strokeWidth="5" strokeLinecap="round" />
+        {/* Middle hood */}
+        <path d="M 32,52 Q 50,41 68,52" fill="none" stroke="#0f172a" strokeWidth="5" strokeLinecap="round" />
+        {/* Bottom hood */}
+        <path d="M 32,82 Q 50,71 68,82" fill="none" stroke="#0f172a" strokeWidth="5" strokeLinecap="round" />
+
+        {/* RED LIGHT (Unlit, realistic glossy dark lens) */}
+        <circle cx="50" cy="24" r="9" fill="#7f1d1d" opacity="0.9" />
+        <circle cx="50" cy="24" r="9" fill="none" stroke="#991b1b" strokeWidth="1" />
+        <circle cx="47" cy="21" r="2" fill="white" opacity="0.2" /> {/* Gloss reflection */}
+
+        {/* AMBER/YELLOW LIGHT (Bright flashing/glowing radial lens) */}
+        {/* Ambient background bloom flare */}
+        <circle cx="50" cy="50" r="28" fill="url(#yellowGlow)" opacity="0.95" />
+        {/* Active lens body */}
+        <circle cx="50" cy="50" r="11" fill="#fbbf24" stroke="#f59e0b" strokeWidth="2" />
+        <circle cx="50" cy="50" r="8" fill="#fffbeb" opacity="0.75" />
+        <circle cx="46" cy="46" r="3" fill="white" opacity="0.4" /> {/* Gloss reflection */}
+        {/* Animated pulses */}
+        <circle cx="50" cy="50" r="11" fill="none" stroke="#fef08a" strokeWidth="2" className="animate-ping" opacity="0.6" />
+
+        {/* GREEN LIGHT (Unlit, realistic glossy dark lens) */}
+        <circle cx="50" cy="76" r="9" fill="#064e3b" opacity="0.9" />
+        <circle cx="50" cy="76" r="9" fill="none" stroke="#065f46" strokeWidth="1" />
+        <circle cx="47" cy="73" r="2" fill="white" opacity="0.2" /> {/* Gloss reflection */}
       </svg>
     )
   },
@@ -90,29 +200,72 @@ const quizData = [
     ],
     hint: "Think of the right-hand rule used universally in driving theory.",
     graphic: (
-      <svg viewBox="0 0 120 120" className="w-28 h-28 mx-auto drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
-        <rect x="0" y="40" width="120" height="40" fill="#334155" />
-        <rect x="40" y="0" width="40" height="120" fill="#334155" />
-        {/* Dotted lines */}
-        <line x1="0" y1="60" x2="35" y2="60" stroke="#fef08a" strokeWidth="1" strokeDasharray="3,3" />
-        <line x1="85" y1="60" x2="120" y2="60" stroke="#fef08a" strokeWidth="1" strokeDasharray="3,3" />
-        <line x1="60" y1="0" x2="60" y2="35" stroke="#fef08a" strokeWidth="1" strokeDasharray="3,3" />
-        <line x1="60" y1="85" x2="60" y2="120" stroke="#fef08a" strokeWidth="1" strokeDasharray="3,3" />
-        {/* Vehicle A (bottom, going straight) */}
+      <svg viewBox="0 0 120 120" className="w-32 h-32 mx-auto drop-shadow-md rounded-2xl" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="roadIntGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#1e293b" />
+            <stop offset="100%" stopColor="#0f172a" />
+          </linearGradient>
+          <linearGradient id="blueCarInt" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#0ea5e9" />
+            <stop offset="100%" stopColor="#1d4ed8" />
+          </linearGradient>
+          <linearGradient id="redCarInt" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#f87171" />
+            <stop offset="100%" stopColor="#b91c1c" />
+          </linearGradient>
+        </defs>
+
+        {/* Intersection Road layout */}
+        <rect x="0" y="40" width="120" height="40" fill="url(#roadIntGrad)" />
+        <rect x="40" y="0" width="40" height="120" fill="url(#roadIntGrad)" />
+        
+        {/* Curbs / sidewalks borders */}
+        <rect x="0" y="38" width="38" height="2" fill="#64748b" />
+        <rect x="82" y="38" width="38" height="2" fill="#64748b" />
+        <rect x="0" y="80" width="38" height="2" fill="#64748b" />
+        <rect x="82" y="80" width="38" height="2" fill="#64748b" />
+        <rect x="38" y="0" width="2" height="38" fill="#64748b" />
+        <rect x="38" y="82" width="2" height="38" fill="#64748b" />
+        <rect x="80" y="0" width="2" height="38" fill="#64748b" />
+        <rect x="80" y="82" width="2" height="38" fill="#64748b" />
+
+        {/* Dotted centre lines */}
+        <line x1="0" y1="60" x2="32" y2="60" stroke="#fbbf24" strokeWidth="1.5" strokeDasharray="4,3" />
+        <line x1="88" y1="60" x2="120" y2="60" stroke="#fbbf24" strokeWidth="1.5" strokeDasharray="4,3" />
+        <line x1="60" y1="0" x2="60" y2="32" stroke="#fbbf24" strokeWidth="1.5" strokeDasharray="4,3" />
+        <line x1="60" y1="88" x2="60" y2="120" stroke="#fbbf24" strokeWidth="1.5" strokeDasharray="4,3" />
+
+        {/* High-contrast crisp crosswalk lines */}
+        <line x1="42" y1="35" x2="78" y2="35" stroke="white" strokeWidth="1.5" strokeDasharray="3,2" />
+        <line x1="42" y1="85" x2="78" y2="85" stroke="white" strokeWidth="1.5" strokeDasharray="3,2" />
+        <line x1="35" y1="42" x2="35" y2="78" stroke="white" strokeWidth="1.5" strokeDasharray="3,2" />
+        <line x1="85" y1="42" x2="85" y2="78" stroke="white" strokeWidth="1.5" strokeDasharray="3,2" />
+
+        {/* Vehicle A (Going straight up, Blue) */}
         <g transform="translate(48, 90)">
-          <rect x="0" y="0" width="12" height="20" fill="#002060" rx="2" />
-          <rect x="2" y="3" width="8" height="5" fill="#bae6fd" />
-          <text x="6" y="14" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">A</text>
+          {/* Shadow */}
+          <rect x="-1" y="1" width="13" height="22" fill="#020617" opacity="0.4" rx="2.5" />
+          {/* Car Body */}
+          <rect x="0" y="0" width="13" height="22" fill="url(#blueCarInt)" rx="2" />
+          <path d="M 2,15 L 11,15 L 9,19 L 4,19 Z" fill="#e0f2fe" opacity="0.8" /> {/* Windshield */}
+          <text x="6.5" y="10" fill="white" fontSize="7" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">A</text>
         </g>
-        {/* Vehicle B (right side, going straight) */}
-        <g transform="translate(90, 48) rotate(270 6 10)">
-          <rect x="0" y="0" width="12" height="20" fill="#dc2626" rx="2" />
-          <rect x="2" y="3" width="8" height="5" fill="#fecaca" />
-          <text x="6" y="14" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">B</text>
+
+        {/* Vehicle B (Going straight left, Red) */}
+        <g transform="translate(90, 48) rotate(270 6.5 11)">
+          {/* Shadow */}
+          <rect x="-1" y="1" width="13" height="22" fill="#020617" opacity="0.4" rx="2.5" />
+          {/* Car Body */}
+          <rect x="0" y="0" width="13" height="22" fill="url(#redCarInt)" rx="2" />
+          <path d="M 2,15 L 11,15 L 9,19 L 4,19 Z" fill="#e0f2fe" opacity="0.8" /> {/* Windshield */}
+          <text x="6.5" y="10" fill="white" fontSize="7" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">B</text>
         </g>
-        {/* Arrow representing right of way B going first */}
-        <path d="M 60,75 Q 75,75 80,62" fill="none" stroke="#22c55e" strokeWidth="1.5" strokeDasharray="2,2" />
-        <polygon points="80,59 77,64 83,63" fill="#22c55e" />
+
+        {/* Glowing priority path indicator arrow (Green) */}
+        <path d="M 100,60 Q 60,60 60,38" fill="none" stroke="#10b981" strokeWidth="2.5" strokeDasharray="3,2" />
+        <polygon points="60,33 56,40 64,40" fill="#10b981" />
+        <circle cx="100" cy="60" r="3" fill="#10b981" />
       </svg>
     )
   },
@@ -128,10 +281,35 @@ const quizData = [
     ],
     hint: "Yielding means giving priority to others, only stopping if they are present.",
     graphic: (
-      <svg viewBox="0 0 100 100" className="w-20 h-20 mx-auto drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="50,90 5,15 95,15" fill="white" stroke="#dc2626" strokeWidth="8" strokeLinejoin="round" />
-        <polygon points="50,72 16,20 84,20" fill="none" stroke="white" strokeWidth="1.5" />
-        <text x="50" y="38" fill="#dc2626" fontSize="13" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">YIELD</text>
+      <svg viewBox="0 0 100 100" className="w-24 h-24 mx-auto drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="poleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#94a3b8" />
+            <stop offset="50%" stopColor="#cbd5e1" />
+            <stop offset="100%" stopColor="#64748b" />
+          </linearGradient>
+          <linearGradient id="signEdge" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#f87171" />
+            <stop offset="100%" stopColor="#991b1b" />
+          </linearGradient>
+        </defs>
+
+        {/* Physical Sign Pole with hardware bolts */}
+        <rect x="47" y="55" width="6" height="45" fill="url(#poleGrad)" />
+        <circle cx="50" cy="62" r="1.5" fill="#334155" /> {/* Bolt */}
+        <circle cx="50" cy="85" r="1.5" fill="#334155" /> {/* Bolt */}
+
+        {/* Drop shadow background sheet for physical thickness */}
+        <polygon points="50,56 4,12 96,12" fill="#1e293b" opacity="0.3" />
+
+        {/* Triangular Yield Sign Outer rim */}
+        <polygon points="50,53 3,9 97,9" fill="url(#signEdge)" stroke="#ffffff" strokeWidth="1" strokeLinejoin="round" />
+        
+        {/* Inner white highly reflective sheeting triangle */}
+        <polygon points="50,42 15,16 85,16" fill="#f8fafc" />
+        
+        {/* Crisp text and bold warning inner styling */}
+        <text x="50" y="32" fill="#b91c1c" fontSize="13" fontWeight="1000" textAnchor="middle" fontFamily="sans-serif" letterSpacing="0.2">YIELD</text>
       </svg>
     )
   },
@@ -171,17 +349,55 @@ const quizData = [
     ],
     hint: "Drivers inside have the priority. Always turn left to enter the circle.",
     graphic: (
-      <svg viewBox="0 0 100 100" className="w-20 h-20 mx-auto drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="50" cy="50" r="45" fill="#002060" stroke="white" strokeWidth="2" />
-        <g transform="translate(50,50)">
-          {/* Circular arrows */}
-          <path d="M -15,15 A 21,21 0 0,1 -15,-15" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" />
-          <polygon points="-15,-15 -21,-10 -11,-10" fill="white" transform="rotate(-15 -15 -15)" />
-          <path d="M -10,-18 A 21,21 0 0,1 18,-8" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" />
-          <polygon points="18,-8 15,-15 11,-9" fill="white" transform="rotate(35 18 -8)" />
-          <path d="M 18,8 A 21,21 0 0,1 -5,20" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" />
-          <polygon points="-5,20 -2,14 -9,15" fill="white" transform="rotate(85 -5 20)" />
+      <svg viewBox="0 0 100 100" className="w-24 h-24 mx-auto drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="blueSignGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#2563eb" />
+            <stop offset="30%" stopColor="#1d4ed8" />
+            <stop offset="100%" stopColor="#1e3a8a" />
+          </linearGradient>
+          <linearGradient id="rimGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#ffffff" />
+            <stop offset="40%" stopColor="#cbd5e1" />
+            <stop offset="100%" stopColor="#64748b" />
+          </linearGradient>
+          <linearGradient id="postGradRound" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#94a3b8" />
+            <stop offset="50%" stopColor="#e2e8f0" />
+            <stop offset="100%" stopColor="#475569" />
+          </linearGradient>
+        </defs>
+
+        {/* Physical sign post and mounting hardware */}
+        <rect x="47" y="55" width="6" height="45" fill="url(#postGradRound)" />
+        <circle cx="50" cy="65" r="1.5" fill="#334155" /> {/* Screw */}
+        <circle cx="50" cy="88" r="1.5" fill="#334155" /> {/* Screw */}
+
+        {/* 3D Drop shadow for sign blank */}
+        <circle cx="50" cy="46" r="43" fill="#0f172a" opacity="0.3" />
+
+        {/* Outer realistic reflective silver bevel rim */}
+        <circle cx="50" cy="44" r="43" fill="url(#rimGrad)" />
+        <circle cx="50" cy="44" r="41" fill="#ffffff" />
+
+        {/* Sign Face - High-contrast reflective blue */}
+        <circle cx="50" cy="44" r="39" fill="url(#blueSignGrad)" />
+
+        {/* Beautiful high-fidelity roundabout loop arrows */}
+        <g transform="translate(50,44)">
+          {/* Arrow 1 */}
+          <path d="M -15,15 A 21,21 0 0,1 -15,-15" fill="none" stroke="#ffffff" strokeWidth="4.5" strokeLinecap="round" />
+          <polygon points="-15,-15 -22,-8 -11,-8" fill="#ffffff" transform="rotate(-15 -15 -15)" />
+          {/* Arrow 2 */}
+          <path d="M -10,-18 A 21,21 0 0,1 18,-8" fill="none" stroke="#ffffff" strokeWidth="4.5" strokeLinecap="round" />
+          <polygon points="18,-8 13,-16 10,-9" fill="#ffffff" transform="rotate(35 18 -8)" />
+          {/* Arrow 3 */}
+          <path d="M 18,8 A 21,21 0 0,1 -5,20" fill="none" stroke="#ffffff" strokeWidth="4.5" strokeLinecap="round" />
+          <polygon points="-5,20 -1,13 -9,14" fill="#ffffff" transform="rotate(85 -5 20)" />
         </g>
+        
+        {/* Subtle glass reflection overlay */}
+        <path d="M 14,30 Q 50,15 86,30 A 39,39 0 0,0 14,30 Z" fill="#ffffff" opacity="0.1" />
       </svg>
     )
   },
@@ -209,19 +425,67 @@ const quizData = [
     ],
     hint: "It requires a physical head turn to see.",
     graphic: (
-      <svg viewBox="0 0 120 120" className="w-24 h-24 mx-auto drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
-        <g transform="translate(48, 40)">
-          <rect x="0" y="0" width="24" height="45" fill="#475569" rx="4" />
-          <rect x="2" y="10" width="20" height="10" fill="#bae6fd" />
-          <rect x="-4" y="12" width="4" height="2" fill="#94a3b8" />
-          <rect x="24" y="12" width="4" height="2" fill="#94a3b8" />
+      <svg viewBox="0 0 120 120" className="w-28 h-28 mx-auto drop-shadow-md rounded-2xl" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="hostCarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#94a3b8" />
+            <stop offset="50%" stopColor="#cbd5e1" />
+            <stop offset="100%" stopColor="#475569" />
+          </linearGradient>
+          <linearGradient id="otherCarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#f97316" />
+            <stop offset="100%" stopColor="#c2410c" />
+          </linearGradient>
+          <linearGradient id="blindSpotRed" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#ef4444" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#7f1d1d" stopOpacity="0.1" />
+          </linearGradient>
+          <linearGradient id="clearViewGreen" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#10b981" stopOpacity="0.25" />
+            <stop offset="100%" stopColor="#064e3b" stopOpacity="0.02" />
+          </linearGradient>
+        </defs>
+
+        {/* Real dark asphalt lane background overlay */}
+        <rect x="10" y="5" width="100" height="110" fill="#1e293b" rx="8" />
+        <line x1="60" y1="5" x2="60" y2="115" stroke="#334155" strokeWidth="1.5" strokeDasharray="5,4" />
+
+        {/* Green safe clear view cone */}
+        <path d="M 60,65 L 12,5 L 108,5 Z" fill="url(#clearViewGreen)" />
+        <text x="60" y="24" fill="#34d399" fontSize="7" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif" letterSpacing="0.2">CLEAR VIEW</text>
+
+        {/* Highly detailed main host car (Silver sedan) */}
+        <g transform="translate(48, 48)">
+          {/* Shadow */}
+          <rect x="-1" y="1" width="24" height="42" fill="#020617" opacity="0.4" rx="4.5" />
+          {/* Main Body */}
+          <rect x="0" y="0" width="24" height="42" fill="url(#hostCarGrad)" rx="4" />
+          {/* Glossy panoramic glass sunroof */}
+          <rect x="3.5" y="10" width="17" height="18" fill="url(#glassGrad)" rx="1.5" />
+          {/* Dual exhaust pipes */}
+          <rect x="4" y="41.5" width="2" height="1.5" fill="#94a3b8" />
+          <rect x="18" y="41.5" width="2" height="1.5" fill="#94a3b8" />
+          {/* Side rearview mirrors */}
+          <rect x="-3" y="13" width="3" height="2" fill="#475569" rx="0.5" />
+          <rect x="24" y="13" width="3" height="2" fill="#475569" rx="0.5" />
+          {/* Rear lights */}
+          <rect x="1" y="41.2" width="4" height="1" fill="#ef4444" />
+          <rect x="19" y="41.2" width="4" height="1" fill="#ef4444" />
         </g>
-        <path d="M 44,52 L 15,75 L 15,95 Z" fill="#dc2626" fillOpacity="0.25" stroke="#dc2626" strokeWidth="1" strokeDasharray="2,2" />
-        <text x="24" y="82" fill="#b91c1c" fontSize="7" fontWeight="bold" fontFamily="sans-serif">BLIND SPOT</text>
-        <path d="M 76,52 L 105,75 L 105,95 Z" fill="#dc2626" fillOpacity="0.25" stroke="#dc2626" strokeWidth="1" strokeDasharray="2,2" />
-        <text x="78" y="82" fill="#b91c1c" fontSize="7" fontWeight="bold" fontFamily="sans-serif">BLIND SPOT</text>
-        <path d="M 48,40 L 10,10 L 110,10 L 72,40 Z" fill="#22c55e" fillOpacity="0.1" />
-        <text x="60" y="25" fill="#15803d" fontSize="7" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">CLEAR VIEW</text>
+
+        {/* Left Side Blind Spot (Dangerous sector with orange car entering) */}
+        <path d="M 45,61 L 12,85 L 12,110 L 45,95 Z" fill="url(#blindSpotRed)" stroke="#ef4444" strokeWidth="1" strokeDasharray="3,2" />
+        <text x="25" y="94" fill="#fca5a5" fontSize="6.5" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">BLIND SPOT</text>
+
+        {/* Detailed hazard car starting to merge inside the left blind spot */}
+        <g transform="translate(18, 88) rotate(5)">
+          <rect x="0" y="0" width="13" height="20" fill="url(#otherCarGrad)" rx="2.5" />
+          <rect x="2" y="5" width="9" height="8" fill="url(#glassGrad)" rx="0.5" />
+        </g>
+
+        {/* Right Side Blind Spot */}
+        <path d="M 75,61 L 108,85 L 108,110 L 75,95 Z" fill="url(#blindSpotRed)" stroke="#ef4444" strokeWidth="1" strokeDasharray="3,2" />
+        <text x="94" y="94" fill="#fca5a5" fontSize="6.5" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">BLIND SPOT</text>
       </svg>
     )
   },
@@ -261,14 +525,44 @@ const quizData = [
     ],
     hint: "Solid borders are visual blockades. They indicate you must stick to your present lane.",
     graphic: (
-      <svg viewBox="0 0 120 70" className="w-24 h-24 mx-auto drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
-        <rect x="0" y="10" width="120" height="50" fill="#334155" />
-        <line x1="0" y1="35" x2="120" y2="35" stroke="white" strokeWidth="3" />
-        <line x1="0" y1="15" x2="120" y2="15" stroke="#eab308" strokeWidth="1" strokeDasharray="4,4" />
-        <line x1="0" y1="55" x2="120" y2="55" stroke="#eab308" strokeWidth="1" strokeDasharray="4,4" />
-        <rect x="15" y="20" width="16" height="8" fill="#002060" rx="1.5" />
-        <rect x="85" y="42" width="16" height="8" fill="#dc2626" rx="1.5" />
-        <path d="M 50,22 L 70,48 M 70,22 L 50,48" stroke="#ef4444" strokeWidth="3.5" strokeLinecap="round" />
+      <svg viewBox="0 0 120 75" className="w-28 h-28 mx-auto drop-shadow-md rounded-xl" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="roadAsphalt" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#1e293b" />
+            <stop offset="100%" stopColor="#0f172a" />
+          </linearGradient>
+        </defs>
+
+        {/* Textured dark asphalt roadway */}
+        <rect x="0" y="10" width="120" height="55" fill="url(#roadAsphalt)" />
+        <rect x="0" y="8" width="120" height="2" fill="#475569" />
+        <rect x="0" y="65" width="120" height="2" fill="#475569" />
+
+        {/* Double solid white line representing illegal crossing barrier */}
+        <line x1="0" y1="35" x2="120" y2="35" stroke="#ffffff" strokeWidth="2.5" />
+        <line x1="0" y1="39" x2="120" y2="39" stroke="#ffffff" strokeWidth="2.5" />
+
+        {/* Yellow exterior lane boundaries */}
+        <line x1="0" y1="16" x2="120" y2="16" stroke="#f59e0b" strokeWidth="1" strokeDasharray="5,4" />
+        <line x1="0" y1="58" x2="120" y2="58" stroke="#f59e0b" strokeWidth="1" strokeDasharray="5,4" />
+
+        {/* Blue sedan staying safely in lane (Left) */}
+        <g transform="translate(15, 19)">
+          <rect x="0" y="0" width="18" height="10" fill="url(#blueCarGrad)" rx="2" />
+          <rect x="11" y="2" width="5" height="6" fill="url(#glassGrad)" />
+        </g>
+
+        {/* Red sports car illegally crossing double line (Middle Right) */}
+        <g transform="translate(75, 30) rotate(14)">
+          <rect x="0" y="0" width="18" height="10" fill="url(#redCarGrad)" rx="2" />
+          <rect x="11" y="2" width="5" height="6" fill="url(#glassGrad)" />
+        </g>
+
+        {/* Glossy 3D Prohibitory Sign Overlay over the offending vehicle */}
+        <g transform="translate(85, 35)">
+          <circle cx="0" cy="0" r="10" fill="none" stroke="#ef4444" strokeWidth="3.2" />
+          <line x1="-7" y1="-7" x2="7" y2="7" stroke="#ef4444" strokeWidth="3.2" />
+        </g>
       </svg>
     )
   },
@@ -284,11 +578,41 @@ const quizData = [
     ],
     hint: "Think about whether oncoming traffic can see you from a safe distance.",
     graphic: (
-      <svg viewBox="0 0 100 100" className="w-20 h-20 mx-auto drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="50" cy="50" r="45" fill="white" stroke="#dc2626" strokeWidth="8" />
-        <path d="M 65,65 L 65,45 A 15,15 0 0,0 35,45 L 35,62" fill="none" stroke="black" strokeWidth="6" strokeLinecap="round" />
-        <polygon points="35,68 29,58 41,58" fill="black" />
-        <line x1="18" y1="18" x2="82" y2="82" stroke="#dc2626" strokeWidth="8" />
+      <svg viewBox="0 0 100 100" className="w-24 h-24 mx-auto drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="redSignRing" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#ef4444" />
+            <stop offset="100%" stopColor="#991b1b" />
+          </linearGradient>
+        </defs>
+
+        {/* Physical steel sign post */}
+        <rect x="47" y="55" width="6" height="45" fill="url(#poleGrad)" />
+        <circle cx="50" cy="65" r="1.5" fill="#334155" />
+        <circle cx="50" cy="88" r="1.5" fill="#334155" />
+
+        {/* Drop shadow for physical feel */}
+        <circle cx="50" cy="46" r="43" fill="#0f172a" opacity="0.3" />
+
+        {/* Outer Silver Beveled Metal Rim */}
+        <circle cx="50" cy="44" r="43" fill="url(#rimGrad)" />
+        <circle cx="50" cy="44" r="41" fill="#ffffff" />
+
+        {/* Bold Prohibitory Red Outer Ring with 3D gradient look */}
+        <circle cx="50" cy="44" r="39" fill="url(#redSignRing)" />
+        
+        {/* White retroreflective background core */}
+        <circle cx="50" cy="44" r="30" fill="#f8fafc" />
+
+        {/* Black printed U-Turn arrow */}
+        <path d="M 60,54 L 60,39 A 10,10 0 0,0 40,39 L 40,51" fill="none" stroke="#0f172a" strokeWidth="5.5" strokeLinecap="round" />
+        <polygon points="40,54 34,46 46,46" fill="#0f172a" />
+
+        {/* Bold Diagonal Cancel Slash with 3D glossy appeal */}
+        <line x1="25" y1="19" x2="75" y2="69" stroke="url(#redSignRing)" strokeWidth="6.5" />
+
+        {/* Glass reflection sheen */}
+        <path d="M 17,28 Q 50,15 83,28 A 39,39 0 0,0 17,28 Z" fill="#ffffff" opacity="0.1" />
       </svg>
     )
   },

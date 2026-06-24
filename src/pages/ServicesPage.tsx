@@ -259,7 +259,7 @@ export default function ServicesPage() {
       <Navbar />
 
       {/* Hero Banner Section */}
-      <section className="relative overflow-hidden bg-white border-b border-gray-100 pt-4 sm:pt-6 lg:pt-8 pb-16 lg:pb-24">
+      <section className="relative overflow-hidden bg-white border-b border-gray-100 pt-4 sm:pt-6 lg:pt-8 pb-5 lg:pb-8">
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -316,7 +316,7 @@ export default function ServicesPage() {
             </div>
           </div>
 
-          <div className="mt-16 flex flex-col md:flex-row flex-nowrap justify-center items-center gap-4 overflow-x-auto pb-4">
+          <div className="mt-5 flex flex-col md:flex-row flex-nowrap justify-center items-center gap-4 overflow-x-auto pb-4">
             <button 
               id="tab-btn-driving"
               onClick={() => setActiveTab('driving')}
@@ -364,9 +364,9 @@ export default function ServicesPage() {
             transition={{ duration: 0.25 }}
           >
             {/* SECTION A: Driving School Hub */}
-            <section id="driving-school" className="py-24 bg-white border-b border-gray-100">
+            <section id="driving-school" className="py-8 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-16">
+          <div className="text-center max-w-2xl mx-auto mb-6">
             <span className="text-xs font-black uppercase tracking-widest text-[#E05A00]">Section A</span>
             <h2 className="text-3.5xl sm:text-4xl font-black text-slate-900 mt-1 mb-3">
               Professional Driving Academy
@@ -483,9 +483,9 @@ export default function ServicesPage() {
             transition={{ duration: 0.25 }}
           >
             {/* SECTION B: Rent Your Car */}
-            <section id="rent-car" className="py-24 bg-slate-50 border-b border-gray-100">
+            <section id="rent-car" className="py-8 bg-slate-50 border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-16">
+          <div className="text-center max-w-2xl mx-auto mb-6">
             <span className="text-xs font-black uppercase tracking-widest text-[#E05A00]">Section B</span>
             <h2 className="text-3.5xl sm:text-4xl font-black text-slate-900 mt-1 mb-3">
               Passive Income Rental Pipeline
@@ -592,9 +592,9 @@ export default function ServicesPage() {
             transition={{ duration: 0.25 }}
           >
             {/* SECTION C: List Your Car for Sale */}
-            <section id="sell-car" className="py-24 bg-white border-b border-gray-100">
+            <section id="sell-car" className="py-8 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-16">
+          <div className="text-center max-w-2xl mx-auto mb-6">
             <span className="text-xs font-black uppercase tracking-widest text-[#E05A00]">Section C</span>
             <h2 className="text-3.5xl sm:text-4xl font-black text-slate-900 mt-1 mb-3">
               Zero-Hassle Direct Car Sales
@@ -713,9 +713,9 @@ export default function ServicesPage() {
       <ScrollReveal direction="up" delay={0.1}><Newsletter /></ScrollReveal>
 
       {/* BOTTOM INQUIRY FORM */}
-      <section ref={contactFormRef} className="py-24 bg-slate-50">
+      <section ref={contactFormRef} className="py-8 bg-slate-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-16">
+          <div className="text-center max-w-2xl mx-auto mb-6">
             <span className="inline-flex items-center gap-1.5 bg-[#FF7112]/10 border border-[#FF7112]/20 text-[#E05A00] px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
               <MessageSquare className="w-3.5 h-3.5 text-[#E05A00]" /> Corporate Inquiry Desk
             </span>
