@@ -99,20 +99,26 @@ async function tableExists(tableName: string): Promise<boolean> {
   try {
     const { error } = await supabase.from(tableName).select('*').limit(1);
     if (error) {
-      if (error.code === 'P0001') {
-        console.warn(`[Supabase] Table "${tableName}" does not exist or has SQL error (P0001).`);
+      // Common codes for missing tables or permission issues that we handle with local fallback
+      const isMissingOrProtected = 
+        error.code === 'P0001' || 
+        error.code === '42P01' || 
+        error.code === '42501' || 
+        error.message?.includes('does not exist') ||
+        error.message?.includes('not found');
+
+      if (isMissingOrProtected) {
+        console.warn(`[Supabase] Table "${tableName}" is not active or accessible (Code: ${error.code}). Local fallback mode is active.`);
         return false;
       }
-      if (error.message?.includes('does not exist') || error.code === '42P01') {
-        console.warn(`[Supabase] Table "${tableName}" does not exist (42P01). Make sure to run your SQL schema script in the Supabase SQL Editor.`);
-        return false;
-      }
-      console.error(`[Supabase] Unexpected error checking table "${tableName}":`, error);
-      return false; // Safely return false if table access fails for any reason
+      
+      // If it's a code 0 (usually network/CORS) or other unexpected error, we still fallback gracefully
+      console.warn(`[Supabase] Potential connectivity issue or unexpected response for table "${tableName}":`, error);
+      return false; 
     }
     return true;
   } catch (err) {
-    console.error(`[Supabase] Exception checking table "${tableName}":`, err);
+    console.warn(`[Supabase] Exception encountered while checking table "${tableName}". Entering fallback mode.`, err);
     return false;
   }
 }
@@ -145,7 +151,7 @@ export async function fetchSaleCars(): Promise<any[]> {
         }
       }
     } catch (e) {
-      console.error('Supabase fetchSaleCars failed, falling back to LocalStorage', e);
+      console.warn('Supabase fetchSaleCars failed, falling back to LocalStorage', e);
     }
   }
   return cars;
@@ -173,7 +179,7 @@ export async function fetchPendingSaleCars(): Promise<any[]> {
         }
       }
     } catch (e) {
-      console.error('Supabase fetchPendingSaleCars failed, falling back to LocalStorage', e);
+      console.warn('Supabase fetchPendingSaleCars failed, falling back to LocalStorage', e);
     }
   }
   return cars;
@@ -239,7 +245,7 @@ export async function insertSaleCar(car: any): Promise<boolean> {
         }
       }
     } catch (e) {
-      console.error('Supabase insertSaleCar failed, retained safely in local storage only', e);
+      console.warn('Supabase insertSaleCar failed, retained safely in local storage only', e);
     }
   }
   return true;
@@ -260,7 +266,7 @@ export async function approveSaleCarBackend(carId: string): Promise<boolean> {
         }
       }
     } catch (e) {
-      console.error('approveSaleCarBackend error', e);
+      console.warn('approveSaleCarBackend error', e);
     }
   }
   return false;
@@ -281,7 +287,7 @@ export async function deleteSaleCarBackend(carId: string): Promise<boolean> {
         }
       }
     } catch (e) {
-      console.error('deleteSaleCarBackend error', e);
+      console.warn('deleteSaleCarBackend error', e);
     }
   }
   return false;
@@ -313,7 +319,7 @@ export async function fetchRentalCars(): Promise<any[]> {
         }
       }
     } catch (e) {
-      console.error('Supabase fetchRentalCars failed', e);
+      console.warn('Supabase fetchRentalCars failed', e);
     }
   }
   return cars;
@@ -341,7 +347,7 @@ export async function fetchPendingRentalCars(): Promise<any[]> {
         }
       }
     } catch (e) {
-      console.error('Supabase fetchPendingRentalCars failed', e);
+      console.warn('Supabase fetchPendingRentalCars failed', e);
     }
   }
   return cars;
@@ -400,7 +406,7 @@ export async function insertRentalCar(car: any): Promise<boolean> {
         }
       }
     } catch (e) {
-      console.error('Supabase insertRentalCar failed', e);
+      console.warn('Supabase insertRentalCar failed', e);
     }
   }
   return true;
@@ -421,7 +427,7 @@ export async function approveRentalCarBackend(carId: string): Promise<boolean> {
         }
       }
     } catch (e) {
-      console.error('approveRentalCarBackend error', e);
+      console.warn('approveRentalCarBackend error', e);
     }
   }
   return false;
@@ -442,7 +448,7 @@ export async function deleteRentalCarBackend(carId: string): Promise<boolean> {
         }
       }
     } catch (e) {
-      console.error('deleteRentalCarBackend error', e);
+      console.warn('deleteRentalCarBackend error', e);
     }
   }
   return false;
@@ -464,7 +470,7 @@ export async function updateRentalCarStatusBackend(carId: string, status: 'Avail
         }
       }
     } catch (e) {
-      console.error('updateRentalCarStatusBackend error', e);
+      console.warn('updateRentalCarStatusBackend error', e);
     }
   }
   return false;
@@ -495,7 +501,7 @@ export async function fetchDrivingBookings(): Promise<any[]> {
         }
       }
     } catch (e) {
-      console.error('Supabase fetchDrivingBookings failed', e);
+      console.warn('Supabase fetchDrivingBookings failed', e);
     }
   }
   return bookings;
@@ -543,7 +549,7 @@ export async function insertDrivingBooking(booking: any): Promise<boolean> {
         }
       }
     } catch (e) {
-      console.error('Supabase insertDrivingBooking failed', e);
+      console.warn('Supabase insertDrivingBooking failed', e);
     }
   }
   return true;
@@ -564,7 +570,7 @@ export async function updateDrivingBookingStatus(id: string, status: string): Pr
         }
       }
     } catch (e) {
-      console.error('updateDrivingBookingStatus error', e);
+      console.warn('updateDrivingBookingStatus error', e);
     }
   }
   return false;
@@ -585,7 +591,7 @@ export async function deleteDrivingBooking(id: string): Promise<boolean> {
         }
       }
     } catch (e) {
-      console.error('deleteDrivingBooking error', e);
+      console.warn('deleteDrivingBooking error', e);
     }
   }
   return false;
@@ -616,7 +622,7 @@ export async function fetchCustomerRequests(): Promise<any[]> {
         }
       }
     } catch (e) {
-      console.error('Supabase fetchCustomerRequests failed', e);
+      console.warn('Supabase fetchCustomerRequests failed', e);
     }
   }
   return requests;
@@ -662,7 +668,7 @@ export async function insertCustomerRequest(req: any): Promise<boolean> {
         }
       }
     } catch (e) {
-      console.error('Supabase insertCustomerRequest failed', e);
+      console.warn('Supabase insertCustomerRequest failed', e);
     }
   }
   return true;
@@ -683,7 +689,7 @@ export async function updateCustomerRequestStatus(id: string, status: string): P
         }
       }
     } catch (e) {
-      console.error('updateCustomerRequestStatus error', e);
+      console.warn('updateCustomerRequestStatus error', e);
     }
   }
   return false;
@@ -704,7 +710,7 @@ export async function deleteCustomerRequest(id: string): Promise<boolean> {
         }
       }
     } catch (e) {
-      console.error('deleteCustomerRequest error', e);
+      console.warn('deleteCustomerRequest error', e);
     }
   }
   return false;
@@ -815,7 +821,7 @@ export async function fetchSystemMetadata(): Promise<Record<string, string>> {
         }
       }
     } catch (e) {
-      console.error('Supabase fetchSystemMetadata failed, using cached / default metrics', e);
+      console.warn('Supabase fetchSystemMetadata failed, using cached / default metrics', e);
     }
   }
 
@@ -846,7 +852,7 @@ export async function updateSystemMetadata(key: string, value: string): Promise<
         }
       }
     } catch (e) {
-      console.error('Supabase updateSystemMetadata failed, saved to LocalStorage', e);
+      console.warn('Supabase updateSystemMetadata failed, saved to LocalStorage', e);
     }
   }
   return true;
@@ -894,7 +900,7 @@ export async function uploadCarImage(file: File): Promise<string> {
         console.warn('Supabase storage upload error, falling back to base64 reader:', error?.message);
       }
     } catch (e) {
-      console.error('Supabase storage upload failed:', e);
+      console.warn('Supabase storage upload failed:', e);
     }
   }
 
