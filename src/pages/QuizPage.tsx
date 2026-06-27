@@ -1180,29 +1180,80 @@ function createV8SynthEngine() {
 }
 
 export default function QuizPage() {
-  const [currentIdx, setCurrentIdx] = useState(() => getSavedProgress()?.currentIdx ?? 0);
-  const [selectedOpt, setSelectedOpt] = useState<number | null>(() => getSavedProgress()?.selectedOpt ?? null);
-  const [isSubmitted, setIsSubmitted] = useState(() => getSavedProgress()?.isSubmitted ?? false);
-  const [score, setScore] = useState(() => getSavedProgress()?.score ?? 0);
-  const [quizStarted, setQuizStarted] = useState(() => getSavedProgress()?.quizStarted ?? false);
-  const [quizFinished, setQuizFinished] = useState(() => getSavedProgress()?.quizFinished ?? false);
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [selectedOpt, setSelectedOpt] = useState<number | null>(null);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [score, setScore] = useState(0);
+  const [quizStarted, setQuizStarted] = useState(false);
+  const [quizFinished, setQuizFinished] = useState(false);
   const [showHint, setShowHint] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(() => getSavedProgress()?.timeLeft ?? 60);
+  const [timeLeft, setTimeLeft] = useState(60);
   const [studentName, setStudentName] = useState(() => getSavedProgress()?.studentName ?? "");
-  const [streak, setStreak] = useState(() => getSavedProgress()?.streak ?? 0);
+  const [streak, setStreak] = useState(0);
   const certRef = useRef<HTMLDivElement>(null);
   const [maxStreak, setMaxStreak] = useState(() => getSavedProgress()?.maxStreak ?? 0);
 
+  const [isDownloadingCert, setIsDownloadingCert] = useState(false);
+
+  const stableCertId = React.useMemo(() => {
+    if (!studentName) return "GD-2026-9481";
+    let hash = 0;
+    for (let i = 0; i < studentName.length; i++) {
+      hash = studentName.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const num = Math.abs(hash % 9000) + 1000;
+    return `GD-2026-${num}`;
+  }, [studentName]);
+
+  const certificateDate = React.useMemo(() => {
+    const d = new Date();
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+  }, []);
+
   const handleDownloadCertificate = async () => {
     if (certRef.current) {
-      const canvas = await html2canvas(certRef.current);
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save('certificate.pdf');
+      try {
+        setIsDownloadingCert(true);
+        // Add a micro-delay for smooth rendering
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        const canvas = await html2canvas(certRef.current, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#FCFAF2',
+          logging: false,
+          windowWidth: 1120, // Lock the width for consistent high-quality export
+          windowHeight: 800
+        });
+        
+        const imgData = canvas.toDataURL('image/png', 1.0);
+        
+        // Horizontal orientation for the certificate PDF
+        const pdf = new jsPDF({
+          orientation: 'landscape',
+          unit: 'mm',
+          format: 'a4'
+        });
+        
+        const pdfWidth = pdf.internal.pageSize.getWidth(); // 297mm
+        const pdfHeight = pdf.internal.pageSize.getHeight(); // 210mm
+        
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+        
+        const safeName = studentName ? studentName.trim().replace(/\s+/g, '_') : 'Safe_Driver';
+        pdf.save(`${safeName}_Safe_Driver_Certificate.pdf`);
+        
+        setShareToast(true);
+        setTimeout(() => setShareToast(false), 3000);
+      } catch (err) {
+        console.warn("PDF generation error, trying fallback print mode...", err);
+        // Fallback print/view
+        window.print();
+      } finally {
+        setIsDownloadingCert(false);
+      }
     }
   };
   const [showCertificate, setShowCertificate] = useState(false);
@@ -1214,7 +1265,7 @@ export default function QuizPage() {
     isCorrect: boolean;
     rationale: string;
     correctText: string;
-  }>>(() => getSavedProgress()?.history ?? []);
+  }>>([]);
   const [selectedDifficulty, setSelectedDifficulty] = useState<"all" | "easy" | "medium" | "hard">(() => getSavedProgress()?.selectedDifficulty ?? "easy");
   const [passedLevels, setPassedLevels] = useState<string[]>(() => {
     const saved = localStorage.getItem('passedLevels');
@@ -1228,17 +1279,17 @@ export default function QuizPage() {
   // Synchronize state changes to localStorage
   useEffect(() => {
     const progress: QuizProgress = {
-      currentIdx,
-      selectedOpt,
-      isSubmitted,
-      score,
-      quizStarted,
-      quizFinished,
-      timeLeft,
+      currentIdx: 0, // Always start fresh on reload
+      selectedOpt: null,
+      isSubmitted: false,
+      score: 0,
+      quizStarted: false,
+      quizFinished: false,
+      timeLeft: 60,
       studentName,
-      streak,
+      streak: 0,
       maxStreak,
-      history,
+      history: [],
       selectedDifficulty,
     };
     try {
@@ -1247,17 +1298,8 @@ export default function QuizPage() {
       console.error("Failed to save progress to localStorage", e);
     }
   }, [
-    currentIdx,
-    selectedOpt,
-    isSubmitted,
-    score,
-    quizStarted,
-    quizFinished,
-    timeLeft,
     studentName,
-    streak,
     maxStreak,
-    history,
     selectedDifficulty,
   ]);
 
@@ -1870,10 +1912,19 @@ export default function QuizPage() {
                     {showCertificate && (
                        <button
                          type="button"
+                         disabled={isDownloadingCert}
                          onClick={handleDownloadCertificate}
-                         className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black py-3 rounded-xl text-xs uppercase tracking-widest cursor-pointer transition-all active:scale-98 flex items-center justify-center gap-2 shadow-lg hover:shadow-emerald-500/10"
+                         className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-400 disabled:cursor-not-allowed text-white font-black py-3 rounded-xl text-xs uppercase tracking-widest cursor-pointer transition-all active:scale-98 flex items-center justify-center gap-2 shadow-lg hover:shadow-emerald-500/10"
                        >
-                         <Download className="w-4 h-4" /> Download Certificate
+                         {isDownloadingCert ? (
+                           <>
+                             <RefreshCw className="w-4 h-4 animate-spin" /> Generating PDF...
+                           </>
+                         ) : (
+                           <>
+                             <Download className="w-4 h-4" /> Download Certificate
+                           </>
+                         )}
                        </button>
                     )}
                   </div>
@@ -1881,52 +1932,113 @@ export default function QuizPage() {
 
                 {/* The Live Certificate View element */}
                 {showCertificate && isPassing && (
-                  <div ref={certRef} className="w-full border-4 border-double border-amber-500 bg-amber-50/10 p-4 sm:p-8 rounded-2xl my-6 relative bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white to-amber-50/40 text-slate-900 shadow-2xl">
-                    <div className="border border-amber-600/30 p-6 rounded-xl flex flex-col items-center">
-                      <div className="flex justify-between items-center w-full mb-6">
+                  <div 
+                    ref={certRef} 
+                    className="w-full border-8 border-double border-amber-600 bg-[#FCFAF2] p-2 rounded-2xl my-6 relative text-slate-900 shadow-2xl overflow-hidden"
+                    style={{ 
+                      minHeight: '520px',
+                    }}
+                  >
+                    {/* Inner fine-line border */}
+                    <div className="border border-amber-600/30 p-6 sm:p-12 rounded-xl flex flex-col justify-between items-center relative h-full min-h-[500px] z-10 bg-[#FCFAF2]">
+                      
+                      {/* Classy Corner Ornaments */}
+                      <div className="absolute top-4 left-4 w-10 h-10 border-t-2 border-l-2 border-amber-600/40 rounded-tl"></div>
+                      <div className="absolute top-4 right-4 w-10 h-10 border-t-2 border-r-2 border-amber-600/40 rounded-tr"></div>
+                      <div className="absolute bottom-4 left-4 w-10 h-10 border-b-2 border-l-2 border-amber-600/40 rounded-bl"></div>
+                      <div className="absolute bottom-4 right-4 w-10 h-10 border-b-2 border-r-2 border-amber-600/40 rounded-br"></div>
+
+                      {/* Giant subtle watermark emblem in the background */}
+                      <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none z-0">
+                        <Award className="w-80 h-80 text-amber-600" />
+                      </div>
+
+                      {/* Top Header Row */}
+                      <div className="flex justify-between items-center w-full z-10 border-b border-amber-600/15 pb-4 mb-4">
                         <div className="text-left">
-                          <span className="text-[10px] font-black tracking-widest text-[#002060] uppercase">GoDriveify Academic</span>
+                          <span className="text-[10px] font-black tracking-[0.2em] text-[#002060] uppercase font-sans">
+                            GoDriveify Academic Academy
+                          </span>
                         </div>
-                        <Award className="w-12 h-12 text-amber-500" />
+                        
+                        {/* Premium Ribbon Medallion */}
+                        <div className="flex flex-col items-center relative -mt-2">
+                          <div className="w-14 h-14 bg-gradient-to-br from-amber-300 via-amber-400 to-amber-600 rounded-full flex items-center justify-center shadow-md relative border-2 border-amber-200 z-10 flex-col">
+                            <Award className="w-7 h-7 text-white fill-amber-100/30" />
+                          </div>
+                          {/* Crimson ribbon tails */}
+                          <div className="absolute -bottom-3 flex gap-1.5 z-0">
+                            <div className="w-2.5 h-6 bg-[#B30000] skew-x-12 rounded-b-xs"></div>
+                            <div className="w-2.5 h-6 bg-[#B30000] -skew-x-12 rounded-b-xs"></div>
+                          </div>
+                        </div>
+
                         <div className="text-right">
-                          <span className="text-[10px] font-mono text-slate-500 font-black">REGID: GD-{new Date().getFullYear()}-{Math.floor(1000 + Math.random() * 9005)}</span>
+                          <span className="text-[10px] font-mono text-slate-500 font-extrabold uppercase tracking-wider">
+                            {stableCertId}
+                          </span>
                         </div>
                       </div>
 
-                      <h4 className="font-serif text-2xl sm:text-3xl font-extrabold text-[#002060] tracking-tight my-2">
-                        SAFE DRIVER CERTIFICATE
-                      </h4>
-                      <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold italic mb-6">
-                        This document honors the academic achievement of
-                      </p>
+                      {/* Main Title of honors */}
+                      <div className="z-10 flex flex-col items-center">
+                        <h4 className="font-serif text-3xl sm:text-4.5xl font-black text-[#002060] tracking-wide uppercase leading-tight my-2 text-center">
+                          Certificate of Safe Driving
+                        </h4>
+                        <p className="text-xs text-slate-500 uppercase tracking-[0.25em] font-bold italic mb-6">
+                          This document officially certifies that
+                        </p>
 
-                      <p className="font-sans text-xl sm:text-2xl font-black text-slate-900 border-b border-dashed border-slate-400 px-6 pb-2 inline-block min-w-[200px] text-center italic">
-                        {studentName || "Graduate Scholar"}
-                      </p>
-
-                      <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed mt-6">
-                        For verifying stellar mastery in theoretical highway driving metrics, passing the high-fidelity simulator with a cumulative score of <strong>{finalPercent}%</strong> correct.
-                      </p>
-
-                      <div className="grid grid-cols-2 gap-12 w-full mt-10 border-t border-slate-200/80 pt-6">
-                        <div className="text-center">
-                          <p className="font-serif text-sm italic font-extrabold">Faisalabad Board</p>
-                          <p className="text-[9px] text-slate-400 uppercase tracking-wider font-bold mt-1">Authorized Agency Branch</p>
+                        <div className="relative inline-block my-2">
+                          <p className="font-serif text-2xl sm:text-3xl font-black text-[#002060] px-10 pb-2 border-b-2 border-amber-500/40 min-w-[280px] text-center italic">
+                            {studentName || "Graduate Scholar"}
+                          </p>
                         </div>
+
+                        <p className="text-xs sm:text-sm text-slate-700 max-w-2xl mx-auto leading-relaxed mt-6 font-sans px-4">
+                          has successfully demonstrated exceptional defensive driving aptitude, high-fidelity simulator operation, and outstanding mastery of Pakistani Highway traffic safety regulations, completing the required curriculum with a final score of <strong className="text-[#002060] font-black text-sm">{finalPercent}%</strong> correct on <strong className="text-slate-800 font-bold">{certificateDate}</strong>.
+                        </p>
+                      </div>
+
+                      {/* Signatures & Stamps Footer */}
+                      <div className="grid grid-cols-3 gap-6 w-full mt-10 border-t border-amber-600/15 pt-8 z-10">
                         <div className="text-center">
-                          <p className="font-serif text-sm italic font-extrabold">GoDriveify Principal</p>
-                          <p className="text-[9px] text-slate-400 uppercase tracking-wider font-bold mt-1">Official Academy Stamp</p>
+                          <p className="font-serif text-sm italic font-extrabold text-[#002060] tracking-wide select-none">
+                            M. Jamil Akhtar
+                          </p>
+                          <div className="w-24 h-[1px] bg-slate-300 mx-auto my-1"></div>
+                          <p className="text-[9px] text-slate-400 uppercase tracking-widest font-bold">
+                            Licensing Commissioner
+                          </p>
+                          <p className="text-[8px] text-slate-300 uppercase tracking-widest font-semibold">
+                            Faisalabad Branch
+                          </p>
+                        </div>
+
+                        {/* Middle Verified Seal */}
+                        <div className="flex flex-col items-center justify-center -mt-2">
+                          <div className="px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-md text-[9px] font-black text-green-700 tracking-wider uppercase mb-1 flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> VERIFIED STATUS
+                          </div>
+                          <p className="text-[8px] font-mono text-slate-400">
+                            ID: {stableCertId.split('-')[2] || "9481"}
+                          </p>
+                        </div>
+
+                        <div className="text-center">
+                          <p className="font-serif text-sm italic font-extrabold text-[#002060] tracking-wide select-none">
+                            T. Javed Khan
+                          </p>
+                          <div className="w-24 h-[1px] bg-slate-300 mx-auto my-1"></div>
+                          <p className="text-[9px] text-slate-400 uppercase tracking-widest font-bold">
+                            GoDriveify Director
+                          </p>
+                          <p className="text-[8px] text-slate-300 uppercase tracking-widest font-semibold">
+                            Academic Seal
+                          </p>
                         </div>
                       </div>
 
-                      {/* Download Simulated Trigger */}
-                      <button 
-                        type="button" 
-                        onClick={handleShare}
-                        className="mt-8 text-xs text-[#002060] hover:text-[#FF7112] font-black uppercase tracking-wider underline flex items-center gap-1 cursor-pointer"
-                      >
-                        <RefreshCw className="w-3.5 h-3.5" /> Force PDF Generate (Simulated)
-                      </button>
                     </div>
                   </div>
                 )}
