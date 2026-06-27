@@ -1868,6 +1868,41 @@ export default function QuizPage() {
                   }
                 </p>
 
+                {/* Score Progress Bar */}
+                <div className="w-full max-w-xl mx-auto my-6 px-4">
+                  <div className="flex justify-between items-center mb-1.5 text-xs font-bold text-slate-500 uppercase">
+                    <span className="flex items-center gap-1.5">
+                      <Gauge className="w-4 h-4 text-[#FF7112]" /> Exam Progress Meter
+                    </span>
+                    <span className={`${isPassing ? 'text-emerald-600' : 'text-rose-600'} font-mono`}>
+                      {score} / {activeQuestions.length} Correct ({finalPercent}%)
+                    </span>
+                  </div>
+                  <div className="w-full bg-slate-100 rounded-full h-5 overflow-hidden relative shadow-inner border border-slate-200/60 p-0.5">
+                    {/* Passing mark (70%) */}
+                    <div className="absolute left-[70%] top-0 bottom-0 w-[2px] bg-amber-500/80 z-20" />
+                    <div 
+                      className={`h-full rounded-full transition-all duration-1000 ease-out flex items-center justify-end pr-2 min-w-[2.5rem] ${
+                        isPassing 
+                          ? 'bg-gradient-to-r from-emerald-400 to-green-600 shadow-md shadow-green-500/20' 
+                          : 'bg-gradient-to-r from-rose-400 to-red-600 shadow-md shadow-red-500/20'
+                      }`}
+                      style={{ width: `${Math.max(5, finalPercent)}%` }}
+                    >
+                      {finalPercent >= 15 && (
+                        <span className="text-[9px] font-black text-white tracking-widest uppercase">
+                          {finalPercent}%
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center mt-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                    <span>0% (Min)</span>
+                    <span className="text-amber-600 font-extrabold bg-amber-50 px-2 py-0.5 rounded border border-amber-200/40">70% (Passing Score)</span>
+                    <span>100% (Perfect)</span>
+                  </div>
+                </div>
+
                 {/* Score panel detailed breakdown */}
                 <div className="my-8 grid grid-cols-2 sm:grid-cols-4 gap-4 w-full">
                   <div className="p-4 bg-slate-50/70 border border-slate-200/50 rounded-2xl shadow-xs text-center">
@@ -1889,6 +1924,48 @@ export default function QuizPage() {
                     <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wide">Status badge</span>
                   </div>
                 </div>
+
+                {/* Learn & Correct: Incorrect Answers Spotlight */}
+                {history.filter(h => !h.isCorrect).length > 0 && (
+                  <div className="w-full max-w-3xl mt-2 mb-8 bg-rose-50/40 border border-rose-200/60 p-5 sm:p-6 rounded-2xl text-left shadow-xs">
+                    <h3 className="font-extrabold text-rose-800 text-sm uppercase tracking-wider flex items-center gap-2 mb-2">
+                      <AlertCircle className="w-5 h-5 text-rose-600 animate-pulse" /> Focus Learning: Incorrect Answers Highlights
+                    </h3>
+                    <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+                      You missed the following questions. Please study the correct required answers and safe-driving rationales to secure a 100% safety record on your upcoming official driving test:
+                    </p>
+                    <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                      {history.filter(h => !h.isCorrect).map((item, idx) => (
+                        <div key={idx} className="bg-white p-4 rounded-xl border border-rose-200/60 shadow-xs flex flex-col gap-2.5 hover:shadow-md transition-all">
+                          <div className="flex items-start gap-2.5">
+                            <span className="w-5 h-5 bg-rose-100 text-rose-800 text-[10px] font-black rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                              {idx + 1}
+                            </span>
+                            <div>
+                              <p className="font-bold text-slate-800 text-sm leading-snug">{item.question}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs mt-1 pl-7">
+                            <div className="bg-rose-50/50 p-2.5 rounded-lg border border-rose-100">
+                              <span className="font-bold text-rose-700 block uppercase text-[9px] tracking-wide mb-1">Your Selected Answer:</span>
+                              <span className="text-slate-700 font-medium">{item.selected}</span>
+                            </div>
+                            <div className="bg-emerald-50/50 p-2.5 rounded-lg border border-emerald-100">
+                              <span className="font-bold text-emerald-700 block uppercase text-[9px] tracking-wide mb-1">Correct Required Answer:</span>
+                              <span className="text-slate-800 font-extrabold">{item.correctText}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="bg-amber-50/40 p-3 rounded-lg border border-amber-100 text-xs text-slate-600 flex gap-2 pl-7 mt-0.5">
+                            <strong className="text-amber-800 shrink-0 uppercase text-[9px] tracking-wider mt-0.5">Driving Rule Explanation:</strong>
+                            <span className="leading-relaxed italic">{item.rationale}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Certificate Generator Trigger Block if passed */}
                 {isPassing && (
@@ -2089,10 +2166,10 @@ export default function QuizPage() {
                     </div>
                   ) : (
                     filteredHistory.map((item, idx) => (
-                      <div key={idx} className={`p-4 rounded-xl border bg-white shadow-2xs transition-all hover:border-slate-350 ${item.isCorrect ? 'border-green-200' : 'border-red-200'}`}>
+                      <div key={idx} className={`p-4 rounded-xl border bg-white shadow-2xs transition-all hover:border-slate-350 ${item.isCorrect ? 'border-green-200' : 'border-rose-200'}`}>
                         <div className="flex justify-between items-start gap-2 mb-2">
                           <p className="font-bold text-slate-800 text-sm leading-snug">{idx + 1}. {item.question}</p>
-                          <span className={`text-[9px] uppercase tracking-widest px-2.5 py-0.5 rounded-full font-black ${item.isCorrect ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-00 text-red-800'}`}>
+                          <span className={`text-[9px] uppercase tracking-widest px-2.5 py-0.5 rounded-full font-black ${item.isCorrect ? 'bg-green-100 text-green-800' : 'bg-rose-100 text-rose-800'}`}>
                             {item.isCorrect ? "Correct" : "Incorrect"}
                           </span>
                         </div>
