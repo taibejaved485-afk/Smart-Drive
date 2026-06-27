@@ -468,124 +468,84 @@ export default function ContactPage() {
                 </span>
               </div>
 
-              {/* Styled graphic map template with premium high-tech glowing orange roads */}
+              {/* Styled graphic map template with elegant glowing orange roads */}
               <div className="absolute inset-x-4 top-24 bottom-14 bg-slate-950 border border-slate-850 rounded-2xl overflow-hidden flex items-center justify-center shadow-inner">
-                {/* CSS Scoped Styles for map animations */}
+                {/* CSS Scoped Styles for clean animated cars */}
                 <style dangerouslySetInnerHTML={{__html: `
                   @keyframes driveRoadHorizontal {
                     0% { left: -10%; }
                     100% { left: 110%; }
                   }
                   @keyframes driveRoadSlanted {
-                    0% { top: -10%; left: 35%; }
-                    100% { top: 110%; left: 55%; }
-                  }
-                  @keyframes radarSweepCircle {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
+                    0% { top: -10%; }
+                    100% { top: 110%; }
                   }
                 `}} />
 
-                {/* Visual grid overlay for tech/navigation look */}
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+                {/* Visual grid overlay for clean navigation aesthetic */}
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
                 
-                {/* Radar Sweep Effect */}
-                <div className="absolute inset-0 pointer-events-none z-0">
-                  <div 
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] h-[380px] rounded-full border border-orange-500/5 bg-[conic-gradient(from_0deg,rgba(255,113,18,0.08),transparent_60%)] pointer-events-none"
-                    style={{ animation: 'radarSweepCircle 6s linear infinite' }}
-                  />
-                </div>
-
-                {/* Visual road layouts with neon orange glowing borders and center dividers */}
+                {/* Visual road layouts with clean glowing orange borders and center dividers */}
                 <div className="absolute inset-0">
                   {/* Road 1 (Angled from top-left) */}
                   <div className="w-[150%] h-10 bg-slate-900 absolute top-1/4 left-[-25%] -rotate-12 flex items-center shadow-lg">
                     {/* Glowing orange edge line - Top */}
-                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-orange-500 shadow-[0_0_8px_rgba(255,113,18,0.85)]" />
+                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-orange-500/80 shadow-[0_0_6px_rgba(255,113,18,0.6)]" />
                     {/* Glowing orange edge line - Bottom */}
-                    <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-orange-500 shadow-[0_0_8px_rgba(255,113,18,0.85)]" />
+                    <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-orange-500/80 shadow-[0_0_6px_rgba(255,113,18,0.6)]" />
                     {/* Center lane divider */}
-                    <div className="w-full h-[1px] border-t border-dashed border-[#FF7112]/30" />
+                    <div className="w-full h-[1px] border-t border-dashed border-[#FF7112]/20" />
                   </div>
 
                   {/* Road 2 (Slanted vertical road) */}
                   <div className="w-10 h-[150%] bg-slate-900 absolute top-[-25%] left-[45%] rotate-12 flex justify-center shadow-lg">
                     {/* Glowing orange edge line - Left */}
-                    <div className="absolute top-0 bottom-0 left-0 w-[2px] bg-orange-500 shadow-[0_0_8px_rgba(255,113,18,0.85)]" />
+                    <div className="absolute top-0 bottom-0 left-0 w-[2px] bg-orange-500/80 shadow-[0_0_6px_rgba(255,113,18,0.6)]" />
                     {/* Glowing orange edge line - Right */}
-                    <div className="absolute top-0 bottom-0 right-0 w-[2px] bg-orange-500 shadow-[0_0_8px_rgba(255,113,18,0.85)]" />
+                    <div className="absolute top-0 bottom-0 right-0 w-[2px] bg-orange-500/80 shadow-[0_0_6px_rgba(255,113,18,0.6)]" />
                     {/* Center lane divider */}
-                    <div className="h-full w-[1px] border-l border-dashed border-[#FF7112]/30" />
-                    
-                    {/* Animated Car 1 traveling on slanted road */}
+                    <div className="h-full w-[1px] border-l border-dashed border-[#FF7112]/20" />
+
+                    {/* Animated Training Car 1 traveling along slanted vertical track */}
                     <div 
-                      className="absolute w-3 h-3 bg-[#FF7112] rounded-full border border-white shadow-[0_0_8px_#FF7112] flex items-center justify-center pointer-events-none"
-                      style={{ animation: 'driveRoadSlanted 10s linear infinite' }}
+                      className="absolute left-1/2 -translate-x-1/2 w-4 h-4 bg-[#FF7112] rounded-full border border-white shadow-[0_0_8px_rgba(255,113,18,0.6)] flex items-center justify-center pointer-events-none"
+                      style={{ animation: 'driveRoadSlanted 9s linear infinite' }}
                     >
-                      <span className="absolute w-5 h-5 bg-[#FF7112]/30 rounded-full animate-ping" />
+                      <Car className="w-2.5 h-2.5 text-white" />
                     </div>
                   </div>
 
                   {/* Road 3 (Horizontal bottom highway) */}
                   <div className="w-[150%] h-10 bg-slate-900/95 absolute top-2/3 left-[-25%] flex items-center shadow-lg">
                     {/* Glowing orange edge line - Top */}
-                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-orange-500 shadow-[0_0_8px_rgba(255,113,18,0.85)]" />
+                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-orange-500/80 shadow-[0_0_6px_rgba(255,113,18,0.6)]" />
                     {/* Glowing orange edge line - Bottom */}
-                    <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-orange-500 shadow-[0_0_8px_rgba(255,113,18,0.85)]" />
+                    <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-orange-500/80 shadow-[0_0_6px_rgba(255,113,18,0.6)]" />
                     {/* Center lane divider */}
-                    <div className="w-full h-[1px] border-t border-dashed border-[#FF7112]/30" />
-                    
-                    {/* Animated Car 2 traveling horizontally */}
+                    <div className="w-full h-[1px] border-t border-dashed border-[#FF7112]/20" />
+
+                    {/* Animated Training Car 2 traveling along bottom track */}
                     <div 
-                      className="absolute w-3 h-3 bg-emerald-400 rounded-full border border-white shadow-[0_0_8px_#10B981] flex items-center justify-center pointer-events-none"
+                      className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-emerald-500 rounded-full border border-white shadow-[0_0_8px_rgba(16,185,129,0.6)] flex items-center justify-center pointer-events-none"
                       style={{ animation: 'driveRoadHorizontal 12s linear infinite' }}
                     >
-                      <span className="absolute w-5 h-5 bg-emerald-400/30 rounded-full animate-ping" />
+                      <Car className="w-2.5 h-2.5 text-white" />
                     </div>
                   </div>
 
-                  {/* Roundabout practicing ring with glowing neon circle */}
-                  <div className="w-24 h-24 rounded-full border-2 border-orange-500/75 shadow-[0_0_15px_rgba(255,113,18,0.65)] absolute top-1/4 left-1/3 border-dashed animate-[spin_60s_linear_infinite]" />
+                  {/* Roundabout practicing ring - simple dashed track */}
+                  <div className="w-24 h-24 rounded-full border-2 border-orange-500/30 absolute top-1/4 left-1/3 border-dashed" />
                 </div>
 
-                {/* Additional Glowing POIs (Points of Interest) */}
-                <div className="absolute top-[48%] left-[16%] z-10 flex items-center gap-1 pointer-events-none">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_5px_#10B981] animate-pulse" />
-                  <span className="text-[7px] font-mono font-black text-slate-300 tracking-wider uppercase bg-slate-950/75 px-1 rounded border border-slate-800">
-                    Parallel Zone
-                  </span>
-                </div>
-
-                <div className="absolute top-[14%] right-[12%] z-10 flex items-center gap-1 pointer-events-none">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#FF7112] shadow-[0_0_5px_#FF7112] animate-pulse" />
-                  <span className="text-[7px] font-mono font-black text-slate-300 tracking-wider uppercase bg-slate-950/75 px-1 rounded border border-slate-800">
-                    L-Type Track
-                  </span>
-                </div>
-
-                {/* Floating telemetry HUD overlay */}
-                <div className="absolute bottom-2 left-2 bg-slate-950/90 border border-slate-800 rounded-xl p-2 z-10 shadow-lg flex flex-col gap-0.5 pointer-events-none max-w-[125px] backdrop-blur-sm">
-                  <div className="flex items-center gap-1 text-[7.5px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-850 pb-0.5">
-                    <span className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
-                    GPS STATUS
-                  </div>
-                  <div className="grid grid-cols-2 gap-x-1 text-[6.5px] font-mono text-slate-400">
-                    <span>LAT:</span> <span className="text-white font-bold">31.4504 N</span>
-                    <span>LNG:</span> <span className="text-white font-bold">73.0805 E</span>
-                    <span>ZONE:</span> <span className="text-[#FF7112] font-black">YARD-FSD</span>
-                  </div>
-                </div>
-
-                {/* Styled marker with vibrant high-visibility custom ping */}
+                {/* Styled marker with vibrant high-visibility orange ping */}
                 <div className="relative z-10 flex flex-col items-center">
                   <div className="relative">
-                    <span className="absolute -inset-1.5 rounded-full bg-[#FF7112]/30 animate-ping"></span>
-                    <div className="w-6 h-6 bg-[#FF7112] border-2 border-white rounded-full flex items-center justify-center shadow-[0_0_15px_#FF7112] relative z-10">
-                      <Car className="w-3.5 h-3.5 text-white animate-pulse" />
+                    <span className="absolute -inset-1.5 rounded-full bg-[#FF7112]/25 animate-ping"></span>
+                    <div className="w-6 h-6 bg-[#FF7112] border-2 border-white rounded-full flex items-center justify-center shadow-[0_0_12px_rgba(255,113,18,0.5)] relative z-10">
+                      <Car className="w-3.5 h-3.5 text-white" />
                     </div>
                   </div>
-                  <div className="bg-slate-950 text-white font-black text-[9px] px-3 py-1 rounded-xl shadow-2xl mt-2 border border-[#FF7112]/30 uppercase tracking-widest bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950">
+                  <div className="bg-slate-950 text-white font-black text-[9px] px-3 py-1 rounded-xl shadow-2xl mt-2 border border-[#FF7112]/30 uppercase tracking-widest">
                     GoDriveify HQ
                   </div>
                 </div>
