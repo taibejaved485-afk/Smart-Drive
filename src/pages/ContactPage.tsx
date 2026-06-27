@@ -8,7 +8,8 @@ import SEO from '../components/SEO';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { 
   Mail, Phone, MapPin, Clock, Send, CheckCircle2, ChevronRight, 
-  Car, Shield, Award, HelpCircle, ArrowRight, MessageSquare, ExternalLink
+  Car, Shield, Award, HelpCircle, ArrowRight, MessageSquare, ExternalLink,
+  Compass, Lightbulb
 } from 'lucide-react';
 import { useToast } from '../components/Toast';
 
@@ -16,6 +17,49 @@ export default function ContactPage() {
   const [searchParams] = useSearchParams();
   const programParam = searchParams.get('program');
   const toast = useToast();
+
+  const [mapMode, setMapMode] = useState<'yard' | 'routes'>('yard');
+  const [hoveredRoute, setHoveredRoute] = useState<number | null>(null);
+  const [activeRoute, setActiveRoute] = useState<number | null>(null);
+
+  const FAISALABAD_TEST_ROUTES = [
+    {
+      id: 1,
+      name: "Sargodha Road Test Track",
+      description: "Official traffic police testing center",
+      difficulty: "Hard",
+      tip: "Maintain strict 20 km/h. Look back before reversing in the L-track.",
+      coords: { x: "25%", y: "45%" },
+      maneuver: "L-Track Test",
+    },
+    {
+      id: 2,
+      name: "Millat Road Bypass Track",
+      description: "Parallel parking & maneuver testing area",
+      difficulty: "Medium",
+      tip: "Tilt side mirrors down to keep a perfect watch on ground cones.",
+      coords: { x: "65%", y: "30%" },
+      maneuver: "Parallel Parking",
+    },
+    {
+      id: 3,
+      name: "Canal Road Gradient Point",
+      description: "Slope control & halt testing zone",
+      difficulty: "Hard",
+      tip: "Use the handbrake restart method on steep slopes to avoid backward roll.",
+      coords: { x: "42%", y: "75%" },
+      maneuver: "Slope Restart",
+    },
+    {
+      id: 4,
+      name: "D-Ground Arena Track",
+      description: "Advanced steering & slalom control points",
+      difficulty: "Easy",
+      tip: "Align door handle with indicator cone before locking the steering wheel.",
+      coords: { x: "82%", y: "55%" },
+      maneuver: "Slalom Control",
+    }
+  ];
 
   const contactSchema = {
     "@context": "https://schema.org",
@@ -457,104 +501,271 @@ export default function ContactPage() {
             </div>
 
             {/* Right side beautifully styled map mockup (clean and beautiful UI card representation) */}
-            <div className="bg-slate-900 border border-slate-800 p-4 rounded-3xl relative overflow-hidden h-96 sm:h-[400px] shadow-2xl flex flex-col justify-between">
-              <div className="flex justify-between items-center bg-slate-950/80 backdrop-blur-md p-3.5 rounded-2xl border border-slate-800 shadow-lg z-10">
-                <div>
-                  <h4 className="font-bold text-white text-xs">Faisalabad Campus Yard</h4>
-                  <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Millat Road Sector</p>
+            <div className="bg-slate-900 border border-slate-800 p-4 rounded-3xl relative overflow-hidden h-[440px] shadow-2xl flex flex-col justify-between">
+              <div className="flex flex-col gap-2 z-10">
+                <div className="flex justify-between items-center bg-slate-950/80 backdrop-blur-md p-3 rounded-2xl border border-slate-800 shadow-lg">
+                  <div>
+                    <h4 className="font-bold text-white text-xs">
+                      {mapMode === 'yard' ? 'Faisalabad Campus Yard' : 'Faisalabad Driving Test Tracks'}
+                    </h4>
+                    <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
+                      {mapMode === 'yard' ? 'Millat Road Sector' : 'Common Licensing Tracks'}
+                    </p>
+                  </div>
+                  <span className="bg-[#FF7112]/20 border border-[#FF7112]/40 text-[#FF7112] text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-xl shadow-[0_0_10px_rgba(255,113,18,0.2)] animate-pulse">
+                    {mapMode === 'yard' ? 'YARD_ACTIVE' : 'TRACKS_LIVE'}
+                  </span>
                 </div>
-                <span className="bg-[#FF7112]/20 border border-[#FF7112]/40 text-[#FF7112] text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-xl shadow-[0_0_10px_rgba(255,113,18,0.2)] animate-pulse">
-                  Registered Academy
-                </span>
+
+                {/* Mode Selectors */}
+                <div className="flex gap-1 p-1 bg-slate-950/90 border border-slate-800/80 rounded-xl">
+                  <button 
+                    onClick={() => setMapMode('yard')}
+                    className={`flex-1 text-center py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer ${
+                      mapMode === 'yard' 
+                        ? 'bg-[#FF7112] text-white shadow-[0_0_10px_rgba(255,113,18,0.45)]' 
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/40'
+                    }`}
+                  >
+                    Training Yard
+                  </button>
+                  <button 
+                    onClick={() => setMapMode('routes')}
+                    className={`flex-1 text-center py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer ${
+                      mapMode === 'routes' 
+                        ? 'bg-[#FF7112] text-white shadow-[0_0_10px_rgba(255,113,18,0.45)]' 
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/40'
+                    }`}
+                  >
+                    FSD Test Routes
+                  </button>
+                </div>
               </div>
 
-              {/* Styled graphic map template with elegant glowing orange roads */}
-              <div className="absolute inset-x-4 top-24 bottom-14 bg-slate-950 border border-slate-850 rounded-2xl overflow-hidden flex items-center justify-center shadow-inner">
-                {/* CSS Scoped Styles for clean animated cars */}
-                <style dangerouslySetInnerHTML={{__html: `
-                  @keyframes driveRoadHorizontal {
-                    0% { left: -10%; }
-                    100% { left: 110%; }
-                  }
-                  @keyframes driveRoadSlanted {
-                    0% { top: -10%; }
-                    100% { top: 110%; }
-                  }
-                `}} />
+              {/* Map body wrapper */}
+              <div className="absolute inset-x-4 top-[148px] bottom-16 bg-slate-950 border border-slate-850 rounded-2xl overflow-hidden flex items-center justify-center shadow-inner">
+                {mapMode === 'routes' ? (
+                  <div className="absolute inset-0">
+                    {/* SVG connection tracks */}
+                    <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-80" xmlns="http://www.w3.org/2000/svg">
+                      <style dangerouslySetInnerHTML={{__html: `
+                        @keyframes dashTrack {
+                          to { stroke-dashoffset: -40; }
+                        }
+                      `}} />
+                      {/* Interactive glowing paths between test zones */}
+                      <path 
+                        d="M 60 80 Q 120 40 160 110" 
+                        fill="none" 
+                        stroke="#FF7112" 
+                        strokeWidth="2.5" 
+                        strokeDasharray="4,4" 
+                        style={{ animation: 'dashTrack 3s linear infinite' }}
+                        className="opacity-70"
+                      />
+                      <path 
+                        d="M 160 110 T 250 50" 
+                        fill="none" 
+                        stroke="#FF7112" 
+                        strokeWidth="2.5" 
+                        strokeDasharray="4,4" 
+                        style={{ animation: 'dashTrack 2.5s linear infinite' }}
+                        className="opacity-70"
+                      />
+                      <path 
+                        d="M 250 50 Q 280 90 310 90" 
+                        fill="none" 
+                        stroke="#FF7112" 
+                        strokeWidth="2.5" 
+                        strokeDasharray="4,4" 
+                        style={{ animation: 'dashTrack 3.5s linear infinite' }}
+                        className="opacity-40"
+                      />
+                    </svg>
 
-                {/* Visual grid overlay for clean navigation aesthetic */}
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
-                
-                {/* Visual road layouts with clean glowing orange borders and center dividers */}
-                <div className="absolute inset-0">
-                  {/* Road 1 (Angled from top-left) */}
-                  <div className="w-[150%] h-10 bg-slate-900 absolute top-1/4 left-[-25%] -rotate-12 flex items-center shadow-lg">
-                    {/* Glowing orange edge line - Top */}
-                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-orange-500/80 shadow-[0_0_6px_rgba(255,113,18,0.6)]" />
-                    {/* Glowing orange edge line - Bottom */}
-                    <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-orange-500/80 shadow-[0_0_6px_rgba(255,113,18,0.6)]" />
-                    {/* Center lane divider */}
-                    <div className="w-full h-[1px] border-t border-dashed border-[#FF7112]/20" />
-                  </div>
+                    {/* FSD Interactive Pins */}
+                    {FAISALABAD_TEST_ROUTES.map((route) => {
+                      const isHovered = hoveredRoute === route.id;
+                      const isActive = activeRoute === route.id;
+                      return (
+                        <div 
+                          key={route.id}
+                          className="absolute z-10 cursor-pointer group transition-all"
+                          style={{ left: route.coords.x, top: route.coords.y }}
+                          onMouseEnter={() => setHoveredRoute(route.id)}
+                          onMouseLeave={() => setHoveredRoute(null)}
+                          onClick={() => setActiveRoute(route.id === activeRoute ? null : route.id)}
+                        >
+                          {/* Pin radar wave */}
+                          <span className={`absolute -inset-2 rounded-full transition-all duration-300 ${
+                            isHovered || isActive ? 'bg-[#FF7112]/30 scale-125 animate-ping' : 'bg-[#FF7112]/10'
+                          }`} />
+                          
+                          {/* Inner custom dot marker */}
+                          <div className={`w-5 h-5 rounded-full flex items-center justify-center border border-white transition-all shadow-md ${
+                            isHovered || isActive ? 'bg-[#FF7112] scale-110 shadow-[0_0_12px_#FF7112]' : 'bg-slate-900 hover:bg-[#FF7112]/80'
+                          }`}>
+                            <Compass className="w-2.5 h-2.5 text-white" />
+                          </div>
 
-                  {/* Road 2 (Slanted vertical road) */}
-                  <div className="w-10 h-[150%] bg-slate-900 absolute top-[-25%] left-[45%] rotate-12 flex justify-center shadow-lg">
-                    {/* Glowing orange edge line - Left */}
-                    <div className="absolute top-0 bottom-0 left-0 w-[2px] bg-orange-500/80 shadow-[0_0_6px_rgba(255,113,18,0.6)]" />
-                    {/* Glowing orange edge line - Right */}
-                    <div className="absolute top-0 bottom-0 right-0 w-[2px] bg-orange-500/80 shadow-[0_0_6px_rgba(255,113,18,0.6)]" />
-                    {/* Center lane divider */}
-                    <div className="h-full w-[1px] border-l border-dashed border-[#FF7112]/20" />
+                          {/* Float dynamic tip card */}
+                          <AnimatePresence>
+                            {(isHovered || isActive) && (
+                              <motion.div 
+                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                className="absolute bottom-7 left-1/2 -translate-x-1/2 w-48 bg-slate-950 border border-slate-800 text-white p-2.5 rounded-xl shadow-2xl z-30 pointer-events-none backdrop-blur-md"
+                              >
+                                <div className="flex justify-between items-center gap-1.5 mb-1">
+                                  <span className="text-[7.5px] font-black uppercase text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded">
+                                    {route.maneuver}
+                                  </span>
+                                  <span className={`text-[7px] font-black px-1.5 py-0.5 rounded ${
+                                    route.difficulty === 'Hard' ? 'bg-red-500/20 text-red-400' :
+                                    route.difficulty === 'Medium' ? 'bg-amber-500/20 text-amber-400' :
+                                    'bg-emerald-500/20 text-emerald-400'
+                                  }`}>
+                                    {route.difficulty}
+                                  </span>
+                                </div>
+                                <h5 className="font-extrabold text-[10px] text-white tracking-wide truncate">{route.name}</h5>
+                                <div className="mt-1 border-t border-slate-850 pt-1">
+                                  <p className="text-[8.5px] text-slate-300 leading-snug font-medium flex items-start gap-1">
+                                    <Lightbulb className="w-3 h-3 text-amber-400 shrink-0 mt-0.5" />
+                                    <span>
+                                      <span className="font-bold text-slate-200">Tip:</span> {route.tip}
+                                    </span>
+                                  </p>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      );
+                    })}
 
-                    {/* Animated Training Car 1 traveling along slanted vertical track */}
-                    <div 
-                      className="absolute left-1/2 -translate-x-1/2 w-4 h-4 bg-[#FF7112] rounded-full border border-white shadow-[0_0_8px_rgba(255,113,18,0.6)] flex items-center justify-center pointer-events-none"
-                      style={{ animation: 'driveRoadSlanted 9s linear infinite' }}
-                    >
-                      <Car className="w-2.5 h-2.5 text-white" />
+                    {/* Visual grid overlay for clean navigation aesthetic */}
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
+
+                    {/* Floating map instruction guide badge */}
+                    <div className="absolute top-2 right-2 bg-slate-950/90 border border-slate-800/80 px-2 py-1 rounded-lg text-[8.5px] text-slate-300 font-bold uppercase tracking-widest flex items-center gap-1.5 pointer-events-none z-10 shadow-md">
+                      <span className="w-1.5 h-1.5 bg-[#FF7112] rounded-full animate-ping" />
+                      Hover Pins for Tips
                     </div>
                   </div>
+                ) : (
+                  <div className="absolute inset-0">
+                    {/* CSS Scoped Styles for clean animated cars */}
+                    <style dangerouslySetInnerHTML={{__html: `
+                      @keyframes driveRoadHorizontal {
+                        0% { left: -10%; }
+                        100% { left: 110%; }
+                      }
+                      @keyframes driveRoadSlanted {
+                        0% { top: -10%; }
+                        100% { top: 110%; }
+                      }
+                    `}} />
 
-                  {/* Road 3 (Horizontal bottom highway) */}
-                  <div className="w-[150%] h-10 bg-slate-900/95 absolute top-2/3 left-[-25%] flex items-center shadow-lg">
-                    {/* Glowing orange edge line - Top */}
-                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-orange-500/80 shadow-[0_0_6px_rgba(255,113,18,0.6)]" />
-                    {/* Glowing orange edge line - Bottom */}
-                    <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-orange-500/80 shadow-[0_0_6px_rgba(255,113,18,0.6)]" />
-                    {/* Center lane divider */}
-                    <div className="w-full h-[1px] border-t border-dashed border-[#FF7112]/20" />
+                    {/* Visual grid overlay for clean navigation aesthetic */}
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+                    
+                    {/* Visual road layouts with clean glowing orange borders and center dividers */}
+                    <div className="absolute inset-0">
+                      {/* Road 1 (Angled from top-left) */}
+                      <div className="w-[150%] h-10 bg-slate-900 absolute top-1/4 left-[-25%] -rotate-12 flex items-center shadow-lg">
+                        {/* Glowing orange edge line - Top */}
+                        <div className="absolute top-0 left-0 right-0 h-[2px] bg-orange-500/80 shadow-[0_0_6px_rgba(255,113,18,0.6)]" />
+                        {/* Glowing orange edge line - Bottom */}
+                        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-orange-500/80 shadow-[0_0_6px_rgba(255,113,18,0.6)]" />
+                        {/* Center lane divider */}
+                        <div className="w-full h-[1px] border-t border-dashed border-[#FF7112]/20" />
+                      </div>
 
-                    {/* Animated Training Car 2 traveling along bottom track */}
-                    <div 
-                      className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-emerald-500 rounded-full border border-white shadow-[0_0_8px_rgba(16,185,129,0.6)] flex items-center justify-center pointer-events-none"
-                      style={{ animation: 'driveRoadHorizontal 12s linear infinite' }}
-                    >
-                      <Car className="w-2.5 h-2.5 text-white" />
+                      {/* Road 2 (Slanted vertical road) */}
+                      <div className="w-10 h-[150%] bg-slate-900 absolute top-[-25%] left-[45%] rotate-12 flex justify-center shadow-lg">
+                        {/* Glowing orange edge line - Left */}
+                        <div className="absolute top-0 bottom-0 left-0 w-[2px] bg-orange-500/80 shadow-[0_0_6px_rgba(255,113,18,0.6)]" />
+                        {/* Glowing orange edge line - Right */}
+                        <div className="absolute top-0 bottom-0 right-0 w-[2px] bg-orange-500/80 shadow-[0_0_6px_rgba(255,113,18,0.6)]" />
+                        {/* Center lane divider */}
+                        <div className="h-full w-[1px] border-l border-dashed border-[#FF7112]/20" />
+
+                        {/* Animated Training Car 1 traveling along slanted vertical track */}
+                        <div 
+                          className="absolute left-1/2 -translate-x-1/2 w-4 h-4 bg-[#FF7112] rounded-full border border-white shadow-[0_0_8px_rgba(255,113,18,0.6)] flex items-center justify-center pointer-events-none"
+                          style={{ animation: 'driveRoadSlanted 9s linear infinite' }}
+                        >
+                          <Car className="w-2.5 h-2.5 text-white animate-pulse" />
+                        </div>
+                      </div>
+
+                      {/* Road 3 (Horizontal bottom highway) */}
+                      <div className="w-[150%] h-10 bg-slate-900/95 absolute top-2/3 left-[-25%] flex items-center shadow-lg">
+                        {/* Glowing orange edge line - Top */}
+                        <div className="absolute top-0 left-0 right-0 h-[2px] bg-orange-500/80 shadow-[0_0_6px_rgba(255,113,18,0.6)]" />
+                        {/* Glowing orange edge line - Bottom */}
+                        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-orange-500/80 shadow-[0_0_6px_rgba(255,113,18,0.6)]" />
+                        {/* Center lane divider */}
+                        <div className="w-full h-[1px] border-t border-dashed border-[#FF7112]/20" />
+
+                        {/* Animated Training Car 2 traveling along bottom track */}
+                        <div 
+                          className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-emerald-500 rounded-full border border-white shadow-[0_0_8px_rgba(16,185,129,0.6)] flex items-center justify-center pointer-events-none"
+                          style={{ animation: 'driveRoadHorizontal 12s linear infinite' }}
+                        >
+                          <Car className="w-2.5 h-2.5 text-white" />
+                        </div>
+                      </div>
+
+                      {/* Roundabout practicing ring - simple dashed track */}
+                      <div className="w-24 h-24 rounded-full border-2 border-orange-500/30 absolute top-1/4 left-1/3 border-dashed animate-[spin_65s_linear_infinite]" />
+                    </div>
+
+                    {/* Styled marker with vibrant high-visibility orange ping */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="relative z-10 flex flex-col items-center">
+                        <div className="relative">
+                          <span className="absolute -inset-1.5 rounded-full bg-[#FF7112]/25 animate-ping"></span>
+                          <div className="w-6 h-6 bg-[#FF7112] border-2 border-white rounded-full flex items-center justify-center shadow-[0_0_12px_rgba(255,113,18,0.5)] relative z-10">
+                            <Car className="w-3.5 h-3.5 text-white" />
+                          </div>
+                        </div>
+                        <div className="bg-slate-950 text-white font-black text-[9px] px-3 py-1 rounded-xl shadow-2xl mt-2 border border-[#FF7112]/30 uppercase tracking-widest pointer-events-auto">
+                          GoDriveify HQ
+                        </div>
+                      </div>
                     </div>
                   </div>
-
-                  {/* Roundabout practicing ring - simple dashed track */}
-                  <div className="w-24 h-24 rounded-full border-2 border-orange-500/30 absolute top-1/4 left-1/3 border-dashed" />
-                </div>
-
-                {/* Styled marker with vibrant high-visibility orange ping */}
-                <div className="relative z-10 flex flex-col items-center">
-                  <div className="relative">
-                    <span className="absolute -inset-1.5 rounded-full bg-[#FF7112]/25 animate-ping"></span>
-                    <div className="w-6 h-6 bg-[#FF7112] border-2 border-white rounded-full flex items-center justify-center shadow-[0_0_12px_rgba(255,113,18,0.5)] relative z-10">
-                      <Car className="w-3.5 h-3.5 text-white" />
-                    </div>
-                  </div>
-                  <div className="bg-slate-950 text-white font-black text-[9px] px-3 py-1 rounded-xl shadow-2xl mt-2 border border-[#FF7112]/30 uppercase tracking-widest">
-                    GoDriveify HQ
-                  </div>
-                </div>
+                )}
               </div>
 
               {/* Bottom bar */}
-              <div className="flex justify-between items-center text-[10.5px] text-slate-200 bg-slate-950/80 backdrop-blur-md p-3 rounded-xl border border-slate-800 shadow-md z-10">
-                <span className="font-bold text-slate-100">Millat Road, Millat Town, FSD</span>
-                <span className="font-mono text-[9px] text-[#FF7112] font-black tracking-widest uppercase">GEO_PLOT_OK</span>
+              <div className="flex justify-between items-center text-[10.5px] text-slate-200 bg-slate-950/80 backdrop-blur-md p-3 rounded-xl border border-slate-800 shadow-md z-10 transition-all min-h-[42px]">
+                {mapMode === 'routes' && (hoveredRoute || activeRoute) ? (
+                  (() => {
+                    const currentRoute = FAISALABAD_TEST_ROUTES.find(r => r.id === (hoveredRoute || activeRoute));
+                    return (
+                      <div className="flex items-center gap-2 w-full text-left">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0 animate-pulse" />
+                        <p className="text-slate-300 font-bold truncate text-[10px] w-full">
+                          <span className="text-amber-500 font-extrabold uppercase text-[9px] mr-1">{currentRoute?.maneuver}:</span>
+                          {currentRoute?.tip}
+                        </p>
+                      </div>
+                    );
+                  })()
+                ) : (
+                  <>
+                    <span className="font-bold text-slate-100">
+                      {mapMode === 'yard' ? 'Millat Road, Millat Town, FSD' : 'Faisalabad Traffic Test Sectors'}
+                    </span>
+                    <span className="font-mono text-[9px] text-[#FF7112] font-black tracking-widest uppercase">
+                      {mapMode === 'yard' ? 'GEO_PLOT_OK' : 'TRACKS_LIVE'}
+                    </span>
+                  </>
+                )}
               </div>
             </div>
 
