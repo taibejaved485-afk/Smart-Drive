@@ -77,6 +77,7 @@ export default function Navbar() {
     { name: 'Rent Car', path: '/rentals' },
     { name: 'Sale Car', path: '/car-sale' },
     { name: 'Students Quiz', path: '/quiz' },
+    { name: 'Biometric Transfer', shortName: 'Biometric', path: '/biometric-transfer', urLabel: 'گاڑی کا ٹرانسفر' },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' }
   ];
@@ -282,16 +283,22 @@ export default function Navbar() {
               <BrandLogo />
             </Link>
             
-            <div className="hidden lg:flex space-x-6 font-sans font-medium text-sm text-gray-700">
+            <div className="hidden lg:flex lg:space-x-3 xl:space-x-5 font-sans font-semibold text-xs xl:text-sm text-gray-700 items-center">
               {navLinks.map(link => {
                 const isActive = location.pathname === link.path;
+                const displayName = link.shortName || link.name;
                 return (
                   <Link 
                     key={link.name} 
                     to={link.path} 
-                    className={`transition tracking-wide text-uppercase pb-1 ${isActive ? 'text-[#FF7112] border-b-2 border-[#FF7112]' : 'hover:text-[#FF7112]'}`}
+                    className={`transition tracking-wide uppercase pb-1 relative group/link shrink-0 ${isActive ? 'text-[#FF7112] font-bold border-b-2 border-[#FF7112]' : 'hover:text-[#FF7112]'}`}
                   >
-                    {link.name.toUpperCase()}
+                    {displayName}
+                    {link.path === '/biometric-transfer' && (
+                      <span className="absolute -top-3 -right-2.5 bg-orange-500 text-[8px] text-white px-1 py-0.2 rounded-full font-bold scale-90 animate-pulse">
+                        🇵🇰
+                      </span>
+                    )}
                   </Link>
                 );
               })}
@@ -363,9 +370,17 @@ export default function Navbar() {
                   key={link.name} 
                   to={link.path} 
                   onClick={() => setIsOpen(false)} 
-                  className={`block pb-1.5 border-b ${isActive ? 'text-[#FF7112] border-[#FF7112]' : 'hover:text-[#FF7112] border-gray-50'}`}
+                  className={`block pb-2 border-b flex items-center justify-between gap-2 ${isActive ? 'text-[#FF7112] border-[#FF7112] font-bold' : 'hover:text-[#FF7112] border-gray-50'}`}
                 >
-                  {link.name}
+                  <span className="flex items-center gap-1.5">
+                    {link.name}
+                    {link.path === '/biometric-transfer' && (
+                      <span className="bg-orange-100 text-[#FF7112] text-[10px] font-bold px-2 py-0.5 rounded-full">New 🇵🇰</span>
+                    )}
+                  </span>
+                  {link.urLabel && (
+                    <span className="text-xs text-slate-400 font-medium font-urdu leading-none">{link.urLabel}</span>
+                  )}
                 </Link>
               );
             })}

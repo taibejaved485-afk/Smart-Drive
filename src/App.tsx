@@ -19,6 +19,7 @@ import Programs from './pages/ServicesPage'; // alias if referenced
 import RentalsPage from './pages/RentalsPage';
 import CarSalePage from './pages/CarSalePage';
 import QuizPage from './pages/QuizPage';
+import BiometricTransferPage from './pages/BiometricTransferPage';
 import BackToTopButton from './components/BackToTopButton';
 import { ToastProvider } from './components/Toast';
 import AppPreloader from './components/AppPreloader';
@@ -44,6 +45,7 @@ export default function App() {
             <Route path="/rentals" element={<RentalsPage />} />
             <Route path="/car-sale" element={<CarSalePage />} />
             <Route path="/quiz" element={<QuizPage />} />
+            <Route path="/biometric-transfer" element={<BiometricTransferPage />} />
           </Routes>
         <WhatsAppButton />
         <BackToTopButton />

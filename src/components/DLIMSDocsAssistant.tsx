@@ -451,7 +451,7 @@ export default function DLIMSDocsAssistant() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto my-16 px-6 relative" id="dlims-assistant">
+    <div className={`max-w-6xl mx-auto my-16 px-6 relative ${language === 'ur' ? 'font-urdu' : 'font-sans'}`} id="dlims-assistant">
       {/* Printable visibility style override */}
       <style dangerouslySetInnerHTML={{__html: `
         @media print {

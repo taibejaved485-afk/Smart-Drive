@@ -31,6 +31,7 @@ export default function ContactPage() {
       tip: "Maintain strict 20 km/h. Look back before reversing in the L-track.",
       coords: { x: "25%", y: "45%" },
       maneuver: "L-Track Test",
+      path: "M 40 220 L 40 130 A 10 10 0 0 1 50 120 L 100 108"
     },
     {
       id: 2,
@@ -40,6 +41,7 @@ export default function ContactPage() {
       tip: "Tilt side mirrors down to keep a perfect watch on ground cones.",
       coords: { x: "65%", y: "30%" },
       maneuver: "Parallel Parking",
+      path: "M 200 220 L 200 100 A 15 15 0 0 1 215 85 L 260 72"
     },
     {
       id: 3,
@@ -49,6 +51,7 @@ export default function ContactPage() {
       tip: "Use the handbrake restart method on steep slopes to avoid backward roll.",
       coords: { x: "42%", y: "75%" },
       maneuver: "Slope Restart",
+      path: "M 100 220 Q 130 220 145 200 T 168 180"
     },
     {
       id: 4,
@@ -58,6 +61,7 @@ export default function ContactPage() {
       tip: "Align door handle with indicator cone before locking the steering wheel.",
       coords: { x: "82%", y: "55%" },
       maneuver: "Slalom Control",
+      path: "M 200 220 Q 230 180 260 210 T 300 160 T 328 132"
     }
   ];
 
@@ -547,40 +551,92 @@ export default function ContactPage() {
                 {mapMode === 'routes' ? (
                   <div className="absolute inset-0">
                     {/* SVG connection tracks */}
-                    <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-80" xmlns="http://www.w3.org/2000/svg">
+                    <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-90" viewBox="0 0 400 240" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
                       <style dangerouslySetInnerHTML={{__html: `
-                        @keyframes dashTrack {
-                          to { stroke-dashoffset: -40; }
+                        @keyframes drawRoutePath {
+                          from { stroke-dashoffset: 400; }
+                          to { stroke-dashoffset: 0; }
                         }
                       `}} />
-                      {/* Interactive glowing paths between test zones */}
-                      <path 
-                        d="M 60 80 Q 120 40 160 110" 
-                        fill="none" 
-                        stroke="#FF7112" 
-                        strokeWidth="2.5" 
-                        strokeDasharray="4,4" 
-                        style={{ animation: 'dashTrack 3s linear infinite' }}
-                        className="opacity-70"
-                      />
-                      <path 
-                        d="M 160 110 T 250 50" 
-                        fill="none" 
-                        stroke="#FF7112" 
-                        strokeWidth="2.5" 
-                        strokeDasharray="4,4" 
-                        style={{ animation: 'dashTrack 2.5s linear infinite' }}
-                        className="opacity-70"
-                      />
-                      <path 
-                        d="M 250 50 Q 280 90 310 90" 
-                        fill="none" 
-                        stroke="#FF7112" 
-                        strokeWidth="2.5" 
-                        strokeDasharray="4,4" 
-                        style={{ animation: 'dashTrack 3.5s linear infinite' }}
-                        className="opacity-40"
-                      />
+                      
+                      {FAISALABAD_TEST_ROUTES.map((route) => {
+                        const isActive = activeRoute === route.id;
+                        const isHovered = hoveredRoute === route.id;
+                        const isHighlighted = isActive || isHovered;
+                        
+                        return (
+                          <g key={`svg-route-${route.id}-${activeRoute}-${hoveredRoute}`}>
+                            {/* Base subtle guide track (always visible) */}
+                            <path 
+                              d={route.path}
+                              fill="none"
+                              stroke={isHighlighted ? "#FF7112" : "rgba(255, 255, 255, 0.15)"}
+                              strokeWidth={isHighlighted ? "2" : "1.5"}
+                              strokeDasharray={isHighlighted ? "0" : "4,4"}
+                              className="transition-all duration-300"
+                              opacity={isHighlighted ? 0.35 : 0.4}
+                            />
+                            
+                            {/* Animated High-contrast drawing paths (Only when highlighted) */}
+                            {isHighlighted && (
+                              <>
+                                {/* Soft glowing trail underneath */}
+                                <path 
+                                  d={route.path}
+                                  fill="none"
+                                  stroke="#FF7112"
+                                  strokeWidth="6"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  opacity="0.3"
+                                  style={{
+                                    strokeDasharray: "400",
+                                    strokeDashoffset: "400",
+                                    animation: "drawRoutePath 1.8s cubic-bezier(0.4, 0, 0.2, 1) forwards",
+                                    filter: "blur(2px)"
+                                  }}
+                                />
+                                
+                                {/* Core bright sharp route path */}
+                                <path 
+                                  d={route.path}
+                                  fill="none"
+                                  stroke="#FF7112"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  opacity="1"
+                                  style={{
+                                    strokeDasharray: "400",
+                                    strokeDashoffset: "400",
+                                    animation: "drawRoutePath 1.8s cubic-bezier(0.4, 0, 0.2, 1) forwards"
+                                  }}
+                                />
+                                
+                                {/* A pulsing tracker dot simulating a real-time car gliding on the path */}
+                                <g>
+                                  <circle r="4.5" fill="#10B981" stroke="#FFFFFF" strokeWidth="1" className="shadow-lg">
+                                    <animateMotion 
+                                      dur="3.2s" 
+                                      repeatCount="indefinite" 
+                                      path={route.path} 
+                                      rotate="auto"
+                                    />
+                                  </circle>
+                                  <circle r="2" fill="#FFFFFF">
+                                    <animateMotion 
+                                      dur="3.2s" 
+                                      repeatCount="indefinite" 
+                                      path={route.path} 
+                                      rotate="auto"
+                                    />
+                                  </circle>
+                                </g>
+                              </>
+                            )}
+                          </g>
+                        );
+                      })}
                     </svg>
 
                     {/* FSD Interactive Pins */}
