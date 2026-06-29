@@ -622,7 +622,7 @@ export default function BlindSpotSimulator() {
         <div className="lg:col-span-7 flex flex-col space-y-6 z-10 lg:max-h-[750px] lg:overflow-y-auto lg:pr-3 scrollbar-thin">
           
           {/* VEHICLE TYPE SELECTOR GRID */}
-          <div className="space-y-3 bg-white p-5 rounded-2xl border border-slate-100 shadow-xs">
+          <div className="space-y-3 bg-white p-5 rounded-2xl border border-slate-100 shadow-xs shrink-0">
             <label className="block text-[11px] font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
               <Info className="w-4 h-4 text-[#FF7112]" />
               {t.vehicleSelect}
@@ -662,7 +662,7 @@ export default function BlindSpotSimulator() {
           </div>
 
           {/* INTERACTIVE POSITION CONTROLS BOX */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-xs space-y-4">
+          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-xs space-y-4 shrink-0">
             
             {/* 1. Track / Lane Selector */}
             <div>
@@ -727,7 +727,7 @@ export default function BlindSpotSimulator() {
           </div>
 
           {/* INTERACTIVE SAFETY PRESETS */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-xs space-y-3">
+          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-xs space-y-3 shrink-0">
             <span className="block text-[10px] font-black uppercase text-slate-400 tracking-wider flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-[#FF7112]" />
               {t.presetsTitle}
@@ -772,7 +772,7 @@ export default function BlindSpotSimulator() {
           </div>
 
           {/* DYNAMIC MIRRORS DISPLAY CONTAINER */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 shrink-0">
             
             {/* 1. Left Wing Mirror */}
             <div className="bg-slate-950 border border-slate-800 rounded-2xl p-3.5 flex flex-col items-center justify-between text-center relative overflow-hidden h-48 shadow-lg">
@@ -935,10 +935,10 @@ export default function BlindSpotSimulator() {
           </div>
 
           {/* HIGH POLISH: PHYSICAL OVER-THE-SHOULDER WINDOW PREVIEW */}
-          <div className="bg-slate-950 border border-slate-800 p-5 rounded-2xl shadow-xl grid grid-cols-1 sm:grid-cols-12 gap-5 items-center relative overflow-hidden">
+          <div className="bg-slate-950 border border-slate-800 p-4 sm:p-5 rounded-2xl shadow-xl flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-5 relative overflow-hidden shrink-0">
             <div className="absolute inset-0 bg-linear-to-r from-emerald-500/0 via-emerald-500/0 to-emerald-500/5 pointer-events-none" />
             
-            <div className="sm:col-span-8 flex gap-4 items-start z-10">
+            <div className="flex gap-4 items-start z-10 flex-1 min-w-0">
               <div className="w-14 h-14 rounded-2xl bg-slate-900 border-2 border-slate-800 flex flex-col items-center justify-center text-2xl shadow-inner relative overflow-hidden shrink-0">
                 🚘
                 {visibleInPeripheral && (
@@ -954,7 +954,7 @@ export default function BlindSpotSimulator() {
                   </span>
                 )}
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1 flex-1 min-w-0">
                 <span className="block text-[10px] font-black uppercase text-slate-400 tracking-wider flex items-center gap-1">
                   <Eye className="w-3.5 h-3.5 text-sky-400" />
                   {t.shoulderCheck}
@@ -995,24 +995,26 @@ export default function BlindSpotSimulator() {
             </div>
 
             {/* Interactive shoulder check button */}
-            <div className="sm:col-span-4 text-right z-10">
+            <div className="shrink-0 z-10 w-full sm:w-auto">
               <button
                 type="button"
                 onMouseDown={() => setShoulderCheckActive(true)}
                 onMouseUp={() => setShoulderCheckActive(false)}
                 onTouchStart={() => setShoulderCheckActive(true)}
                 onTouchEnd={() => setShoulderCheckActive(false)}
-                className={`w-full px-5 py-3.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer select-none ${
+                className={`w-full sm:w-52 px-4 py-3 sm:py-3.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer select-none ${
                   shoulderCheckActive
                     ? 'bg-emerald-600 text-white shadow-inner scale-95 border-emerald-500'
                     : 'bg-gradient-to-r from-sky-500 to-[#002060] hover:from-sky-400 hover:to-[#002060]/95 text-white shadow-md shadow-sky-950/20'
                 }`}
               >
-                <Eye className="w-4 h-4 animate-pulse" />
-                {shoulderCheckActive 
-                  ? (lang === 'en' ? 'Checking Windows...' : 'گردن گھما کر دیکھ رہے ہیں...') 
-                  : (lang === 'en' ? 'Hold to Peek Side' : 'دبا کر رکھیں (Shoulder Check)')
-                }
+                <Eye className="w-4 h-4 animate-pulse shrink-0" />
+                <span className="truncate">
+                  {shoulderCheckActive 
+                    ? (lang === 'en' ? 'Checking Windows...' : 'گردن گھما رہے ہیں...') 
+                    : (lang === 'en' ? 'Hold to Peek Side' : 'دبا کر رکھیں (Shoulder Check)')
+                  }
+                </span>
               </button>
             </div>
 
@@ -1039,7 +1041,7 @@ export default function BlindSpotSimulator() {
           </AnimatePresence>
 
           {/* GoDriveify Professional Tips block */}
-          <div className="bg-slate-900 text-slate-100 p-5 rounded-2xl flex gap-4 items-start shadow-xl border border-slate-800">
+          <div className="bg-slate-900 text-slate-100 p-5 rounded-2xl flex gap-4 items-start shadow-xl border border-slate-800 shrink-0">
             <span className="text-2xl mt-0.5 shrink-0">🎓</span>
             <div className="space-y-1">
               <span className="block text-[10px] font-black uppercase text-[#FF7112] tracking-wider">

@@ -521,11 +521,11 @@ export default function BiometricTransferPage() {
               </div>
             </div>
             
-            <div className="flex items-center gap-2.5">
+            <div className="flex flex-wrap justify-center sm:justify-end items-center gap-2 sm:gap-2.5">
               <span className="text-[11px] text-slate-300 font-medium hidden md:inline">Language / زبان منتخب کریں:</span>
               <button
                 onClick={() => setLang(lang === 'en' ? 'ur' : 'en')}
-                className="bg-white hover:bg-slate-50 text-[#002060] text-xs font-extrabold px-4 py-2 rounded-xl shadow transition-all duration-200 border border-slate-200 flex items-center gap-2 cursor-pointer"
+                className="bg-white hover:bg-slate-50 text-[#002060] text-xs font-extrabold px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl shadow transition-all duration-200 border border-slate-200 flex items-center gap-1.5 sm:gap-2 cursor-pointer"
                 id="language-switcher-transfer-v2"
               >
                 <span>🌐</span>
@@ -534,7 +534,7 @@ export default function BiometricTransferPage() {
 
               <button
                 onClick={() => setIsAdminPanelOpen(!isAdminPanelOpen)}
-                className={`text-xs font-extrabold px-4 py-2 rounded-xl shadow transition-all duration-200 flex items-center gap-2 cursor-pointer border ${
+                className={`text-xs font-extrabold px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl shadow transition-all duration-200 flex items-center gap-1.5 sm:gap-2 cursor-pointer border ${
                   isAdminPanelOpen 
                     ? 'bg-orange-500 hover:bg-orange-600 text-white border-orange-500' 
                     : 'bg-slate-800 hover:bg-slate-700 text-white border-slate-700'
@@ -542,7 +542,8 @@ export default function BiometricTransferPage() {
                 id="admin-panel-toggle-btn"
               >
                 <Settings className={`w-3.5 h-3.5 ${isAdminPanelOpen ? 'animate-spin' : ''}`} />
-                <span>{isAdminPanelOpen ? adm.toggleClose : adm.toggleOpen}</span>
+                <span className="hidden min-[450px]:inline">{isAdminPanelOpen ? adm.toggleClose : adm.toggleOpen}</span>
+                <span className="min-[450px]:hidden">{isAdminPanelOpen ? (lang === 'en' ? 'Close' : 'بند کریں') : (lang === 'en' ? 'Rates' : 'ریٹس')}</span>
               </button>
             </div>
           </div>
@@ -788,7 +789,7 @@ export default function BiometricTransferPage() {
                     <button
                       key={v.id}
                       onClick={() => setVehicleType(v.id)}
-                      className={`p-4 rounded-2xl border text-left transition-all duration-300 flex items-center gap-3.5 cursor-pointer relative overflow-hidden group ${
+                      className={`p-3.5 sm:p-4 rounded-2xl border text-left transition-all duration-300 flex items-center gap-2.5 sm:gap-3.5 cursor-pointer relative overflow-hidden group ${
                         vehicleType === v.id
                           ? 'border-[#FF7112] bg-orange-50/20 text-[#002060] shadow-md shadow-orange-100/30'
                           : 'border-slate-150 bg-slate-50 text-slate-700 hover:bg-slate-100/70 hover:border-slate-300'
@@ -796,12 +797,12 @@ export default function BiometricTransferPage() {
                       id={`vehicle-btn-${v.id}`}
                     >
                       {vehicleType === v.id && (
-                        <div className="absolute top-0 right-0 w-8 h-8 bg-[#FF7112] text-white flex items-center justify-center rounded-bl-xl shadow">
-                          <Check className="w-3.5 h-3.5 stroke-[3]" />
+                        <div className="absolute top-0 right-0 w-7 h-7 sm:w-8 sm:h-8 bg-[#FF7112] text-white flex items-center justify-center rounded-bl-xl shadow">
+                          <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 stroke-[3]" />
                         </div>
                       )}
-                      <span className="text-3xl p-3 bg-white rounded-xl shadow-inner shadow-slate-100 shrink-0 group-hover:scale-105 transition-transform duration-200">{v.icon}</span>
-                      <div className="min-w-0 pr-4">
+                      <span className="text-2xl sm:text-3xl p-2.5 sm:p-3 bg-white rounded-xl shadow-inner shadow-slate-100 shrink-0 group-hover:scale-105 transition-transform duration-200">{v.icon}</span>
+                      <div className="min-w-0 pr-3 sm:pr-4">
                         <span className="block text-xs font-black leading-tight tracking-wider text-[#002060]">
                           {lang === 'en' ? v.name : v.urduName}
                         </span>
@@ -934,7 +935,7 @@ export default function BiometricTransferPage() {
                 </div>
 
                 {/* Step Navigation Pill Rows */}
-                <div className="grid grid-cols-4 bg-slate-50 rounded-2xl p-1.5 border border-slate-150">
+                <div className="grid grid-cols-4 bg-slate-50 rounded-2xl p-1 sm:p-1.5 border border-slate-150">
                   {tSteps.map((s) => (
                     <button
                       key={s.step}
@@ -942,15 +943,15 @@ export default function BiometricTransferPage() {
                         setActiveStep(s.step);
                         // don't wipe active matching simulations unless step shifts
                       }}
-                      className={`py-3.5 rounded-xl font-extrabold text-xs flex flex-col items-center justify-center transition-all duration-300 cursor-pointer ${
+                      className={`py-2 sm:py-3.5 rounded-xl font-extrabold text-xs flex flex-col items-center justify-center transition-all duration-300 cursor-pointer ${
                         activeStep === s.step
                           ? 'bg-orange-500 text-white shadow shadow-orange-500/25 scale-102'
                           : 'text-slate-500 hover:bg-slate-100/50 hover:text-slate-800'
                       }`}
                       id={`step-pill-${s.step}`}
                     >
-                      <span className="text-[10px] uppercase font-mono tracking-wider opacity-75">Step</span>
-                      <span className="text-base font-black leading-none mt-1">{s.step}</span>
+                      <span className="text-[9px] sm:text-[10px] uppercase font-mono tracking-wider opacity-75">Step</span>
+                      <span className="text-sm sm:text-base font-black leading-none mt-0.5 sm:mt-1">{s.step}</span>
                     </button>
                   ))}
                 </div>
@@ -978,7 +979,7 @@ export default function BiometricTransferPage() {
                 </div>
 
                 {/* Smartphone Device Canvas */}
-                <div className="border-4 border-slate-300 rounded-[36px] overflow-hidden bg-slate-900 shadow-2xl relative max-w-sm mx-auto">
+                <div className="border-4 border-slate-300 rounded-[36px] overflow-hidden bg-slate-900 shadow-2xl relative w-full max-w-sm mx-auto">
                   
                   {/* Phone Speaker & Camera Notch */}
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-slate-900 rounded-b-2xl z-20 flex justify-center items-center gap-1.5">
@@ -987,7 +988,7 @@ export default function BiometricTransferPage() {
                   </div>
 
                   {/* Device Bar Header */}
-                  <div className="bg-[#0c1222] pt-7 px-5 pb-3 border-b border-[#18233f] flex justify-between items-center text-[10px] text-slate-400 font-mono">
+                  <div className="bg-[#0c1222] pt-7 px-4 sm:px-5 pb-3 border-b border-[#18233f] flex justify-between items-center text-[10px] text-slate-400 font-mono">
                     <div className="flex items-center gap-1">
                       <Smartphone className="w-3.5 h-3.5 text-orange-400" />
                       <span className="text-slate-200 font-black tracking-wide">PAK-ID NADRA v2.6</span>
@@ -999,7 +1000,7 @@ export default function BiometricTransferPage() {
                   </div>
 
                   {/* Device App Content Body */}
-                  <div className="bg-[#0f172a] p-6 min-h-[310px] flex flex-col justify-between relative">
+                  <div className="bg-[#0f172a] p-4 sm:p-6 min-h-[310px] flex flex-col justify-between relative">
                     
                     {/* Animated grid line overlay */}
                     <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:16px_16px] opacity-25 pointer-events-none" />
@@ -1276,47 +1277,47 @@ export default function BiometricTransferPage() {
                   <span className="text-3xl">🧾</span>
                 </div>
 
-                {/* Details list item lines */}
+                 {/* Details list item lines */}
                 <div className="space-y-3.5">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500 font-bold">Category selected:</span>
-                    <span className="font-extrabold text-[#002060]">{lang === 'en' ? selectedVehicle.name : selectedVehicle.urduName}</span>
+                  <div className="flex justify-between items-start gap-3 text-xs">
+                    <span className="text-slate-500 font-bold shrink-0">Category selected:</span>
+                    <span className="font-extrabold text-[#002060] text-right">{lang === 'en' ? selectedVehicle.name : selectedVehicle.urduName}</span>
                   </div>
                   
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500 font-bold">{t.buyerTitle}:</span>
-                    <span className={`font-black uppercase tracking-widest text-[11px] ${buyerFiler ? 'text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded' : 'text-red-500 bg-red-50 px-2 py-0.5 rounded'}`}>
+                  <div className="flex justify-between items-center gap-3 text-xs">
+                    <span className="text-slate-500 font-bold shrink-0">{t.buyerTitle}:</span>
+                    <span className={`font-black uppercase tracking-widest text-[11px] shrink-0 ${buyerFiler ? 'text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded' : 'text-red-500 bg-red-50 px-2 py-0.5 rounded'}`}>
                       {buyerFiler ? t.activeFiler : t.inactiveFiler}
                     </span>
                   </div>
 
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500 font-bold">{t.sellerTitle}:</span>
-                    <span className={`font-black uppercase tracking-widest text-[11px] ${sellerFiler ? 'text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded' : 'text-red-500 bg-red-50 px-2 py-0.5 rounded'}`}>
+                  <div className="flex justify-between items-center gap-3 text-xs">
+                    <span className="text-slate-500 font-bold shrink-0">{t.sellerTitle}:</span>
+                    <span className={`font-black uppercase tracking-widest text-[11px] shrink-0 ${sellerFiler ? 'text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded' : 'text-red-500 bg-red-50 px-2 py-0.5 rounded'}`}>
                       {sellerFiler ? t.activeFiler : t.inactiveFiler}
                     </span>
                   </div>
 
                   <div className="border-t border-slate-100 my-4 pt-4 space-y-3">
-                    <div className="flex justify-between items-center text-xs font-mono">
-                      <span className="text-slate-500 font-medium">{t.baseFeeLabel}:</span>
-                      <span className="text-[#002060] font-bold">PKR {fees.base.toLocaleString()}</span>
+                    <div className="flex justify-between items-center gap-3 text-xs font-mono">
+                      <span className="text-slate-500 font-medium shrink-0">{t.baseFeeLabel}:</span>
+                      <span className="text-[#002060] font-bold shrink-0">PKR {fees.base.toLocaleString()}</span>
                     </div>
 
-                    <div className="flex justify-between items-center text-xs font-mono">
-                      <span className="text-slate-500 font-medium">{t.whtLabel}:</span>
-                      <span className="text-[#002060] font-bold">PKR {fees.wht.toLocaleString()}</span>
+                    <div className="flex justify-between items-center gap-3 text-xs font-mono">
+                      <span className="text-slate-500 font-medium shrink-0">{t.whtLabel}:</span>
+                      <span className="text-[#002060] font-bold shrink-0">PKR {fees.wht.toLocaleString()}</span>
                     </div>
 
-                    <div className="flex justify-between items-center text-xs font-mono">
-                      <span className="text-slate-500 font-medium">{t.nadraLabel}:</span>
-                      <span className="text-[#002060] font-bold">PKR {fees.scanFee.toLocaleString()}</span>
+                    <div className="flex justify-between items-center gap-3 text-xs font-mono">
+                      <span className="text-slate-500 font-medium shrink-0">{t.nadraLabel}:</span>
+                      <span className="text-[#002060] font-bold shrink-0">PKR {fees.scanFee.toLocaleString()}</span>
                     </div>
                   </div>
 
-                  <div className="border-t-2 border-dashed border-slate-200 pt-4 flex justify-between items-center">
-                    <span className="text-xs font-black text-[#002060] uppercase tracking-widest">{t.totalLabel}:</span>
-                    <span className="text-xl font-mono font-black text-[#FF7112]">
+                  <div className="border-t-2 border-dashed border-slate-200 pt-4 flex justify-between items-center gap-3">
+                    <span className="text-xs font-black text-[#002060] uppercase tracking-widest shrink-0">{t.totalLabel}:</span>
+                    <span className="text-xl font-mono font-black text-[#FF7112] shrink-0">
                       PKR {fees.total.toLocaleString()}
                     </span>
                   </div>
