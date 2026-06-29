@@ -25,7 +25,12 @@ import {
   Clock,
   HelpCircle,
   HelpCircle as HelpIcon,
-  CreditCard
+  CreditCard,
+  Settings,
+  Lock,
+  Unlock,
+  Save,
+  RotateCcw
 } from 'lucide-react';
 import { useToast } from '../components/Toast';
 
@@ -232,6 +237,51 @@ const T_DICT = {
   }
 };
 
+const adminTranslations = {
+  en: {
+    panelTitle: "⚙️ Admin Slabs & Tax Rates Manager",
+    panelDesc: "Configure baseline Punjab Excise transfer fees, withholding taxes, and NADRA verification costs. Updates are cached in your browser as a fallback.",
+    authTitle: "Admin Authentication Required",
+    authDesc: "Please enter the passcode to access live rate adjustments.",
+    pwdPlaceholder: "Enter admin passcode (e.g., GoDriveify786)",
+    unlockBtn: "Verify & Unlock Panel",
+    invalidPwd: "Incorrect passcode. Please try again!",
+    successUnlock: "Access Granted. Welcome back, Admin!",
+    successSave: "Excise tax rates and NADRA fee updated successfully!",
+    successReset: "Tax rates successfully reverted to 2026 official defaults.",
+    baseFeeLabel: "Base Fee (Rs.)",
+    filerWhtLabel: "Filer WHT (Rs.)",
+    nonFilerWhtLabel: "Non-Filer WHT (Rs.)",
+    nadraFeeLabel: "NADRA Scan Fee (Rs.)",
+    saveBtn: "Save & Apply Custom Slabs",
+    resetBtn: "Reset to 2026 Defaults",
+    exitBtn: "Lock & Exit Admin",
+    toggleOpen: "⚙️ Adjust Tax Rates (Admin)",
+    toggleClose: "✕ Close Slabs Config"
+  },
+  ur: {
+    panelTitle: "⚙️ ایڈمن ٹیکس اور ریٹس مینیجر",
+    panelDesc: "پنجاب ایکسائز ٹرانسفر فیس، ود ہولڈنگ ٹیکس اور نادرا فیس خود سیٹ کریں۔ یہ معلومات آپ کے براؤزر کی میموری (localStorage) میں محفوظ ہو جائیں گی۔",
+    authTitle: "ایڈمن لاگ ان",
+    authDesc: "ریٹس تبدیل کرنے کے لیے ایڈمن پاس کوڈ درج کریں۔",
+    pwdPlaceholder: "پاس کوڈ درج کریں (جیسے GoDriveify786)",
+    unlockBtn: "تصدیق کریں اور انلاک کریں",
+    invalidPwd: "غلط پاس کوڈ! دوبارہ کوشش کریں۔",
+    successUnlock: "خوش آمدید ایڈمن! آپ کو ریٹس تبدیل کرنے کی اجازت ہے۔",
+    successSave: "ایکسائز ریٹس اور نادرا فیس کامیابی سے اپ ڈیٹ ہو گئی ہے!",
+    successReset: "ریٹس کامیابی سے سرکاری ڈیفالٹ ۲۰۲۶ پر واپس سیٹ کر دیے گئے ہیں۔",
+    baseFeeLabel: "بنیادی فیس (روپے)",
+    filerWhtLabel: "فائلر ٹیکس (روپے)",
+    nonFilerWhtLabel: "نان فائلر ٹیکس (روپے)",
+    nadraFeeLabel: "نادرا فیس (روپے)",
+    saveBtn: "تبدیلیاں محفوظ کریں",
+    resetBtn: "سرکاری ریٹس پر ری سیٹ کریں",
+    exitBtn: "ایڈمن پینل بند کریں",
+    toggleOpen: "⚙️ ٹیکس ریٹس تبدیل کریں (ایڈمن)",
+    toggleClose: "✕ ایڈمن پینل بند کریں"
+  }
+};
+
 export default function BiometricTransferPage() {
   const toast = useToast();
   const [lang, setLang] = useState<'en' | 'ur'>('en');
@@ -251,6 +301,43 @@ export default function BiometricTransferPage() {
   // Challan generation and payment simulator state
   const [simChallanStatus, setSimChallanStatus] = useState<'unpaid' | 'paying' | 'paid'>('unpaid');
 
+  // Admin Slabs configuration states
+  const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [adminPasswordInput, setAdminPasswordInput] = useState('');
+  
+  // Stateful vehicle types initialized from localStorage or global static defaults
+  const [vehicleTypes, setVehicleTypes] = useState(() => {
+    const saved = localStorage.getItem('godriveify_excise_rates');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse cached tax rates:', e);
+      }
+    }
+    return VEHICLE_TYPES;
+  });
+
+  // Stateful NADRA biometric verification fee
+  const [nadraFee, setNadraFee] = useState(() => {
+    const saved = localStorage.getItem('godriveify_nadra_fee');
+    return saved ? Number(saved) : 350;
+  });
+
+  // Form draft states for safe inline edits
+  const [draftVehicleTypes, setDraftVehicleTypes] = useState(vehicleTypes);
+  const [draftNadraFee, setDraftNadraFee] = useState(nadraFee);
+
+  // Synchronize drafts when state changes
+  useEffect(() => {
+    setDraftVehicleTypes(vehicleTypes);
+  }, [vehicleTypes]);
+
+  useEffect(() => {
+    setDraftNadraFee(nadraFee);
+  }, [nadraFee]);
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
@@ -258,12 +345,14 @@ export default function BiometricTransferPage() {
   const t = T_DICT[lang];
   const tSteps = STEPS_DATA[lang];
   const tDocs = DOCS_LIST[lang];
-  const selectedVehicle = VEHICLE_TYPES.find(v => v.id === vehicleType) || VEHICLE_TYPES[1];
+  const adm = adminTranslations[lang];
+
+  const selectedVehicle = vehicleTypes.find((v: any) => v.id === vehicleType) || vehicleTypes[1];
 
   const calculateTotalFees = () => {
     const base = selectedVehicle.baseFee;
     const wht = buyerFiler ? selectedVehicle.filerWht : selectedVehicle.nonFilerWht;
-    const scanFee = 350; // NADRA standard verification portal cost
+    const scanFee = nadraFee; // Dynamic NADRA standard verification cost from config
     return {
       base,
       wht,
@@ -274,6 +363,34 @@ export default function BiometricTransferPage() {
   };
 
   const fees = calculateTotalFees();
+
+  const handleAdminAuth = () => {
+    if (adminPasswordInput === 'GoDriveify786') {
+      setIsAdminAuthenticated(true);
+      toast.success(adm.successUnlock, 'Authenticated ✓');
+      setAdminPasswordInput('');
+    } else {
+      toast.error(adm.invalidPwd, 'Auth Failed');
+    }
+  };
+
+  const handleRateFieldChange = (idx: number, field: string, value: string) => {
+    const updated = [...draftVehicleTypes];
+    updated[idx] = {
+      ...updated[idx],
+      [field]: Number(value) || 0
+    };
+    setDraftVehicleTypes(updated);
+  };
+
+  const handleSaveRates = () => {
+    setVehicleTypes(draftVehicleTypes);
+    setNadraFee(draftNadraFee);
+    localStorage.setItem('godriveify_excise_rates', JSON.stringify(draftVehicleTypes));
+    localStorage.setItem('godriveify_nadra_fee', draftNadraFee.toString());
+    toast.success(adm.successSave, 'Rates Saved ✓');
+    setIsAdminPanelOpen(false);
+  };
 
   const handleDocCheck = (idx: number) => {
     setCheckedDocs(prev => ({ ...prev, [idx]: !prev[idx] }));
@@ -385,15 +502,28 @@ export default function BiometricTransferPage() {
               </div>
             </div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <span className="text-[11px] text-slate-300 font-medium hidden md:inline">Language / زبان منتخب کریں:</span>
               <button
                 onClick={() => setLang(lang === 'en' ? 'ur' : 'en')}
-                className="bg-white hover:bg-slate-50 text-[#002060] text-xs font-extrabold px-4 py-2 rounded-xl shadow transition-all duration-200 border border-slate-200 flex items-center gap-2"
+                className="bg-white hover:bg-slate-50 text-[#002060] text-xs font-extrabold px-4 py-2 rounded-xl shadow transition-all duration-200 border border-slate-200 flex items-center gap-2 cursor-pointer"
                 id="language-switcher-transfer-v2"
               >
                 <span>🌐</span>
                 <span>{lang === 'en' ? 'اردو (Urdu) ⇆' : 'English ⇆'}</span>
+              </button>
+
+              <button
+                onClick={() => setIsAdminPanelOpen(!isAdminPanelOpen)}
+                className={`text-xs font-extrabold px-4 py-2 rounded-xl shadow transition-all duration-200 flex items-center gap-2 cursor-pointer border ${
+                  isAdminPanelOpen 
+                    ? 'bg-orange-500 hover:bg-orange-600 text-white border-orange-500' 
+                    : 'bg-slate-800 hover:bg-slate-700 text-white border-slate-700'
+                }`}
+                id="admin-panel-toggle-btn"
+              >
+                <Settings className={`w-3.5 h-3.5 ${isAdminPanelOpen ? 'animate-spin' : ''}`} />
+                <span>{isAdminPanelOpen ? adm.toggleClose : adm.toggleOpen}</span>
               </button>
             </div>
           </div>
@@ -419,6 +549,206 @@ export default function BiometricTransferPage() {
             </p>
           </div>
 
+          {/* Admin Panel Collapsible Section */}
+          <AnimatePresence>
+            {isAdminPanelOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden mb-8"
+              >
+                <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden p-6 md:p-8 space-y-6">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-4">
+                    <div className="flex items-center gap-2.5">
+                      <span className="p-2 bg-slate-100 text-slate-700 rounded-xl">
+                        <Settings className="w-5 h-5 text-[#002060]" />
+                      </span>
+                      <div>
+                        <h3 className="text-lg font-black text-[#002060] tracking-tight">{adm.panelTitle}</h3>
+                        <p className="text-xs text-slate-500">{adm.panelDesc}</p>
+                      </div>
+                    </div>
+                    {isAdminAuthenticated && (
+                      <button
+                        onClick={() => {
+                          if (window.confirm(lang === 'en' ? 'Are you sure you want to reset all rates to 2026 default standards?' : 'کیا آپ تمام ٹیکس ریٹس دوبارہ ڈیفالٹ ۲۰۲۶ پر سیٹ کرنا چاہتے ہیں؟')) {
+                            localStorage.removeItem('godriveify_excise_rates');
+                            localStorage.removeItem('godriveify_nadra_fee');
+                            setVehicleTypes(VEHICLE_TYPES);
+                            setNadraFee(350);
+                            toast.success(adm.successReset, 'System Reset ✓');
+                          }
+                        }}
+                        className="text-xs text-red-600 hover:text-red-700 font-extrabold flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 rounded-xl transition-all cursor-pointer"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        <span>{adm.resetBtn}</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {!isAdminAuthenticated ? (
+                    /* Lock Screen Auth form */
+                    <div className="max-w-md mx-auto p-6 border border-slate-150 rounded-2xl bg-slate-50/50 space-y-4">
+                      <div className="text-center space-y-1">
+                        <div className="mx-auto w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 mb-2">
+                          <Lock className="w-5 h-5" />
+                        </div>
+                        <h4 className="text-sm font-extrabold text-slate-800">{adm.authTitle}</h4>
+                        <p className="text-xs text-slate-500 leading-relaxed">{adm.authDesc}</p>
+                      </div>
+
+                      <div className="space-y-3">
+                        <input
+                          type="password"
+                          placeholder={adm.pwdPlaceholder}
+                          value={adminPasswordInput}
+                          onChange={(e) => setAdminPasswordInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              handleAdminAuth();
+                            }
+                          }}
+                          className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#002060] text-sm font-bold text-center bg-white shadow-inner"
+                        />
+                        <button
+                          onClick={handleAdminAuth}
+                          className="w-full bg-[#002060] hover:bg-slate-900 text-white font-black py-3 rounded-xl text-xs uppercase tracking-widest shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                          <Unlock className="w-4 h-4" />
+                          <span>{adm.unlockBtn}</span>
+                        </button>
+                      </div>
+
+                      <div className="text-center mt-2">
+                        <span className="text-[10px] text-slate-400 font-medium">
+                          {lang === 'en' 
+                            ? "🔑 Default passcode: GoDriveify786 (case-sensitive)" 
+                            : "🔑 ڈیفالٹ پاس کوڈ: GoDriveify786 (حساس حروف)"
+                          }
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Admin editable dashboard rates table form */
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 border-b border-slate-100 pb-2 text-[10px] font-black text-[#002060] uppercase tracking-wider hidden md:grid">
+                        <div className="md:col-span-3">Category Name / کیٹیگری</div>
+                        <div className="md:col-span-3">{adm.baseFeeLabel}</div>
+                        <div className="md:col-span-3">{adm.filerWhtLabel}</div>
+                        <div className="md:col-span-3">{adm.nonFilerWhtLabel}</div>
+                      </div>
+
+                      <div className="divide-y divide-slate-100 space-y-4 md:space-y-0">
+                        {draftVehicleTypes.map((cat: any, idx: number) => (
+                          <div key={cat.id} className="py-3.5 grid grid-cols-1 md:grid-cols-12 gap-3.5 items-center">
+                            <div className="md:col-span-3 flex items-center gap-2">
+                              <span className="text-2xl p-1 bg-slate-50 rounded-lg">{cat.icon}</span>
+                              <div>
+                                <span className="block text-xs font-black text-[#002060]">{lang === 'en' ? cat.name : cat.urduName}</span>
+                                <span className="block text-[9.5px] text-slate-400 font-bold uppercase font-mono">{cat.id}</span>
+                              </div>
+                            </div>
+
+                            <div className="md:col-span-3">
+                              <label className="block text-[9.5px] font-extrabold text-slate-400 mb-1 md:hidden uppercase">{adm.baseFeeLabel}</label>
+                              <div className="relative">
+                                <span className="absolute left-3 top-2.5 text-slate-400 text-xs font-bold">Rs.</span>
+                                <input
+                                  type="number"
+                                  value={cat.baseFee}
+                                  onChange={(e) => handleRateFieldChange(idx, 'baseFee', e.target.value)}
+                                  className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-xs font-extrabold focus:ring-1 focus:ring-orange-500 focus:outline-none focus:border-orange-500 bg-slate-50/50"
+                                  required
+                                />
+                              </div>
+                            </div>
+
+                            <div className="md:col-span-3">
+                              <label className="block text-[9.5px] font-extrabold text-slate-400 mb-1 md:hidden uppercase">{adm.filerWhtLabel}</label>
+                              <div className="relative">
+                                <span className="absolute left-3 top-2.5 text-slate-400 text-xs font-bold">Rs.</span>
+                                <input
+                                  type="number"
+                                  value={cat.filerWht}
+                                  onChange={(e) => handleRateFieldChange(idx, 'filerWht', e.target.value)}
+                                  className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-xs font-extrabold text-emerald-700 focus:ring-1 focus:ring-orange-500 focus:outline-none focus:border-orange-500 bg-slate-50/50"
+                                  required
+                                />
+                              </div>
+                            </div>
+
+                            <div className="md:col-span-3">
+                              <label className="block text-[9.5px] font-extrabold text-slate-400 mb-1 md:hidden uppercase">{adm.nonFilerWhtLabel}</label>
+                              <div className="relative">
+                                <span className="absolute left-3 top-2.5 text-slate-400 text-xs font-bold">Rs.</span>
+                                <input
+                                  type="number"
+                                  value={cat.nonFilerWht}
+                                  onChange={(e) => handleRateFieldChange(idx, 'nonFilerWht', e.target.value)}
+                                  className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-xs font-extrabold text-red-700 focus:ring-1 focus:ring-orange-500 focus:outline-none focus:border-orange-500 bg-slate-50/50"
+                                  required
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* NADRA Scanner Fee setting row */}
+                      <div className="bg-slate-50/80 p-5 rounded-2xl border border-slate-150 grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                        <div>
+                          <span className="block text-xs font-black text-[#002060] uppercase tracking-wider">
+                            {adm.nadraFeeLabel}
+                          </span>
+                          <p className="text-[10.5px] text-slate-500 mt-0.5">
+                            {lang === 'en' 
+                              ? "Baseline processing fee set for biometric fingerprint scan verification." 
+                              : "بایومیٹرک فنگر پرنٹ اسکین ویریفیکیشن کی بنیادی نادرا فیس۔"
+                            }
+                          </p>
+                        </div>
+                        <div className="relative md:justify-self-end w-full md:w-48">
+                          <span className="absolute left-3 top-2.5 text-slate-400 text-xs font-bold">Rs.</span>
+                          <input
+                            type="number"
+                            value={draftNadraFee}
+                            onChange={(e) => setDraftNadraFee(Number(e.target.value) || 0)}
+                            className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-xs font-black text-slate-800 focus:ring-1 focus:ring-orange-500 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Control Panel Save / Exit buttons */}
+                      <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-100">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsAdminAuthenticated(false);
+                            setIsAdminPanelOpen(false);
+                            setAdminPasswordInput('');
+                          }}
+                          className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold py-3 rounded-xl text-xs uppercase tracking-wider text-center cursor-pointer transition-colors"
+                        >
+                          {adm.exitBtn}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleSaveRates}
+                          className="flex-1 bg-[#002060] hover:bg-opacity-95 text-white font-black py-3 rounded-xl text-xs uppercase tracking-widest shadow-md flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                        >
+                          <Save className="w-4 h-4" />
+                          <span>{adm.saveBtn}</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
             {/* Left Column: Interactive Calculator & Gamified Live Simulator */}
@@ -435,7 +765,7 @@ export default function BiometricTransferPage() {
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  {VEHICLE_TYPES.map((v) => (
+                  {vehicleTypes.map((v: any) => (
                     <button
                       key={v.id}
                       onClick={() => setVehicleType(v.id)}

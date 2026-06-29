@@ -222,7 +222,30 @@ export default function AdminPage() {
   const [blogSearchQuery, setBlogSearchQuery] = useState('');
   const [editorWorkspaceTab, setEditorWorkspaceTab] = useState<'write' | 'preview'>('write');
   const [editorAuthorSelectMode, setEditorAuthorSelectMode] = useState<'dropdown' | 'custom'>('dropdown');
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'bookings' | 'blogs' | 'dns' | 'rentals' | 'requests' | 'courses' | 'car-sales' | 'instructors'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'bookings' | 'blogs' | 'dns' | 'rentals' | 'requests' | 'courses' | 'car-sales' | 'instructors' | 'excise'>('dashboard');
+  
+  // Punjab Excise Slabs & NADRA Biometric Fee state variables
+  const [exciseRates, setExciseRates] = useState<any[]>(() => {
+    const saved = localStorage.getItem('godriveify_excise_rates');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse cached tax rates in Admin:', e);
+      }
+    }
+    return [
+      { id: 'motorcycle', name: 'Motorcycle / Scooter', urduName: 'موٹر سائیکل / سکوٹر', baseFee: 605, filerWht: 500, nonFilerWht: 1500, icon: '🏍️' },
+      { id: 'car_low', name: 'Car up to 1000cc (e.g., Alto/Cultus)', urduName: 'گاڑی 1000 سی سی تک', baseFee: 3025, filerWht: 2500, nonFilerWht: 7500, icon: '🚗' },
+      { id: 'car_mid', name: 'Car 1001cc to 1800cc (e.g., Civic/Corolla)', urduName: 'گاڑی 1001 سے 1800 سی سی', baseFee: 6050, filerWht: 5000, nonFilerWht: 15000, icon: '🚘' },
+      { id: 'car_high', name: 'SUV / Luxury Car (Above 1800cc)', urduName: 'لگری گاڑی یا SUV', baseFee: 12100, filerWht: 10000, nonFilerWht: 30000, icon: '🚙' }
+    ];
+  });
+
+  const [exciseNadraFee, setExciseNadraFee] = useState<number>(() => {
+    const saved = localStorage.getItem('godriveify_nadra_fee');
+    return saved ? Number(saved) : 350;
+  });
   const [systemMetadata, setSystemMetadata] = useState<Record<string, string>>({
     years_active: '8',
     students_trained: '4500+',
@@ -893,6 +916,15 @@ export default function AdminPage() {
       ...instructorForm,
       reviewsList: instructorForm.reviewsList.filter((_, i) => i !== idx)
     });
+  };
+
+  const handleExciseRateChange = (idx: number, field: string, value: string) => {
+    const updated = [...exciseRates];
+    updated[idx] = {
+      ...updated[idx],
+      [field]: Number(value) || 0
+    };
+    setExciseRates(updated);
   };
 
   const getStudentWhatsAppLink = (b: any) => {
@@ -2496,6 +2528,26 @@ export default function AdminPage() {
                     activeTab === 'instructors' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
                   }`}>
                     {instructors.length}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('excise')}
+                  className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                    activeTab === 'excise'
+                      ? 'bg-[#E05A00] text-white font-extrabold shadow-md shadow-red-700/10'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
+                    <Sliders className="w-4 h-4 text-orange-500" />
+                    <span>Excise & Biometric Slabs</span>
+                  </div>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ${
+                    activeTab === 'excise' ? 'bg-white/30 text-white' : 'bg-orange-100 text-orange-800'
+                  }`}>
+                    Live
                   </span>
                 </button>
               </div>
@@ -4614,6 +4666,159 @@ export default function AdminPage() {
                     className="px-6 py-2.5 rounded-xl bg-[#E05A00] hover:bg-[#FF7112] text-white text-sm font-black transition cursor-pointer shadow-md shadow-orange-700/10"
                   >
                     {editingInstructorId ? 'Update Profile' : 'Publish Profile'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'excise' && (
+          <div className="space-y-8 animate-fade-in">
+            {/* Slabs Header */}
+            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm">
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-5 mb-6">
+                <div className="flex items-center gap-2.5">
+                  <span className="p-2 bg-orange-500/10 text-orange-600 rounded-lg">
+                    <Sliders className="w-5 h-5 text-orange-600 animate-pulse" />
+                  </span>
+                  <div>
+                    <h2 className="text-2xl font-black text-gray-900 tracking-tight font-sans">Punjab Excise Slabs & NADRA Biometric Fee Manager</h2>
+                    <p className="text-gray-500 text-sm mt-1 font-medium">
+                      Configure baseline Punjab Excise vehicle transfer fees, active tax filer/non-filer withholding taxes, and NADRA scan rates.
+                    </p>
+                    <p className="text-xs text-orange-600 font-extrabold mt-2 flex items-center gap-1.5 bg-orange-50 border border-orange-100 px-3 py-1.5 rounded-xl w-fit">
+                      <Check className="w-4 h-4 shrink-0" />
+                      <span>Saved values sync instantly to the public <strong>Biometric Transfer Assistant</strong> tool using offline-first application cache fallback (localStorage).</span>
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (window.confirm('Are you sure you want to revert all Excise slabs back to official 2026 standards?')) {
+                      const defaults = [
+                        { id: 'motorcycle', name: 'Motorcycle / Scooter', urduName: 'موٹر سائیکل / سکوٹر', baseFee: 605, filerWht: 500, nonFilerWht: 1500, icon: '🏍️' },
+                        { id: 'car_low', name: 'Car up to 1000cc (e.g., Alto/Cultus)', urduName: 'گاڑی 1000 سی سی تک', baseFee: 3025, filerWht: 2500, nonFilerWht: 7500, icon: '🚗' },
+                        { id: 'car_mid', name: 'Car 1001cc to 1800cc (e.g., Civic/Corolla)', urduName: 'گاڑی 1001 سے 1800 سی سی', baseFee: 6050, filerWht: 5000, nonFilerWht: 15000, icon: '🚘' },
+                        { id: 'car_high', name: 'SUV / Luxury Car (Above 1800cc)', urduName: 'لگری گاڑی یا SUV', baseFee: 12100, filerWht: 10000, nonFilerWht: 30000, icon: '🚙' }
+                      ];
+                      setExciseRates(defaults);
+                      setExciseNadraFee(350);
+                      localStorage.setItem('godriveify_excise_rates', JSON.stringify(defaults));
+                      localStorage.setItem('godriveify_nadra_fee', '350');
+                      showToast('Successfully reset to official 2026 default standards.', 'success');
+                    }
+                  }}
+                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 px-4 py-2 rounded-xl font-extrabold text-xs flex items-center gap-2 transition duration-200 cursor-pointer"
+                >
+                  Reset Defaults
+                </button>
+              </div>
+
+              {/* Form Content */}
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  localStorage.setItem('godriveify_excise_rates', JSON.stringify(exciseRates));
+                  localStorage.setItem('godriveify_nadra_fee', exciseNadraFee.toString());
+                  showToast('Punjab Excise tax slabs and NADRA biometric rates updated successfully!', 'success');
+                }}
+                className="space-y-6"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-4 border-b border-gray-150 pb-2 text-[11px] font-black text-[#002060] uppercase tracking-wider hidden md:grid">
+                  <div className="md:col-span-3">Category Name / کیٹیگری</div>
+                  <div className="md:col-span-3">Base Fee (بنیادی فیس)</div>
+                  <div className="md:col-span-3">Filer WHT (فائلر ٹیکس)</div>
+                  <div className="md:col-span-3">Non-Filer WHT (نان فائلر ٹیکس)</div>
+                </div>
+
+                <div className="divide-y divide-gray-100 space-y-6 md:space-y-0">
+                  {exciseRates.map((cat: any, idx: number) => (
+                    <div key={cat.id} className="py-4 grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                      <div className="md:col-span-3 flex items-center gap-3">
+                        <span className="text-3xl p-2 bg-slate-50 border border-slate-100 rounded-xl">{cat.icon}</span>
+                        <div>
+                          <span className="block text-sm font-black text-slate-800">{cat.name}</span>
+                          <span className="block text-xs text-slate-400 font-bold font-urdu">{cat.urduName}</span>
+                          <span className="block text-[10px] text-orange-500 font-mono tracking-wider font-extrabold uppercase mt-0.5">{cat.id}</span>
+                        </div>
+                      </div>
+
+                      <div className="md:col-span-3">
+                        <label className="block text-[10px] font-extrabold text-slate-400 mb-1 md:hidden uppercase">Base Fee (Rs.)</label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-2 text-slate-400 text-xs font-bold">Rs.</span>
+                          <input
+                            type="number"
+                            value={cat.baseFee}
+                            onChange={(e) => handleExciseRateChange(idx, 'baseFee', e.target.value)}
+                            className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-xs font-black focus:ring-1 focus:ring-orange-500 focus:outline-none focus:border-orange-500 bg-white"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="md:col-span-3">
+                        <label className="block text-[10px] font-extrabold text-slate-400 mb-1 md:hidden uppercase">Filer WHT (Rs.)</label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-2 text-slate-400 text-xs font-bold">Rs.</span>
+                          <input
+                            type="number"
+                            value={cat.filerWht}
+                            onChange={(e) => handleExciseRateChange(idx, 'filerWht', e.target.value)}
+                            className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-xs font-black text-emerald-700 focus:ring-1 focus:ring-orange-500 focus:outline-none focus:border-orange-500 bg-white"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="md:col-span-3">
+                        <label className="block text-[10px] font-extrabold text-slate-400 mb-1 md:hidden uppercase">Non-Filer WHT (Rs.)</label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-2 text-slate-400 text-xs font-bold">Rs.</span>
+                          <input
+                            type="number"
+                            value={cat.nonFilerWht}
+                            onChange={(e) => handleExciseRateChange(idx, 'nonFilerWht', e.target.value)}
+                            className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-xs font-black text-red-600 focus:ring-1 focus:ring-orange-500 focus:outline-none focus:border-orange-500 bg-white"
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* NADRA Biometric setting box */}
+                <div className="bg-slate-50/80 p-5 rounded-2xl border border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                  <div>
+                    <span className="block text-sm font-black text-[#002060] uppercase tracking-wider">
+                      NADRA e-Sahulat Scan Fee (نادرا بائیومیٹرک فیس)
+                    </span>
+                    <p className="text-xs text-slate-500 mt-1 font-medium">
+                      Standard government portal validation and thumbprint scan fee per registration verification.
+                    </p>
+                  </div>
+                  <div className="relative md:justify-self-end w-full md:w-48">
+                    <span className="absolute left-3 top-2 text-slate-400 text-xs font-bold">Rs.</span>
+                    <input
+                      type="number"
+                      value={exciseNadraFee}
+                      onChange={(e) => setExciseNadraFee(Number(e.target.value) || 0)}
+                      className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-xs font-black text-slate-800 focus:ring-1 focus:ring-orange-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Submit Action block */}
+                <div className="flex gap-4 pt-4 border-t border-gray-100 justify-end">
+                  <button
+                    type="submit"
+                    className="px-8 py-3.5 bg-[#002060] hover:bg-slate-900 text-white font-extrabold text-xs uppercase tracking-widest rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Save className="w-4 h-4 text-white" />
+                    <span>Save & Sync Excise Rates</span>
                   </button>
                 </div>
               </form>
