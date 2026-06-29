@@ -155,3 +155,83 @@ insert into public.system_metadata (key, value) values
 ('happy_reviews', '150+')
 on conflict (key) do update set value = excluded.value;
 
+
+----------------------------------------------------
+-- 6. TABLE: biometric_rates
+-- Stores dynamic biometric vehicle transfer rates and tax slabs
+----------------------------------------------------
+drop table if exists public.biometric_rates cascade;
+
+create table public.biometric_rates (
+    id text primary key, -- e.g., 'motorcycle', 'car_low', 'car_mid', 'car_high'
+    name text not null,
+    urdu_name text not null,
+    base_fee numeric not null default 0,
+    filer_wht numeric not null default 0,
+    non_filer_wht numeric not null default 0,
+    icon text,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Enable RLS and insert open access policy
+alter table public.biometric_rates enable row level security;
+create policy "Allow public select of biometric_rates" on public.biometric_rates for select using (true);
+create policy "Allow public insert of biometric_rates" on public.biometric_rates for insert with check (true);
+create policy "Allow public update of biometric_rates" on public.biometric_rates for update using (true);
+create policy "Allow public delete of biometric_rates" on public.biometric_rates for delete using (true);
+
+-- Insert initial values matching 2026 default standards
+insert into public.biometric_rates (id, name, urdu_name, base_fee, filer_wht, non_filer_wht, icon) values
+('motorcycle', 'Motorcycle / Scooter', 'موٹر سائیکل / سکوٹر', 605, 500, 1500, '🏍️'),
+('car_low', 'Car up to 1000cc (e.g., Alto/Cultus)', 'گاڑی 1000 سی سی تک', 3025, 2500, 7500, '🚗'),
+('car_mid', 'Car 1001cc to 1800cc (e.g., Civic/Corolla)', 'گاڑی 1001 سے 1800 سی سی', 6050, 5000, 15000, '🚘'),
+('car_high', 'SUV / Luxury Car (Above 1800cc)', 'لگری گاڑی یا SUV', 12100, 10000, 30000, '🚙')
+on conflict (id) do update set 
+    name = excluded.name,
+    urdu_name = excluded.urdu_name,
+    base_fee = excluded.base_fee,
+    filer_wht = excluded.filer_wht,
+    non_filer_wht = excluded.non_filer_wht,
+    icon = excluded.icon;
+
+
+----------------------------------------------------
+-- 7. TABLE: driving_courses
+-- Stores editable driving courses and their dynamic pricing
+----------------------------------------------------
+drop table if exists public.driving_courses cascade;
+
+create table public.driving_courses (
+    id text primary key, -- e.g., 'basic', 'standard', 'premium' or UUID
+    course_title text not null,
+    course_description text not null,
+    course_fee text not null,
+    lesson_duration text not null,
+    daily_time text not null,
+    theory_duration text not null,
+    car_image text,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Enable RLS and insert open access policy
+alter table public.driving_courses enable row level security;
+create policy "Allow public select of driving_courses" on public.driving_courses for select using (true);
+create policy "Allow public insert of driving_courses" on public.driving_courses for insert with check (true);
+create policy "Allow public update of driving_courses" on public.driving_courses for update using (true);
+create policy "Allow public delete of driving_courses" on public.driving_courses for delete using (true);
+
+-- Insert initial values matching 2026 default courses
+insert into public.driving_courses (id, course_title, course_description, course_fee, lesson_duration, daily_time, theory_duration, car_image) values
+('basic', 'Basic Driving Course', 'Excellent foundational course covering vital steering control, brake safety, and real-world road signals.', '15000', '10 Driving Classes Included', '1,500 PKR Per Class Rate', '35 Mins Practice Lesson', '/static/basic_driving_course_1782284625178.jpg'),
+('standard', 'Standard Driving Course', 'Our most popular training track covering parallel parking, reverse controls, and highway driving confidence.', '20000', '15 Driving Classes Included', '1,333 PKR Per Class Rate', '35 Mins Practice Lesson', '/static/standard_driving_course_1782284602847.jpg'),
+('premium', 'Premium Driving Course', 'Complete masterclass including city grid navigation, night driving safety, and expert-level license exam preparation.', '25000', '20 Driving Classes Included', '1,250 PKR Per Class Rate', '35 Mins Practice Lesson', '/static/premium_driving_course_1782284580290.jpg')
+on conflict (id) do update set 
+    course_title = excluded.course_title,
+    course_description = excluded.course_description,
+    course_fee = excluded.course_fee,
+    lesson_duration = excluded.lesson_duration,
+    daily_time = excluded.daily_time,
+    theory_duration = excluded.theory_duration,
+    car_image = excluded.car_image;
+
+

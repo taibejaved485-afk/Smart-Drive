@@ -33,6 +33,7 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { useToast } from '../components/Toast';
+import { fetchBiometricRates, upsertBiometricRate } from '../lib/supabase';
 
 // Punjab Excise transfer fee structure (Verified for 2026 guidelines)
 const VEHICLE_TYPES = [
@@ -340,6 +341,18 @@ export default function BiometricTransferPage() {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    fetchBiometricRates().then(data => {
+      if (data && data.length > 0) {
+        // Ensure properties like baseFee are present as numbers
+        const normalized = data.map((item: any) => ({
+          ...item,
+          baseFee: Number(item.baseFee || item.base_fee || 0),
+          filerWht: Number(item.filerWht || item.filer_wht || 0),
+          nonFilerWht: Number(item.nonFilerWht || item.non_filer_wht || 0)
+        }));
+        setVehicleTypes(normalized);
+      }
+    }).catch(err => console.error('Error fetching biometric rates', err));
   }, []);
 
   const t = T_DICT[lang];
@@ -388,6 +401,12 @@ export default function BiometricTransferPage() {
     setNadraFee(draftNadraFee);
     localStorage.setItem('godriveify_excise_rates', JSON.stringify(draftVehicleTypes));
     localStorage.setItem('godriveify_nadra_fee', draftNadraFee.toString());
+    
+    // Upsert in Supabase
+    draftVehicleTypes.forEach((rate: any) => {
+      upsertBiometricRate(rate).catch(err => console.error('Error syncing rate to Supabase:', err));
+    });
+
     toast.success(adm.successSave, 'Rates Saved ✓');
     setIsAdminPanelOpen(false);
   };

@@ -22,7 +22,13 @@ import {
   updateCustomerRequestStatus,
   deleteCustomerRequest,
   fetchSystemMetadata,
-  updateSystemMetadata
+  updateSystemMetadata,
+  fetchBiometricRates,
+  upsertBiometricRate,
+  deleteBiometricRate,
+  fetchDrivingCoursesSupabase,
+  upsertDrivingCourseSupabase,
+  deleteDrivingCourseSupabase
 } from '../lib/supabase';
 
 interface BlogPost {
@@ -245,6 +251,17 @@ export default function AdminPage() {
   const [exciseNadraFee, setExciseNadraFee] = useState<number>(() => {
     const saved = localStorage.getItem('godriveify_nadra_fee');
     return saved ? Number(saved) : 350;
+  });
+
+  const [showAddExciseModal, setShowAddExciseModal] = useState(false);
+  const [newExciseRate, setNewExciseRate] = useState({
+    id: '',
+    name: '',
+    urduName: '',
+    baseFee: 0,
+    filerWht: 0,
+    nonFilerWht: 0,
+    icon: '🚗'
   });
   const [systemMetadata, setSystemMetadata] = useState<Record<string, string>>({
     years_active: '8',
@@ -612,6 +629,18 @@ export default function AdminPage() {
     fetchSystemMetadata().then(data => {
       if (data) {
         setSystemMetadata(data);
+      }
+    }).catch(() => {});
+
+    fetchBiometricRates().then(data => {
+      if (data && data.length > 0) {
+        setExciseRates(data);
+      }
+    }).catch(() => {});
+
+    fetchDrivingCoursesSupabase().then(data => {
+      if (data && data.length > 0) {
+        setDrivingCourses(data);
       }
     }).catch(() => {});
   };
@@ -4693,28 +4722,156 @@ export default function AdminPage() {
                     </p>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (window.confirm('Are you sure you want to revert all Excise slabs back to official 2026 standards?')) {
-                      const defaults = [
-                        { id: 'motorcycle', name: 'Motorcycle / Scooter', urduName: 'موٹر سائیکل / سکوٹر', baseFee: 605, filerWht: 500, nonFilerWht: 1500, icon: '🏍️' },
-                        { id: 'car_low', name: 'Car up to 1000cc (e.g., Alto/Cultus)', urduName: 'گاڑی 1000 سی سی تک', baseFee: 3025, filerWht: 2500, nonFilerWht: 7500, icon: '🚗' },
-                        { id: 'car_mid', name: 'Car 1001cc to 1800cc (e.g., Civic/Corolla)', urduName: 'گاڑی 1001 سے 1800 سی سی', baseFee: 6050, filerWht: 5000, nonFilerWht: 15000, icon: '🚘' },
-                        { id: 'car_high', name: 'SUV / Luxury Car (Above 1800cc)', urduName: 'لگری گاڑی یا SUV', baseFee: 12100, filerWht: 10000, nonFilerWht: 30000, icon: '🚙' }
-                      ];
-                      setExciseRates(defaults);
-                      setExciseNadraFee(350);
-                      localStorage.setItem('godriveify_excise_rates', JSON.stringify(defaults));
-                      localStorage.setItem('godriveify_nadra_fee', '350');
-                      showToast('Successfully reset to official 2026 default standards.', 'success');
-                    }
-                  }}
-                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 px-4 py-2 rounded-xl font-extrabold text-xs flex items-center gap-2 transition duration-200 cursor-pointer"
-                >
-                  Reset Defaults
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddExciseModal(prev => !prev)}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-extrabold text-xs flex items-center gap-1.5 transition duration-200 cursor-pointer shadow-sm shadow-emerald-700/10"
+                  >
+                    <span>+ Add Custom Slab</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm('Are you sure you want to revert all Excise slabs back to official 2026 standards?')) {
+                        const defaults = [
+                          { id: 'motorcycle', name: 'Motorcycle / Scooter', urduName: 'موٹر سائیکل / سکوٹر', baseFee: 605, filerWht: 500, nonFilerWht: 1500, icon: '🏍️' },
+                          { id: 'car_low', name: 'Car up to 1000cc (e.g., Alto/Cultus)', urduName: 'گاڑی 1000 سی سی تک', baseFee: 3025, filerWht: 2500, nonFilerWht: 7500, icon: '🚗' },
+                          { id: 'car_mid', name: 'Car 1001cc to 1800cc (e.g., Civic/Corolla)', urduName: 'گاڑی 1001 سے 1800 سی سی', baseFee: 6050, filerWht: 5000, nonFilerWht: 15000, icon: '🚘' },
+                          { id: 'car_high', name: 'SUV / Luxury Car (Above 1800cc)', urduName: 'لگری گاڑی یا SUV', baseFee: 12100, filerWht: 10000, nonFilerWht: 30000, icon: '🚙' }
+                        ];
+                        setExciseRates(defaults);
+                        setExciseNadraFee(350);
+                        localStorage.setItem('godriveify_excise_rates', JSON.stringify(defaults));
+                        localStorage.setItem('godriveify_nadra_fee', '350');
+                        defaults.forEach(rate => {
+                          upsertBiometricRate(rate).catch(err => console.error(err));
+                        });
+                        showToast('Successfully reset to official 2026 default standards.', 'success');
+                      }
+                    }}
+                    className="bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 px-4 py-2 rounded-xl font-extrabold text-xs flex items-center gap-2 transition duration-200 cursor-pointer"
+                  >
+                    Reset Defaults
+                  </button>
+                </div>
               </div>
+
+              {/* Add Custom Category Form */}
+              {showAddExciseModal && (
+                <div className="mb-8 p-6 bg-slate-50 rounded-2xl border border-gray-200 animate-fade-in space-y-4">
+                  <h3 className="text-sm font-black text-[#002060] uppercase tracking-wider flex items-center gap-2 border-b border-gray-100 pb-2">
+                    <Sliders className="w-4 h-4 text-emerald-600" />
+                    <span>Create Custom Vehicle Transfer Category</span>
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-[11px] font-bold text-gray-600 mb-1">Unique Category Key (a-z, 0-9, underscores)</label>
+                      <input 
+                        type="text" 
+                        placeholder="e.g. loader_truck"
+                        value={newExciseRate.id}
+                        onChange={(e) => setNewExciseRate({ ...newExciseRate, id: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '') })}
+                        className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-emerald-500 bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-gray-600 mb-1">Category Name (English)</label>
+                      <input 
+                        type="text" 
+                        placeholder="e.g. Commercial Loader"
+                        value={newExciseRate.name}
+                        onChange={(e) => setNewExciseRate({ ...newExciseRate, name: e.target.value })}
+                        className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-emerald-500 bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-gray-600 mb-1">Category Name (Urdu / اردو نام)</label>
+                      <input 
+                        type="text" 
+                        placeholder="e.g. لوڈر گاڑی"
+                        value={newExciseRate.urduName}
+                        onChange={(e) => setNewExciseRate({ ...newExciseRate, urduName: e.target.value })}
+                        className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-semibold font-urdu text-right focus:outline-none focus:border-emerald-500 bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-gray-600 mb-1">Base Excise Fee (Rs.)</label>
+                      <input 
+                        type="number" 
+                        placeholder="e.g. 5000"
+                        value={newExciseRate.baseFee || ''}
+                        onChange={(e) => setNewExciseRate({ ...newExciseRate, baseFee: Number(e.target.value) || 0 })}
+                        className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-gray-600 mb-1">Active Tax Filer WHT Tax (Rs.)</label>
+                      <input 
+                        type="number" 
+                        placeholder="e.g. 2000"
+                        value={newExciseRate.filerWht || ''}
+                        onChange={(e) => setNewExciseRate({ ...newExciseRate, filerWht: Number(e.target.value) || 0 })}
+                        className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-gray-600 mb-1">Non-Filer WHT Tax (Rs.)</label>
+                      <input 
+                        type="number" 
+                        placeholder="e.g. 6000"
+                        value={newExciseRate.nonFilerWht || ''}
+                        onChange={(e) => setNewExciseRate({ ...newExciseRate, nonFilerWht: Number(e.target.value) || 0 })}
+                        className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-gray-600 mb-1">Category Emoji Icon</label>
+                      <input 
+                        type="text" 
+                        placeholder="e.g. 🚛"
+                        value={newExciseRate.icon}
+                        onChange={(e) => setNewExciseRate({ ...newExciseRate, icon: e.target.value })}
+                        className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none bg-white"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddExciseModal(false)}
+                      className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!newExciseRate.id || !newExciseRate.name) {
+                          showToast('Unique category key and name are required!', 'error');
+                          return;
+                        }
+                        if (exciseRates.some(r => r.id === newExciseRate.id)) {
+                          showToast('This Category ID already exists!', 'error');
+                          return;
+                        }
+                        const updated = [...exciseRates, newExciseRate];
+                        setExciseRates(updated);
+                        localStorage.setItem('godriveify_excise_rates', JSON.stringify(updated));
+                        upsertBiometricRate(newExciseRate).catch(err => console.error(err));
+                        setShowAddExciseModal(false);
+                        setNewExciseRate({ id: '', name: '', urduName: '', baseFee: 0, filerWht: 0, nonFilerWht: 0, icon: '🚗' });
+                        showToast('Successfully published custom excise slab and synced to Supabase!', 'success');
+                        window.dispatchEvent(new Event('godriveify_excise_rates_updated'));
+                        window.dispatchEvent(new Event('storage'));
+                      }}
+                      className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl cursor-pointer"
+                    >
+                      Publish Category
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Form Content */}
               <form 
@@ -4722,15 +4879,22 @@ export default function AdminPage() {
                   e.preventDefault();
                   localStorage.setItem('godriveify_excise_rates', JSON.stringify(exciseRates));
                   localStorage.setItem('godriveify_nadra_fee', exciseNadraFee.toString());
+                  
+                  // Centralized Sync to Supabase
+                  exciseRates.forEach((rate: any) => {
+                    upsertBiometricRate(rate).catch(err => console.error('Error syncing rate to Supabase:', err));
+                  });
+
                   showToast('Punjab Excise tax slabs and NADRA biometric rates updated successfully!', 'success');
                 }}
                 className="space-y-6"
               >
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4 border-b border-gray-150 pb-2 text-[11px] font-black text-[#002060] uppercase tracking-wider hidden md:grid">
                   <div className="md:col-span-3">Category Name / کیٹیگری</div>
-                  <div className="md:col-span-3">Base Fee (بنیادی فیس)</div>
-                  <div className="md:col-span-3">Filer WHT (فائلر ٹیکس)</div>
+                  <div className="md:col-span-2">Base Fee (بنیادی فیس)</div>
+                  <div className="md:col-span-2">Filer WHT (فائلر ٹیکس)</div>
                   <div className="md:col-span-3">Non-Filer WHT (نان فائلر ٹیکس)</div>
+                  <div className="md:col-span-2 text-right">Action</div>
                 </div>
 
                 <div className="divide-y divide-gray-100 space-y-6 md:space-y-0">
@@ -4745,7 +4909,7 @@ export default function AdminPage() {
                         </div>
                       </div>
 
-                      <div className="md:col-span-3">
+                      <div className="md:col-span-2">
                         <label className="block text-[10px] font-extrabold text-slate-400 mb-1 md:hidden uppercase">Base Fee (Rs.)</label>
                         <div className="relative">
                           <span className="absolute left-3 top-2 text-slate-400 text-xs font-bold">Rs.</span>
@@ -4759,7 +4923,7 @@ export default function AdminPage() {
                         </div>
                       </div>
 
-                      <div className="md:col-span-3">
+                      <div className="md:col-span-2">
                         <label className="block text-[10px] font-extrabold text-slate-400 mb-1 md:hidden uppercase">Filer WHT (Rs.)</label>
                         <div className="relative">
                           <span className="absolute left-3 top-2 text-slate-400 text-xs font-bold">Rs.</span>
@@ -4785,6 +4949,28 @@ export default function AdminPage() {
                             required
                           />
                         </div>
+                      </div>
+
+                      <div className="md:col-span-2 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (window.confirm(`Are you sure you want to delete the "${cat.name}" category?`)) {
+                              const updated = exciseRates.filter(r => r.id !== cat.id);
+                              setExciseRates(updated);
+                              localStorage.setItem('godriveify_excise_rates', JSON.stringify(updated));
+                              deleteBiometricRate(cat.id).catch(err => console.error(err));
+                              showToast('Excise Category deleted successfully.', 'info');
+                              window.dispatchEvent(new Event('godriveify_excise_rates_updated'));
+                              window.dispatchEvent(new Event('storage'));
+                            }
+                          }}
+                          className="p-2 border border-red-200 hover:border-red-300 rounded-xl hover:bg-red-50 text-red-600 font-bold transition flex items-center gap-1 cursor-pointer text-xs"
+                          title="Delete Category"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          <span className="md:hidden">Delete</span>
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -5678,9 +5864,11 @@ export default function AdminPage() {
                       return;
                     }
                     if (editingCourseId) {
-                      const updated = drivingCourses.map(c => c.id === editingCourseId ? { ...newCourse, id: editingCourseId } : c);
+                      const finalCourse = { ...newCourse, id: editingCourseId };
+                      const updated = drivingCourses.map(c => c.id === editingCourseId ? finalCourse : c);
                       setDrivingCourses(updated);
                       localStorage.setItem('driving_courses_v4', JSON.stringify(updated));
+                      upsertDrivingCourseSupabase(finalCourse).catch(err => console.error('Error upserting to Supabase:', err));
                       setEditingCourseId(null);
                       setNewCourse({
                         courseTitle: '',
@@ -5700,6 +5888,7 @@ export default function AdminPage() {
                       const updated = [finalCourse, ...drivingCourses];
                       setDrivingCourses(updated);
                       localStorage.setItem('driving_courses_v4', JSON.stringify(updated));
+                      upsertDrivingCourseSupabase(finalCourse).catch(err => console.error('Error upserting to Supabase:', err));
                       setNewCourse({
                         courseTitle: '',
                         courseDescription: '',
@@ -5976,6 +6165,7 @@ export default function AdminPage() {
                                   const updated = drivingCourses.filter(c => c.id !== course.id);
                                   setDrivingCourses(updated);
                                   localStorage.setItem('driving_courses_v4', JSON.stringify(updated));
+                                  deleteDrivingCourseSupabase(course.id).catch(err => console.error('Error deleting course:', err));
                                   showToast('Course package deleted.', 'info');
                                   window.dispatchEvent(new Event('driving_courses_updated'));
                                   window.dispatchEvent(new Event('storage'));

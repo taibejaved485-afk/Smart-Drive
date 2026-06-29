@@ -918,3 +918,253 @@ export async function uploadCarImage(file: File): Promise<string> {
 }
 
 
+// -------------------------------------------------------------------------
+// 7. BIOMETRIC RATES AND EXCISE TAX SLABS OPERATIONS
+// -------------------------------------------------------------------------
+
+export interface DbBiometricRate {
+  id: string;
+  name: string;
+  urdu_name: string;
+  base_fee: number;
+  filer_wht: number;
+  non_filer_wht: number;
+  icon?: string;
+  created_at?: string;
+}
+
+export async function fetchBiometricRates(): Promise<any[]> {
+  const localSaved = localStorage.getItem('godriveify_excise_rates');
+  let rates = localSaved ? JSON.parse(localSaved) : [];
+
+  if (supabase) {
+    try {
+      const active = await tableExists('biometric_rates');
+      if (active) {
+        const { data, error } = await supabase
+          .from('biometric_rates')
+          .select('*')
+          .order('base_fee', { ascending: true });
+
+        if (!error && data) {
+          const mapped = data.map(item => ({
+            id: item.id,
+            name: item.name,
+            urduName: item.urdu_name,
+            baseFee: Number(item.base_fee),
+            filerWht: Number(item.filer_wht),
+            nonFilerWht: Number(item.non_filer_wht),
+            icon: item.icon || '🚗'
+          }));
+          localStorage.setItem('godriveify_excise_rates', JSON.stringify(mapped));
+          return mapped;
+        }
+      }
+    } catch (e) {
+      console.warn('Supabase fetchBiometricRates failed, using cached LocalStorage', e);
+    }
+  }
+  return rates;
+}
+
+export async function upsertBiometricRate(rate: any): Promise<boolean> {
+  const mapped = {
+    id: rate.id,
+    name: rate.name,
+    urdu_name: rate.urduName || rate.urdu_name || '',
+    base_fee: Number(rate.baseFee || rate.base_fee || 0),
+    filer_wht: Number(rate.filerWht || rate.filer_wht || 0),
+    non_filer_wht: Number(rate.nonFilerWht || rate.non_filer_wht || 0),
+    icon: rate.icon || '🚗'
+  };
+
+  // Sync locally first
+  const localSaved = localStorage.getItem('godriveify_excise_rates');
+  let currentList = localSaved ? JSON.parse(localSaved) : [];
+  const idx = currentList.findIndex((r: any) => r.id === rate.id);
+  const localRateObj = {
+    id: rate.id,
+    name: rate.name,
+    urduName: mapped.urdu_name,
+    baseFee: mapped.base_fee,
+    filerWht: mapped.filer_wht,
+    nonFilerWht: mapped.non_filer_wht,
+    icon: mapped.icon
+  };
+  if (idx > -1) {
+    currentList[idx] = localRateObj;
+  } else {
+    currentList.push(localRateObj);
+  }
+  localStorage.setItem('godriveify_excise_rates', JSON.stringify(currentList));
+  window.dispatchEvent(new Event('godriveify_excise_rates_updated'));
+
+  if (supabase) {
+    try {
+      const active = await tableExists('biometric_rates');
+      if (active) {
+        const { error } = await supabase
+          .from('biometric_rates')
+          .upsert([mapped], { onConflict: 'id' });
+        
+        if (!error) return true;
+        console.warn('Supabase upsertBiometricRate error:', error.message);
+      }
+    } catch (e) {
+      console.warn('Supabase upsertBiometricRate failed', e);
+    }
+  }
+  return true;
+}
+
+export async function deleteBiometricRate(id: string): Promise<boolean> {
+  // Sync locally first
+  const localSaved = localStorage.getItem('godriveify_excise_rates');
+  if (localSaved) {
+    const currentList = JSON.parse(localSaved);
+    const filtered = currentList.filter((r: any) => r.id !== id);
+    localStorage.setItem('godriveify_excise_rates', JSON.stringify(filtered));
+    window.dispatchEvent(new Event('godriveify_excise_rates_updated'));
+  }
+
+  if (supabase) {
+    try {
+      const active = await tableExists('biometric_rates');
+      if (active) {
+        const { error } = await supabase
+          .from('biometric_rates')
+          .delete()
+          .eq('id', id);
+        
+        if (!error) return true;
+      }
+    } catch (e) {
+      console.warn('Supabase deleteBiometricRate failed', e);
+    }
+  }
+  return true;
+}
+
+
+// -------------------------------------------------------------------------
+// 8. DRIVING COURSES OPERATIONS (DYNAMIC PRICING & DATA)
+// -------------------------------------------------------------------------
+
+export async function fetchDrivingCoursesSupabase(): Promise<any[]> {
+  const localSaved = localStorage.getItem('driving_courses_v4');
+  let courses = localSaved ? JSON.parse(localSaved) : [];
+
+  if (supabase) {
+    try {
+      const active = await tableExists('driving_courses');
+      if (active) {
+        const { data, error } = await supabase
+          .from('driving_courses')
+          .select('*')
+          .order('course_fee', { ascending: true });
+
+        if (!error && data && data.length > 0) {
+          const mapped = data.map(item => ({
+            id: item.id,
+            courseTitle: item.course_title,
+            courseDescription: item.course_description,
+            courseFee: item.course_fee,
+            lessonDuration: item.lesson_duration,
+            dailyTime: item.daily_time,
+            theoryDuration: item.theory_duration,
+            carImage: item.car_image
+          }));
+          localStorage.setItem('driving_courses_v4', JSON.stringify(mapped));
+          return mapped;
+        }
+      }
+    } catch (e) {
+      console.warn('Supabase fetchDrivingCoursesSupabase failed, fallback to LocalStorage', e);
+    }
+  }
+  return courses;
+}
+
+export async function upsertDrivingCourseSupabase(course: any): Promise<boolean> {
+  const mapped = {
+    id: course.id || 'course-' + Date.now().toString(),
+    course_title: course.courseTitle || '',
+    course_description: course.courseDescription || '',
+    course_fee: course.courseFee ? course.courseFee.toString() : '0',
+    lesson_duration: course.lessonDuration || '',
+    daily_time: course.dailyTime || '',
+    theory_duration: course.theoryDuration || '',
+    car_image: course.carImage || ''
+  };
+
+  // Sync locally first
+  const localSaved = localStorage.getItem('driving_courses_v4');
+  let currentList = localSaved ? JSON.parse(localSaved) : [];
+  const idx = currentList.findIndex((c: any) => c.id === mapped.id);
+  const localCourseObj = {
+    id: mapped.id,
+    courseTitle: mapped.course_title,
+    courseDescription: mapped.course_description,
+    courseFee: mapped.course_fee,
+    lessonDuration: mapped.lesson_duration,
+    dailyTime: mapped.daily_time,
+    theoryDuration: mapped.theory_duration,
+    carImage: mapped.car_image
+  };
+
+  if (idx > -1) {
+    currentList[idx] = localCourseObj;
+  } else {
+    currentList.push(localCourseObj);
+  }
+  localStorage.setItem('driving_courses_v4', JSON.stringify(currentList));
+  window.dispatchEvent(new Event('driving_courses_updated'));
+
+  if (supabase) {
+    try {
+      const active = await tableExists('driving_courses');
+      if (active) {
+        const { error } = await supabase
+          .from('driving_courses')
+          .upsert([mapped], { onConflict: 'id' });
+        
+        if (!error) return true;
+        console.warn('Supabase upsertDrivingCourseSupabase error:', error.message);
+      }
+    } catch (e) {
+      console.warn('Supabase upsertDrivingCourseSupabase failed', e);
+    }
+  }
+  return true;
+}
+
+export async function deleteDrivingCourseSupabase(id: string): Promise<boolean> {
+  // Sync locally first
+  const localSaved = localStorage.getItem('driving_courses_v4');
+  if (localSaved) {
+    const currentList = JSON.parse(localSaved);
+    const filtered = currentList.filter((c: any) => c.id !== id);
+    localStorage.setItem('driving_courses_v4', JSON.stringify(filtered));
+    window.dispatchEvent(new Event('driving_courses_updated'));
+  }
+
+  if (supabase) {
+    try {
+      const active = await tableExists('driving_courses');
+      if (active) {
+        const { error } = await supabase
+          .from('driving_courses')
+          .delete()
+          .eq('id', id);
+        
+        if (!error) return true;
+      }
+    } catch (e) {
+      console.warn('Supabase deleteDrivingCourseSupabase failed', e);
+    }
+  }
+  return true;
+}
+
+
+
