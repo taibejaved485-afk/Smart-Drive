@@ -2241,8 +2241,8 @@ export default function AdminPage() {
           </button>
           
           <div className="text-center mt-4">
-            <Link to="/blog" className="text-xs text-gray-500 hover:text-[#FF7112] flex items-center justify-center gap-1">
-              <ArrowLeft className="w-3.5 h-3.5" /> Back to Blogs
+            <Link to="/" className="text-xs text-gray-500 hover:text-[#FF7112] flex items-center justify-center gap-1">
+              <ArrowLeft className="w-3.5 h-3.5" /> Back to Home / ہوم پیج پر واپس جائیں
             </Link>
           </div>
         </form>
@@ -2315,10 +2315,10 @@ export default function AdminPage() {
               User Guide / یوزر گائیڈ
             </button>
             <Link 
-              to="/blog" 
+              to="/" 
               className="w-full md:w-auto bg-slate-900 hover:bg-slate-800 text-white px-5 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-center flex items-center justify-center gap-2 transition shadow-md shadow-slate-900/10"
             >
-              <ArrowLeft className="w-4 h-4" /> Exit Board
+              <ArrowLeft className="w-4 h-4" /> Exit Board / ہوم پیج پر جائیں
             </Link>
             <button 
               onClick={purgeLocalStorage}
