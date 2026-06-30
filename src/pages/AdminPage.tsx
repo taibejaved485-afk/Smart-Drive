@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import CTABanner from '../components/CTABanner';
-import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag, Bold, Italic, Underline, Link as LinkIcon, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, BookOpen, User, Calendar, Zap, UserCheck, Users, Pilcrow, Star, GripVertical, ArrowUp, ArrowDown } from 'lucide-react';
+import AdminOnboardingTour from '../components/AdminOnboardingTour';
+import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag, Bold, Italic, Underline, Link as LinkIcon, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, BookOpen, User, Calendar, Zap, UserCheck, Users, Pilcrow, Star, GripVertical, ArrowUp, ArrowDown, HelpCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RentalCar } from '../data/inventory';
 import { 
@@ -206,6 +207,22 @@ export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isTourOpen, setIsTourOpen] = useState(false);
+
+  // Auto-launch user guide onboarding tour when logged in for the first time
+  useEffect(() => {
+    if (isLoggedIn) {
+      const tourSeen = localStorage.getItem('godriveify_admin_tour_seen');
+      if (!tourSeen) {
+        // Delay slightly for smoother transition after login
+        const timer = setTimeout(() => {
+          setIsTourOpen(true);
+          localStorage.setItem('godriveify_admin_tour_seen', 'true');
+        }, 850);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isLoggedIn]);
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [newPost, setNewPost] = useState({ 
@@ -1411,6 +1428,7 @@ export default function AdminPage() {
     e.preventDefault();
     if (username === 'admin' && password === 'admin123') {
       setIsLoggedIn(true);
+      setIsTourOpen(true); // Auto-open onboarding guide on successful login
     } else {
       showToast('Invalid credentials! Default is admin / admin123', 'error');
     }
@@ -2287,7 +2305,15 @@ export default function AdminPage() {
               Create, edit, manage, and audit local Faisalabad driving school curriculums, student registrations, rental marketplace vehicles, and content listings instantly.
             </p>
           </div>
-          <div className="flex items-center gap-2 shrink-0 relative z-10 w-full md:w-auto">
+          <div className="flex items-center gap-2 shrink-0 relative z-10 w-full md:w-auto flex-wrap md:flex-nowrap">
+            <button
+              onClick={() => setIsTourOpen(true)}
+              className="w-full md:w-auto bg-gradient-to-r from-[#FF7112] to-amber-500 hover:from-[#E05A00] hover:to-amber-600 text-white px-4.5 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-center flex items-center justify-center gap-2 transition shadow-md shadow-orange-200 cursor-pointer"
+              title="Launch Interactive Admin User Guide"
+            >
+              <HelpCircle className="w-4 h-4 shrink-0 animate-pulse" />
+              User Guide / یوزر گائیڈ
+            </button>
             <Link 
               to="/blog" 
               className="w-full md:w-auto bg-slate-900 hover:bg-slate-800 text-white px-5 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-center flex items-center justify-center gap-2 transition shadow-md shadow-slate-900/10"
@@ -2305,7 +2331,7 @@ export default function AdminPage() {
         </div>
 
         {/* Live System Diagnostics Rows */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div id="admin-tour-stats" className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between mb-2">
               <span className="text-slate-400 text-[10px] font-black uppercase tracking-wider">Bookings Registered</span>
@@ -2375,7 +2401,7 @@ export default function AdminPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-12">
           
           {/* LEFT COMMAND SIDEBAR */}
-          <div className="lg:col-span-3 space-y-4">
+          <div id="admin-tour-sidebar" className="lg:col-span-3 space-y-4">
             <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4">
               <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2 border-b border-slate-100 pb-2">
                 Operations Directory
@@ -2384,6 +2410,7 @@ export default function AdminPage() {
               {/* Responsive Tab Buttons Stack */}
               <div className="flex flex-row lg:flex-col overflow-x-auto lg:overflow-x-visible gap-1.5 pb-2 lg:pb-0 scrollbar-none">
                 <button
+                   id="admin-tour-dashboard"
                    type="button"
                    onClick={() => setActiveTab('dashboard')}
                    className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
@@ -2401,6 +2428,7 @@ export default function AdminPage() {
                 <div className="h-px bg-slate-100 my-2 hidden lg:block" />
 
                 <button
+                  id="admin-tour-bookings"
                   type="button"
                   onClick={() => setActiveTab('bookings')}
                   className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
@@ -2421,6 +2449,7 @@ export default function AdminPage() {
                 </button>
 
                 <button
+                  id="admin-tour-courses"
                   type="button"
                   onClick={() => setActiveTab('courses')}
                   className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
@@ -2441,6 +2470,7 @@ export default function AdminPage() {
                 </button>
 
                 <button
+                  id="admin-tour-rentals"
                   type="button"
                   onClick={() => setActiveTab('rentals')}
                   className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
@@ -2461,6 +2491,7 @@ export default function AdminPage() {
                 </button>
 
                 <button
+                  id="admin-tour-requests"
                   type="button"
                   onClick={() => setActiveTab('requests')}
                   className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
@@ -2481,6 +2512,7 @@ export default function AdminPage() {
                 </button>
 
                 <button
+                  id="admin-tour-car-sales"
                   type="button"
                   onClick={() => setActiveTab('car-sales')}
                   className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
@@ -2501,6 +2533,7 @@ export default function AdminPage() {
                 </button>
 
                 <button
+                  id="admin-tour-blogs"
                   type="button"
                   onClick={() => setActiveTab('blogs')}
                   className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
@@ -2521,6 +2554,7 @@ export default function AdminPage() {
                 </button>
 
                 <button
+                  id="admin-tour-dns"
                   type="button"
                   onClick={() => setActiveTab('dns')}
                   className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
@@ -2541,6 +2575,7 @@ export default function AdminPage() {
                 </button>
 
                 <button
+                  id="admin-tour-instructors"
                   type="button"
                   onClick={() => setActiveTab('instructors')}
                   className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
@@ -2561,6 +2596,7 @@ export default function AdminPage() {
                 </button>
 
                 <button
+                  id="admin-tour-excise"
                   type="button"
                   onClick={() => setActiveTab('excise')}
                   className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
@@ -6576,6 +6612,13 @@ export default function AdminPage() {
           </p>
         </div>
       </footer>
+
+      <AdminOnboardingTour 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        isOpen={isTourOpen} 
+        onClose={() => setIsTourOpen(false)} 
+      />
     </div>
   );
 }
