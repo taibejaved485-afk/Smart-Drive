@@ -242,25 +242,54 @@ export default function AdminOnboardingTour({
 
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
 
+  // Determine whether the card has to be positioned above the target to avoid clipping
+  let isPositionedAbove = false;
   if (coords && !isMobile) {
+    const cardHeight = 280;
+    if (coords.placement === 'bottom') {
+      const idealTop = coords.top + coords.height + 16;
+      if (idealTop + cardHeight > window.innerHeight && coords.top - cardHeight - 16 > 16) {
+        isPositionedAbove = true;
+      }
+    }
+  }
+
+  if (coords && !isMobile) {
+    const cardWidth = 460;
+    const cardHeight = 280; // Compact card height
+
     if (coords.placement === 'right') {
-      const cardWidth = 460;
       const targetRight = coords.left + coords.width;
       const fitRight = targetRight + cardWidth + 30 < window.innerWidth;
       
       if (fitRight) {
-        popupStyle.left = targetRight + 24;
+        popupStyle.left = targetRight + 20;
         // Vertically centered next to target, clamped to viewport bounds
-        const idealTop = coords.top + (coords.height / 2) - 160;
-        popupStyle.top = Math.max(24, Math.min(window.innerHeight - 340, idealTop));
+        const idealTop = coords.top + (coords.height / 2) - (cardHeight / 2);
+        popupStyle.top = Math.max(16, Math.min(window.innerHeight - cardHeight - 16, idealTop));
       } else {
-        // Overlay below the sidebar item if horizontal space is tight
-        popupStyle.left = Math.max(24, Math.min(window.innerWidth - cardWidth - 24, coords.left));
-        popupStyle.top = coords.top + coords.height + 24;
+        // Overlay below or above the item if horizontal space is tight
+        popupStyle.left = Math.max(16, Math.min(window.innerWidth - cardWidth - 16, coords.left));
+        const idealTop = coords.top + coords.height + 16;
+        if (idealTop + cardHeight > window.innerHeight) {
+          popupStyle.top = Math.max(16, coords.top - cardHeight - 16);
+          isPositionedAbove = true;
+        } else {
+          popupStyle.top = idealTop;
+        }
       }
     } else if (coords.placement === 'bottom') {
-      popupStyle.left = Math.max(24, Math.min(window.innerWidth - 480, coords.left + (coords.width / 2) - 230));
-      popupStyle.top = coords.top + coords.height + 24;
+      popupStyle.left = Math.max(16, Math.min(window.innerWidth - cardWidth - 16, coords.left + (coords.width / 2) - (cardWidth / 2)));
+      
+      const idealTop = coords.top + coords.height + 16;
+      if (isPositionedAbove) {
+        popupStyle.top = coords.top - cardHeight - 16;
+      } else if (idealTop + cardHeight > window.innerHeight) {
+        // If it can't fit above or below perfectly, clamp to the bottom safe area
+        popupStyle.top = Math.max(16, window.innerHeight - cardHeight - 16);
+      } else {
+        popupStyle.top = idealTop;
+      }
     }
   } else {
     // Center alignment on Mobile screens
@@ -313,7 +342,7 @@ export default function AdminOnboardingTour({
           exit={isMobile ? { y: 100, opacity: 0, x: "-50%" } : { scale: 0.9, opacity: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
           style={popupStyle}
-          className="absolute bg-white dark:bg-slate-900 border-3 border-[#FF7112] rounded-3xl p-6 sm:p-7 max-w-md sm:max-w-lg w-[calc(100vw-32px)] sm:w-full shadow-2xl overflow-visible pointer-events-auto"
+          className="absolute bg-white dark:bg-slate-900 border-3 border-[#FF7112] rounded-3xl p-5 sm:p-6 max-w-md sm:max-w-lg w-[calc(100vw-32px)] sm:w-full shadow-2xl shadow-[#FF7112]/30 ring-6 ring-orange-500/15 overflow-visible pointer-events-auto"
         >
           {/* Top aesthetic accent line */}
           <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-orange-500 via-[#FF7112] to-amber-500 rounded-t-3xl" />
@@ -323,15 +352,19 @@ export default function AdminOnboardingTour({
             <div className="absolute left-0 top-[30%] -translate-x-3 w-5 h-5 bg-white dark:bg-slate-900 border-l-3 border-b-3 border-[#FF7112] rotate-45" />
           )}
 
-          {coords && !isMobile && coords.placement === 'bottom' && (
+          {coords && !isMobile && !isPositionedAbove && coords.placement === 'bottom' && (
             <div className="absolute top-0 left-[15%] -translate-y-3 w-5 h-5 bg-white dark:bg-slate-900 border-t-3 border-l-3 border-[#FF7112] rotate-45" />
           )}
 
+          {coords && !isMobile && isPositionedAbove && (
+            <div className="absolute bottom-0 left-[15%] translate-y-3 w-5 h-5 bg-white dark:bg-slate-900 border-r-3 border-b-3 border-[#FF7112] rotate-45" />
+          )}
+
           {/* Header row */}
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <span className="text-2xl">{step.icon}</span>
-              <span className="bg-[#FF7112]/10 text-[#E05A00] text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-[#FF7112]/20">
+              <span className="text-xl">{step.icon}</span>
+              <span className="bg-[#FF7112]/10 text-[#E05A00] text-[10px] font-black uppercase tracking-widest px-3 py-0.5 rounded-full border border-[#FF7112]/20">
                 {language === 'en' ? step.badge : step.urduBadge}
               </span>
             </div>
@@ -358,19 +391,19 @@ export default function AdminOnboardingTour({
           </div>
 
           {/* Onboarding text content block */}
-          <div className="space-y-3.5">
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white leading-tight flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-[#FF7112] shrink-0" />
+          <div className="space-y-2.5">
+            <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white leading-tight flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#FF7112] shrink-0" />
               {language === 'en' ? step.title : step.urduTitle}
             </h2>
             
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-bold">
+            <p className="text-xs sm:text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-bold">
               {language === 'en' ? step.description : step.urduDescription}
             </p>
           </div>
 
           {/* Footers controls stack */}
-          <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             
             {/* Step bullet list trackers */}
             <div className="flex items-center gap-1.5 flex-wrap">
@@ -379,10 +412,10 @@ export default function AdminOnboardingTour({
                   key={idx}
                   type="button"
                   onClick={() => setCurrentStep(idx)}
-                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                  className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
                     idx === currentStep 
-                      ? 'w-5 bg-[#FF7112]' 
-                      : 'w-2 bg-slate-200 dark:bg-slate-800 hover:bg-[#FF7112]/40'
+                      ? 'w-4 bg-[#FF7112]' 
+                      : 'w-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-[#FF7112]/40'
                   }`}
                   title={`Go to step ${idx + 1}`}
                 />
@@ -395,9 +428,9 @@ export default function AdminOnboardingTour({
                 <button
                   type="button"
                   onClick={handlePrev}
-                  className="bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 px-3.5 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition flex items-center gap-1 cursor-pointer border border-slate-200 dark:border-slate-700"
+                  className="bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition flex items-center gap-1 cursor-pointer border border-slate-200 dark:border-slate-700"
                 >
-                  <ChevronLeft className="w-3.5 h-3.5" />
+                  <ChevronLeft className="w-3 h-3" />
                   {language === 'en' ? 'Back' : 'پیچھے'}
                 </button>
               )}
@@ -405,14 +438,17 @@ export default function AdminOnboardingTour({
               <button
                 type="button"
                 onClick={handleNext}
-                className="bg-[#FF7112] hover:bg-[#E05A00] text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition flex items-center gap-1 shadow-md shadow-orange-200 dark:shadow-none cursor-pointer"
+                className="relative bg-gradient-to-r from-[#FF7112] to-amber-500 hover:from-[#E05A00] hover:to-amber-600 text-white px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:scale-105 active:scale-95 cursor-pointer border border-white/20 group"
               >
-                <span>
+                <span className="relative z-10 flex items-center gap-1">
                   {currentStep === steps.length - 1 
-                    ? (language === 'en' ? 'Get Started' : 'شروع کریں') 
+                    ? (language === 'en' ? 'Finish' : 'مکمل کریں') 
                     : (language === 'en' ? 'Next' : 'اگلا')}
+                  <ChevronRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                 </span>
-                <ChevronRight className="w-3.5 h-3.5" />
+
+                {/* High contrast pulsing guide ring to draw user's eye to the Next action */}
+                <span className="absolute -inset-1 rounded-xl border-2 border-[#FF7112]/80 animate-ping pointer-events-none opacity-80 group-hover:opacity-100" />
               </button>
             </div>
           </div>
