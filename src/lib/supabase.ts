@@ -1170,6 +1170,20 @@ export async function deleteDrivingCourseSupabase(id: string): Promise<boolean> 
 // BLOG POST OPERATIONS WITH GLOBAL SUPABASE SYNC AND LOCAL FALLBACK
 // -------------------------------------------------------------------------
 
+function ensureUUID(id: any): string {
+  const str = String(id || '');
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+  if (isUuid) {
+    return str;
+  }
+  // Standard fallback UUID generator
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 function normalizeDbBlogPost(item: any): any {
   return {
     id: String(item.id),
@@ -1187,7 +1201,7 @@ function normalizeDbBlogPost(item: any): any {
     excerpt: item.excerpt || '',
     status: item.status || 'Published',
     scheduledAt: item.scheduled_at || '',
-    category: item.category || ''
+    category: item.category || 'Safety Guide'
   };
 }
 
@@ -1221,8 +1235,11 @@ export async function fetchBlogPostsSupabase(): Promise<any[]> {
 }
 
 export async function upsertBlogPostSupabase(post: any): Promise<boolean> {
-  const mapped: any = {
-    id: String(post.id || Date.now().toString()),
+  const postUuid = ensureUUID(post.id);
+  
+  // Database object schema (does not contain 'category' column)
+  const dbMapped: any = {
+    id: postUuid,
     title: post.title,
     author: post.author || 'GoDriveify Team',
     image_url: post.imageUrl || '',
@@ -1236,32 +1253,31 @@ export async function upsertBlogPostSupabase(post: any): Promise<boolean> {
     focus_keywords: post.focusKeywords || '',
     excerpt: post.excerpt || '',
     status: post.status || 'Published',
-    scheduled_at: post.scheduledAt || '',
-    category: post.category || ''
+    scheduled_at: post.scheduledAt || ''
   };
 
-  // Sync locally first
+  // Sync locally first (keeping 'category' for local layout rendering)
   const localSaved = localStorage.getItem('blogPosts');
   let currentList = localSaved ? JSON.parse(localSaved) : [];
-  const idx = currentList.findIndex((p: any) => String(p.id) === String(mapped.id));
+  const idx = currentList.findIndex((p: any) => String(p.id) === String(postUuid) || String(p.id) === String(post.id));
   
   const localPostObj = {
-    id: mapped.id,
-    title: mapped.title,
-    author: mapped.author,
-    imageUrl: mapped.image_url,
-    content: mapped.content,
-    date: mapped.date,
-    authorAvatar: mapped.author_avatar,
-    authorRole: mapped.author_role,
-    imageAlt: mapped.image_alt,
-    metaTitle: mapped.meta_title,
-    metaDescription: mapped.meta_description,
-    focusKeywords: mapped.focus_keywords,
-    excerpt: mapped.excerpt,
-    status: mapped.status,
-    scheduledAt: mapped.scheduled_at,
-    category: mapped.category
+    id: postUuid,
+    title: dbMapped.title,
+    author: dbMapped.author,
+    imageUrl: dbMapped.image_url,
+    content: dbMapped.content,
+    date: dbMapped.date,
+    authorAvatar: dbMapped.author_avatar,
+    authorRole: dbMapped.author_role,
+    imageAlt: dbMapped.image_alt,
+    metaTitle: dbMapped.meta_title,
+    metaDescription: dbMapped.meta_description,
+    focusKeywords: dbMapped.focus_keywords,
+    excerpt: dbMapped.excerpt,
+    status: dbMapped.status,
+    scheduledAt: dbMapped.scheduled_at,
+    category: post.category || 'Safety Guide'
   };
 
   if (idx > -1) {
@@ -1278,7 +1294,7 @@ export async function upsertBlogPostSupabase(post: any): Promise<boolean> {
       if (active) {
         const { error } = await supabase
           .from('blog_posts')
-          .upsert([mapped], { onConflict: 'id' });
+          .upsert([dbMapped], { onConflict: 'id' });
         
         if (!error) return true;
         console.warn('Supabase upsertBlogPostSupabase error:', error.message);
