@@ -29,7 +29,10 @@ import {
   deleteBiometricRate,
   fetchDrivingCoursesSupabase,
   upsertDrivingCourseSupabase,
-  deleteDrivingCourseSupabase
+  deleteDrivingCourseSupabase,
+  fetchBlogPostsSupabase,
+  upsertBlogPostSupabase,
+  deleteBlogPostSupabase
 } from '../lib/supabase';
 
 interface BlogPost {
@@ -399,20 +402,12 @@ export default function AdminPage() {
   };
 
   const loadDataAndSync = () => {
-    // 1. Load blog posts
-    const savedPosts = localStorage.getItem('blogPosts');
-    if (savedPosts) {
-      try {
-        const parsed = JSON.parse(savedPosts);
-        if (Array.isArray(parsed)) {
-          setPosts(parsed);
-        } else {
-          setPosts([]);
-        }
-      } catch (e) {
-        setPosts([]);
+    // 1. Load blog posts with global sync
+    fetchBlogPostsSupabase().then(data => {
+      if (Array.isArray(data)) {
+        setPosts(data);
       }
-    }
+    });
 
     // 2. Load Driving School Bookings
     const savedBookings = localStorage.getItem('driving_bookings');
@@ -2045,30 +2040,27 @@ export default function AdminPage() {
     const finalImageUrl = newPost.imageUrl || PRESET_IMAGES[0].url;
 
     if (editingPostId) {
-      setPosts(prevPosts => {
-        const updatedPosts = prevPosts.map(p => {
-          if (String(p.id) === String(editingPostId)) {
-            return {
-              ...p,
-              title: newPost.title,
-              author: newPost.author || 'GoDriveify Team',
-              imageUrl: finalImageUrl,
-              content: newPost.content,
-              authorAvatar: newPost.authorAvatar,
-              authorRole: newPost.authorRole,
-              imageAlt: newPost.imageAlt,
-              metaTitle: newPost.metaTitle,
-              metaDescription: newPost.metaDescription,
-              focusKeywords: newPost.focusKeywords,
-              excerpt: newPost.excerpt,
-              status: finalStatus,
-              scheduledAt: finalStatus === 'Scheduled' ? newPost.scheduledAt : ''
-            };
-          }
-          return p;
+      const updatedPost: BlogPost = {
+        id: String(editingPostId),
+        title: newPost.title,
+        author: newPost.author || 'GoDriveify Team',
+        imageUrl: finalImageUrl,
+        content: newPost.content,
+        date: posts.find(p => String(p.id) === String(editingPostId))?.date || new Date().toLocaleDateString(),
+        authorAvatar: newPost.authorAvatar,
+        authorRole: newPost.authorRole,
+        imageAlt: newPost.imageAlt,
+        metaTitle: newPost.metaTitle,
+        metaDescription: newPost.metaDescription,
+        focusKeywords: newPost.focusKeywords,
+        excerpt: newPost.excerpt,
+        status: finalStatus,
+        scheduledAt: finalStatus === 'Scheduled' ? newPost.scheduledAt : ''
+      };
+      upsertBlogPostSupabase(updatedPost).then(() => {
+        fetchBlogPostsSupabase().then(data => {
+          if (Array.isArray(data)) setPosts(data);
         });
-        localStorage.setItem('blogPosts', JSON.stringify(updatedPosts));
-        return updatedPosts;
       });
       setEditingPostId(null);
       showToast(`Post updated successfully as ${finalStatus === 'Draft' ? 'Draft' : finalStatus}!`, 'success');
@@ -2090,10 +2082,10 @@ export default function AdminPage() {
         status: finalStatus,
         scheduledAt: finalStatus === 'Scheduled' ? newPost.scheduledAt : ''
       };
-      setPosts(prevPosts => {
-        const updatedPosts = [post, ...prevPosts];
-        localStorage.setItem('blogPosts', JSON.stringify(updatedPosts));
-        return updatedPosts;
+      upsertBlogPostSupabase(post).then(() => {
+        fetchBlogPostsSupabase().then(data => {
+          if (Array.isArray(data)) setPosts(data);
+        });
       });
       showToast(`Post saved successfully as ${finalStatus === 'Draft' ? 'Draft' : finalStatus}!`, 'success');
     }
@@ -2190,10 +2182,10 @@ export default function AdminPage() {
 
   // Blog Editor Operations
   const deletePost = (id: string) => {
-    setPosts(prevPosts => {
-      const updatedPosts = prevPosts.filter(p => String(p.id) !== String(id));
-      localStorage.setItem('blogPosts', JSON.stringify(updatedPosts));
-      return updatedPosts;
+    deleteBlogPostSupabase(id).then(() => {
+      fetchBlogPostsSupabase().then(data => {
+        if (Array.isArray(data)) setPosts(data);
+      });
     });
     showToast('Blog post deleted successfully.', 'info');
     if (editingPostId === id) {

@@ -1166,5 +1166,158 @@ export async function deleteDrivingCourseSupabase(id: string): Promise<boolean> 
   return true;
 }
 
+// -------------------------------------------------------------------------
+// BLOG POST OPERATIONS WITH GLOBAL SUPABASE SYNC AND LOCAL FALLBACK
+// -------------------------------------------------------------------------
+
+function normalizeDbBlogPost(item: any): any {
+  return {
+    id: String(item.id),
+    title: item.title,
+    author: item.author || 'GoDriveify Team',
+    imageUrl: item.image_url || '',
+    content: item.content || '',
+    date: item.date || new Date().toLocaleDateString(),
+    authorAvatar: item.author_avatar || '',
+    authorRole: item.author_role || '',
+    imageAlt: item.image_alt || '',
+    metaTitle: item.meta_title || '',
+    metaDescription: item.meta_description || '',
+    focusKeywords: item.focus_keywords || '',
+    excerpt: item.excerpt || '',
+    status: item.status || 'Published',
+    scheduledAt: item.scheduled_at || '',
+    category: item.category || ''
+  };
+}
+
+export async function fetchBlogPostsSupabase(): Promise<any[]> {
+  const localSaved = localStorage.getItem('blogPosts');
+  let posts = localSaved ? JSON.parse(localSaved) : [];
+
+  if (supabase) {
+    try {
+      const active = await tableExists('blog_posts');
+      if (active) {
+        const { data, error } = await supabase
+          .from('blog_posts')
+          .select('*')
+          .order('id', { ascending: false });
+
+        if (!error && data) {
+          const mapped = data.map(normalizeDbBlogPost);
+          localStorage.setItem('blogPosts', JSON.stringify(mapped));
+          window.dispatchEvent(new Event('blog_posts_updated'));
+          return mapped;
+        } else if (error) {
+          console.warn('Supabase fetchBlogPostsSupabase error:', error.message);
+        }
+      }
+    } catch (e) {
+      console.warn('Supabase fetchBlogPostsSupabase failed', e);
+    }
+  }
+  return posts;
+}
+
+export async function upsertBlogPostSupabase(post: any): Promise<boolean> {
+  const mapped: any = {
+    id: String(post.id || Date.now().toString()),
+    title: post.title,
+    author: post.author || 'GoDriveify Team',
+    image_url: post.imageUrl || '',
+    content: post.content || '',
+    date: post.date || new Date().toLocaleDateString(),
+    author_avatar: post.authorAvatar || '',
+    author_role: post.authorRole || '',
+    image_alt: post.imageAlt || '',
+    meta_title: post.metaTitle || '',
+    meta_description: post.metaDescription || '',
+    focus_keywords: post.focusKeywords || '',
+    excerpt: post.excerpt || '',
+    status: post.status || 'Published',
+    scheduled_at: post.scheduledAt || '',
+    category: post.category || ''
+  };
+
+  // Sync locally first
+  const localSaved = localStorage.getItem('blogPosts');
+  let currentList = localSaved ? JSON.parse(localSaved) : [];
+  const idx = currentList.findIndex((p: any) => String(p.id) === String(mapped.id));
+  
+  const localPostObj = {
+    id: mapped.id,
+    title: mapped.title,
+    author: mapped.author,
+    imageUrl: mapped.image_url,
+    content: mapped.content,
+    date: mapped.date,
+    authorAvatar: mapped.author_avatar,
+    authorRole: mapped.author_role,
+    imageAlt: mapped.image_alt,
+    metaTitle: mapped.meta_title,
+    metaDescription: mapped.meta_description,
+    focusKeywords: mapped.focus_keywords,
+    excerpt: mapped.excerpt,
+    status: mapped.status,
+    scheduledAt: mapped.scheduled_at,
+    category: mapped.category
+  };
+
+  if (idx > -1) {
+    currentList[idx] = localPostObj;
+  } else {
+    currentList.unshift(localPostObj);
+  }
+  localStorage.setItem('blogPosts', JSON.stringify(currentList));
+  window.dispatchEvent(new Event('blog_posts_updated'));
+
+  if (supabase) {
+    try {
+      const active = await tableExists('blog_posts');
+      if (active) {
+        const { error } = await supabase
+          .from('blog_posts')
+          .upsert([mapped], { onConflict: 'id' });
+        
+        if (!error) return true;
+        console.warn('Supabase upsertBlogPostSupabase error:', error.message);
+      }
+    } catch (e) {
+      console.warn('Supabase upsertBlogPostSupabase failed', e);
+    }
+  }
+  return true;
+}
+
+export async function deleteBlogPostSupabase(id: string): Promise<boolean> {
+  // Sync locally first
+  const localSaved = localStorage.getItem('blogPosts');
+  if (localSaved) {
+    const currentList = JSON.parse(localSaved);
+    const filtered = currentList.filter((p: any) => String(p.id) !== String(id));
+    localStorage.setItem('blogPosts', JSON.stringify(filtered));
+    window.dispatchEvent(new Event('blog_posts_updated'));
+  }
+
+  if (supabase) {
+    try {
+      const active = await tableExists('blog_posts');
+      if (active) {
+        const { error } = await supabase
+          .from('blog_posts')
+          .delete()
+          .eq('id', id);
+        
+        if (!error) return true;
+        console.warn('Supabase deleteBlogPostSupabase error:', error.message);
+      }
+    } catch (e) {
+      console.warn('Supabase deleteBlogPostSupabase failed', e);
+    }
+  }
+  return true;
+}
+
 
 
