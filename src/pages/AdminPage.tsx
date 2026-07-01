@@ -2070,7 +2070,11 @@ export default function AdminPage() {
         author: newPost.author || 'GoDriveify Team',
         imageUrl: finalImageUrl,
         content: newPost.content,
-        id: Date.now().toString(),
+        id: 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+          const r = Math.random() * 16 | 0;
+          const v = c === 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        }),
         date: new Date().toLocaleDateString(),
         authorAvatar: newPost.authorAvatar,
         authorRole: newPost.authorRole,

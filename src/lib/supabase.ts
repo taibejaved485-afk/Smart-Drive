@@ -1311,16 +1311,22 @@ export async function deleteBlogPostSupabase(id: string): Promise<boolean> {
   }
 
   if (supabase) {
-    try {
-      const { error } = await supabase
-        .from('blog_posts')
-        .delete()
-        .eq('id', id);
-      
-      if (!error) return true;
-      console.warn('Supabase deleteBlogPostSupabase error:', error.message);
-    } catch (e) {
-      console.warn('Supabase deleteBlogPostSupabase failed', e);
+    // Only attempt to delete from Supabase if the ID is a valid UUID
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    if (isUuid) {
+      try {
+        const { error } = await supabase
+          .from('blog_posts')
+          .delete()
+          .eq('id', id);
+        
+        if (!error) return true;
+        console.warn('Supabase deleteBlogPostSupabase error:', error.message);
+      } catch (e) {
+        console.warn('Supabase deleteBlogPostSupabase failed', e);
+      }
+    } else {
+      console.log('Skipping Supabase delete for non-UUID blog post ID:', id);
     }
   }
   return true;
