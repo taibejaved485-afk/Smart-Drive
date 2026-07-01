@@ -219,12 +219,30 @@ export default function BlogPage() {
   const [language, setLanguage] = useState<'en' | 'ur'>('en');
 
   useEffect(() => {
-    fetchBlogPostsSupabase().then(data => {
-      if (Array.isArray(data)) {
-        setPosts(data);
-      }
-    });
-  }, []);
+    const handleUpdate = () => {
+      fetchBlogPostsSupabase().then(data => {
+        if (Array.isArray(data)) {
+          setPosts(data);
+          // If the currently selected post has been deleted, return to list view
+          if (selectedPost) {
+            const stillExists = data.some(p => String(p.id) === String(selectedPost.id));
+            if (!stillExists) {
+              setSelectedPost(null);
+            }
+          }
+        }
+      });
+    };
+
+    // Initial load
+    handleUpdate();
+
+    // Listen for updates in real-time (e.g., when deleted from Admin page)
+    window.addEventListener('blog_posts_updated', handleUpdate);
+    return () => {
+      window.removeEventListener('blog_posts_updated', handleUpdate);
+    };
+  }, [selectedPost]);
 
   // Check if posts exist
   useEffect(() => {

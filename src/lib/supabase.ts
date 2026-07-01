@@ -1301,32 +1301,50 @@ export async function upsertBlogPostSupabase(post: any): Promise<boolean> {
 }
 
 export async function deleteBlogPostSupabase(id: string): Promise<boolean> {
+  const cleanId = String(id || '').trim();
+  let blogTitleToDelete: string | null = null;
+
   // Sync locally first
   const localSaved = localStorage.getItem('blogPosts');
   if (localSaved) {
     const currentList = JSON.parse(localSaved);
-    const filtered = currentList.filter((p: any) => String(p.id) !== String(id));
+    const postToDelete = currentList.find((p: any) => String(p.id) === cleanId);
+    if (postToDelete && postToDelete.title) {
+      blogTitleToDelete = postToDelete.title;
+    }
+    const filtered = currentList.filter((p: any) => String(p.id) !== cleanId);
     localStorage.setItem('blogPosts', JSON.stringify(filtered));
     window.dispatchEvent(new Event('blog_posts_updated'));
   }
 
   if (supabase) {
-    // Only attempt to delete from Supabase if the ID is a valid UUID
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cleanId);
     if (isUuid) {
       try {
         const { error } = await supabase
           .from('blog_posts')
           .delete()
-          .eq('id', id);
+          .eq('id', cleanId);
         
         if (!error) return true;
         console.warn('Supabase deleteBlogPostSupabase error:', error.message);
       } catch (e) {
         console.warn('Supabase deleteBlogPostSupabase failed', e);
       }
-    } else {
-      console.log('Skipping Supabase delete for non-UUID blog post ID:', id);
+    } else if (blogTitleToDelete) {
+      // Fallback: Delete from Supabase by title if ID is not a valid UUID
+      try {
+        console.log(`Attempting fallback Supabase deletion by title: "${blogTitleToDelete}"`);
+        const { error } = await supabase
+          .from('blog_posts')
+          .delete()
+          .eq('title', blogTitleToDelete);
+        
+        if (!error) return true;
+        console.warn('Supabase delete by title error:', error.message);
+      } catch (e) {
+        console.warn('Supabase delete by title failed', e);
+      }
     }
   }
   return true;
