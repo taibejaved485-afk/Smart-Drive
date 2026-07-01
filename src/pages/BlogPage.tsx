@@ -490,7 +490,7 @@ export default function BlogPage() {
           <div className="h-1 w-16 bg-[#FF7112] rounded"></div>
         </div>
 
-        {posts.length === 0 ? (
+        {posts.filter(p => p.status === 'Published').length === 0 ? (
           <div className="bg-white rounded-3xl border border-gray-100 shadow-xl p-20 text-center relative overflow-hidden">
             <div className="absolute top-0 right-0 p-10 opacity-5">
               <BookOpen className="w-64 h-64 text-slate-900" />
@@ -499,7 +499,7 @@ export default function BlogPage() {
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {posts.map((post, i) => {
+            {posts.filter(p => p.status === 'Published').map((post, i) => {
               const excerpt = stripMarkdown(post.content);
               const readTime = Math.max(2, Math.ceil(excerpt.split(/\s+/).filter(Boolean).length / 180));
               

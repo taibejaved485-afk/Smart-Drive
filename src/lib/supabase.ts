@@ -1211,21 +1211,18 @@ export async function fetchBlogPostsSupabase(): Promise<any[]> {
 
   if (supabase) {
     try {
-      const active = await tableExists('blog_posts');
-      if (active) {
-        const { data, error } = await supabase
-          .from('blog_posts')
-          .select('*')
-          .order('id', { ascending: false });
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-        if (!error && data) {
-          const mapped = data.map(normalizeDbBlogPost);
-          localStorage.setItem('blogPosts', JSON.stringify(mapped));
-          window.dispatchEvent(new Event('blog_posts_updated'));
-          return mapped;
-        } else if (error) {
-          console.warn('Supabase fetchBlogPostsSupabase error:', error.message);
-        }
+      if (!error && data) {
+        const mapped = data.map(normalizeDbBlogPost);
+        localStorage.setItem('blogPosts', JSON.stringify(mapped));
+        window.dispatchEvent(new Event('blog_posts_updated'));
+        return mapped;
+      } else if (error) {
+        console.warn('Supabase fetchBlogPostsSupabase error:', error.message);
       }
     } catch (e) {
       console.warn('Supabase fetchBlogPostsSupabase failed', e);
@@ -1290,15 +1287,12 @@ export async function upsertBlogPostSupabase(post: any): Promise<boolean> {
 
   if (supabase) {
     try {
-      const active = await tableExists('blog_posts');
-      if (active) {
-        const { error } = await supabase
-          .from('blog_posts')
-          .upsert([dbMapped], { onConflict: 'id' });
-        
-        if (!error) return true;
-        console.warn('Supabase upsertBlogPostSupabase error:', error.message);
-      }
+      const { error } = await supabase
+        .from('blog_posts')
+        .upsert([dbMapped], { onConflict: 'id' });
+      
+      if (!error) return true;
+      console.warn('Supabase upsertBlogPostSupabase error:', error.message);
     } catch (e) {
       console.warn('Supabase upsertBlogPostSupabase failed', e);
     }
@@ -1318,16 +1312,13 @@ export async function deleteBlogPostSupabase(id: string): Promise<boolean> {
 
   if (supabase) {
     try {
-      const active = await tableExists('blog_posts');
-      if (active) {
-        const { error } = await supabase
-          .from('blog_posts')
-          .delete()
-          .eq('id', id);
-        
-        if (!error) return true;
-        console.warn('Supabase deleteBlogPostSupabase error:', error.message);
-      }
+      const { error } = await supabase
+        .from('blog_posts')
+        .delete()
+        .eq('id', id);
+      
+      if (!error) return true;
+      console.warn('Supabase deleteBlogPostSupabase error:', error.message);
     } catch (e) {
       console.warn('Supabase deleteBlogPostSupabase failed', e);
     }
