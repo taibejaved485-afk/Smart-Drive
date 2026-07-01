@@ -528,12 +528,24 @@ export default function RentalsPage() {
       <Navbar />
 
       {/* Hero Header */}
-      <section 
-        className="relative py-24 text-white overflow-hidden bg-cover bg-center"
-        style={{ backgroundImage: "url('https://i.pinimg.com/1200x/aa/8c/59/aa8c59af08030bf767a16f053cb78d1c.jpg')" }}
-      >
-        <div className="absolute inset-0 bg-slate-950/75"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+      <section className="relative py-24 bg-slate-950 text-white overflow-hidden">
+        {/* Cinematic Background Video Layer */}
+        <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden bg-black">
+          <video 
+            autoPlay 
+            loop 
+            muted 
+            playsInline 
+            preload="auto"
+            src="/hero-video.mp4"
+            className="absolute inset-0 w-full h-full object-cover z-0 opacity-40 pointer-events-none"
+          />
+          {/* Rich Dark Vignette Overlay for Premium Contrast and Text Readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-slate-950/40 to-slate-950/90 z-10"></div>
+          <div className="absolute inset-0 bg-radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops)) from-red-950/20 via-transparent to-black/80 z-15"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-20">
           <motion.p 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
