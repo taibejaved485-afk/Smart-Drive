@@ -104,13 +104,28 @@ export default function CarSalePage() {
       <Navbar />
 
       {/* Hero Header Banner */}
-      <section className="relative pt-36 pb-24 bg-gray-950 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-red-950/50 via-slate-900 to-black z-0"></div>
+      <section className="relative pt-36 pb-24 bg-slate-950 text-white overflow-hidden">
+        {/* Cinematic Background Video Layer */}
+        <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden bg-black">
+          <video 
+            autoPlay 
+            loop 
+            muted 
+            playsInline 
+            preload="auto"
+            src="/hero-video.mp4"
+            className="absolute inset-0 w-full h-full object-cover z-0 opacity-40 pointer-events-none"
+          />
+          {/* Rich Dark Vignette Overlay for Premium Contrast and Text Readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-slate-950/40 to-slate-950/90 z-10"></div>
+          <div className="absolute inset-0 bg-radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops)) from-red-950/20 via-transparent to-black/80 z-15"></div>
+        </div>
+
         {/* Subtle decorative background patterns */}
-        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-red-500/30 to-transparent"></div>
-        <div className="absolute -bottom-16 -left-16 w-64 h-64 bg-[#FF7112]/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-red-500/30 to-transparent z-10"></div>
+        <div className="absolute -bottom-16 -left-16 w-64 h-64 bg-[#FF7112]/10 rounded-full blur-3xl z-10"></div>
         
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-20">
           <ScrollReveal direction="down">
             <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#FF7112]/10 border border-[#FF7112]/30 text-orange-400 text-xs font-black uppercase tracking-widest mb-6">
               <ShieldCheck className="w-3.5 h-3.5" /> 100% Direct Owner Marketplace

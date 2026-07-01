@@ -1622,7 +1622,7 @@ export default function QuizPage() {
       </section>
 
       {/* Quiz Area Container */}
-      <main className="flex-grow py-8 sm:py-12 px-4 max-w-2xl mx-auto w-full relative z-10">
+      <main className="flex-grow py-8 sm:py-12 px-4 max-w-7xl mx-auto w-full relative z-10">
         <ScrollReveal>
           {!quizStarted ? (
             /* LANDING VIEW */
