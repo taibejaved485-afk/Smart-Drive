@@ -156,7 +156,7 @@ export default function AppointmentForm() {
                         type="text" 
                         required 
                         className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-[#FF7112] focus:ring-1 focus:ring-[#FF7112] outline-none text-white text-sm transition" 
-                        placeholder="e.g. Muhammad" 
+                        placeholder="e.g. Muhammad" name="given-name" autoComplete="given-name" 
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                       />
@@ -167,7 +167,7 @@ export default function AppointmentForm() {
                         type="text" 
                         required 
                         className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-[#FF7112] focus:ring-1 focus:ring-[#FF7112] outline-none text-white text-sm transition" 
-                        placeholder="e.g. Ahmad" 
+                        placeholder="e.g. Ahmad" name="family-name" autoComplete="family-name" 
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                       />
@@ -179,7 +179,7 @@ export default function AppointmentForm() {
                       type="email" 
                       required 
                       className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-[#FF7112] focus:ring-1 focus:ring-[#FF7112] outline-none text-white text-sm transition" 
-                      placeholder="e.g. ahmad@gmail.com" 
+                      placeholder="e.g. ahmad@gmail.com" name="email" autoComplete="email" 
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
@@ -190,7 +190,7 @@ export default function AppointmentForm() {
                       type="tel" 
                       required 
                       className="w-full p-3 rounded-xl bg-gray-800/40 border border-white/10 focus:border-[#FF7112] focus:ring-1 focus:ring-[#FF7112] outline-none text-white text-sm transition" 
-                      placeholder="e.g. 03097666928" 
+                      placeholder="e.g. 03097666928" name="tel" autoComplete="tel" 
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                     />

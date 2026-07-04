@@ -539,7 +539,7 @@ export default function Navbar() {
                               required
                               type="text" 
                               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-medium" 
-                              placeholder="e.g. Muhammad Ahmad Malik" 
+                              placeholder="e.g. Muhammad Ahmad Malik" name="name" autoComplete="name" 
                               value={formData.ownerName} 
                               onChange={e => setFormData({...formData, ownerName: e.target.value})} 
                             />
@@ -553,7 +553,7 @@ export default function Navbar() {
                               required
                               type="tel" 
                               className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition text-sm font-mono font-bold" 
-                              placeholder="e.g. 03097666928" 
+                              placeholder="e.g. 03097666928" name="tel" autoComplete="tel" 
                               value={formData.ownerPhone} 
                               onChange={e => setFormData({...formData, ownerPhone: e.target.value})} 
                             />

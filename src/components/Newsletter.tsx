@@ -118,7 +118,7 @@ export default function Newsletter() {
                     </span>
                     <input
                       type="email"
-                      placeholder="Enter your email address"
+                      placeholder="Enter your email address" name="email" autoComplete="email"
                       value={email}
                       onChange={(e) => {
                         setEmail(e.target.value);

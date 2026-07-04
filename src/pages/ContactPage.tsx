@@ -355,7 +355,7 @@ export default function ContactPage() {
                             <input 
                               type="text" 
                               required
-                              value={formData.name}
+                              name="name" autoComplete="name" value={formData.name}
                               onChange={(e) => setFormData({...formData, name: e.target.value})}
                               placeholder="Muhammad Ali" 
                               className="rounded-full bg-transparent border border-gray-200 pl-5 pr-5 py-4 text-sm text-slate-900 focus:outline-none focus:border-[#FF7112] focus:ring-1 focus:ring-[#FF7112] placeholder:text-gray-400 font-semibold transition-all duration-300 w-full"
@@ -369,7 +369,7 @@ export default function ContactPage() {
                             <input 
                               type="tel" 
                               required
-                              value={formData.phone}
+                              name="tel" autoComplete="tel" value={formData.phone}
                               onChange={(e) => setFormData({...formData, phone: e.target.value})}
                               placeholder="0300-1234567" 
                               className="rounded-full bg-transparent border border-gray-200 pl-5 pr-5 py-4 text-sm text-slate-900 focus:outline-none focus:border-[#FF7112] focus:ring-1 focus:ring-[#FF7112] placeholder:text-gray-400 font-semibold transition-all duration-300 w-full"
@@ -384,7 +384,7 @@ export default function ContactPage() {
                           <input 
                             type="email" 
                             required
-                            value={formData.email}
+                            name="email" autoComplete="email" value={formData.email}
                             onChange={(e) => setFormData({...formData, email: e.target.value})}
                             placeholder="student@gmail.com" 
                             className="rounded-full bg-transparent border border-gray-200 pl-5 pr-5 py-4 text-sm text-slate-900 focus:outline-none focus:border-[#FF7112] focus:ring-1 focus:ring-[#FF7112] placeholder:text-gray-400 font-semibold transition-all duration-300 w-full"

@@ -1025,7 +1025,7 @@ export default function RentalMarketplace() {
                       <input 
                         required
                         type="text"
-                        placeholder="e.g. Ali Ahmed"
+                        placeholder="e.g. Ali Ahmed" name="name" autoComplete="name"
                         value={bookingName}
                         onChange={e => setBookingName(e.target.value)}
                         className="w-full border border-gray-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition"
@@ -1037,7 +1037,7 @@ export default function RentalMarketplace() {
                       <input 
                         required
                         type="tel"
-                        placeholder="e.g. 0300-1234567"
+                        placeholder="e.g. 0300-1234567" name="tel" autoComplete="tel"
                         value={bookingPhone}
                         onChange={e => setBookingPhone(e.target.value)}
                         className="w-full border border-gray-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-[#FF7112] focus:border-[#FF7112] outline-none transition font-mono"
