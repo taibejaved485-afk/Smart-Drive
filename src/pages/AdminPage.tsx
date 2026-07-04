@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import CTABanner from '../components/CTABanner';
 import AdminOnboardingTour from '../components/AdminOnboardingTour';
-import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag, Bold, Italic, Underline, Link as LinkIcon, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, BookOpen, User, Calendar, Zap, UserCheck, Users, Pilcrow, Star, GripVertical, ArrowUp, ArrowDown, HelpCircle } from 'lucide-react';
+import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag, Bold, Italic, Underline, Link as LinkIcon, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, BookOpen, User, Calendar, Zap, UserCheck, Users, Pilcrow, Star, GripVertical, ArrowUp, ArrowDown, HelpCircle, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RentalCar } from '../data/inventory';
 import EmailMarketingDashboard from '../components/EmailMarketingDashboard';
@@ -33,7 +33,10 @@ import {
   deleteDrivingCourseSupabase,
   fetchBlogPostsSupabase,
   upsertBlogPostSupabase,
-  deleteBlogPostSupabase
+  deleteBlogPostSupabase,
+  fetchContactMessages,
+  updateContactMessageStatus,
+  deleteContactMessage
 } from '../lib/supabase';
 
 const compressImage = (file: File, maxWidth = 1000, maxHeight = 1000, quality = 0.7): Promise<string> => {
@@ -296,7 +299,13 @@ export default function AdminPage() {
   const [blogSearchQuery, setBlogSearchQuery] = useState('');
   const [editorWorkspaceTab, setEditorWorkspaceTab] = useState<'write' | 'preview'>('write');
   const [editorAuthorSelectMode, setEditorAuthorSelectMode] = useState<'dropdown' | 'custom'>('dropdown');
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'bookings' | 'blogs' | 'dns' | 'rentals' | 'requests' | 'courses' | 'car-sales' | 'instructors' | 'excise' | 'marketing'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'bookings' | 'blogs' | 'dns' | 'rentals' | 'requests' | 'courses' | 'car-sales' | 'instructors' | 'excise' | 'marketing' | 'messages'>('dashboard');
+  
+  // Contact Messages states
+  const [contactMessages, setContactMessages] = useState<any[]>([]);
+  const [contactSearchQuery, setContactSearchQuery] = useState('');
+  const [contactStatusFilter, setContactStatusFilter] = useState<'all' | 'unread' | 'read' | 'replied'>('all');
+
   
   // Punjab Excise Slabs & NADRA Biometric Fee state variables
   const [exciseRates, setExciseRates] = useState<any[]>(() => {
@@ -710,6 +719,28 @@ export default function AdminPage() {
         setDrivingCourses(data);
       }
     }).catch(() => {});
+
+    // 9. Load Contact Messages
+    const savedContactMessages = localStorage.getItem('contact_messages');
+    if (savedContactMessages) {
+      try {
+        const parsed = JSON.parse(savedContactMessages);
+        if (Array.isArray(parsed)) {
+          setContactMessages(parsed);
+        } else {
+          setContactMessages([]);
+        }
+      } catch (err) {
+        setContactMessages([]);
+      }
+    } else {
+      setContactMessages([]);
+    }
+    fetchContactMessages().then(data => {
+      if (data) {
+        setContactMessages(data);
+      }
+    }).catch(() => {});
   };
 
   useEffect(() => {
@@ -727,6 +758,7 @@ export default function AdminPage() {
     window.addEventListener('blog_editors_updated', loadDataAndSync);
     window.addEventListener('instructors_updated', loadDataAndSync);
     window.addEventListener('system_metadata_updated', loadDataAndSync);
+    window.addEventListener('contact_messages_updated', loadDataAndSync);
     
     // Background polling interval for extra visual reactivity safety (every 3s, skipBlog=true)
     const syncInterval = setInterval(() => loadDataAndSync(true), 3000);
@@ -743,9 +775,11 @@ export default function AdminPage() {
       window.removeEventListener('blog_editors_updated', loadDataAndSync);
       window.removeEventListener('instructors_updated', loadDataAndSync);
       window.removeEventListener('system_metadata_updated', loadDataAndSync);
+      window.removeEventListener('contact_messages_updated', loadDataAndSync);
       clearInterval(syncInterval);
     };
   }, []);
+
 
   // Handler methods for Driving Academy Bookings
   const changeBookingStatus = async (id: string, newStatus: string) => {
@@ -772,6 +806,33 @@ export default function AdminPage() {
       loadDataAndSync();
     }
   };
+
+  // Handler methods for Contact Page Messages
+  const changeContactMessageStatus = async (id: string, newStatus: string) => {
+    const updated = contactMessages.map(m => m.id === id ? { ...m, status: newStatus } : m);
+    setContactMessages(updated);
+    localStorage.setItem('contact_messages', JSON.stringify(updated));
+    window.dispatchEvent(new Event('contact_messages_updated'));
+    window.dispatchEvent(new Event('storage'));
+
+    await updateContactMessageStatus(id, newStatus);
+    loadDataAndSync();
+  };
+
+  const removeContactMessageRecord = async (id: string) => {
+    if (window.confirm('Are you sure you want to permanently delete this contact submission?')) {
+      const updated = contactMessages.filter(m => String(m.id) !== String(id));
+      setContactMessages(updated);
+      localStorage.setItem('contact_messages', JSON.stringify(updated));
+      window.dispatchEvent(new Event('contact_messages_updated'));
+      window.dispatchEvent(new Event('storage'));
+
+      await deleteContactMessage(id);
+      showToast('Contact message deleted.', 'info');
+      loadDataAndSync();
+    }
+  };
+
 
   // -------------------------------------------------------------------------
   // Instructors CRUD Handlers
@@ -2746,6 +2807,28 @@ export default function AdminPage() {
                     AI
                   </span>
                 </button>
+
+                <button
+                  id="admin-tour-messages"
+                  type="button"
+                  onClick={() => setActiveTab('messages')}
+                  className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                    activeTab === 'messages'
+                      ? 'bg-[#E05A00] text-white font-extrabold shadow-md shadow-red-700/10'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
+                    <MessageSquare className="w-4 h-4" />
+                    <span>Contact Messages</span>
+                  </div>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ${
+                    activeTab === 'messages' ? 'bg-white/30 text-white' : 'bg-blue-100 text-blue-800'
+                  }`}>
+                    {contactMessages.filter(m => m.status === 'unread').length > 0 ? `${contactMessages.filter(m => m.status === 'unread').length} New` : contactMessages.length}
+                  </span>
+                </button>
+
               </div>
             </div>
           </div>
@@ -4872,6 +4955,202 @@ export default function AdminPage() {
         {activeTab === 'marketing' && (
           <EmailMarketingDashboard onBackToDashboard={() => setActiveTab('dashboard')} />
         )}
+
+        {activeTab === 'messages' && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-100 pb-5">
+                <div className="flex items-center gap-3">
+                  <span className="p-2 bg-[#E05A00]/10 text-[#E05A00] rounded-xl">
+                    <MessageSquare className="w-6 h-6" />
+                  </span>
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight font-sans">Contact Inquiries & Submissions</h2>
+                    <p className="text-gray-500 text-sm mt-0.5 font-medium">
+                      Manage client requests, questions, and course enrollment feedback sent from the Contact form.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">
+                  <span className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse"></span>
+                  <span className="text-xs font-bold text-slate-600">
+                    {contactMessages.filter(m => m.status === 'unread').length} Unread Submissions
+                  </span>
+                </div>
+              </div>
+
+              {/* Filters Panel */}
+              <div className="flex flex-col md:flex-row gap-3 mt-6">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by name, email, phone, course or message content..."
+                    value={contactSearchQuery}
+                    onChange={(e) => setContactSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-[#E05A00] focus:ring-1 focus:ring-[#E05A00] transition outline-none font-medium"
+                  />
+                </div>
+                
+                <div className="flex gap-2">
+                  <select
+                    value={contactStatusFilter}
+                    onChange={(e: any) => setContactStatusFilter(e.target.value)}
+                    className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:bg-white focus:border-[#E05A00] transition outline-none cursor-pointer"
+                  >
+                    <option value="all">All Statuses</option>
+                    <option value="unread">Unread</option>
+                    <option value="read">Read</option>
+                    <option value="replied">Replied</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Submissions List */}
+            <div className="space-y-4">
+              {(() => {
+                const filtered = contactMessages.filter(m => {
+                  const matchQuery = 
+                    m.name?.toLowerCase().includes(contactSearchQuery.toLowerCase()) ||
+                    m.email?.toLowerCase().includes(contactSearchQuery.toLowerCase()) ||
+                    m.phone?.toLowerCase().includes(contactSearchQuery.toLowerCase()) ||
+                    m.course?.toLowerCase().includes(contactSearchQuery.toLowerCase()) ||
+                    m.message?.toLowerCase().includes(contactSearchQuery.toLowerCase());
+                  
+                  const matchStatus = contactStatusFilter === 'all' || m.status === contactStatusFilter;
+                  return matchQuery && matchStatus;
+                });
+
+                if (filtered.length === 0) {
+                  return (
+                    <div className="bg-white border border-dashed border-slate-200 rounded-2xl p-12 text-center text-slate-400">
+                      <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-30 text-slate-600" />
+                      <p className="font-extrabold text-slate-700">No matching inquiries found</p>
+                      <p className="text-sm text-slate-400 mt-1">Try relaxing your search terms or filter selection.</p>
+                    </div>
+                  );
+                }
+
+                return filtered.map((m: any) => {
+                  const dateStr = m.created_at ? new Date(m.created_at).toLocaleString('en-US', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  }) : 'N/A';
+
+                  // WhatsApp quick reply generator
+                  const cleanPhone = m.phone.replace(/[^0-9]/g, '');
+                  const formattedPhone = cleanPhone.startsWith('0') ? '92' + cleanPhone.substring(1) : cleanPhone;
+                  const waText = `Assalam-o-Alaikum ${m.name}! Thank you for contacting GoDriveify regarding "${m.course}". We received your message: "${m.message}". Let us assist you with our timings and fee details!`;
+                  const waUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(waText)}`;
+
+                  return (
+                    <div 
+                      key={m.id} 
+                      className={`p-6 sm:p-8 bg-white border rounded-2xl transition duration-200 shadow-sm relative overflow-hidden flex flex-col md:flex-row md:items-start md:justify-between gap-6 ${
+                        m.status === 'unread' ? 'border-orange-200 bg-orange-50/10' : 'border-gray-200'
+                      }`}
+                    >
+                      {m.status === 'unread' && (
+                        <div className="absolute top-0 left-0 w-1.5 h-full bg-[#E05A00]"></div>
+                      )}
+                      
+                      <div className="flex-1 space-y-4">
+                        <div className="flex flex-wrap items-center gap-2.5">
+                          <h3 className="text-lg font-black text-slate-900 font-sans">{m.name}</h3>
+                          
+                          <span className={`text-[10px] uppercase tracking-widest font-black px-2.5 py-1 rounded-full ${
+                            m.status === 'unread' ? 'bg-orange-100 text-[#E05A00]' :
+                            m.status === 'read' ? 'bg-blue-100 text-blue-800' :
+                            'bg-emerald-100 text-emerald-800'
+                          }`}>
+                            {m.status}
+                          </span>
+
+                          <span className="text-xs text-slate-400 font-medium">
+                            {dateStr}
+                          </span>
+                        </div>
+
+                        {/* Details Grid */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+                          <div className="flex items-center gap-2 text-slate-600 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100/50">
+                            <Mail className="w-4 h-4 text-slate-400 shrink-0" />
+                            <a href={`mailto:${m.email}`} className="font-bold hover:text-[#E05A00] transition truncate">{m.email}</a>
+                          </div>
+                          
+                          <div className="flex items-center gap-2 text-slate-600 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100/50">
+                            <Phone className="w-4 h-4 text-slate-400 shrink-0" />
+                            <span className="font-bold">{m.phone}</span>
+                          </div>
+
+                          <div className="flex items-center gap-2 text-slate-600 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100/50 sm:col-span-2 lg:col-span-1">
+                            <Car className="w-4 h-4 text-slate-400 shrink-0" />
+                            <span className="font-black text-slate-800 truncate">{m.course}</span>
+                          </div>
+                        </div>
+
+                        {/* Inquiry Message */}
+                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-slate-700 text-sm leading-relaxed whitespace-pre-line">
+                          <p className="font-bold text-slate-400 text-[10px] uppercase tracking-wider mb-1.5">User Message:</p>
+                          {m.message}
+                        </div>
+                      </div>
+
+                      {/* Actions Panel */}
+                      <div className="flex flex-row md:flex-col items-center justify-end md:items-stretch gap-2 shrink-0 self-end md:self-auto w-full md:w-auto">
+                        {m.status === 'unread' && (
+                          <button
+                            type="button"
+                            onClick={() => changeContactMessageStatus(m.id, 'read')}
+                            className="flex-1 md:w-full bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer"
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Mark Read</span>
+                          </button>
+                        )}
+
+                        {m.status !== 'replied' && (
+                          <button
+                            type="button"
+                            onClick={() => changeContactMessageStatus(m.id, 'replied')}
+                            className="flex-1 md:w-full bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                            <span>Mark Replied</span>
+                          </button>
+                        )}
+
+                        <a
+                          href={waUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 md:w-full bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-center shadow-sm shadow-emerald-700/10"
+                        >
+                          <Phone className="w-3.5 h-3.5" />
+                          <span>WhatsApp Reply</span>
+                        </a>
+
+                        <button
+                          type="button"
+                          onClick={() => removeContactMessageRecord(m.id)}
+                          className="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span className="hidden sm:inline md:hidden lg:inline">Delete</span>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                });
+              })()}
+            </div>
+          </div>
+        )}
+
 
         {activeTab === 'excise' && (
           <div className="space-y-8 animate-fade-in">

@@ -235,3 +235,77 @@ on conflict (id) do update set
     car_image = excluded.car_image;
 
 
+----------------------------------------------------
+-- 8. TABLE: marketing_subscribers
+-- Stores newsletter subscribers, leads and students for email marketing
+----------------------------------------------------
+drop table if exists public.marketing_subscribers cascade;
+
+create table public.marketing_subscribers (
+    id uuid default gen_random_uuid() primary key,
+    email text unique not null,
+    name text,
+    type text not null default 'subscriber', -- 'subscriber', 'lead', 'student'
+    source text not null default 'Website',
+    status text not null default 'active', -- 'active', 'unsubscribed'
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Enable RLS and insert open access policy
+alter table public.marketing_subscribers enable row level security;
+create policy "Allow public select of marketing_subscribers" on public.marketing_subscribers for select using (true);
+create policy "Allow public insert of marketing_subscribers" on public.marketing_subscribers for insert with check (true);
+create policy "Allow public update of marketing_subscribers" on public.marketing_subscribers for update using (true);
+create policy "Allow public delete of marketing_subscribers" on public.marketing_subscribers for delete using (true);
+
+
+----------------------------------------------------
+-- 9. TABLE: marketing_campaigns
+-- Stores launched marketing campaign histories and stats
+----------------------------------------------------
+drop table if exists public.marketing_campaigns cascade;
+
+create table public.marketing_campaigns (
+    id uuid default gen_random_uuid() primary key,
+    subject text not null,
+    content text not null,
+    recipients_count integer not null default 0,
+    target_segment text not null default 'all',
+    status text not null default 'Sent',
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Enable RLS and insert open access policy
+alter table public.marketing_campaigns enable row level security;
+create policy "Allow public select of marketing_campaigns" on public.marketing_campaigns for select using (true);
+create policy "Allow public insert of marketing_campaigns" on public.marketing_campaigns for insert with check (true);
+create policy "Allow public update of marketing_campaigns" on public.marketing_campaigns for update using (true);
+create policy "Allow public delete of marketing_campaigns" on public.marketing_campaigns for delete using (true);
+
+
+----------------------------------------------------
+-- 10. TABLE: contact_messages
+-- Stores contact form submissions from ContactPage
+----------------------------------------------------
+drop table if exists public.contact_messages cascade;
+
+create table public.contact_messages (
+    id uuid default gen_random_uuid() primary key,
+    name text not null,
+    phone text not null,
+    email text not null,
+    course text not null,
+    message text not null,
+    status text not null default 'unread', -- 'unread', 'read', 'replied'
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Enable RLS and insert open access policy
+alter table public.contact_messages enable row level security;
+create policy "Allow public select of contact_messages" on public.contact_messages for select using (true);
+create policy "Allow public insert of contact_messages" on public.contact_messages for insert with check (true);
+create policy "Allow public update of contact_messages" on public.contact_messages for update using (true);
+create policy "Allow public delete of contact_messages" on public.contact_messages for delete using (true);
+
+
+

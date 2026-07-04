@@ -108,7 +108,14 @@ export default function EmailMarketingDashboard({ onBackToDashboard }: EmailMark
 
   const loadMarketingData = async () => {
     const subs = await fetchMarketingSubscribers();
-    setAudience(subs.length > 0 ? subs : INITIAL_AUDIENCE);
+    // Merge database/localStorage subscribers with INITIAL_AUDIENCE to maintain rich visual presentation
+    const merged = [...subs];
+    INITIAL_AUDIENCE.forEach(item => {
+      if (!merged.some(m => m.email.toLowerCase() === item.email.toLowerCase())) {
+        merged.push(item);
+      }
+    });
+    setAudience(merged);
     
     const campaigns = await fetchMarketingCampaigns();
     setCampaignsHistory(campaigns);
@@ -166,8 +173,8 @@ export default function EmailMarketingDashboard({ onBackToDashboard }: EmailMark
     const filteredList = audience.filter((user: any) => {
       if (user.status === 'banned') return false;
       const matchesFilter = targetFilter === 'all' || user.type === targetFilter;
-      const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          user.email.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = (user.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          (user.email || '').toLowerCase().includes(searchTerm.toLowerCase());
       return matchesFilter && matchesSearch;
     });
 
@@ -629,12 +636,12 @@ export default function EmailMarketingDashboard({ onBackToDashboard }: EmailMark
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {audience.filter((u:any) => 
-                        u.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                        u.email.toLowerCase().includes(searchTerm.toLowerCase())
+                        (u.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                        (u.email || '').toLowerCase().includes(searchTerm.toLowerCase())
                       ).map((user: any) => (
                         <tr key={user.id} className="hover:bg-slate-50/50 transition-colors group">
                           <td className="px-6 py-4">
-                            <span className="block font-black text-[#002060]">{user.name}</span>
+                            <span className="block font-black text-[#002060]">{user.name || 'Newsletter Subscriber'}</span>
                             <span className="text-[10px] text-slate-400 font-bold">{user.email}</span>
                           </td>
                           <td className="px-6 py-4">

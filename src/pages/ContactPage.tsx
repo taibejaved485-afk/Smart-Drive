@@ -12,6 +12,8 @@ import {
   Compass, Lightbulb
 } from 'lucide-react';
 import { useToast } from '../components/Toast';
+import { insertContactMessage } from '../lib/supabase';
+
 
 export default function ContactPage() {
   const [searchParams] = useSearchParams();
@@ -143,7 +145,7 @@ export default function ContactPage() {
     }
   }, [programParam]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Quick validation with graceful error toast
@@ -157,15 +159,32 @@ export default function ContactPage() {
     }
 
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const success = await insertContactMessage({
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        course: formData.course,
+        message: formData.message
+      });
+      
       setLoading(false);
-      setIsSubmitted(true);
-      toast.success(
-        `Session reservation registered for ${formData.course}. Our support team will connect with you shortly!`,
-        'Inquiry Submitted'
-      );
-    }, 1200);
+      if (success) {
+        setIsSubmitted(true);
+        toast.success(
+          `Thank you, ${formData.name}! Your message regarding "${formData.course}" has been sent successfully. Our support team will connect with you shortly!`,
+          'Message Sent Successfully'
+        );
+      } else {
+        toast.error('Failed to submit inquiry. Please try again or call us directly at 03097666928.', 'Submission Error');
+      }
+    } catch (err) {
+      setLoading(false);
+      console.error("Error submitting contact message:", err);
+      toast.error('An error occurred. Please try again or contact us directly.', 'Submission Error');
+    }
   };
+
 
   return (
     <div className="font-sans text-gray-800 bg-slate-50 min-h-screen flex flex-col justify-between selection:bg-[#E05A00] selection:text-white">

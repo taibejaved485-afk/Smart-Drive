@@ -1396,11 +1396,9 @@ export async function upsertMarketingSubscriber(sub: any) {
       
       if (error) {
         console.warn('Supabase upsertMarketingSubscriber error:', error.message);
-        return false;
       }
     } catch (e) {
       console.warn('Supabase upsertMarketingSubscriber failed', e);
-      return false;
     }
   }
 
@@ -1426,11 +1424,9 @@ export async function deleteMarketingSubscriber(id: string) {
         .eq('id', id);
       if (error) {
         console.warn('Supabase deleteMarketingSubscriber error:', error.message);
-        return false;
       }
     } catch (e) {
       console.warn('Supabase deleteMarketingSubscriber failed', e);
-      return false;
     }
   }
 
@@ -1475,11 +1471,9 @@ export async function saveMarketingCampaign(campaign: any) {
       
       if (error) {
         console.warn('Supabase saveMarketingCampaign error:', error.message);
-        return false;
       }
     } catch (e) {
       console.warn('Supabase saveMarketingCampaign failed', e);
-      return false;
     }
   }
 
@@ -1490,6 +1484,133 @@ export async function saveMarketingCampaign(campaign: any) {
   window.dispatchEvent(new Event('marketing_campaign_updated'));
   return true;
 }
+
+
+// -------------------------------------------------------------------------
+// 10. CONTACT PAGE MESSAGES & SUBMISSIONS
+// -------------------------------------------------------------------------
+
+export async function fetchContactMessages(): Promise<any[]> {
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('contact_messages')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (!error && data) {
+        localStorage.setItem('contact_messages', JSON.stringify(data));
+        return data;
+      }
+    } catch (e) {
+      console.warn('Supabase fetchContactMessages failed', e);
+    }
+  }
+  const saved = localStorage.getItem('contact_messages');
+  return saved ? JSON.parse(saved) : [];
+}
+
+export async function insertContactMessage(msg: any): Promise<boolean> {
+  const newMsg = {
+    id: msg.id || (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'msg-' + Date.now().toString()),
+    name: msg.name,
+    phone: msg.phone,
+    email: msg.email,
+    course: msg.course || 'Complete Driving Course',
+    message: msg.message,
+    status: msg.status || 'unread',
+    created_at: msg.created_at || new Date().toISOString()
+  };
+
+  // 1. Save to contact_messages table
+  if (supabase) {
+    try {
+      const { error } = await supabase
+        .from('contact_messages')
+        .insert([newMsg]);
+      
+      if (error) {
+        console.warn('Supabase insertContactMessage error:', error.message);
+      }
+    } catch (e) {
+      console.warn('Supabase insertContactMessage failed', e);
+    }
+  }
+
+  // Save to localStorage fallback
+  const saved = localStorage.getItem('contact_messages');
+  let currentList = saved ? JSON.parse(saved) : [];
+  currentList.unshift(newMsg);
+  localStorage.setItem('contact_messages', JSON.stringify(currentList));
+  window.dispatchEvent(new Event('contact_messages_updated'));
+
+  // 2. Also register as a Marketing Lead automatically!
+  try {
+    await upsertMarketingSubscriber({
+      email: msg.email,
+      name: msg.name,
+      type: 'lead',
+      source: 'Contact Us Form',
+      status: 'active'
+    });
+  } catch (e) {
+    console.warn('Cross-saving contact message as marketing lead failed:', e);
+  }
+
+  return true;
+}
+
+export async function updateContactMessageStatus(id: string, status: string): Promise<boolean> {
+  if (supabase) {
+    try {
+      const { error } = await supabase
+        .from('contact_messages')
+        .update({ status })
+        .eq('id', id);
+      
+      if (error) {
+        console.warn('Supabase updateContactMessageStatus error:', error.message);
+      }
+    } catch (e) {
+      console.warn('Supabase updateContactMessageStatus failed', e);
+    }
+  }
+
+  const saved = localStorage.getItem('contact_messages');
+  let currentList = saved ? JSON.parse(saved) : [];
+  const idx = currentList.findIndex((m: any) => m.id === id);
+  if (idx > -1) {
+    currentList[idx].status = status;
+    localStorage.setItem('contact_messages', JSON.stringify(currentList));
+    window.dispatchEvent(new Event('contact_messages_updated'));
+  }
+  return true;
+}
+
+export async function deleteContactMessage(id: string): Promise<boolean> {
+  if (supabase) {
+    try {
+      const { error } = await supabase
+        .from('contact_messages')
+        .delete()
+        .eq('id', id);
+      
+      if (error) {
+        console.warn('Supabase deleteContactMessage error:', error.message);
+      }
+    } catch (e) {
+      console.warn('Supabase deleteContactMessage failed', e);
+    }
+  }
+
+  const saved = localStorage.getItem('contact_messages');
+  let currentList = saved ? JSON.parse(saved) : [];
+  const filtered = currentList.filter((m: any) => m.id !== id);
+  localStorage.setItem('contact_messages', JSON.stringify(filtered));
+  window.dispatchEvent(new Event('contact_messages_updated'));
+  return true;
+}
+
 
 
 
