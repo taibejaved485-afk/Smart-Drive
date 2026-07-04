@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import CTABanner from '../components/CTABanner';
 import AdminOnboardingTour from '../components/AdminOnboardingTour';
-import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag, Bold, Italic, Underline, Link as LinkIcon, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, BookOpen, User, Calendar, Zap, UserCheck, Users, Pilcrow, Star, GripVertical, ArrowUp, ArrowDown, HelpCircle, MessageSquare } from 'lucide-react';
+import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag, Bold, Italic, Underline, Link as LinkIcon, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, BookOpen, User, Calendar, Zap, UserCheck, Users, Pilcrow, Star, GripVertical, ArrowUp, ArrowDown, HelpCircle, MessageSquare, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RentalCar } from '../data/inventory';
 import EmailMarketingDashboard from '../components/EmailMarketingDashboard';
