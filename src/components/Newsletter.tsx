@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Mail, CheckCircle, Sparkles, Send } from 'lucide-react';
+import { upsertMarketingSubscriber } from '../lib/supabase';
 
 export default function Newsletter() {
   const [email, setEmail] = useState('');
@@ -41,17 +42,18 @@ export default function Newsletter() {
     }
 
     // Success flow - store locally if needed as an aggregate, then set success state
-    try {
-      const stored = localStorage.getItem('newsletter_subscriptions');
-      const list = stored ? JSON.parse(stored) : [];
-      list.push({
-        email: trimmedEmail,
-        timestamp: new Date().toISOString()
-      });
-      localStorage.setItem('newsletter_subscriptions', JSON.stringify(list));
-    } catch (err) {
-      console.warn('LocalStorage save failed:', err);
-    }
+    const subData = {
+      id: crypto.randomUUID(),
+      email: trimmedEmail,
+      type: 'subscriber',
+      source: 'Website Newsletter Widget',
+      status: 'active',
+      created_at: new Date().toISOString()
+    };
+
+    upsertMarketingSubscriber(subData).catch(err => {
+      console.warn('Supabase subscribe failed, fallback used:', err);
+    });
 
     setSubscribed(true);
     setEmail('');

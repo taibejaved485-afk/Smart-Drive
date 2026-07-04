@@ -146,7 +146,6 @@ export async function fetchSaleCars(): Promise<any[]> {
           // Normalize names
           const mapped = data.map(normalizeDbCar);
           localStorage.setItem('sale_cars', JSON.stringify(mapped));
-          window.dispatchEvent(new Event('sale_cars_updated'));
           return mapped;
         }
       }
@@ -174,7 +173,6 @@ export async function fetchPendingSaleCars(): Promise<any[]> {
         if (!error && data) {
           const mapped = data.map(normalizeDbCar);
           localStorage.setItem('pending_sale_cars', JSON.stringify(mapped));
-          window.dispatchEvent(new Event('pending_sale_cars_updated'));
           return mapped;
         }
       }
@@ -314,7 +312,6 @@ export async function fetchRentalCars(): Promise<any[]> {
         if (!error && data) {
           const mapped = data.map(normalizeDbCar);
           localStorage.setItem('rental_cars', JSON.stringify(mapped));
-          window.dispatchEvent(new Event('rental_cars_updated'));
           return mapped;
         }
       }
@@ -342,7 +339,6 @@ export async function fetchPendingRentalCars(): Promise<any[]> {
         if (!error && data) {
           const mapped = data.map(normalizeDbCar);
           localStorage.setItem('pending_cars', JSON.stringify(mapped));
-          window.dispatchEvent(new Event('pending_cars_updated'));
           return mapped;
         }
       }
@@ -496,7 +492,6 @@ export async function fetchDrivingBookings(): Promise<any[]> {
         if (!error && data) {
           const mapped = data.map(normalizeDbBooking);
           localStorage.setItem('driving_bookings', JSON.stringify(mapped));
-          window.dispatchEvent(new Event('driving_bookings_updated'));
           return mapped;
         }
       }
@@ -617,7 +612,6 @@ export async function fetchCustomerRequests(): Promise<any[]> {
         if (!error && data) {
           const mapped = data.map(normalizeDbRequest);
           localStorage.setItem('customer_requests', JSON.stringify(mapped));
-          window.dispatchEvent(new Event('customer_requests_updated'));
           return mapped;
         }
       }
@@ -816,7 +810,6 @@ export async function fetchSystemMetadata(): Promise<Record<string, string>> {
           });
           
           localStorage.setItem('system_metadata', JSON.stringify(dbMetadata));
-          window.dispatchEvent(new Event('system_metadata_updated'));
           return dbMetadata;
         }
       }
@@ -1219,7 +1212,6 @@ export async function fetchBlogPostsSupabase(): Promise<any[]> {
       if (!error && data) {
         const mapped = data.map(normalizeDbBlogPost);
         localStorage.setItem('blogPosts', JSON.stringify(mapped));
-        window.dispatchEvent(new Event('blog_posts_updated'));
         return mapped;
       } else if (error) {
         console.warn('Supabase fetchBlogPostsSupabase error:', error.message);
@@ -1253,7 +1245,23 @@ export async function upsertBlogPostSupabase(post: any): Promise<boolean> {
     scheduled_at: post.scheduledAt || ''
   };
 
-  // Sync locally first (keeping 'category' for local layout rendering)
+  if (supabase) {
+    try {
+      const { error } = await supabase
+        .from('blog_posts')
+        .upsert([dbMapped], { onConflict: 'id' });
+      
+      if (error) {
+        console.warn('Supabase upsertBlogPostSupabase error:', error.message);
+        return false;
+      }
+    } catch (e) {
+      console.warn('Supabase upsertBlogPostSupabase failed', e);
+      return false;
+    }
+  }
+
+  // Sync locally on success (keeping 'category' for local layout rendering)
   const localSaved = localStorage.getItem('blogPosts');
   let currentList = localSaved ? JSON.parse(localSaved) : [];
   const idx = currentList.findIndex((p: any) => String(p.id) === String(postUuid) || String(p.id) === String(post.id));
@@ -1285,18 +1293,6 @@ export async function upsertBlogPostSupabase(post: any): Promise<boolean> {
   localStorage.setItem('blogPosts', JSON.stringify(currentList));
   window.dispatchEvent(new Event('blog_posts_updated'));
 
-  if (supabase) {
-    try {
-      const { error } = await supabase
-        .from('blog_posts')
-        .upsert([dbMapped], { onConflict: 'id' });
-      
-      if (!error) return true;
-      console.warn('Supabase upsertBlogPostSupabase error:', error.message);
-    } catch (e) {
-      console.warn('Supabase upsertBlogPostSupabase failed', e);
-    }
-  }
   return true;
 }
 
@@ -1312,13 +1308,12 @@ export async function deleteBlogPostSupabase(id: string): Promise<boolean> {
     if (postToDelete && postToDelete.title) {
       blogTitleToDelete = postToDelete.title;
     }
-    const filtered = currentList.filter((p: any) => String(p.id) !== cleanId);
-    localStorage.setItem('blogPosts', JSON.stringify(filtered));
-    window.dispatchEvent(new Event('blog_posts_updated'));
   }
 
   if (supabase) {
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cleanId);
+    let success = false;
+    
     if (isUuid) {
       try {
         const { error } = await supabase
@@ -1326,8 +1321,11 @@ export async function deleteBlogPostSupabase(id: string): Promise<boolean> {
           .delete()
           .eq('id', cleanId);
         
-        if (!error) return true;
-        console.warn('Supabase deleteBlogPostSupabase error:', error.message);
+        if (!error) {
+          success = true;
+        } else {
+          console.warn('Supabase deleteBlogPostSupabase error:', error.message);
+        }
       } catch (e) {
         console.warn('Supabase deleteBlogPostSupabase failed', e);
       }
@@ -1340,13 +1338,156 @@ export async function deleteBlogPostSupabase(id: string): Promise<boolean> {
           .delete()
           .eq('title', blogTitleToDelete);
         
-        if (!error) return true;
-        console.warn('Supabase delete by title error:', error.message);
+        if (!error) {
+          success = true;
+        } else {
+          console.warn('Supabase delete by title error:', error.message);
+        }
       } catch (e) {
         console.warn('Supabase delete by title failed', e);
       }
+    } else {
+      success = true; // non-UUID post not in local posts (probably local-only post already deleted)
+    }
+
+    if (!success) {
+      return false;
     }
   }
+
+  if (localSaved) {
+    const currentList = JSON.parse(localSaved);
+    const filtered = currentList.filter((p: any) => String(p.id) !== cleanId);
+    localStorage.setItem('blogPosts', JSON.stringify(filtered));
+    window.dispatchEvent(new Event('blog_posts_updated'));
+  }
+
+  return true;
+}
+
+// --- Marketing Subscribers ---
+
+export async function fetchMarketingSubscribers() {
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('marketing_subscribers')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (!error && data) {
+        localStorage.setItem('marketing_subscribers', JSON.stringify(data));
+        return data;
+      }
+    } catch (e) {
+      console.warn('Supabase fetchMarketingSubscribers failed', e);
+    }
+  }
+  const saved = localStorage.getItem('marketing_subscribers');
+  return saved ? JSON.parse(saved) : [];
+}
+
+export async function upsertMarketingSubscriber(sub: any) {
+  if (supabase) {
+    try {
+      const { error } = await supabase
+        .from('marketing_subscribers')
+        .upsert([sub], { onConflict: 'email' });
+      
+      if (error) {
+        console.warn('Supabase upsertMarketingSubscriber error:', error.message);
+        return false;
+      }
+    } catch (e) {
+      console.warn('Supabase upsertMarketingSubscriber failed', e);
+      return false;
+    }
+  }
+
+  const saved = localStorage.getItem('marketing_subscribers');
+  let currentList = saved ? JSON.parse(saved) : [];
+  const idx = currentList.findIndex((s: any) => s.email === sub.email);
+  if (idx > -1) {
+    currentList[idx] = { ...currentList[idx], ...sub };
+  } else {
+    currentList.unshift(sub);
+  }
+  localStorage.setItem('marketing_subscribers', JSON.stringify(currentList));
+  window.dispatchEvent(new Event('marketing_sub_updated'));
+  return true;
+}
+
+export async function deleteMarketingSubscriber(id: string) {
+  if (supabase) {
+    try {
+      const { error } = await supabase
+        .from('marketing_subscribers')
+        .delete()
+        .eq('id', id);
+      if (error) {
+        console.warn('Supabase deleteMarketingSubscriber error:', error.message);
+        return false;
+      }
+    } catch (e) {
+      console.warn('Supabase deleteMarketingSubscriber failed', e);
+      return false;
+    }
+  }
+
+  const saved = localStorage.getItem('marketing_subscribers');
+  if (saved) {
+    const list = JSON.parse(saved);
+    const filtered = list.filter((s: any) => s.id !== id);
+    localStorage.setItem('marketing_subscribers', JSON.stringify(filtered));
+    window.dispatchEvent(new Event('marketing_sub_updated'));
+  }
+  return true;
+}
+
+// --- Marketing Campaigns ---
+
+export async function fetchMarketingCampaigns() {
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('marketing_campaigns')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (!error && data) {
+        localStorage.setItem('marketing_campaigns', JSON.stringify(data));
+        return data;
+      }
+    } catch (e) {
+      console.warn('Supabase fetchMarketingCampaigns failed', e);
+    }
+  }
+  const saved = localStorage.getItem('marketing_campaigns');
+  return saved ? JSON.parse(saved) : [];
+}
+
+export async function saveMarketingCampaign(campaign: any) {
+  if (supabase) {
+    try {
+      const { error } = await supabase
+        .from('marketing_campaigns')
+        .insert([campaign]);
+      
+      if (error) {
+        console.warn('Supabase saveMarketingCampaign error:', error.message);
+        return false;
+      }
+    } catch (e) {
+      console.warn('Supabase saveMarketingCampaign failed', e);
+      return false;
+    }
+  }
+
+  const saved = localStorage.getItem('marketing_campaigns');
+  let currentList = saved ? JSON.parse(saved) : [];
+  currentList.unshift(campaign);
+  localStorage.setItem('marketing_campaigns', JSON.stringify(currentList));
+  window.dispatchEvent(new Event('marketing_campaign_updated'));
   return true;
 }
 

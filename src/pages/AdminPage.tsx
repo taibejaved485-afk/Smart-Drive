@@ -6,6 +6,7 @@ import AdminOnboardingTour from '../components/AdminOnboardingTour';
 import { Edit, Trash2, Upload, Image as ImageIcon, Plus, X, ArrowLeft, Save, Sparkles, Check, Globe, Copy, ShieldAlert, Mail, AlertCircle, FileSpreadsheet, Car, Sliders, Clock, CheckCircle2, ShieldCheck, Search, ChevronDown, Tag, Bold, Italic, Underline, Link as LinkIcon, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, BookOpen, User, Calendar, Zap, UserCheck, Users, Pilcrow, Star, GripVertical, ArrowUp, ArrowDown, HelpCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RentalCar } from '../data/inventory';
+import EmailMarketingDashboard from '../components/EmailMarketingDashboard';
 import { 
   fetchSaleCars, 
   fetchPendingSaleCars, 
@@ -34,6 +35,52 @@ import {
   upsertBlogPostSupabase,
   deleteBlogPostSupabase
 } from '../lib/supabase';
+
+const compressImage = (file: File, maxWidth = 1000, maxHeight = 1000, quality = 0.7): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(event.target?.result as string);
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(dataUrl);
+      };
+      img.onerror = (err) => {
+        reject(err);
+      };
+    };
+    reader.onerror = (err) => {
+      reject(err);
+    };
+  });
+};
 
 interface BlogPost {
   id: string;
@@ -244,11 +291,12 @@ export default function AdminPage() {
     scheduledAt: ''
   });
   const [isDragging, setIsDragging] = useState(false);
+  const [isSavingPost, setIsSavingPost] = useState(false);
   
   const [blogSearchQuery, setBlogSearchQuery] = useState('');
   const [editorWorkspaceTab, setEditorWorkspaceTab] = useState<'write' | 'preview'>('write');
   const [editorAuthorSelectMode, setEditorAuthorSelectMode] = useState<'dropdown' | 'custom'>('dropdown');
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'bookings' | 'blogs' | 'dns' | 'rentals' | 'requests' | 'courses' | 'car-sales' | 'instructors' | 'excise'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'bookings' | 'blogs' | 'dns' | 'rentals' | 'requests' | 'courses' | 'car-sales' | 'instructors' | 'excise' | 'marketing'>('dashboard');
   
   // Punjab Excise Slabs & NADRA Biometric Fee state variables
   const [exciseRates, setExciseRates] = useState<any[]>(() => {
@@ -401,13 +449,20 @@ export default function AdminPage() {
     }
   };
 
-  const loadDataAndSync = () => {
-    // 1. Load blog posts with global sync
+  const loadBlogPostsOnly = () => {
     fetchBlogPostsSupabase().then(data => {
       if (Array.isArray(data)) {
         setPosts(data);
       }
     });
+  };
+
+  const loadDataAndSync = (skipBlog: any = false) => {
+    // 1. Load blog posts with global sync
+    const shouldSkip = typeof skipBlog === 'boolean' ? skipBlog : false;
+    if (!shouldSkip) {
+      loadBlogPostsOnly();
+    }
 
     // 2. Load Driving School Bookings
     const savedBookings = localStorage.getItem('driving_bookings');
@@ -662,6 +717,7 @@ export default function AdminPage() {
     
     // Cross-tab real-time sync listeners
     window.addEventListener('storage', loadDataAndSync);
+    window.addEventListener('blog_posts_updated', loadBlogPostsOnly);
     window.addEventListener('driving_bookings_updated', loadDataAndSync);
     window.addEventListener('pending_cars_updated', loadDataAndSync);
     window.addEventListener('pending_sale_cars_updated', loadDataAndSync);
@@ -672,11 +728,12 @@ export default function AdminPage() {
     window.addEventListener('instructors_updated', loadDataAndSync);
     window.addEventListener('system_metadata_updated', loadDataAndSync);
     
-    // Background polling interval for extra visual reactivity safety (every 3s)
-    const syncInterval = setInterval(loadDataAndSync, 3000);
+    // Background polling interval for extra visual reactivity safety (every 3s, skipBlog=true)
+    const syncInterval = setInterval(() => loadDataAndSync(true), 3000);
     
     return () => {
       window.removeEventListener('storage', loadDataAndSync);
+      window.removeEventListener('blog_posts_updated', loadBlogPostsOnly);
       window.removeEventListener('driving_bookings_updated', loadDataAndSync);
       window.removeEventListener('pending_cars_updated', loadDataAndSync);
       window.removeEventListener('pending_sale_cars_updated', loadDataAndSync);
@@ -1432,17 +1489,28 @@ export default function AdminPage() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (typeof reader.result === 'string') {
+      compressImage(file)
+        .then((compressedBase64) => {
           setNewPost(prev => ({ 
             ...prev, 
-            imageUrl: reader.result as string,
+            imageUrl: compressedBase64,
             imageAlt: file.name.split('.')[0].replace(/[-_]/g, ' ')
           }));
-        }
-      };
-      reader.readAsDataURL(file);
+        })
+        .catch((err) => {
+          console.error("Image compression failed, using original fallback:", err);
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            if (typeof reader.result === 'string') {
+              setNewPost(prev => ({ 
+                ...prev, 
+                imageUrl: reader.result as string,
+                imageAlt: file.name.split('.')[0].replace(/[-_]/g, ' ')
+              }));
+            }
+          };
+          reader.readAsDataURL(file);
+        });
     }
   };
 
@@ -1461,17 +1529,28 @@ export default function AdminPage() {
     setIsDragging(false);
     const file = e.dataTransfer.files?.[0];
     if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (typeof reader.result === 'string') {
+      compressImage(file)
+        .then((compressedBase64) => {
           setNewPost(prev => ({ 
             ...prev, 
-            imageUrl: reader.result as string,
+            imageUrl: compressedBase64,
             imageAlt: file.name.split('.')[0].replace(/[-_]/g, ' ')
           }));
-        }
-      };
-      reader.readAsDataURL(file);
+        })
+        .catch((err) => {
+          console.error("Image compression failed, using original fallback:", err);
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            if (typeof reader.result === 'string') {
+              setNewPost(prev => ({ 
+                ...prev, 
+                imageUrl: reader.result as string,
+                imageAlt: file.name.split('.')[0].replace(/[-_]/g, ' ')
+              }));
+            }
+          };
+          reader.readAsDataURL(file);
+        });
     }
   };
 
@@ -2025,8 +2104,16 @@ export default function AdminPage() {
     });
   };
 
-  const publishPost = (statusOverride?: 'Draft' | 'Published' | 'Scheduled') => {
-    if (!newPost.title || !newPost.content) {
+  const publishPost = async (statusOverride?: 'Draft' | 'Published' | 'Scheduled') => {
+    if (isSavingPost) return;
+
+    let currentHtml = '';
+    if (wysiwygEditorRef.current) {
+      currentHtml = wysiwygEditorRef.current.innerHTML;
+    }
+    const currentMarkdown = htmlToMarkdown(currentHtml).trim();
+
+    if (!newPost.title || !currentMarkdown) {
       showToast('Please fill out the Title and Content fields.', 'error');
       return;
     }
@@ -2038,83 +2125,100 @@ export default function AdminPage() {
     }
 
     const finalImageUrl = newPost.imageUrl || PRESET_IMAGES[0].url;
+    setIsSavingPost(true);
+    showToast('Saving blog post... / بلاگ محفوظ ہو رہا ہے...', 'info');
 
-    if (editingPostId) {
-      const updatedPost: BlogPost = {
-        id: String(editingPostId),
-        title: newPost.title,
-        author: newPost.author || 'GoDriveify Team',
-        imageUrl: finalImageUrl,
-        content: newPost.content,
-        date: posts.find(p => String(p.id) === String(editingPostId))?.date || new Date().toLocaleDateString(),
-        authorAvatar: newPost.authorAvatar,
-        authorRole: newPost.authorRole,
-        imageAlt: newPost.imageAlt,
-        metaTitle: newPost.metaTitle,
-        metaDescription: newPost.metaDescription,
-        focusKeywords: newPost.focusKeywords,
-        excerpt: newPost.excerpt,
-        status: finalStatus,
-        scheduledAt: finalStatus === 'Scheduled' ? newPost.scheduledAt : ''
-      };
-      upsertBlogPostSupabase(updatedPost).then(() => {
-        fetchBlogPostsSupabase().then(data => {
-          if (Array.isArray(data)) setPosts(data);
-        });
-      });
-      setEditingPostId(null);
-      showToast(`Post updated successfully as ${finalStatus === 'Draft' ? 'Draft' : finalStatus}!`, 'success');
-    } else {
-      const post: BlogPost = {
-        title: newPost.title,
-        author: newPost.author || 'GoDriveify Team',
-        imageUrl: finalImageUrl,
-        content: newPost.content,
-        id: 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-          const r = Math.random() * 16 | 0;
-          const v = c === 'x' ? r : (r & 0x3 | 0x8);
-          return v.toString(16);
-        }),
-        date: new Date().toLocaleDateString(),
-        authorAvatar: newPost.authorAvatar,
-        authorRole: newPost.authorRole,
-        imageAlt: newPost.imageAlt,
-        metaTitle: newPost.metaTitle,
-        metaDescription: newPost.metaDescription,
-        focusKeywords: newPost.focusKeywords,
-        excerpt: newPost.excerpt,
-        status: finalStatus,
-        scheduledAt: finalStatus === 'Scheduled' ? newPost.scheduledAt : ''
-      };
-      upsertBlogPostSupabase(post).then(() => {
-        fetchBlogPostsSupabase().then(data => {
-          if (Array.isArray(data)) setPosts(data);
-        });
-      });
-      showToast(`Post saved successfully as ${finalStatus === 'Draft' ? 'Draft' : finalStatus}!`, 'success');
+    let success = false;
+
+    try {
+      if (editingPostId) {
+        const updatedPost: BlogPost = {
+          id: String(editingPostId),
+          title: newPost.title,
+          author: newPost.author || 'GoDriveify Team',
+          imageUrl: finalImageUrl,
+          content: currentMarkdown,
+          date: posts.find(p => String(p.id) === String(editingPostId))?.date || new Date().toLocaleDateString(),
+          authorAvatar: newPost.authorAvatar,
+          authorRole: newPost.authorRole,
+          imageAlt: newPost.imageAlt,
+          metaTitle: newPost.metaTitle,
+          metaDescription: newPost.metaDescription,
+          focusKeywords: newPost.focusKeywords,
+          excerpt: newPost.excerpt,
+          status: finalStatus,
+          scheduledAt: finalStatus === 'Scheduled' ? newPost.scheduledAt : ''
+        };
+        success = await upsertBlogPostSupabase(updatedPost);
+        if (success) {
+          setEditingPostId(null);
+          showToast(`Post updated successfully as ${finalStatus === 'Draft' ? 'Draft' : finalStatus}!`, 'success');
+        } else {
+          showToast('Failed to update post in Database. Payload may be too large or connection error.', 'error');
+        }
+      } else {
+        const post: BlogPost = {
+          title: newPost.title,
+          author: newPost.author || 'GoDriveify Team',
+          imageUrl: finalImageUrl,
+          content: currentMarkdown,
+          id: 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+            const r = Math.random() * 16 | 0;
+            const v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+          }),
+          date: new Date().toLocaleDateString(),
+          authorAvatar: newPost.authorAvatar,
+          authorRole: newPost.authorRole,
+          imageAlt: newPost.imageAlt,
+          metaTitle: newPost.metaTitle,
+          metaDescription: newPost.metaDescription,
+          focusKeywords: newPost.focusKeywords,
+          excerpt: newPost.excerpt,
+          status: finalStatus,
+          scheduledAt: finalStatus === 'Scheduled' ? newPost.scheduledAt : ''
+        };
+        success = await upsertBlogPostSupabase(post);
+        if (success) {
+          showToast(`Post saved successfully as ${finalStatus === 'Draft' ? 'Draft' : finalStatus}!`, 'success');
+        } else {
+          showToast('Failed to save post in Database. Payload may be too large or connection error.', 'error');
+        }
+      }
+    } catch (e) {
+      console.error('Error during publishPost:', e);
+      showToast('An unexpected error occurred while saving.', 'error');
+    } finally {
+      setIsSavingPost(false);
     }
 
-    // Reset post form
-    setNewPost({ 
-      title: '', 
-      author: '', 
-      imageUrl: '', 
-      content: '', 
-      authorAvatar: '', 
-      authorRole: '',
-      imageAlt: '',
-      metaTitle: '',
-      metaDescription: '',
-      focusKeywords: '',
-      excerpt: '',
-      status: 'Draft',
-      scheduledAt: ''
-    });
-    
-    if (wysiwygEditorRef.current) {
-      wysiwygEditorRef.current.innerHTML = '';
+    if (success) {
+      // Reload blog posts state
+      const updatedData = await fetchBlogPostsSupabase();
+      if (Array.isArray(updatedData)) setPosts(updatedData);
+
+      // Reset post form
+      setNewPost({ 
+        title: '', 
+        author: '', 
+        imageUrl: '', 
+        content: '', 
+        authorAvatar: '', 
+        authorRole: '',
+        imageAlt: '',
+        metaTitle: '',
+        metaDescription: '',
+        focusKeywords: '',
+        excerpt: '',
+        status: 'Draft',
+        scheduledAt: ''
+      });
+      
+      if (wysiwygEditorRef.current) {
+        wysiwygEditorRef.current.innerHTML = '';
+      }
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
-    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleAutoGenerateSEO = () => {
@@ -2185,15 +2289,25 @@ export default function AdminPage() {
   };
 
   // Blog Editor Operations
-  const deletePost = (id: string) => {
-    deleteBlogPostSupabase(id).then(() => {
-      fetchBlogPostsSupabase().then(data => {
-        if (Array.isArray(data)) setPosts(data);
-      });
-    });
-    showToast('Blog post deleted successfully.', 'info');
-    if (editingPostId === id) {
-      cancelEdit();
+  const deletePost = async (id: string) => {
+    if (window.confirm('کیا آپ واقعی یہ بلاگ پوسٹ حذف کرنا چاہتے ہیں؟ / Are you sure you want to permanently delete this blog post?')) {
+      showToast('Deleting blog post... / ڈیلیٹ ہو رہا ہے...', 'info');
+      try {
+        const success = await deleteBlogPostSupabase(id);
+        if (success) {
+          showToast('Blog post deleted successfully.', 'info');
+          const updatedData = await fetchBlogPostsSupabase();
+          if (Array.isArray(updatedData)) setPosts(updatedData);
+          if (editingPostId === id) {
+            cancelEdit();
+          }
+        } else {
+          showToast('Failed to delete blog post from Database.', 'error');
+        }
+      } catch (e) {
+        console.error('Error deleting post:', e);
+        showToast('An unexpected error occurred while deleting.', 'error');
+      }
     }
   };
 
@@ -2397,7 +2511,7 @@ export default function AdminPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-12">
           
           {/* LEFT COMMAND SIDEBAR */}
-          <div id="admin-tour-sidebar" className="lg:col-span-3 space-y-4">
+          <div id="admin-tour-sidebar" className={`${activeTab === 'marketing' ? 'hidden' : 'lg:col-span-3'} space-y-4`}>
             <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4">
               <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2 border-b border-slate-100 pb-2">
                 Operations Directory
@@ -2611,12 +2725,33 @@ export default function AdminPage() {
                     Live
                   </span>
                 </button>
+
+                <button
+                  id="admin-tour-marketing"
+                  type="button"
+                  onClick={() => setActiveTab('marketing')}
+                  className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                    activeTab === 'marketing'
+                      ? 'bg-[#E05A00] text-white font-extrabold shadow-md shadow-red-700/10'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
+                    <Mail className="w-4 h-4" />
+                    <span>Email Marketing</span>
+                  </div>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ${
+                    activeTab === 'marketing' ? 'bg-white/30 text-white' : 'bg-orange-100 text-orange-800'
+                  }`}>
+                    AI
+                  </span>
+                </button>
               </div>
             </div>
           </div>
 
           {/* RIGHT WORKSPACE DISPLAY VIEWPORT */}
-          <div className="lg:col-span-9 space-y-6">
+          <div className={`${activeTab === 'marketing' ? 'lg:col-span-12' : 'lg:col-span-9'} space-y-6`}>
             {activeTab === 'dashboard' && (
               <div className="animate-fade-in space-y-8">
                 <div className="bg-slate-950 rounded-[2.5rem] p-8 md:p-12 text-white relative overflow-hidden shadow-2xl shadow-slate-900/40">
@@ -4734,6 +4869,10 @@ export default function AdminPage() {
           </div>
         )}
 
+        {activeTab === 'marketing' && (
+          <EmailMarketingDashboard onBackToDashboard={() => setActiveTab('dashboard')} />
+        )}
+
         {activeTab === 'excise' && (
           <div className="space-y-8 animate-fade-in">
             {/* Slabs Header */}
@@ -6434,16 +6573,26 @@ export default function AdminPage() {
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (file) {
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
-                              if (typeof reader.result === 'string') {
-                                setLayoutImageUrl(reader.result);
+                            compressImage(file)
+                              .then((compressedBase64) => {
+                                setLayoutImageUrl(compressedBase64);
                                 if (!layoutAlt || layoutAlt === 'Academy Section Illustrative Picture') {
                                   setLayoutAlt(file.name.split('.')[0].replace(/[-_]/g, ' '));
                                 }
-                              }
-                            };
-                            reader.readAsDataURL(file);
+                              })
+                              .catch((err) => {
+                                console.error("Layout image compression failed, using fallback:", err);
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  if (typeof reader.result === 'string') {
+                                    setLayoutImageUrl(reader.result);
+                                    if (!layoutAlt || layoutAlt === 'Academy Section Illustrative Picture') {
+                                      setLayoutAlt(file.name.split('.')[0].replace(/[-_]/g, ' '));
+                                    }
+                                  }
+                                };
+                                reader.readAsDataURL(file);
+                              });
                           }
                         }} 
                       />
