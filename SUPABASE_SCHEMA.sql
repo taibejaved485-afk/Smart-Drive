@@ -308,4 +308,38 @@ create policy "Allow public update of contact_messages" on public.contact_messag
 create policy "Allow public delete of contact_messages" on public.contact_messages for delete using (true);
 
 
+----------------------------------------------------
+-- 11. TABLE: blog_posts
+-- Stores blog posts authored by the admin
+----------------------------------------------------
+drop table if exists public.blog_posts cascade;
+
+create table public.blog_posts (
+    id uuid default gen_random_uuid() primary key,
+    title text not null,
+    author text not null default 'GoDriveify Team',
+    image_url text,
+    content text,
+    date text,
+    author_avatar text,
+    author_role text,
+    image_alt text,
+    meta_title text,
+    meta_description text,
+    focus_keywords text,
+    excerpt text,
+    status text default 'Published',
+    scheduled_at text,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Enable RLS and insert open access policy
+alter table public.blog_posts enable row level security;
+create policy "Allow public select of blog_posts" on public.blog_posts for select using (true);
+create policy "Allow public insert of blog_posts" on public.blog_posts for insert with check (true);
+create policy "Allow public update of blog_posts" on public.blog_posts for update using (true);
+create policy "Allow public delete of blog_posts" on public.blog_posts for delete using (true);
+
+
+
 

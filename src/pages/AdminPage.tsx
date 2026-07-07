@@ -2354,14 +2354,17 @@ export default function AdminPage() {
     if (window.confirm('کیا آپ واقعی یہ بلاگ پوسٹ حذف کرنا چاہتے ہیں؟ / Are you sure you want to permanently delete this blog post?')) {
       showToast('Deleting blog post... / ڈیلیٹ ہو رہا ہے...', 'info');
       try {
+        // Optimistically remove from UI state immediately
+        setPosts(prev => prev.filter(p => String(p.id) !== String(id)));
+        if (editingPostId === id) {
+          cancelEdit();
+        }
+
         const success = await deleteBlogPostSupabase(id);
         if (success) {
           showToast('Blog post deleted successfully.', 'info');
           const updatedData = await fetchBlogPostsSupabase();
           if (Array.isArray(updatedData)) setPosts(updatedData);
-          if (editingPostId === id) {
-            cancelEdit();
-          }
         } else {
           showToast('Failed to delete blog post from Database.', 'error');
         }

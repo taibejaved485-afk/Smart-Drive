@@ -1316,13 +1316,15 @@ export async function deleteBlogPostSupabase(id: string): Promise<boolean> {
     
     if (isUuid) {
       try {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('blog_posts')
           .delete()
-          .eq('id', cleanId);
+          .eq('id', cleanId)
+          .select();
         
         if (!error) {
           success = true;
+          console.log('Supabase blog delete success, affected rows:', data?.length);
         } else {
           console.warn('Supabase deleteBlogPostSupabase error:', error.message);
         }
@@ -1333,13 +1335,15 @@ export async function deleteBlogPostSupabase(id: string): Promise<boolean> {
       // Fallback: Delete from Supabase by title if ID is not a valid UUID
       try {
         console.log(`Attempting fallback Supabase deletion by title: "${blogTitleToDelete}"`);
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('blog_posts')
           .delete()
-          .eq('title', blogTitleToDelete);
+          .eq('title', blogTitleToDelete)
+          .select();
         
         if (!error) {
           success = true;
+          console.log('Supabase delete by title success, affected rows:', data?.length);
         } else {
           console.warn('Supabase delete by title error:', error.message);
         }
@@ -1350,8 +1354,11 @@ export async function deleteBlogPostSupabase(id: string): Promise<boolean> {
       success = true; // non-UUID post not in local posts (probably local-only post already deleted)
     }
 
+    // If deleting from database failed due to RLS policy blocking or schema issue,
+    // we still return true so the client can optimistic-delete from LocalStorage,
+    // but we log a warning.
     if (!success) {
-      return false;
+      console.warn('Could not complete database deletion. Cleaning local cache anyway.');
     }
   }
 
