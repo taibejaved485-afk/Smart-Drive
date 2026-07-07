@@ -2588,7 +2588,7 @@ export default function AdminPage() {
                    id="admin-tour-dashboard"
                    type="button"
                    onClick={() => setActiveTab('dashboard')}
-                   className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
+                   className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink cursor-pointer border ${
                      activeTab === 'dashboard'
                        ? 'bg-[#002060]/5 text-[#002060] border-[#002060]/15 shadow-sm shadow-[#002060]/5 lg:translate-x-1 font-extrabold'
                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
@@ -2613,7 +2613,7 @@ export default function AdminPage() {
                   id="admin-tour-bookings"
                   type="button"
                   onClick={() => setActiveTab('bookings')}
-                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
+                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink cursor-pointer border ${
                     activeTab === 'bookings'
                       ? 'bg-[#FF7112]/5 text-[#FF7112] border-[#FF7112]/15 shadow-sm shadow-[#FF7112]/5 lg:translate-x-1 font-extrabold'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
@@ -2641,7 +2641,7 @@ export default function AdminPage() {
                   id="admin-tour-courses"
                   type="button"
                   onClick={() => setActiveTab('courses')}
-                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
+                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink cursor-pointer border ${
                     activeTab === 'courses'
                       ? 'bg-[#FF7112]/5 text-[#FF7112] border-[#FF7112]/15 shadow-sm shadow-[#FF7112]/5 lg:translate-x-1 font-extrabold'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
@@ -2669,7 +2669,7 @@ export default function AdminPage() {
                   id="admin-tour-rentals"
                   type="button"
                   onClick={() => setActiveTab('rentals')}
-                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
+                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink cursor-pointer border ${
                     activeTab === 'rentals'
                       ? 'bg-[#FF7112]/5 text-[#FF7112] border-[#FF7112]/15 shadow-sm shadow-[#FF7112]/5 lg:translate-x-1 font-extrabold'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
@@ -2697,7 +2697,7 @@ export default function AdminPage() {
                   id="admin-tour-requests"
                   type="button"
                   onClick={() => setActiveTab('requests')}
-                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
+                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink cursor-pointer border ${
                     activeTab === 'requests'
                       ? 'bg-[#FF7112]/5 text-[#FF7112] border-[#FF7112]/15 shadow-sm shadow-[#FF7112]/5 lg:translate-x-1 font-extrabold'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
@@ -2725,7 +2725,7 @@ export default function AdminPage() {
                   id="admin-tour-car-sales"
                   type="button"
                   onClick={() => setActiveTab('car-sales')}
-                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
+                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink cursor-pointer border ${
                     activeTab === 'car-sales'
                       ? 'bg-[#FF7112]/5 text-[#FF7112] border-[#FF7112]/15 shadow-sm shadow-[#FF7112]/5 lg:translate-x-1 font-extrabold'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
@@ -2753,7 +2753,7 @@ export default function AdminPage() {
                   id="admin-tour-blogs"
                   type="button"
                   onClick={() => setActiveTab('blogs')}
-                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
+                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink cursor-pointer border ${
                     activeTab === 'blogs'
                       ? 'bg-[#FF7112]/5 text-[#FF7112] border-[#FF7112]/15 shadow-sm shadow-[#FF7112]/5 lg:translate-x-1 font-extrabold'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
@@ -2781,7 +2781,7 @@ export default function AdminPage() {
                   id="admin-tour-dns"
                   type="button"
                   onClick={() => setActiveTab('dns')}
-                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
+                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink cursor-pointer border ${
                     activeTab === 'dns'
                       ? 'bg-[#FF7112]/5 text-[#FF7112] border-[#FF7112]/15 shadow-sm shadow-[#FF7112]/5 lg:translate-x-1 font-extrabold'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
@@ -2809,7 +2809,7 @@ export default function AdminPage() {
                   id="admin-tour-instructors"
                   type="button"
                   onClick={() => setActiveTab('instructors')}
-                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
+                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink cursor-pointer border ${
                     activeTab === 'instructors'
                       ? 'bg-[#FF7112]/5 text-[#FF7112] border-[#FF7112]/15 shadow-sm shadow-[#FF7112]/5 lg:translate-x-1 font-extrabold'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
@@ -2837,7 +2837,7 @@ export default function AdminPage() {
                   id="admin-tour-excise"
                   type="button"
                   onClick={() => setActiveTab('excise')}
-                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
+                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink cursor-pointer border ${
                     activeTab === 'excise'
                       ? 'bg-[#FF7112]/5 text-[#FF7112] border-[#FF7112]/15 shadow-sm shadow-[#FF7112]/5 lg:translate-x-1 font-extrabold'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
@@ -2865,7 +2865,7 @@ export default function AdminPage() {
                   id="admin-tour-marketing"
                   type="button"
                   onClick={() => setActiveTab('marketing')}
-                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
+                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink cursor-pointer border ${
                     activeTab === 'marketing'
                       ? 'bg-[#FF7112]/5 text-[#FF7112] border-[#FF7112]/15 shadow-sm shadow-[#FF7112]/5 lg:translate-x-1 font-extrabold'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
@@ -2893,7 +2893,7 @@ export default function AdminPage() {
                   id="admin-tour-messages"
                   type="button"
                   onClick={() => setActiveTab('messages')}
-                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
+                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink cursor-pointer border ${
                     activeTab === 'messages'
                       ? 'bg-[#FF7112]/5 text-[#FF7112] border-[#FF7112]/15 shadow-sm shadow-[#FF7112]/5 lg:translate-x-1 font-extrabold'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
