@@ -2577,7 +2577,8 @@ export default function AdminPage() {
           {/* LEFT COMMAND SIDEBAR */}
           <div id="admin-tour-sidebar" className={`${activeTab === 'marketing' ? 'hidden' : 'lg:col-span-3'} space-y-4`}>
             <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4">
-              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2 border-b border-slate-100 pb-2">
+              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2 border-b border-slate-100 pb-2 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FF7112] animate-pulse"></span>
                 Operations Directory
               </h3>
               
@@ -2587,36 +2588,50 @@ export default function AdminPage() {
                    id="admin-tour-dashboard"
                    type="button"
                    onClick={() => setActiveTab('dashboard')}
-                   className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                   className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
                      activeTab === 'dashboard'
-                       ? 'bg-slate-950 text-white font-extrabold shadow-lg shadow-slate-950/20'
-                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                       ? 'bg-[#002060]/5 text-[#002060] border-[#002060]/15 shadow-sm shadow-[#002060]/5 lg:translate-x-1 font-extrabold'
+                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
                    }`}
                 >
-                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
-                    <Sparkles className="w-4 h-4" />
-                    <span>Control Panel</span>
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm min-w-0 flex-1">
+                    <div className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${
+                      activeTab === 'dashboard' ? 'bg-[#002060]/15 text-[#002060]' : 'bg-slate-100 text-slate-500'
+                    }`}>
+                      <Sparkles className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex flex-col text-left truncate">
+                      <span className="text-xs sm:text-sm font-black truncate">Control Panel</span>
+                      <span className="hidden lg:block text-[9px] text-slate-400 font-medium tracking-tight mt-0.5 truncate">Overview & Quick Stats</span>
+                    </div>
                   </div>
                 </button>
 
-                <div className="h-px bg-slate-100 my-2 hidden lg:block" />
+                <div className="h-px bg-slate-100 my-1 hidden lg:block" />
 
                 <button
                   id="admin-tour-bookings"
                   type="button"
                   onClick={() => setActiveTab('bookings')}
-                  className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
                     activeTab === 'bookings'
-                      ? 'bg-[#E05A00] text-white font-extrabold shadow-md shadow-red-700/10'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                      ? 'bg-[#FF7112]/5 text-[#FF7112] border-[#FF7112]/15 shadow-sm shadow-[#FF7112]/5 lg:translate-x-1 font-extrabold'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
-                    <FileSpreadsheet className="w-4 h-4" />
-                    <span>Academy Bookings</span>
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm min-w-0 flex-1">
+                    <div className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${
+                      activeTab === 'bookings' ? 'bg-[#FF7112]/15 text-[#FF7112]' : 'bg-slate-100 text-slate-500'
+                    }`}>
+                      <FileSpreadsheet className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex flex-col text-left truncate">
+                      <span className="text-xs sm:text-sm font-black truncate">Academy Bookings</span>
+                      <span className="hidden lg:block text-[9px] text-slate-400 font-medium tracking-tight mt-0.5 truncate">Student Registrations</span>
+                    </div>
                   </div>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-md font-black min-w-5 text-center ${
-                    activeTab === 'bookings' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                  <span className={`text-[9px] px-2 py-0.5 rounded-full font-black min-w-5 text-center flex-shrink-0 ${
+                    activeTab === 'bookings' ? 'bg-[#FF7112] text-white' : 'bg-slate-100 text-slate-600'
                   }`}>
                     {bookings.length}
                   </span>
@@ -2626,18 +2641,25 @@ export default function AdminPage() {
                   id="admin-tour-courses"
                   type="button"
                   onClick={() => setActiveTab('courses')}
-                  className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
                     activeTab === 'courses'
-                      ? 'bg-[#E05A00] text-white font-extrabold shadow-md shadow-red-700/10'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                      ? 'bg-[#FF7112]/5 text-[#FF7112] border-[#FF7112]/15 shadow-sm shadow-[#FF7112]/5 lg:translate-x-1 font-extrabold'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
-                    <Sliders className="w-4 h-4" />
-                    <span>Academy Courses</span>
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm min-w-0 flex-1">
+                    <div className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${
+                      activeTab === 'courses' ? 'bg-[#FF7112]/15 text-[#FF7112]' : 'bg-slate-100 text-slate-500'
+                    }`}>
+                      <Sliders className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex flex-col text-left truncate">
+                      <span className="text-xs sm:text-sm font-black truncate">Academy Courses</span>
+                      <span className="hidden lg:block text-[9px] text-slate-400 font-medium tracking-tight mt-0.5 truncate">Packages & Curriculum</span>
+                    </div>
                   </div>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-md font-black min-w-5 text-center ${
-                    activeTab === 'courses' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                  <span className={`text-[9px] px-2 py-0.5 rounded-full font-black min-w-5 text-center flex-shrink-0 ${
+                    activeTab === 'courses' ? 'bg-[#FF7112] text-white' : 'bg-slate-100 text-slate-600'
                   }`}>
                     {drivingCourses.length}
                   </span>
@@ -2647,18 +2669,25 @@ export default function AdminPage() {
                   id="admin-tour-rentals"
                   type="button"
                   onClick={() => setActiveTab('rentals')}
-                  className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
                     activeTab === 'rentals'
-                      ? 'bg-[#E05A00] text-white font-extrabold shadow-md shadow-red-700/10'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                      ? 'bg-[#FF7112]/5 text-[#FF7112] border-[#FF7112]/15 shadow-sm shadow-[#FF7112]/5 lg:translate-x-1 font-extrabold'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
-                    <Car className="w-4 h-4" />
-                    <span>Rental Fleet</span>
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm min-w-0 flex-1">
+                    <div className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${
+                      activeTab === 'rentals' ? 'bg-[#FF7112]/15 text-[#FF7112]' : 'bg-slate-100 text-slate-500'
+                    }`}>
+                      <Car className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex flex-col text-left truncate">
+                      <span className="text-xs sm:text-sm font-black truncate">Rental Fleet</span>
+                      <span className="hidden lg:block text-[9px] text-slate-400 font-medium tracking-tight mt-0.5 truncate">Booking Vehicles & Rates</span>
+                    </div>
                   </div>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-md font-black min-w-5 text-center ${
-                    activeTab === 'rentals' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                  <span className={`text-[9px] px-2 py-0.5 rounded-full font-black min-w-5 text-center flex-shrink-0 ${
+                    activeTab === 'rentals' ? 'bg-[#FF7112] text-white' : 'bg-slate-100 text-slate-600'
                   }`}>
                     {rentalCars.length}
                   </span>
@@ -2668,18 +2697,25 @@ export default function AdminPage() {
                   id="admin-tour-requests"
                   type="button"
                   onClick={() => setActiveTab('requests')}
-                  className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
                     activeTab === 'requests'
-                      ? 'bg-[#E05A00] text-white font-extrabold shadow-md shadow-red-700/10'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                      ? 'bg-[#FF7112]/5 text-[#FF7112] border-[#FF7112]/15 shadow-sm shadow-[#FF7112]/5 lg:translate-x-1 font-extrabold'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
-                    <Clock className="w-4 h-4" />
-                    <span>Market Requests</span>
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm min-w-0 flex-1">
+                    <div className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${
+                      activeTab === 'requests' ? 'bg-[#FF7112]/15 text-[#FF7112]' : 'bg-slate-100 text-slate-500'
+                    }`}>
+                      <Clock className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex flex-col text-left truncate">
+                      <span className="text-xs sm:text-sm font-black truncate">Market Requests</span>
+                      <span className="hidden lg:block text-[9px] text-slate-400 font-medium tracking-tight mt-0.5 truncate">Public Buying & Selling</span>
+                    </div>
                   </div>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-md font-black min-w-5 text-center ${
-                    activeTab === 'requests' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                  <span className={`text-[9px] px-2 py-0.5 rounded-full font-black min-w-5 text-center flex-shrink-0 ${
+                    activeTab === 'requests' ? 'bg-[#FF7112] text-white' : 'bg-slate-100 text-slate-600'
                   }`}>
                     {customerRequests.length}
                   </span>
@@ -2689,18 +2725,25 @@ export default function AdminPage() {
                   id="admin-tour-car-sales"
                   type="button"
                   onClick={() => setActiveTab('car-sales')}
-                  className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
                     activeTab === 'car-sales'
-                      ? 'bg-[#E05A00] text-white font-extrabold shadow-md shadow-red-700/10'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                      ? 'bg-[#FF7112]/5 text-[#FF7112] border-[#FF7112]/15 shadow-sm shadow-[#FF7112]/5 lg:translate-x-1 font-extrabold'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
-                    <Tag className="w-4 h-4" />
-                    <span>Car Sales</span>
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm min-w-0 flex-1">
+                    <div className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${
+                      activeTab === 'car-sales' ? 'bg-[#FF7112]/15 text-[#FF7112]' : 'bg-slate-100 text-slate-500'
+                    }`}>
+                      <Tag className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex flex-col text-left truncate">
+                      <span className="text-xs sm:text-sm font-black truncate">Car Sales</span>
+                      <span className="hidden lg:block text-[9px] text-slate-400 font-medium tracking-tight mt-0.5 truncate">Approved Listings</span>
+                    </div>
                   </div>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-md font-black min-w-5 text-center ${
-                    activeTab === 'car-sales' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                  <span className={`text-[9px] px-2 py-0.5 rounded-full font-black min-w-5 text-center flex-shrink-0 ${
+                    activeTab === 'car-sales' ? 'bg-[#FF7112] text-white' : 'bg-slate-100 text-slate-600'
                   }`}>
                     {pendingSaleCars.length}
                   </span>
@@ -2710,18 +2753,25 @@ export default function AdminPage() {
                   id="admin-tour-blogs"
                   type="button"
                   onClick={() => setActiveTab('blogs')}
-                  className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
                     activeTab === 'blogs'
-                      ? 'bg-[#E05A00] text-white font-extrabold shadow-md shadow-red-700/10'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                      ? 'bg-[#FF7112]/5 text-[#FF7112] border-[#FF7112]/15 shadow-sm shadow-[#FF7112]/5 lg:translate-x-1 font-extrabold'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
-                    <Plus className="w-4 h-4" />
-                    <span>Blogs Manager</span>
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm min-w-0 flex-1">
+                    <div className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${
+                      activeTab === 'blogs' ? 'bg-[#FF7112]/15 text-[#FF7112]' : 'bg-slate-100 text-slate-500'
+                    }`}>
+                      <Plus className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex flex-col text-left truncate">
+                      <span className="text-xs sm:text-sm font-black truncate">Blogs Manager</span>
+                      <span className="hidden lg:block text-[9px] text-slate-400 font-medium tracking-tight mt-0.5 truncate">Write & Edit Articles</span>
+                    </div>
                   </div>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-md font-black min-w-5 text-center ${
-                    activeTab === 'blogs' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                  <span className={`text-[9px] px-2 py-0.5 rounded-full font-black min-w-5 text-center flex-shrink-0 ${
+                    activeTab === 'blogs' ? 'bg-[#FF7112] text-white' : 'bg-slate-100 text-slate-600'
                   }`}>
                     {posts.length}
                   </span>
@@ -2731,18 +2781,25 @@ export default function AdminPage() {
                   id="admin-tour-dns"
                   type="button"
                   onClick={() => setActiveTab('dns')}
-                  className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
                     activeTab === 'dns'
-                      ? 'bg-[#E05A00] text-white font-extrabold shadow-md shadow-red-700/10'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                      ? 'bg-[#FF7112]/5 text-[#FF7112] border-[#FF7112]/15 shadow-sm shadow-[#FF7112]/5 lg:translate-x-1 font-extrabold'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
-                    <ShieldAlert className="w-4 h-4" />
-                    <span>SEO & DNS</span>
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm min-w-0 flex-1">
+                    <div className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${
+                      activeTab === 'dns' ? 'bg-[#FF7112]/15 text-[#FF7112]' : 'bg-slate-100 text-slate-500'
+                    }`}>
+                      <ShieldAlert className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex flex-col text-left truncate">
+                      <span className="text-xs sm:text-sm font-black truncate">SEO & DNS</span>
+                      <span className="hidden lg:block text-[9px] text-slate-400 font-medium tracking-tight mt-0.5 truncate">Metadata & Security</span>
+                    </div>
                   </div>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ${
-                    activeTab === 'dns' ? 'bg-white/30 text-white' : 'bg-amber-100 text-amber-800'
+                  <span className={`text-[9px] px-2 py-0.5 rounded-full font-black flex-shrink-0 ${
+                    activeTab === 'dns' ? 'bg-[#FF7112] text-white' : 'bg-amber-100 text-amber-800 border border-amber-200'
                   }`}>
                     SSL
                   </span>
@@ -2752,18 +2809,25 @@ export default function AdminPage() {
                   id="admin-tour-instructors"
                   type="button"
                   onClick={() => setActiveTab('instructors')}
-                  className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
                     activeTab === 'instructors'
-                      ? 'bg-[#E05A00] text-white font-extrabold shadow-md shadow-red-700/10'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                      ? 'bg-[#FF7112]/5 text-[#FF7112] border-[#FF7112]/15 shadow-sm shadow-[#FF7112]/5 lg:translate-x-1 font-extrabold'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
-                    <UserCheck className="w-4 h-4" />
-                    <span>Instructors Manager</span>
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm min-w-0 flex-1">
+                    <div className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${
+                      activeTab === 'instructors' ? 'bg-[#FF7112]/15 text-[#FF7112]' : 'bg-slate-100 text-slate-500'
+                    }`}>
+                      <UserCheck className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex flex-col text-left truncate">
+                      <span className="text-xs sm:text-sm font-black truncate">Instructors Manager</span>
+                      <span className="hidden lg:block text-[9px] text-slate-400 font-medium tracking-tight mt-0.5 truncate">Roster & Schedules</span>
+                    </div>
                   </div>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-md font-black min-w-5 text-center ${
-                    activeTab === 'instructors' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                  <span className={`text-[9px] px-2 py-0.5 rounded-full font-black min-w-5 text-center flex-shrink-0 ${
+                    activeTab === 'instructors' ? 'bg-[#FF7112] text-white' : 'bg-slate-100 text-slate-600'
                   }`}>
                     {instructors.length}
                   </span>
@@ -2773,18 +2837,25 @@ export default function AdminPage() {
                   id="admin-tour-excise"
                   type="button"
                   onClick={() => setActiveTab('excise')}
-                  className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
                     activeTab === 'excise'
-                      ? 'bg-[#E05A00] text-white font-extrabold shadow-md shadow-red-700/10'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                      ? 'bg-[#FF7112]/5 text-[#FF7112] border-[#FF7112]/15 shadow-sm shadow-[#FF7112]/5 lg:translate-x-1 font-extrabold'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
-                    <Sliders className="w-4 h-4 text-orange-500" />
-                    <span>Excise & Biometric Slabs</span>
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm min-w-0 flex-1">
+                    <div className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${
+                      activeTab === 'excise' ? 'bg-[#FF7112]/15 text-[#FF7112]' : 'bg-slate-100 text-slate-500'
+                    }`}>
+                      <Sliders className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex flex-col text-left truncate">
+                      <span className="text-xs sm:text-sm font-black truncate">Excise & Biometric Slabs</span>
+                      <span className="hidden lg:block text-[9px] text-slate-400 font-medium tracking-tight mt-0.5 truncate">Tax & Fee Structures</span>
+                    </div>
                   </div>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ${
-                    activeTab === 'excise' ? 'bg-white/30 text-white' : 'bg-orange-100 text-orange-800'
+                  <span className={`text-[9px] px-2 py-0.5 rounded-full font-black flex-shrink-0 ${
+                    activeTab === 'excise' ? 'bg-[#FF7112] text-white' : 'bg-orange-100 text-orange-800 border border-orange-200'
                   }`}>
                     Live
                   </span>
@@ -2794,18 +2865,25 @@ export default function AdminPage() {
                   id="admin-tour-marketing"
                   type="button"
                   onClick={() => setActiveTab('marketing')}
-                  className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
                     activeTab === 'marketing'
-                      ? 'bg-[#E05A00] text-white font-extrabold shadow-md shadow-red-700/10'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                      ? 'bg-[#FF7112]/5 text-[#FF7112] border-[#FF7112]/15 shadow-sm shadow-[#FF7112]/5 lg:translate-x-1 font-extrabold'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
-                    <Mail className="w-4 h-4" />
-                    <span>Email Marketing</span>
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm min-w-0 flex-1">
+                    <div className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${
+                      activeTab === 'marketing' ? 'bg-[#FF7112]/15 text-[#FF7112]' : 'bg-slate-100 text-slate-500'
+                    }`}>
+                      <Mail className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex flex-col text-left truncate">
+                      <span className="text-xs sm:text-sm font-black truncate">Email Marketing</span>
+                      <span className="hidden lg:block text-[9px] text-slate-400 font-medium tracking-tight mt-0.5 truncate">Bilingual AI Campaigns</span>
+                    </div>
                   </div>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ${
-                    activeTab === 'marketing' ? 'bg-white/30 text-white' : 'bg-orange-100 text-orange-800'
+                  <span className={`text-[9px] px-2 py-0.5 rounded-full font-black flex-shrink-0 ${
+                    activeTab === 'marketing' ? 'bg-[#FF7112] text-white' : 'bg-[#FF7112]/10 text-[#FF7112] border border-[#FF7112]/20'
                   }`}>
                     AI
                   </span>
@@ -2815,18 +2893,25 @@ export default function AdminPage() {
                   id="admin-tour-messages"
                   type="button"
                   onClick={() => setActiveTab('messages')}
-                  className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-xl transition duration-200 shrink-0 lg:shrink whitespace-nowrap cursor-pointer ${
+                  className={`w-full text-left flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 shrink-0 lg:shrink whitespace-nowrap cursor-pointer border ${
                     activeTab === 'messages'
-                      ? 'bg-[#E05A00] text-white font-extrabold shadow-md shadow-red-700/10'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold'
+                      ? 'bg-[#FF7112]/5 text-[#FF7112] border-[#FF7112]/15 shadow-sm shadow-[#FF7112]/5 lg:translate-x-1 font-extrabold'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:translate-x-0.5 font-semibold'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5 text-xs sm:text-sm">
-                    <MessageSquare className="w-4 h-4" />
-                    <span>Contact Messages</span>
+                  <div className="flex items-center gap-2.5 text-xs sm:text-sm min-w-0 flex-1">
+                    <div className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${
+                      activeTab === 'messages' ? 'bg-[#FF7112]/15 text-[#FF7112]' : 'bg-slate-100 text-slate-500'
+                    }`}>
+                      <MessageSquare className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex flex-col text-left truncate">
+                      <span className="text-xs sm:text-sm font-black truncate">Contact Messages</span>
+                      <span className="hidden lg:block text-[9px] text-slate-400 font-medium tracking-tight mt-0.5 truncate">Student Support Inbox</span>
+                    </div>
                   </div>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ${
-                    activeTab === 'messages' ? 'bg-white/30 text-white' : 'bg-blue-100 text-blue-800'
+                  <span className={`text-[9px] px-2 py-0.5 rounded-full font-black flex-shrink-0 ${
+                    activeTab === 'messages' ? 'bg-[#FF7112] text-white' : 'bg-blue-100 text-blue-800 border border-blue-200'
                   }`}>
                     {contactMessages.filter(m => m.status === 'unread').length > 0 ? `${contactMessages.filter(m => m.status === 'unread').length} New` : contactMessages.length}
                   </span>
