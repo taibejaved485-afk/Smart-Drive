@@ -1,9 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 
 // @ts-ignore
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || import.meta.env.NEXT_PUBLIC_SUPABASE_URL || 'https://gzepvqpygnfgyahjfann.supabase.co';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || import.meta.env.NEXT_PUBLIC_SUPABASE_URL || 'https://dqqlqjloddysncowgadi.supabase.co';
 // @ts-ignore
-const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_VN4CNJYtHYvx0VHFcEJV7Q_95mUpgnX';
+const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_Xv2JhwrjFQesfZ5rjs_Hew_UwPUoQDN';
 
 // Let's create the client. If variables are missing, we don't crash, instead we handle it gracefully.
 export const supabase = supabaseUrl && supabaseKey 
@@ -1472,9 +1472,18 @@ export async function fetchMarketingCampaigns() {
 export async function saveMarketingCampaign(campaign: any) {
   if (supabase) {
     try {
+      const dbCampaign = {
+        id: ensureUUID(campaign.id),
+        subject: campaign.subject || '',
+        content: campaign.content || campaign.body || '',
+        recipients_count: campaign.recipients_count || campaign.sent_count || 0,
+        target_segment: campaign.target_segment || 'all',
+        status: campaign.status || 'Sent',
+        created_at: campaign.created_at || new Date().toISOString()
+      };
       const { error } = await supabase
         .from('marketing_campaigns')
-        .insert([campaign]);
+        .insert([dbCampaign]);
       
       if (error) {
         console.warn('Supabase saveMarketingCampaign error:', error.message);
@@ -1519,7 +1528,7 @@ export async function fetchContactMessages(): Promise<any[]> {
 
 export async function insertContactMessage(msg: any): Promise<boolean> {
   const newMsg = {
-    id: msg.id || (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'msg-' + Date.now().toString()),
+    id: ensureUUID(msg.id),
     name: msg.name,
     phone: msg.phone,
     email: msg.email,
